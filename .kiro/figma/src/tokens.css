@@ -1,0 +1,40 @@
+/*
+ * Design tokens (single source of truth):
+ *   Building Blocks/XR/Navigation bar/Nav item -> --building-blocks-xr-navigation-bar-nav-item-key
+ *   Icon container/effect -> --icon-container-effect-shadow, --icon-container-effect-radius
+ *   Label/typography -> --label-typography-font-family, --label-typography-font-weight, --label-typography-font-size, --label-typography-line-height, --label-typography-letter-spacing
+ *   Nav item 01/effect -> --nav-item-01-effect-radius
+ *   Nav item 02/effect -> --nav-item-02-effect-radius
+ *   Nav item 03/effect -> --nav-item-03-effect-radius
+ *   XR/XR Navigation bar -> --xr-xr-navigation-bar-key
+ *   XR/XR Navigation bar/effect -> --xr-xr-navigation-bar-effect-shadow, --xr-xr-navigation-bar-effect-radius
+ *   dark gray -> --dark-gray-fill
+ *   light blue -> --light-blue-fill
+ *   subtitle -> --subtitle-font-family, --subtitle-font-weight, --subtitle-font-size, --subtitle-line-height, --subtitle-letter-spacing
+ *   white -> --white-fill
+ */
+
+:root {
+  --dark-gray-fill: rgba(36, 34, 34, 1);
+  --light-blue-fill: rgba(223, 235, 253, 1);
+  --white-fill: rgba(255, 255, 255, 1);
+  --label-typography-font-family: "Albert Sans";
+  --label-typography-font-weight: 700;
+  --label-typography-font-size: 12px;
+  --label-typography-line-height: 12px;
+  --label-typography-letter-spacing: 0px;
+  --subtitle-font-family: "Albert Sans";
+  --subtitle-font-weight: 400;
+  --subtitle-font-size: 11px;
+  --subtitle-line-height: 11px;
+  --subtitle-letter-spacing: 0px;
+  --icon-container-effect-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.25);
+  --icon-container-effect-radius: 100px;
+  --nav-item-01-effect-radius: 0px;
+  --nav-item-02-effect-radius: 0px;
+  --nav-item-03-effect-radius: 0px;
+  --xr-xr-navigation-bar-effect-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  --xr-xr-navigation-bar-effect-radius: 0px;
+  --building-blocks-xr-navigation-bar-nav-item-key: 2b27c2d33d305b66c7a7f9da766bca74984102a5;
+  --xr-xr-navigation-bar-key: b2480bb7b9063bf82c6e2dca412a6e21fc64ee04;
+}
