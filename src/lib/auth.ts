@@ -36,9 +36,11 @@ export async function signOut(): Promise<void> {
     await AsyncStorage.removeItem(LOCAL_SESSION_KEY);
     return;
   }
-  // Local scope clears this device's session without a network call. The default (global)
-  // returns early on a failed revoke and leaves the session stored, so the user stays signed in.
-  await supabase.auth.signOut({ scope: 'local' });
+  // Revoke on the server first (global), so a copied token stops working. That call returns
+  // early on a network failure and leaves the session stored, so fall back to clearing this
+  // device's session (local), which needs no network: offline sign-out still signs out.
+  const { error } = await supabase.auth.signOut();
+  if (error) await supabase.auth.signOut({ scope: 'local' });
 }
 
 export async function currentUserId(): Promise<string | null> {

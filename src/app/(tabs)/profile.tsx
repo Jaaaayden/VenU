@@ -110,15 +110,20 @@ export default function ProfileScreen() {
             <View style={styles.menuCard}>
               {section.items.map((item, idx) => (
                 <View key={item.label}>
+                  {/* Rows without a screen yet are marked "Soon" and disabled, so they don't
+                      announce or behave as working buttons. */}
                   <Pressable
                     onPress={item.href ? () => router.push(item.href!) : undefined}
+                    disabled={!item.href}
                     accessibilityRole="button"
-                    style={({ pressed }) => [styles.menuRow, pressed && styles.menuRowPressed]}>
+                    accessibilityState={{ disabled: !item.href }}
+                    accessibilityLabel={item.href ? item.label : `${item.label}, coming soon`}
+                    style={({ pressed }) => [styles.menuRow, pressed && item.href && styles.menuRowPressed]}>
                     <View style={styles.menuIconBox}>
                       <Text style={styles.menuIcon}>{item.icon}</Text>
                     </View>
-                    <Text style={styles.menuLabel}>{item.label}</Text>
-                    <Text style={styles.menuChevron}>›</Text>
+                    <Text style={[styles.menuLabel, !item.href && styles.menuLabelSoon]}>{item.label}</Text>
+                    {item.href ? <Text style={styles.menuChevron}>›</Text> : <Text style={styles.soon}>Soon</Text>}
                   </Pressable>
                   {idx < section.items.length - 1 && <View style={styles.divider} />}
                 </View>
@@ -197,6 +202,8 @@ const styles = StyleSheet.create({
   menuIcon: { fontSize: 16 },
   menuLabel: { ...Type.body, flex: 1, fontWeight: '500' },
   menuChevron: { fontSize: 20, color: Colors.textFaint },
+  menuLabelSoon: { color: Colors.textMuted },
+  soon: { ...Type.caption, fontWeight: '600' },
   divider: { height: 1, backgroundColor: Colors.divider, marginLeft: 60 },
 
   deleteBox: { marginTop: Spacing.md, gap: Spacing.sm, alignItems: 'stretch' },

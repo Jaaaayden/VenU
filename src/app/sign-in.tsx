@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -25,7 +25,7 @@ type Mode = 'signin' | 'signup';
 const MIN_PASSWORD = 8;
 
 export default function SignInScreen() {
-  const { refresh } = useProfile();
+  const { status, profile, refresh } = useProfile();
   const [mode, setMode] = useState<Mode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,8 +70,9 @@ export default function SignInScreen() {
         setNotice('Check your email to confirm your account, then sign in.');
         return;
       }
-      const profile = await refresh();
-      router.replace(profile ? homeFor(profile) : '/onboarding/role');
+      // No navigation here: once the provider is 'ready' (from this load or the auth listener's,
+      // whichever lands last), the redirect below sends the user on.
+      await refresh();
     } catch (e) {
       setError(friendlyError(e));
     } finally {
@@ -79,6 +80,9 @@ export default function SignInScreen() {
       setBusy(false);
     }
   }
+
+  // Signed in (just now, in another tab, or by opening /sign-in while signed in): move on.
+  if (status === 'ready') return <Redirect href={profile ? homeFor(profile) : '/onboarding/role'} />;
 
   return (
     <SafeAreaView style={styles.safe}>

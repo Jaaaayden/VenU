@@ -93,7 +93,8 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
           <LanguagePicker
             languages={d.languages}
             main={d.mainLanguage}
-            onChange={(languages, main) => setD(prev => ({ ...prev, languages, mainLanguage: main }))}
+            // The app's UI language follows the main language (there's no separate setting yet).
+            onChange={(languages, main) => setD(prev => ({ ...prev, languages, mainLanguage: main, appLanguage: main }))}
           />
         </FormSection>
 

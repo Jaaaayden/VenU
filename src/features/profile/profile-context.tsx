@@ -183,7 +183,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
       const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUploads);
-      generation.current += 1; // a reload that started before this save mustn't put the old profile back
+      // Someone else signed in (another tab) while this saved: that session wins; don't show A's
+      // saved profile under B's session.
+      if (userIdRef.current !== userId) return saved;
+      generation.current += 1; // a same-user reload that started before this save mustn't put the old profile back
       // Same photo: keep the current URL (no extra round trip, no re-download).
       if (saved.avatarPath !== (profile?.avatarPath ?? null)) setSignedUrl(await urlFor(saved));
       setProfile(saved);
