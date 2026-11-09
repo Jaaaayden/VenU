@@ -133,8 +133,34 @@ async function freePort(p) {
     for (let i = 0; i < 20 && !(await isPortFree(p)); i++) await new Promise(r => setTimeout(r, 250));
     if (await isPortFree(p)) return;
   }
-  console.error(`Port ${p} is in use. If it's an old VenU server, run npm run stop and try again; otherwise use -- --port <another>.`);
+  const pid = portOwner(p);
+  const owner = pid ? processList().find(x => x.pid === pid) : null;
+  const what = owner ? `process ${pid}: ${owner.command.replace(/\s+/g, ' ').slice(0, 120)}` : pid ? `process ${pid}` : 'another program';
+  console.error(`Port ${p} is in use by ${what}`);
+  console.error(owner && isVenuExpo(owner.command)
+    ? 'That is a VenU dev server started outside these scripts. npm run stop ends it.'
+    : 'Close that program, or pick another port: -- --port <number>.');
   process.exit(1);
+}
+
+/** PID listening on a TCP port, or null. */
+function portOwner(p) {
+  try {
+    if (process.platform === 'win32') {
+      const line = execFileSync('netstat', ['-ano', '-p', 'TCP'], { encoding: 'utf8' })
+        .split('\n').find(l => /LISTENING/.test(l) && new RegExp(`:${p}\\s`).test(l.trim().split(/\s+/)[1] + ' '));
+      return line ? Number(line.trim().split(/\s+/).pop()) : null;
+    }
+    return Number(execFileSync('lsof', ['-nP', `-iTCP:${p}`, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' }).split('\n')[0]) || null;
+  } catch {
+    return null;
+  }
+}
+
+/** An `expo start` running from this folder (by these scripts or by hand). */
+function isVenuExpo(command) {
+  const cmd = command.replace(/\\/g, '/').toLowerCase();
+  return cmd.includes(ROOT.replace(/\\/g, '/').toLowerCase() + '/') && /expo\/bin\/cli|@expo\/cli/.test(cmd);
 }
 
 /** [{ pid, command }] for every process, with the full command line. */
@@ -184,15 +210,11 @@ function killTree(pid) {
 
 /** Ends servers started by this script, plus any `expo start` running from this folder. */
 function stopAll() {
-  const list = processList();
-  const norm = s => s.replace(/\\/g, '/').toLowerCase();
-  const root = norm(ROOT) + '/'; // trailing slash: don't match a sibling folder like VenU-old
   const stopped = [];
-  for (const s of runningServers(list)) if (killTree(s.pid)) stopped.push(`${s.mode} (port ${s.port})`);
+  for (const s of runningServers()) if (killTree(s.pid)) stopped.push(`${s.mode} (port ${s.port})`);
   // Expo started by hand (npx expo start), or left behind by a closed terminal.
   for (const p of processList()) {
-    const cmd = norm(p.command);
-    if (p.pid !== process.pid && cmd.includes(root) && /expo\/bin\/cli|@expo\/cli/.test(cmd) && killTree(p.pid)) stopped.push(`expo (pid ${p.pid})`);
+    if (p.pid !== process.pid && isVenuExpo(p.command) && killTree(p.pid)) stopped.push(`expo (pid ${p.pid})`);
   }
   rmSync(RUN_DIR, { recursive: true, force: true });
   return stopped;
