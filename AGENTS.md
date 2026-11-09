@@ -15,6 +15,8 @@ Use `bunx` instead of `npx` if the project uses bun (`bun.lock` present).
 ```bash
 npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
 npx expo start              # start the dev server
+npm run dev:local|dev:mock|dev:mock:verify|dev:supabase  # start in a backend mode (see README)
+npm run stop                # end every VenU dev server
 npm run lint                # lint (fails on warnings)
 npm run typecheck           # generate typed routes, then tsc --noEmit
 npm test                    # jest unit tests (src/**/__tests__)
