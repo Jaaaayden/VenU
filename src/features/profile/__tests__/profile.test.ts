@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type ProfileStore } from '../store';
+import { checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type ProfileStore } from '../store';
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
@@ -225,11 +225,17 @@ describe('saveWithAvatar', () => {
   const at = '2026-11-09T00:00:00.000Z';
   const existing = rowToProfile({ id: 'u1', verified: false, ...draftToWrite({ ...rosa, avatarPath: 'u1/avatar-old' }, at) });
 
-  function fakeStore({ saveFails = false, removeFails = false } = {}) {
+  // saveFails: 'rejected' = server said no (PostgREST error with a code); 'network' = outcome unknown.
+  function fakeStore({ saveFails = false as false | 'rejected' | 'network', removeFails = false } = {}) {
     const calls: string[] = [];
     const store: ProfileStore = {
       get: async () => null,
-      save: async (_u, d) => { calls.push(`save ${d.avatarPath}`); if (saveFails) throw new Error('save failed'); return { ...existing, avatarPath: d.avatarPath }; },
+      save: async (_u, d) => {
+        calls.push(`save ${d.avatarPath}`);
+        if (saveFails === 'rejected') throw Object.assign(new Error('save failed'), { code: '23514' });
+        if (saveFails === 'network') throw new TypeError('Failed to fetch');
+        return { ...existing, avatarPath: d.avatarPath };
+      },
       uploadAvatar: async () => (calls.push('upload'), 'u1/avatar-new'),
       removeAvatar: async p => { calls.push(`remove ${p}`); if (removeFails) throw new Error('remove failed'); },
       avatarUrl: async p => p,
@@ -246,17 +252,23 @@ describe('saveWithAvatar', () => {
     expect(saved.avatarPath).toBe('u1/avatar-new');
   });
 
-  it('failed save keeps the old photo and cleans up the new upload', async () => {
-    const { store, calls } = fakeStore({ saveFails: true });
+  it('rejected save keeps the old photo and cleans up the new upload', async () => {
+    const { store, calls } = fakeStore({ saveFails: 'rejected' });
     await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toThrow('save failed');
     expect(calls).toEqual(['upload', 'save u1/avatar-new', 'remove u1/avatar-new']);
+  });
+
+  it('network failure keeps the new upload too (the row may have committed pointing at it)', async () => {
+    const { store, calls } = fakeStore({ saveFails: 'network' });
+    await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toThrow('Failed to fetch');
+    expect(calls).toEqual(['upload', 'save u1/avatar-new']);
   });
 
   it('remove: clears the row first, deletes the file only after', async () => {
     const { store, calls } = fakeStore();
     await saveWithAvatar(store, 'u1', rosa, 'remove', existing);
     expect(calls).toEqual(['save null', 'remove u1/avatar-old']);
-    const failing = fakeStore({ saveFails: true });
+    const failing = fakeStore({ saveFails: 'rejected' });
     await expect(saveWithAvatar(failing.store, 'u1', rosa, 'remove', existing)).rejects.toThrow();
     expect(failing.calls).toEqual(['save null']); // photo untouched
   });
@@ -276,12 +288,63 @@ describe('friendlyError', () => {
     expect(friendlyError(new TypeError('Failed to fetch'))).toBe(offline);
     expect(friendlyError({ name: 'AuthRetryableFetchError', message: '{}' })).toBe(offline);
     expect(friendlyError(new Error('Invalid login credentials'))).toBe('Wrong email or password.');
-    expect(friendlyError({ message: 'new row violates row-level security policy for table "profiles"' })).toBe('Your session expired. Sign in again.');
+    // A policy refusal isn't a session problem, so it mustn't say "session expired".
+    expect(friendlyError({ message: 'new row violates row-level security policy for table "profiles"' })).toBe(
+      "VenU couldn't save that change. If it keeps happening, sign out and back in.",
+    );
+    expect(friendlyError({ message: 'JWT expired' })).toBe('Your session expired. Sign out and sign in again.');
+    expect(friendlyError({ message: 'The object exceeded the maximum allowed size' })).toBe('That photo is over 5 MB. Pick a smaller one.');
+    expect(friendlyError({ message: 'mime type image/gif is not supported' })).toBe('Use a JPG, PNG, WebP or HEIC photo.');
   });
 
   it('keeps unknown messages and falls back when there is none', () => {
     expect(friendlyError(new Error('That photo is too big'))).toBe('That photo is too big');
     expect(friendlyError(undefined)).toBe('Something went wrong. Try again.');
     expect(friendlyError({}, 'Custom fallback')).toBe('Custom fallback');
+  });
+});
+
+describe('checkPhoto', () => {
+  it('matches the avatars bucket rules and lets unknowns through', () => {
+    expect(checkPhoto({ mimeType: 'image/jpeg', fileSize: 1_000_000 })).toBeNull();
+    expect(checkPhoto({ mimeType: 'image/HEIC', fileSize: null })).toBeNull();
+    expect(checkPhoto({ mimeType: null, fileSize: null })).toBeNull();
+    expect(checkPhoto({ mimeType: 'image/gif', fileSize: 10 })).toBe('Use a JPG, PNG, WebP or HEIC photo.');
+    expect(checkPhoto({ mimeType: 'image/png', fileSize: 6 * 1024 * 1024 })).toBe('That photo is over 5 MB. Pick a smaller one.');
+  });
+});
+
+describe('supabase store save', () => {
+  const row = { id: 'u1', verified: false, ...draftToWrite(rosa, '2026-11-09T00:00:00.000Z') };
+
+  // Minimal PostgREST chain: insert(...).select().single() and update(...).eq().select().single().
+  function tableClient(insertResult: { data: unknown; error: unknown }) {
+    const calls: string[] = [];
+    const single = (name: string, result: { data: unknown; error: unknown }) => ({ select: () => ({ single: async () => (calls.push(name), result) }) });
+    const client = {
+      from: () => ({
+        insert: (r: { role?: string }) => single(`insert role=${r.role}`, insertResult),
+        update: (r: { role?: string }) => ({ eq: () => single(`update role=${'role' in r ? r.role : 'omitted'}`, { data: row, error: null }) }),
+      }),
+    };
+    return { client: client as unknown as SupabaseClient, calls };
+  }
+
+  it('first save inserts with the role', async () => {
+    const { client, calls } = tableClient({ data: row, error: null });
+    await createSupabaseStore(client, 'avatars').save('u1', rosa, null);
+    expect(calls).toEqual(['insert role=visitor']);
+  });
+
+  it('falls back to update (without role) when the row already exists', async () => {
+    const { client, calls } = tableClient({ data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } });
+    const saved = await createSupabaseStore(client, 'avatars').save('u1', rosa, null);
+    expect(calls).toEqual(['insert role=visitor', 'update role=omitted']);
+    expect(saved.firstName).toBe('Rosa');
+  });
+
+  it('other insert errors still throw', async () => {
+    const { client } = tableClient({ data: null, error: { code: '23514', message: 'violates check constraint' } });
+    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: '23514' });
   });
 });

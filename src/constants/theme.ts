@@ -75,3 +75,6 @@ export const FigmaShadows = {
     elevation: 4,
   },
 } as const;
+
+/** Web only: the app renders in a centred column this wide instead of stretching across a desktop. */
+export const WEB_COLUMN_MAX = 520;

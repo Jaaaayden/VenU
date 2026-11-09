@@ -2,7 +2,7 @@
 // this isn't legal text. Bump PRIVACY_VERSION whenever a section changes so
 // profiles store which version the person agreed to.
 
-export const PRIVACY_VERSION = '2026-11-draft-2';
+export const PRIVACY_VERSION = '2026-11-draft-3';
 
 export interface PrivacySection {
   title: string;
@@ -49,7 +49,8 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
   {
     title: 'How long we keep it',
     points: [
-      'Until you delete your account.',
+      'Your profile and photo: until you delete them (Profile → Delete my data).',
+      'Your sign-in email: until your account is closed. In-app account closing is coming; until then, ask the team.',
       'Data from LA28 events is deleted after the Games end (date TBD by the team).',
     ],
   },
@@ -58,7 +59,7 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
     points: [
       'Edit your profile any time from the Profile tab.',
       'Access needs are optional. Share only what helps.',
-      'Delete your data from Profile → Delete my data. It removes your profile and photo.',
+      'Delete your data from Profile → Delete my data. It removes your profile and photo (not yet your sign-in email).',
     ],
   },
 ];

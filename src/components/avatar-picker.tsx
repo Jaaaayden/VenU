@@ -4,7 +4,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { Colors, Spacing, Type } from '@/constants/theme';
-import type { PickedImage } from '@/features/profile/store';
+import { checkPhoto, type PickedImage } from '@/features/profile/store';
 import { isLocalMode } from '@/lib/auth';
 
 interface AvatarPickerProps {
@@ -42,7 +42,11 @@ export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps)
       : await ImagePicker.launchImageLibraryAsync(PICK_OPTIONS);
     if (result.canceled) return;
     const asset = result.assets[0];
-    if (asset) onPick({ uri: asset.uri, mimeType: asset.mimeType ?? null, base64: asset.base64 ?? null });
+    if (!asset) return;
+    const image: PickedImage = { uri: asset.uri, mimeType: asset.mimeType ?? null, fileSize: asset.fileSize ?? null, base64: asset.base64 ?? null };
+    const problem = checkPhoto(image);
+    if (problem) return setError(problem);
+    onPick(image);
   }
 
   return (
@@ -54,7 +58,9 @@ export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps)
           {Platform.OS !== 'web' && <Action label="Take photo" onPress={() => pick('camera')} />}
           {uri && <Action label="Remove" onPress={onRemove} muted />}
         </View>
-        <Text style={styles.hint}>{error ?? 'Helps your helper spot you. Optional.'}</Text>
+        <Text style={[styles.hint, error && styles.error]} accessibilityLiveRegion="polite">
+          {error ?? 'Helps your helper spot you. Optional.'}
+        </Text>
       </View>
     </View>
   );
@@ -62,7 +68,7 @@ export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps)
 
 function Action({ label, onPress, muted }: { label: string; onPress: () => void; muted?: boolean }) {
   return (
-    <Pressable onPress={onPress} hitSlop={8} accessibilityRole="button">
+    <Pressable onPress={onPress} hitSlop={8} style={styles.target} accessibilityRole="button">
       <Text style={[styles.action, muted && styles.actionMuted]}>{label}</Text>
     </Pressable>
   );
@@ -72,7 +78,9 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
   actions: { flex: 1, gap: Spacing.xs },
   links: { flexDirection: 'row', flexWrap: 'wrap', columnGap: Spacing.lg, rowGap: Spacing.xs },
+  target: { minHeight: 32, justifyContent: 'center' }, // >= 24px on web too, where hitSlop is ignored
   action: { ...Type.label, color: Colors.primary },
   actionMuted: { color: Colors.textMuted },
   hint: Type.caption,
+  error: { color: Colors.danger },
 });

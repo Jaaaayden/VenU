@@ -35,13 +35,18 @@ export async function signOut(): Promise<void> {
     await AsyncStorage.removeItem(LOCAL_SESSION_KEY);
     return;
   }
-  await supabase.auth.signOut();
+  // Local scope clears this device's session without a network call. The default (global)
+  // returns early on a failed revoke and leaves the session stored, so the user stays signed in.
+  await supabase.auth.signOut({ scope: 'local' });
 }
 
 export async function currentUserId(): Promise<string | null> {
   if (!supabase) {
     return (await AsyncStorage.getItem(LOCAL_SESSION_KEY)) ? LOCAL_USER_ID : null;
   }
-  const { data } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
+  // An expired token that can't refresh (e.g. offline) is a load error, not "signed out":
+  // throwing lets the app show "Can't reach VenU" and keep the saved session.
+  if (error && !data.session) throw error;
   return data.session?.user.id ?? null;
 }

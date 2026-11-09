@@ -3,7 +3,7 @@ import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Chip } from '@/components/chip';
-import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Radius, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
 import { isolatedLanguageName, searchLanguages, type Language } from '@/features/profile/options';
 
 interface LanguagePickerProps {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 
   modal: { flex: 1, backgroundColor: Colors.bg, paddingHorizontal: Spacing.gutter },
   // Phone-width column even on a desktop browser.
-  modalBody: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' }, // matches the web app column
+  modalBody: { flex: 1, width: '100%', maxWidth: WEB_COLUMN_MAX, alignSelf: 'center' }, // same column as the app on web
   // Arabic, Persian, Hebrew names: keep each word's script direction but line the rows up on the left
   // (RN web otherwise auto-detects RTL and pushes them to the right edge).
   ltr: { writingDirection: 'ltr', textAlign: 'left' },

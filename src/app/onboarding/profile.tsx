@@ -20,7 +20,7 @@ export default function ProfileStep() {
   const visitor = role === 'visitor';
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <TopBar back />
+      <TopBar back fallback="/onboarding/role" />
       <ProfileForm
         initial={emptyDraft(role, params.lang || 'en')}
         savedAvatarUrl={null}

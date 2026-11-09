@@ -16,14 +16,16 @@ export default function EditProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <TopBar back backLabel="Profile" />
+      <TopBar back backLabel="Profile" fallback="/profile" />
       <ProfileForm
         initial={draftFromProfile(profile)}
         savedAvatarUrl={avatarUrl}
         submitLabel="Save changes"
         onSubmit={async (draft, avatar) => {
           await save(draft, avatar);
-          router.back();
+          // No history after a web reload or deep link; fall back to the Profile tab.
+          if (router.canGoBack()) router.back();
+          else router.replace('/profile');
         }}
         header={<StepHeader title="Edit profile" subtitle="Changes apply to your next help request." />}
       />

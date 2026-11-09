@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import * as auth from '@/lib/auth';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
@@ -88,14 +88,24 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     };
   }, [applySession]);
 
-  // Session ended elsewhere (token revoked/expired, signed out on another tab): drop to signed out.
+  // Session changed elsewhere: signed out (token revoked/expired, another tab) → drop to signed out;
+  // a different user signed in (another tab) → reload so we never show A's data under B's session.
+  const userIdRef = useRef(userId);
+  useEffect(() => {
+    userIdRef.current = userId;
+  }, [userId]);
   useEffect(() => {
     if (!supabase) return;
-    const { data } = supabase.auth.onAuthStateChange(event => {
-      if (event === 'SIGNED_OUT') applySession({ userId: null, profile: null, avatarUrl: null });
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        applySession({ userId: null, profile: null, avatarUrl: null });
+      } else if (session && userIdRef.current && session.user.id !== userIdRef.current) {
+        // Supabase warns against awaiting its own calls inside this callback; defer.
+        setTimeout(() => refresh().catch(() => {}), 0);
+      }
     });
     return () => data.subscription.unsubscribe();
-  }, [applySession]);
+  }, [applySession, refresh]);
 
   // Signed photo URLs expire; re-sign shortly before they do while the app stays open.
   const avatarPath = profile?.avatarPath ?? null;

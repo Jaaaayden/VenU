@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
+import { WEB_COLUMN_MAX } from '@/constants/theme';
 import { ProfileProvider } from '@/features/profile/profile-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,8 +32,6 @@ export default function RootLayout() {
     </ProfileProvider>
   );
 }
-
-const WEB_COLUMN_MAX = 520;
 
 const styles = StyleSheet.create({
   backdrop: Platform.select({

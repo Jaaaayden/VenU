@@ -13,6 +13,7 @@ export default function PrivacyScreen() {
         <Pressable
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           hitSlop={10}
+          style={styles.closeTarget}
           accessibilityRole="button">
           <Text style={styles.close}>Close</Text>
         </Pressable>
@@ -41,6 +42,7 @@ export default function PrivacyScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.bg },
   bar: { flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: Spacing.gutter, paddingVertical: Spacing.md },
+  closeTarget: { minHeight: 44, justifyContent: 'center', paddingLeft: Spacing.md }, // real target on web
   close: { ...Type.bodyStrong, color: Colors.primary },
   content: { paddingHorizontal: Spacing.gutter, paddingBottom: 48 },
   card: {

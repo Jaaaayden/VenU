@@ -1,15 +1,21 @@
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Wordmark } from '@/components/wordmark';
 import { Colors, Spacing, Type } from '@/constants/theme';
 
 /** White bar at the top of a screen: back link (when `back`) or the VenU wordmark. */
-export function TopBar({ back, backLabel = 'Back', right }: { back?: boolean; backLabel?: string; right?: React.ReactNode }) {
+export function TopBar({ back, backLabel = 'Back', fallback = '/', right }: {
+  back?: boolean;
+  backLabel?: string;
+  /** Where Back goes when there's no history (web reload, deep link). */
+  fallback?: Href;
+  right?: React.ReactNode;
+}) {
   return (
     <View style={styles.bar}>
       {back ? (
-        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel={backLabel}>
+        <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace(fallback))} hitSlop={10} style={styles.target} accessibilityRole="button" accessibilityLabel={backLabel}>
           <Text style={styles.back}>‹ {backLabel}</Text>
         </Pressable>
       ) : (
@@ -31,5 +37,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.divider,
   },
+  // Real padding, not just hitSlop: hitSlop doesn't enlarge the target on web.
+  target: { minHeight: 44, justifyContent: 'center', paddingRight: Spacing.md },
   back: { ...Type.bodyStrong, color: Colors.primary },
 });

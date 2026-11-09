@@ -7,8 +7,21 @@ import type { Profile, ProfileDraft } from './types';
 export interface PickedImage {
   uri: string;
   mimeType: string | null;
+  /** Bytes, when the picker knows it. */
+  fileSize?: number | null;
   /** Present on web, where blob: URIs don't survive a reload. */
   base64?: string | null;
+}
+
+/** Same limits as the `avatars` bucket in supabase/migrations, so a bad pick fails here, not on upload. */
+export const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
+export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+
+/** A message to show by the photo, or null if the pick is fine. Unknown size/type passes. */
+export function checkPhoto(image: Pick<PickedImage, 'mimeType' | 'fileSize'>): string | null {
+  if (image.mimeType && !PHOTO_TYPES.includes(image.mimeType.toLowerCase())) return 'Use a JPG, PNG, WebP or HEIC photo.';
+  if (image.fileSize && image.fileSize > PHOTO_MAX_BYTES) return 'That photo is over 5 MB. Pick a smaller one.';
+  return null;
 }
 
 /** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
@@ -98,12 +111,12 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       const write = draftToWrite(draft, consentTime(existing));
       // Role can't change after creation; the column isn't updatable for users.
       const { role: _role, ...updatable } = write;
-      const query = existing
-        ? table().update(updatable).eq('id', userId)
-        : table().insert({ id: userId, ...write });
-      const { data, error } = await query.select('*').single<ProfileRow>();
-      if (error) throw error;
-      return rowToProfile(data);
+      const update = () => table().update(updatable).eq('id', userId).select('*').single<ProfileRow>();
+      let result = existing ? await update() : await table().insert({ id: userId, ...write }).select('*').single<ProfileRow>();
+      // Row already exists (an earlier insert committed but its response was lost): update it instead.
+      if (!existing && result.error?.code === '23505') result = await update();
+      if (result.error) throw result.error;
+      return rowToProfile(result.data);
     },
     async uploadAvatar(userId, image) {
       const contentType = image.mimeType ?? 'image/jpeg';
@@ -143,7 +156,7 @@ export type AvatarChange = PickedImage | 'remove' | null;
 /**
  * Saves a profile and its photo change in a safe order: upload the new photo to a fresh
  * path, save the row, and only then delete the old file. A failed save leaves the old
- * photo and row untouched (and cleans up the new upload).
+ * photo and row untouched; the new upload is cleaned up only if the server definitely said no.
  */
 export async function saveWithAvatar(
   store: ProfileStore,
@@ -159,7 +172,10 @@ export async function saveWithAvatar(
   try {
     saved = await store.save(userId, { ...draft, avatarPath }, existing);
   } catch (e) {
-    if (uploaded) await store.removeAvatar(uploaded).catch(() => {});
+    // PostgREST rejections carry a string `code`; a network failure doesn't, and the row may
+    // have committed pointing at this photo, so keep it (an orphan at worst; deleteAll sweeps it).
+    const rejected = typeof (e as { code?: unknown } | null)?.code === 'string';
+    if (uploaded && rejected) await store.removeAvatar(uploaded).catch(() => {});
     throw e;
   }
   // Best effort: if this fails the file is orphaned in the user's own folder, and deleteAll sweeps it.

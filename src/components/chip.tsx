@@ -32,7 +32,7 @@ export function Chip({ label, selected = false, onPress, role = 'checkbox', dash
         </Text>
       </Pressable>
       {onRemove && (
-        <Pressable onPress={onRemove} hitSlop={8} accessibilityRole="button" accessibilityLabel={removeLabel ?? `Remove ${label}`}>
+        <Pressable onPress={onRemove} hitSlop={8} style={styles.removeTarget} accessibilityRole="button" accessibilityLabel={removeLabel ?? `Remove ${label}`}>
           <Text style={[styles.remove, selected && styles.labelSelected]}>×</Text>
         </Pressable>
       )}
@@ -58,5 +58,7 @@ const styles = StyleSheet.create({
   // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
   label: { ...Type.label, fontWeight: '500', writingDirection: 'ltr' },
   labelSelected: { color: Colors.primary, fontWeight: '700' },
+  // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's right padding.
+  removeTarget: { minWidth: 28, minHeight: 28, marginRight: -8, alignItems: 'center', justifyContent: 'center' },
   remove: { fontSize: 18, lineHeight: 20, color: Colors.textMuted },
 });
