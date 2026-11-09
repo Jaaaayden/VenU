@@ -2,9 +2,9 @@ import { describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
-import { isolatedLanguageName, searchLanguages } from '../options';
+import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type ProfileStore } from '../store';
+import { checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
@@ -181,12 +181,19 @@ describe('review fixes', () => {
 });
 
 describe('supabase store', () => {
-  function fakeClient({ listError = null as Error | null, removeError = null as Error | null } = {}) {
+  function fakeClient({ listError = null as Error | null, removeError = null as Error | null, fileCount = 1 } = {}) {
     const calls: string[] = [];
+    const files = Array.from({ length: fileCount }, (_, i) => ({ name: fileCount === 1 ? 'avatar' : `avatar-${i}` }));
     const bucket = {
-      list: async (dir: string) => (calls.push(`list ${dir}`), { data: listError ? null : [{ name: 'avatar' }], error: listError }),
-      remove: async (paths: string[]) => (calls.push(`remove ${paths.join(',')}`), { data: null, error: removeError }),
-      upload: async (path: string, _b: ArrayBuffer, o: { contentType: string }) => (calls.push(`upload ${path} ${o.contentType}`), { error: null }),
+      list: async (dir: string, o: { limit?: number; offset?: number } = {}) => {
+        calls.push(`list ${dir}${o.offset ? ` @${o.offset}` : ''}`);
+        const page = files.slice(o.offset ?? 0, (o.offset ?? 0) + (o.limit ?? 100));
+        return { data: listError ? null : page, error: listError };
+      },
+      remove: async (paths: string[]) => (calls.push(paths.length > 3 ? `remove ${paths.length} files` : `remove ${paths.join(',')}`), { data: null, error: removeError }),
+      upload: async (path: string, _b: ArrayBuffer, o: { contentType: string; upsert?: boolean }) => (
+        calls.push(`upload ${path} ${o.contentType}${o.upsert ? ' UPSERT' : ''}`), { error: null }
+      ),
     };
     const client = {
       storage: { from: () => bucket },
@@ -199,6 +206,12 @@ describe('supabase store', () => {
     const { client, calls } = fakeClient();
     await createSupabaseStore(client, 'avatars').deleteAll('u1');
     expect(calls).toEqual(['list u1', 'remove u1/avatar', 'delete row u1']);
+  });
+
+  it('deletes every photo across list pages, not just the first 100', async () => {
+    const { client, calls } = fakeClient({ fileCount: 150 });
+    await createSupabaseStore(client, 'avatars').deleteAll('u1');
+    expect(calls).toEqual(['list u1', 'list u1 @100', 'remove 150 files', 'delete row u1']);
   });
 
   it('keeps the row and throws when the photo can\'t be removed', async () => {
@@ -385,5 +398,78 @@ describe('supabase store save', () => {
   it('other insert errors still throw', async () => {
     const { client } = tableClient({ insert: { data: null, error: { code: '23514', message: 'violates check constraint' } } });
     await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: '23514' });
+  });
+});
+
+describe('saveWithAvatar retries after a network failure', () => {
+  const at = '2026-11-09T00:00:00.000Z';
+  const existing = rowToProfile({ id: 'u1', verified: false, ...draftToWrite({ ...rosa, avatarPath: 'u1/avatar-old' }, at) });
+
+  // save() fails on the network `failures` times, then succeeds. Uploads get numbered paths.
+  function flakyStore(failures: number) {
+    const calls: string[] = [];
+    let n = 0;
+    const store: ProfileStore = {
+      get: async () => null,
+      save: async (_u, d) => {
+        calls.push(`save ${d.avatarPath}`);
+        if (failures-- > 0) throw new TypeError('Failed to fetch');
+        return { ...existing, avatarPath: d.avatarPath };
+      },
+      uploadAvatar: async () => { n += 1; calls.push(`upload #${n}`); return `u1/avatar-${n}`; },
+      removeAvatar: async p => void calls.push(`remove ${p}`),
+      avatarUrl: async p => p,
+      deleteAll: async () => {},
+    };
+    return { store, calls };
+  }
+  const photo = { uri: 'file:///same.jpg', mimeType: 'image/jpeg' };
+
+  it('reuses the kept upload when retrying with the same photo', async () => {
+    const { store, calls } = flakyStore(1);
+    const pending = { current: null as PendingUpload | null };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow('Failed to fetch');
+    expect(pending.current).toEqual({ uri: 'file:///same.jpg', path: 'u1/avatar-1' });
+    const saved = await saveWithAvatar(store, 'u1', rosa, photo, existing, pending);
+    expect(saved.avatarPath).toBe('u1/avatar-1');
+    expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'save u1/avatar-1', 'remove u1/avatar-old']); // one upload
+    expect(pending.current).toBeNull();
+  });
+
+  it('a different photo on retry uploads anew and cleans up the superseded upload', async () => {
+    const { store, calls } = flakyStore(1);
+    const pending = { current: null as PendingUpload | null };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
+    await saveWithAvatar(store, 'u1', rosa, { uri: 'file:///other.jpg', mimeType: 'image/jpeg' }, existing, pending);
+    expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'upload #2', 'save u1/avatar-2', 'remove u1/avatar-1', 'remove u1/avatar-old']);
+  });
+
+  it('choosing Remove on retry also cleans up the kept upload', async () => {
+    const { store, calls } = flakyStore(1);
+    const pending = { current: null as PendingUpload | null };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
+    await saveWithAvatar(store, 'u1', rosa, 'remove', existing, pending);
+    expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'save null', 'remove u1/avatar-1', 'remove u1/avatar-old']);
+  });
+});
+
+describe('round five details', () => {
+  it('role-mismatch errors carry a code, so the new upload counts as rejected', async () => {
+    const row = { id: 'u1', verified: false, ...draftToWrite(rosa, '2026-11-09T00:00:00.000Z') };
+    const client = {
+      from: () => ({
+        insert: () => ({ select: () => ({ single: async () => ({ data: null, error: { code: '23505', message: 'duplicate' } }) }) }),
+        select: () => ({ eq: () => ({ single: async () => ({ data: { role: 'volunteer' }, error: null }) }) }),
+        update: () => ({ eq: () => ({ select: () => ({ single: async () => ({ data: row, error: null }) }) }) }),
+      }),
+    } as unknown as SupabaseClient;
+    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: 'VENU_ROLE_MISMATCH' });
+  });
+
+  it('only known language codes are accepted from a URL', () => {
+    expect(isKnownLanguage('es')).toBe(true);
+    expect(isKnownLanguage('ase')).toBe(true);
+    expect(isKnownLanguage('xx')).toBe(false);
+    expect(isKnownLanguage(undefined)).toBe(false);
   });
 });

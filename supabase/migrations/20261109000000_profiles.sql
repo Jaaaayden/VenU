@@ -70,7 +70,8 @@ grant update (
   trainings, gender, age_band, privacy_version, privacy_accepted_at
 ) on public.profiles to authenticated;
 
--- Avatars: private bucket, files at <uid>/avatar.<ext>, read through signed URLs.
+-- Avatars: private bucket, files at <uid>/avatar-<unix ms> (a new name per upload), read through
+-- signed URLs. Later migrations narrow reads to the owner and drop the update policy below.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('avatars', 'avatars', false, 5242880, array['image/jpeg','image/png','image/webp','image/heic'])
 on conflict (id) do nothing;

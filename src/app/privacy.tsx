@@ -1,17 +1,17 @@
-import { router } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepHeader } from '@/components/form-section';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { PRIVACY_SECTIONS, PRIVACY_SUMMARY, PRIVACY_VERSION } from '@/features/profile/privacy';
+import { goBack } from '@/lib/navigation';
 
 export default function PrivacyScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <View style={styles.bar}>
         <Pressable
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          onPress={() => goBack('/')}
           hitSlop={10}
           style={styles.closeTarget}
           accessibilityRole="button">

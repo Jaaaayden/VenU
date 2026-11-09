@@ -136,7 +136,10 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         const current = await table().select('role').eq('id', userId).single<{ role: ProfileRow['role'] }>();
         if (current.error) throw current.error;
         if (current.data.role !== write.role) {
-          throw new Error(`This account is already set up as a ${current.data.role}. Reload the app to continue.`);
+          // A coded error counts as a definite rejection, so saveWithAvatar cleans up the new upload.
+          throw Object.assign(new Error(`This account is already set up as a ${current.data.role}. Reload the app to continue.`), {
+            code: 'VENU_ROLE_MISMATCH',
+          });
         }
         result = await update();
       } else if (existing && result.error?.code === 'PGRST116') {
@@ -152,7 +155,8 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       // before the row points at the new one; the provider deletes the old file after saving.
       const path = `${userId}/avatar-${Date.now()}`;
       const body = await (await fetch(image.uri)).arrayBuffer();
-      const { error } = await client.storage.from(bucket).upload(path, body, { contentType, upsert: true });
+      // No upsert: paths are never reused, so storage never needs to overwrite (and no UPDATE policy).
+      const { error } = await client.storage.from(bucket).upload(path, body, { contentType });
       if (error) throw error;
       return path;
     },
@@ -166,10 +170,17 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
     },
     async deleteAll(userId) {
       // Photos first: if that fails, stop, so we never report "deleted" with a photo left behind.
-      const listed = await client.storage.from(bucket).list(userId);
-      if (listed.error) throw listed.error;
-      if (listed.data.length) {
-        const removed = await client.storage.from(bucket).remove(listed.data.map(f => `${userId}/${f.name}`));
+      // list() returns one page (100 by default), so page through everything in the folder.
+      const PAGE = 100;
+      const names: string[] = [];
+      for (let offset = 0; ; offset += PAGE) {
+        const listed = await client.storage.from(bucket).list(userId, { limit: PAGE, offset });
+        if (listed.error) throw listed.error;
+        names.push(...listed.data.map(f => `${userId}/${f.name}`));
+        if (listed.data.length < PAGE) break;
+      }
+      if (names.length) {
+        const removed = await client.storage.from(bucket).remove(names);
         if (removed.error) throw removed.error;
       }
       const { error } = await table().delete().eq('id', userId);
@@ -181,10 +192,20 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
 /** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */
 export type AvatarChange = PickedImage | 'remove' | null;
 
+/** An upload kept after a save failed on the network, so a retry reuses it instead of uploading again. */
+export interface PendingUpload {
+  uri: string;
+  path: string;
+}
+
 /**
  * Saves a profile and its photo change in a safe order: upload the new photo to a fresh
  * path, save the row, and only then delete the old file. A failed save leaves the old
- * photo and row untouched; the new upload is cleaned up only if the server definitely said no.
+ * photo and row untouched.
+ *
+ * `pending` carries an upload across retries: after a network failure the upload is kept
+ * (the row may already point at it) and a retry with the same picked image reuses it.
+ * Once a save succeeds, a kept upload that the row no longer uses is deleted.
  */
 export async function saveWithAvatar(
   store: ProfileStore,
@@ -192,20 +213,32 @@ export async function saveWithAvatar(
   draft: ProfileDraft,
   avatar: AvatarChange,
   existing: Profile | null,
+  pending: { current: PendingUpload | null } = { current: null },
 ): Promise<Profile> {
   const previous = existing?.avatarPath ?? null;
-  const uploaded = avatar && avatar !== 'remove' ? await store.uploadAvatar(userId, avatar) : null;
+  const picked = avatar && avatar !== 'remove' ? avatar : null;
+  const kept = pending.current;
+  const uploaded = picked ? (kept?.uri === picked.uri ? kept.path : await store.uploadAvatar(userId, picked)) : null;
   const avatarPath = avatar === 'remove' ? null : (uploaded ?? previous);
   let saved: Profile;
   try {
     saved = await store.save(userId, { ...draft, avatarPath }, existing);
   } catch (e) {
-    // On a network failure the row may have committed pointing at this photo, so keep it
-    // (an orphan at worst; deleteAll sweeps it). Only a definite server rejection cleans up.
-    if (uploaded && isServerRejection(e)) await store.removeAvatar(uploaded).catch(() => {});
+    if (picked && uploaded) {
+      if (isServerRejection(e)) {
+        // The server definitely said no: nothing points at this upload.
+        await store.removeAvatar(uploaded).catch(() => {});
+        pending.current = null;
+      } else {
+        // Network failure: the row may have committed pointing at it, so keep it for the retry.
+        pending.current = { uri: picked.uri, path: uploaded };
+      }
+    }
     throw e;
   }
-  // Best effort: if this fails the file is orphaned in the user's own folder, and deleteAll sweeps it.
+  pending.current = null;
+  // Best effort cleanups; anything missed is an orphan in the user's own folder, and deleteAll sweeps it.
+  if (kept && kept.path !== saved.avatarPath) await store.removeAvatar(kept.path).catch(() => {});
   if (previous && previous !== avatarPath) await store.removeAvatar(previous).catch(() => {});
   return saved;
 }

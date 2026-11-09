@@ -6,7 +6,15 @@ import * as auth from '@/lib/auth';
 import { friendlyError } from '@/lib/errors';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
-import { AVATAR_URL_TTL_S, createLocalStore, createSupabaseStore, saveWithAvatar, type AvatarChange, type ProfileStore } from './store';
+import {
+  AVATAR_URL_TTL_S,
+  createLocalStore,
+  createSupabaseStore,
+  saveWithAvatar,
+  type AvatarChange,
+  type PendingUpload,
+  type ProfileStore,
+} from './store';
 import type { Profile, ProfileDraft } from './types';
 
 const store: ProfileStore = supabase
@@ -28,6 +36,7 @@ interface ProfileContextValue {
   /** Re-reads the session and profile; returns the profile (null if none yet). */
   refresh(): Promise<Profile | null>;
   save(draft: ProfileDraft, avatar: AvatarChange): Promise<Profile>;
+  /** Deletes the profile and photos, then signs out (one step, so no screen sees "signed in, no profile"). */
   deleteAll(): Promise<void>;
   signOut(): Promise<void>;
 }
@@ -123,21 +132,27 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const avatarPath = profile?.avatarPath ?? null;
   useEffect(() => {
     if (!supabase || !avatarPath) return;
+    // `alive` drops a re-sign that finishes after the photo changed, so it can't overwrite the new URL.
+    let alive = true;
     const resign = () => {
-      store.avatarUrl(avatarPath).then(url => url && setAvatarUrl(url)).catch(() => {});
+      store.avatarUrl(avatarPath).then(url => alive && url && setAvatarUrl(url)).catch(() => {});
     };
     const timer = setInterval(resign, (AVATAR_URL_TTL_S - 5 * 60) * 1000);
     const sub = AppState.addEventListener('change', state => state === 'active' && resign());
     return () => {
+      alive = false;
       clearInterval(timer);
       sub.remove();
     };
   }, [avatarPath]);
 
+  // An upload kept after a network-failed save, reused by the next retry (see saveWithAvatar).
+  const pendingUpload = useRef<PendingUpload | null>(null);
+
   const save = useCallback(
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
-      const saved = await saveWithAvatar(store, userId, draft, avatar, profile);
+      const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUpload);
       await applyProfile(saved);
       return saved;
     },
@@ -147,8 +162,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const deleteAll = useCallback(async () => {
     if (!userId) return;
     await store.deleteAll(userId);
-    await applyProfile(null);
-  }, [userId, applyProfile]);
+    pendingUpload.current = null;
+    // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile.
+    await auth.signOut().catch(() => {});
+    applySession({ userId: null, profile: null, avatarUrl: null });
+  }, [userId, applySession]);
 
   const signOut = useCallback(async () => {
     await auth.signOut();

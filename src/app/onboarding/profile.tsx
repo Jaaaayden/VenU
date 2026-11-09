@@ -7,6 +7,7 @@ import { TopBar } from '@/components/top-bar';
 import { Colors } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
+import { isKnownLanguage } from '@/features/profile/options';
 import { emptyDraft, type Role } from '@/features/profile/types';
 
 /** Step 2 of 2: the role-specific questions (mockup 01). */
@@ -22,7 +23,8 @@ export default function ProfileStep() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <TopBar back fallback="/onboarding/role" />
       <ProfileForm
-        initial={emptyDraft(role, params.lang || 'en')}
+        // Only a language we know; a hand-edited URL (?lang=xx) falls back to English.
+        initial={emptyDraft(role, isKnownLanguage(params.lang) ? params.lang : 'en')}
         savedAvatarUrl={null}
         submitLabel="Save and continue"
         // No navigation here: once the profile exists, the onboarding layout redirects to the home tab.

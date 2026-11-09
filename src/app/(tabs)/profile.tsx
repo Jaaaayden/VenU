@@ -58,17 +58,17 @@ export default function ProfileScreen() {
     setBusy(true);
     setDeleteError(null);
     try {
-      await deleteAll();
+      await deleteAll(); // also signs out
+      router.replace('/sign-in');
     } catch (e) {
       // Photos go first, so a failure can be partial; don't claim nothing changed.
       setDeleteError(`Couldn't finish deleting your data. ${friendlyError(e)}`);
       setBusy(false);
-      return;
     }
-    // Data is gone at this point; a sign-out hiccup shouldn't strand them on this screen.
-    await signOut().catch(() => {});
-    router.replace('/sign-in');
   }
+
+  // The tabs layout only renders tabs for a signed-in user with a profile.
+  if (!profile) return null;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -81,36 +81,28 @@ export default function ProfileScreen() {
         onContentSizeChange={() => confirmDelete && scrollRef.current?.scrollToEnd({ animated: true })}>
         <Text style={styles.pageTitle} accessibilityRole="header">Profile</Text>
 
-        {profile ? (
-          <View style={styles.card}>
-            <View style={styles.profileRow}>
-              <Avatar name={profile.firstName} uri={avatarUrl} size={60} />
-              <View style={styles.profileInfo}>
-                <Text style={Type.heading}>{profile.firstName}</Text>
-                <View style={styles.badges}>
-                  <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? 'Visitor' : 'Volunteer'}</Text>
-                  {profile.role === 'volunteer' && (
-                    <Text style={[styles.badge, profile.verified ? styles.badgeOk : styles.badgePending]}>
-                      {profile.verified ? '✓ Verified LA28' : 'Unverified'}
-                    </Text>
-                  )}
-                </View>
+        <View style={styles.card}>
+          <View style={styles.profileRow}>
+            <Avatar name={profile.firstName} uri={avatarUrl} size={60} />
+            <View style={styles.profileInfo}>
+              <Text style={Type.heading}>{profile.firstName}</Text>
+              <View style={styles.badges}>
+                <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? 'Visitor' : 'Volunteer'}</Text>
+                {profile.role === 'volunteer' && (
+                  <Text style={[styles.badge, profile.verified ? styles.badgeOk : styles.badgePending]}>
+                    {profile.verified ? '✓ Verified LA28' : 'Unverified'}
+                  </Text>
+                )}
               </View>
-              <Button label="Edit" variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
             </View>
+            <Button label="Edit" variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
+          </View>
 
-            <Text style={[Type.overline, styles.shareTitle]}>
-              {profile.role === 'visitor' ? 'Shared with your helper' : 'Shown to visitors'}
-            </Text>
-            <SummaryTags draft={profile} />
-          </View>
-        ) : (
-          <View style={styles.card}>
-            <Text style={Type.bodyStrong}>No profile yet</Text>
-            <Text style={[Type.caption, styles.gapSm]}>Set one up so helpers know your language and needs.</Text>
-            <Button label="Set up profile" onPress={() => router.push('/onboarding/role')} style={styles.gapMd} />
-          </View>
-        )}
+          <Text style={[Type.overline, styles.shareTitle]}>
+            {profile.role === 'visitor' ? 'Shared with your helper' : 'Shown to visitors'}
+          </Text>
+          <SummaryTags draft={profile} />
+        </View>
 
         {MENU_SECTIONS.map(section => (
           <View key={section.title} style={styles.section}>
@@ -142,22 +134,20 @@ export default function ProfileScreen() {
           </Text>
         )}
 
-        {profile && (
-          <View style={styles.deleteBox}>
-            {confirmDelete ? (
-              <>
-                <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
-                {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
-                <View style={styles.deleteRow}>
-                  <Button label="Cancel" variant="secondary" onPress={() => setConfirmDelete(false)} style={styles.flex} />
-                  <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
-                </View>
-              </>
-            ) : (
-              <Button label="Delete my data" variant="link" onPress={() => setConfirmDelete(true)} />
-            )}
-          </View>
-        )}
+        <View style={styles.deleteBox}>
+          {confirmDelete ? (
+            <>
+              <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
+              {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
+              <View style={styles.deleteRow}>
+                <Button label="Cancel" variant="secondary" onPress={() => setConfirmDelete(false)} style={styles.flex} />
+                <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
+              </View>
+            </>
+          ) : (
+            <Button label="Delete my data" variant="link" onPress={() => setConfirmDelete(true)} />
+          )}
+        </View>
 
         <View style={{ height: NAV_BAR_CLEARANCE }} />
       </ScrollView>
@@ -171,7 +161,6 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: Spacing.gutter, paddingTop: Spacing.lg },
   flex: { flex: 1 },
   gapSm: { marginTop: Spacing.xs },
-  gapMd: { marginTop: Spacing.md },
 
   pageTitle: { ...Type.title, marginBottom: Spacing.gutter },
 

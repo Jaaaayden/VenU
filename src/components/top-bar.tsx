@@ -1,8 +1,9 @@
-import { router, type Href } from 'expo-router';
+import type { Href } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Wordmark } from '@/components/wordmark';
 import { Colors, Spacing, Type } from '@/constants/theme';
+import { goBack } from '@/lib/navigation';
 
 /** White bar at the top of a screen: back link (when `back`) or the VenU wordmark. */
 export function TopBar({ back, backLabel = 'Back', fallback = '/', right }: {
@@ -15,7 +16,7 @@ export function TopBar({ back, backLabel = 'Back', fallback = '/', right }: {
   return (
     <View style={styles.bar}>
       {back ? (
-        <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace(fallback))} hitSlop={10} style={styles.target} accessibilityRole="button" accessibilityLabel={backLabel}>
+        <Pressable onPress={() => goBack(fallback)} hitSlop={10} style={styles.target} accessibilityRole="button" accessibilityLabel={backLabel}>
           <Text style={styles.back}>‹ {backLabel}</Text>
         </Pressable>
       ) : (

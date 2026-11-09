@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { Redirect } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,6 +8,7 @@ import { Colors } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
 import { draftFromProfile } from '@/features/profile/types';
+import { goBack } from '@/lib/navigation';
 
 export default function EditProfileScreen() {
   const { status, profile, avatarUrl, save } = useProfile();
@@ -23,9 +24,7 @@ export default function EditProfileScreen() {
         submitLabel="Save changes"
         onSubmit={async (draft, avatar) => {
           await save(draft, avatar);
-          // No history after a web reload or deep link; fall back to the Profile tab.
-          if (router.canGoBack()) router.back();
-          else router.replace('/profile');
+          goBack('/profile');
         }}
         header={<StepHeader title="Edit profile" subtitle="Changes apply to your next help request." />}
       />

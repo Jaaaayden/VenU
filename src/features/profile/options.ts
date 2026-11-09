@@ -47,6 +47,11 @@ export const LANGUAGES: Language[] = [
 
 const BY_CODE = new Map(LANGUAGES.map(l => [l.code, l]));
 
+/** True for codes in LANGUAGES; anything else (e.g. from a hand-edited URL) shouldn't be saved. */
+export function isKnownLanguage(code: string | undefined | null): code is string {
+  return !!code && BY_CODE.has(code);
+}
+
 export function languageName(code: string): string {
   return BY_CODE.get(code)?.native ?? code;
 }
