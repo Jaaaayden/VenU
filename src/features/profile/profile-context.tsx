@@ -69,32 +69,45 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  const applyProfile = useCallback(async (p: Profile | null) => {
-    const url = await urlFor(p);
-    setProfile(p);
-    setAvatarUrl(url);
-  }, []);
-
   // Uploads kept after network-failed saves, reused by the next retry (see saveWithAvatar).
   const pendingUploads = useRef<PendingUpload[]>([]);
   // Last applied user, read by the auth listener (a ref, so the listener needn't resubscribe).
   const userIdRef = useRef<string | null>(null);
+  // When the current photo URL was signed, so a foreground resume only re-signs near expiry.
+  const signedAt = useRef(0);
+  // One session load at a time: startup, sign-in and the auth listener can all ask at once.
+  const inFlight = useRef<Promise<Session> | null>(null);
+
+  const setSignedUrl = useCallback((url: string | null) => {
+    signedAt.current = url ? Date.now() : 0;
+    setAvatarUrl(url);
+  }, []);
 
   /** The single place the session changes, including every way of becoming signed out. */
-  const applySession = useCallback((s: Session) => {
-    // Kept uploads belong to one account; never carry them into another session.
-    if (s.userId !== userIdRef.current) pendingUploads.current = [];
-    userIdRef.current = s.userId;
-    setUserId(s.userId);
-    setProfile(s.profile);
-    setAvatarUrl(s.avatarUrl);
-    setStatus(s.userId ? 'ready' : 'signedOut');
-    setLoadError(null);
+  const applySession = useCallback(
+    (s: Session) => {
+      // Kept uploads belong to one account; never carry them into another session.
+      if (s.userId !== userIdRef.current) pendingUploads.current = [];
+      userIdRef.current = s.userId;
+      setUserId(s.userId);
+      setProfile(s.profile);
+      setSignedUrl(s.avatarUrl);
+      setStatus(s.userId ? 'ready' : 'signedOut');
+      setLoadError(null);
+    },
+    [setSignedUrl],
+  );
+
+  const loadOnce = useCallback(() => {
+    inFlight.current ??= loadSession().finally(() => {
+      inFlight.current = null;
+    });
+    return inFlight.current;
   }, []);
 
   const refresh = useCallback(async () => {
     try {
-      const s = await loadSession();
+      const s = await loadOnce();
       applySession(s);
       return s.profile;
     } catch (e) {
@@ -102,12 +115,12 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       setStatus('error');
       throw e;
     }
-  }, [applySession]);
+  }, [applySession, loadOnce]);
 
   // Startup load. A failure (e.g. offline) is 'error', not 'signedOut', so a saved session isn't thrown away.
   useEffect(() => {
     let alive = true;
-    loadSession()
+    loadOnce()
       .then(s => alive && applySession(s))
       .catch(e => {
         if (!alive) return;
@@ -117,14 +130,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return () => {
       alive = false;
     };
-  }, [applySession]);
+  }, [applySession, loadOnce]);
 
   // Session changed elsewhere: signed out (token revoked/expired, another tab) → drop to signed out;
   // someone signed in (another tab, whether this one was signed out or showing a different user)
   // → reload, so we never show A's data under B's session or sit on sign-in with a live session.
+  // INITIAL_SESSION is skipped: the startup load above already covers it.
   useEffect(() => {
     if (!supabase) return;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') return;
       if (event === 'SIGNED_OUT') {
         applySession(SIGNED_OUT);
       } else if (session && session.user.id !== userIdRef.current) {
@@ -135,43 +150,54 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, [applySession, refresh]);
 
-  // Signed photo URLs expire. Re-sign shortly before they do while the app stays open, and
-  // whenever it comes back to the foreground (JS timers don't run while a phone app is backgrounded).
+  // Signed photo URLs expire. Re-sign shortly before they do while the app stays open, and on
+  // returning to the foreground (JS timers don't run while a phone app is backgrounded), but only
+  // when the URL is near expiry: a new URL makes the image re-download.
   const avatarPath = profile?.avatarPath ?? null;
   useEffect(() => {
     if (!supabase || !avatarPath) return;
+    const refreshAfterMs = (AVATAR_URL_TTL_S - 5 * 60) * 1000;
     // `alive` drops a re-sign that finishes after the photo changed, so it can't overwrite the new URL.
     let alive = true;
     const resign = () => {
-      store.avatarUrl(avatarPath).then(url => alive && url && setAvatarUrl(url)).catch(() => {});
+      store.avatarUrl(avatarPath).then(url => alive && url && setSignedUrl(url)).catch(() => {});
     };
-    const timer = setInterval(resign, (AVATAR_URL_TTL_S - 5 * 60) * 1000);
-    const sub = AppState.addEventListener('change', state => state === 'active' && resign());
+    const timer = setInterval(resign, refreshAfterMs);
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active' && Date.now() - signedAt.current > refreshAfterMs) resign();
+    });
     return () => {
       alive = false;
       clearInterval(timer);
       sub.remove();
     };
-  }, [avatarPath]);
-
+  }, [avatarPath, setSignedUrl]);
 
   const save = useCallback(
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
       const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUploads);
-      await applyProfile(saved);
+      // Same photo: keep the current URL (no extra round trip, no re-download).
+      if (saved.avatarPath !== (profile?.avatarPath ?? null)) setSignedUrl(await urlFor(saved));
+      setProfile(saved);
       return saved;
     },
-    [userId, profile, applyProfile],
+    [userId, profile, setSignedUrl],
   );
 
   const deleteAll = useCallback(async () => {
     if (!userId) return;
-    await store.deleteAll(userId);
+    try {
+      await store.deleteAll(userId);
+    } catch (e) {
+      // Part of it may be gone (e.g. the photo). Show what's actually there now, then report.
+      await refresh().catch(() => {});
+      throw e;
+    }
     // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile.
     await auth.signOut().catch(() => {});
     applySession(SIGNED_OUT);
-  }, [userId, applySession]);
+  }, [userId, applySession, refresh]);
 
   const signOut = useCallback(async () => {
     await auth.signOut();

@@ -17,7 +17,8 @@ npx expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — re
 npx expo start              # start the dev server
 npm run lint                # lint (fails on warnings)
 npm run typecheck           # generate typed routes, then tsc --noEmit
-npm run check               # lint + typecheck + expo-doctor (what CI runs)
+npm test                    # jest unit tests (src/**/__tests__)
+npm run check               # lint + typecheck + tests + expo-doctor (what CI runs)
 npx expo-doctor             # diagnose dependency and config issues
 npx expo install --fix      # fix incompatible package versions
 ```

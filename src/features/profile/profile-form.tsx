@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
@@ -42,16 +42,23 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
     setD(prev => ({ ...prev, [key]: value }));
   }
 
+  // A ref, not `saving`: state only disables the button after a re-render, so a quick double
+  // tap (or Enter plus a tap on web) could otherwise start two saves and two photo uploads.
+  const inFlight = useRef(false);
+
   async function submit() {
+    if (inFlight.current) return;
     setSubmitted(true);
     setSaveError(null);
     if (!isValid(validateDraft(d))) return;
+    inFlight.current = true;
     setSaving(true);
     try {
       await onSubmit(d, avatar);
     } catch (e) {
       setSaveError(friendlyError(e));
     } finally {
+      inFlight.current = false;
       setSaving(false);
     }
   }

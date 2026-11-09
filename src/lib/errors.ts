@@ -11,7 +11,8 @@ const KNOWN: [RegExp, string][] = [
   [/email not confirmed/i, 'Confirm your email first. Check your inbox for the link.'],
   [/user already registered/i, 'That email already has an account. Try signing in.'],
   [/rate limit|too many requests/i, 'Too many tries. Wait a minute and try again.'],
-  [/jwt expired|invalid jwt|refresh token/i, 'Your session expired. Sign out and sign in again.'],
+  // Shown on screens with and without a sign-out button (e.g. sign-in), so no "sign out" step.
+  [/jwt expired|invalid jwt|refresh token/i, 'Your session expired. Please sign in again.'],
   // Not a session problem: the database or storage policy refused this change.
   [/row-level security|permission denied/i, "VenU couldn't save that change. If it keeps happening, sign out and back in."],
   [/exceeded the maximum allowed size|payload too large/i, PHOTO_TOO_BIG],

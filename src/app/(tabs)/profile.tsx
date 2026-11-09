@@ -61,7 +61,7 @@ export default function ProfileScreen() {
       await deleteAll(); // also signs out
       router.replace('/sign-in');
     } catch (e) {
-      // Photos go first, so a failure can be partial; don't claim nothing changed.
+      // Photos go first, so a failure can be partial (the context has already reloaded what's left).
       setDeleteError(`Couldn't finish deleting your data. ${friendlyError(e)}`);
       setBusy(false);
     }

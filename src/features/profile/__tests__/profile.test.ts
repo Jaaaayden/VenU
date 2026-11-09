@@ -116,6 +116,13 @@ describe('local store', () => {
     expect(storage.data.has('venu.profile.u1')).toBe(false);
   });
 
+  it('drops a parseable but malformed row (e.g. an old format) too', async () => {
+    const storage = memoryStorage();
+    storage.data.set('venu.profile.u1', JSON.stringify({ id: 'u1', first_name: 'Rosa' })); // no role or languages
+    expect(await createLocalStore(storage).get('u1')).toBeNull();
+    expect(storage.data.has('venu.profile.u1')).toBe(false);
+  });
+
   it('keeps web photos as data URIs so they survive a reload', async () => {
     const store = createLocalStore(memoryStorage());
     expect(await store.uploadAvatar('u1', { uri: 'blob:x', mimeType: 'image/png', base64: 'AAA' })).toBe('data:image/png;base64,AAA');
@@ -202,23 +209,23 @@ describe('supabase store', () => {
     return { client: client as unknown as SupabaseClient, calls };
   }
 
-  it('deletes the row, then sweeps the photos', async () => {
+  it('sweeps the photos, then deletes the row', async () => {
     const { client, calls } = fakeClient();
     await createSupabaseStore(client, 'avatars').deleteAll('u1');
-    expect(calls).toEqual(['delete row u1', 'list u1', 'remove u1/avatar']);
+    expect(calls).toEqual(['list u1', 'remove u1/avatar', 'delete row u1']);
   });
 
   it('deletes every photo across list pages, not just the first 100', async () => {
     const { client, calls } = fakeClient({ fileCount: 150 });
     await createSupabaseStore(client, 'avatars').deleteAll('u1');
-    expect(calls).toEqual(['delete row u1', 'list u1', 'list u1 @100', 'remove 150 files']);
+    expect(calls).toEqual(['list u1', 'list u1 @100', 'remove 150 files', 'delete row u1']);
   });
 
-  it('reports a failed photo sweep (the row is already gone, so no profile points at a deleted file)', async () => {
+  it('a failed photo sweep stops before the row, so the profile still exists and a retry finishes', async () => {
     for (const opts of [{ listError: new Error('list failed') }, { removeError: new Error('remove failed') }]) {
       const { client, calls } = fakeClient(opts);
       await expect(createSupabaseStore(client, 'avatars').deleteAll('u1')).rejects.toThrow('failed');
-      expect(calls[0]).toBe('delete row u1');
+      expect(calls).not.toContain('delete row u1');
     }
   });
 
@@ -326,7 +333,7 @@ describe('friendlyError', () => {
     expect(friendlyError({ message: 'new row violates row-level security policy for table "profiles"' })).toBe(
       "VenU couldn't save that change. If it keeps happening, sign out and back in.",
     );
-    expect(friendlyError({ message: 'JWT expired' })).toBe('Your session expired. Sign out and sign in again.');
+    expect(friendlyError({ message: 'JWT expired' })).toBe('Your session expired. Please sign in again.');
     expect(friendlyError({ message: 'The object exceeded the maximum allowed size' })).toBe('That photo is over 5 MB. Pick a smaller one.');
     expect(friendlyError({ message: 'mime type image/gif is not supported' })).toBe('Use a JPG, PNG, WebP or HEIC photo.');
   });

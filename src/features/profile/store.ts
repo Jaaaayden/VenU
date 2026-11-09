@@ -62,19 +62,33 @@ export interface KeyValueStorage {
 
 const localKey = (userId: string) => `venu.profile.${userId}`;
 
+/** Enough of a ProfileRow that the app can use it (role, name and languages are what screens rely on). */
+function isProfileRowShape(v: unknown): v is ProfileRow {
+  if (!v || typeof v !== 'object') return false;
+  const r = v as Partial<ProfileRow>;
+  return (
+    (r.role === 'visitor' || r.role === 'volunteer') &&
+    typeof r.first_name === 'string' &&
+    typeof r.main_language === 'string' &&
+    Array.isArray(r.languages) &&
+    r.languages.includes(r.main_language)
+  );
+}
+
 export function createLocalStore(storage: KeyValueStorage): ProfileStore {
   return {
     async get(userId) {
       const raw = await storage.getItem(localKey(userId));
       if (!raw) return null;
+      let row: unknown = null;
       try {
-        return rowToProfile(JSON.parse(raw) as ProfileRow);
-      } catch {
-        // Unreadable (corrupt or from an old format): drop it and start setup again rather than
-        // failing every launch. Device-only dev data, so nothing is lost that the server holds.
-        await storage.removeItem(localKey(userId));
-        return null;
-      }
+        row = JSON.parse(raw);
+      } catch {}
+      if (isProfileRowShape(row)) return rowToProfile(row);
+      // Unreadable or from an old format: drop it and start setup again rather than loading a
+      // broken profile on every launch. Device-only dev data, so nothing the server holds is lost.
+      await storage.removeItem(localKey(userId));
+      return null;
     },
     async save(userId, draft, existing) {
       const row: ProfileRow = {
@@ -171,11 +185,10 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       return error ? null : data.signedUrl;
     },
     async deleteAll(userId) {
-      // Row first: if the photo sweep then fails, there's no live profile pointing at a deleted
-      // file, just files in the user's own (owner-only) folder that a retry removes. The caller
-      // reports any failure, and a retry is safe (deleting a missing row isn't an error).
-      const { error } = await table().delete().eq('id', userId);
-      if (error) throw error;
+      // Photos first, row last. If anything fails the profile still exists, so the app keeps
+      // showing it (correctly), reports the failure, and a retry finishes the job. A row whose
+      // photo is already gone just shows initials (avatarUrl() returns null for a missing file).
+      // Row-first would instead leave the app showing a profile that no longer exists.
       // list() returns one page (100 by default), so page through everything in the folder.
       const PAGE = 100;
       const names: string[] = [];
@@ -189,6 +202,8 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         const removed = await client.storage.from(bucket).remove(names);
         if (removed.error) throw removed.error;
       }
+      const { error } = await table().delete().eq('id', userId);
+      if (error) throw error;
     },
   };
 }
