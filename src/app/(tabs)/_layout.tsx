@@ -2,6 +2,7 @@ import { Href, router, Slot, usePathname } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { XrNavigationBar, XrTab } from '@/components/xr-navigation-bar';
+import { Colors } from '@/constants/theme';
 
 const TAB_ROUTES: Record<XrTab, Href> = {
   venue:     '/venue',
@@ -37,6 +38,6 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fff' },
+  root: { flex: 1, backgroundColor: Colors.bg },
   screen: { flex: 1 },
 });

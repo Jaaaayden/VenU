@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import {
   Pressable,
@@ -9,7 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FigmaColors } from '@/constants/theme';
+import { Avatar } from '@/components/avatar';
+import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
+import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { useProfile } from '@/features/profile/profile-context';
 
 const FILTERS = ['All', 'Outdoor', 'Indoor', 'Stadium', 'Hall', 'Rooftop'];
 
@@ -22,6 +26,7 @@ const VENUES = [
 ];
 
 export default function VenueScreen() {
+  const { profile, avatarUrl } = useProfile();
   const [activeFilter, setActiveFilter] = useState('All');
   const [saved, setSaved] = useState<Record<string, boolean>>(
     Object.fromEntries(VENUES.map(v => [v.id, v.saved]))
@@ -44,9 +49,9 @@ export default function VenueScreen() {
             <Text style={styles.greeting}>Good morning 👋</Text>
             <Text style={styles.title}>Find a Venue</Text>
           </View>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>KR</Text>
-          </View>
+          <Pressable onPress={() => router.replace('/profile')} accessibilityRole="button" accessibilityLabel="Your profile">
+            <Avatar name={profile?.firstName ?? ''} uri={avatarUrl} size={42} />
+          </Pressable>
         </View>
 
         {/* Search */}
@@ -55,7 +60,7 @@ export default function VenueScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search venues, cities, events..."
-            placeholderTextColor="#aaa"
+            placeholderTextColor={Colors.textFaint}
           />
         </View>
 
@@ -124,9 +129,9 @@ export default function VenueScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: Colors.bg },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 8 },
+  content: { paddingHorizontal: Spacing.gutter, paddingTop: Spacing.lg },
 
   header: {
     flexDirection: 'row',
@@ -134,42 +139,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  greeting: { fontSize: 13, color: '#888', marginBottom: 2 },
-  title: { fontSize: 28, fontWeight: '700', color: FigmaColors.darkGray, letterSpacing: -0.5 },
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: FigmaColors.darkGray,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  greeting: { fontSize: 13, color: Colors.textMuted, marginBottom: 2 },
+  title: Type.title,
 
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    borderRadius: 14,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
     paddingHorizontal: 14,
     height: 48,
     marginBottom: 16,
     gap: 8,
   },
   searchIcon: { fontSize: 16 },
-  searchInput: { flex: 1, fontSize: 15, color: FigmaColors.darkGray },
+  searchInput: { flex: 1, fontSize: 15, color: Colors.text },
 
   filtersScroll: { marginBottom: 20 },
   filtersContent: { gap: 8, paddingRight: 4 },
   chip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    borderRadius: Radius.pill,
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
   },
-  chipActive: { backgroundColor: FigmaColors.darkGray },
-  chipLabel: { fontSize: 13, fontWeight: '500', color: '#666' },
-  chipLabelActive: { color: '#fff', fontWeight: '600' },
+  chipActive: { backgroundColor: Colors.primarySoft, borderColor: Colors.primary },
+  chipLabel: { fontSize: 13, fontWeight: '500', color: Colors.textMuted },
+  chipLabelActive: { color: Colors.primary, fontWeight: '700' },
 
   sectionRow: {
     flexDirection: 'row',
@@ -177,15 +177,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 14,
   },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: FigmaColors.darkGray },
-  seeAll: { fontSize: 13, color: '#3c87f7', fontWeight: '500' },
+  sectionTitle: Type.heading,
+  seeAll: { fontSize: 13, color: Colors.primary, fontWeight: '500' },
 
   cards: { gap: 14 },
   card: {
-    borderRadius: 16,
-    backgroundColor: '#fff',
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#ebebeb',
+    borderColor: Colors.border,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     height: 120,
-    backgroundColor: FigmaColors.lightBlue,
+    backgroundColor: Colors.primarySoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -207,17 +207,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   cardTitleRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  cardName: { fontSize: 16, fontWeight: '700', color: FigmaColors.darkGray },
+  cardName: { fontSize: 16, fontWeight: '700', color: Colors.text },
   typeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colors.bg,
   },
-  typeBadgeLabel: { fontSize: 11, fontWeight: '600', color: '#666' },
+  typeBadgeLabel: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
   heartIcon: { fontSize: 20 },
-  cardLocation: { fontSize: 13, color: '#666', marginTop: 2 },
-  cardCapacity: { fontSize: 12, color: '#aaa' },
+  cardLocation: { fontSize: 13, color: Colors.textMuted, marginTop: 2 },
+  cardCapacity: { fontSize: 12, color: Colors.textFaint },
 
-  navSpacer: { height: 100 },
+  navSpacer: { height: NAV_BAR_CLEARANCE },
 });

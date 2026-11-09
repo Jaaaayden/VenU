@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FigmaColors } from '@/constants/theme';
+import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
+import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 
 const OPPORTUNITIES = [
   {
@@ -132,12 +133,12 @@ export default function VolunteerScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: Colors.bg },
   scroll: { flex: 1 },
-  content: { paddingHorizontal: 20, paddingTop: 8 },
+  content: { paddingHorizontal: Spacing.gutter, paddingTop: Spacing.lg },
 
-  title: { fontSize: 28, fontWeight: '700', color: FigmaColors.darkGray, letterSpacing: -0.5 },
-  subtitle: { fontSize: 14, color: '#888', marginTop: 4, marginBottom: 20 },
+  title: Type.title,
+  subtitle: { fontSize: 14, color: Colors.textMuted, marginTop: 4, marginBottom: 20 },
 
   statsRow: {
     flexDirection: 'row',
@@ -146,14 +147,14 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: FigmaColors.lightBlue,
-    borderRadius: 14,
+    backgroundColor: Colors.primarySoft,
+    borderRadius: Radius.md,
     padding: 14,
     alignItems: 'center',
     gap: 2,
   },
-  statValue: { fontSize: 22, fontWeight: '700', color: FigmaColors.darkGray },
-  statLabel: { fontSize: 11, color: '#555', textAlign: 'center' },
+  statValue: { fontSize: 22, fontWeight: '700', color: Colors.text },
+  statLabel: { fontSize: 11, color: Colors.textMuted, textAlign: 'center' },
 
   sectionRow: {
     flexDirection: 'row',
@@ -161,14 +162,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 14,
   },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: FigmaColors.darkGray },
-  seeAll: { fontSize: 13, color: '#3c87f7', fontWeight: '500' },
+  sectionTitle: Type.heading,
+  seeAll: { fontSize: 13, color: Colors.primary, fontWeight: '500' },
 
   cards: { gap: 14 },
   card: {
-    borderRadius: 16,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: '#ebebeb',
+    borderColor: Colors.border,
     padding: 16,
     gap: 12,
     shadowColor: '#000',
@@ -176,49 +177,49 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.surface,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   emojiBox: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   emoji: { fontSize: 22 },
   cardMeta: { flex: 1, gap: 2 },
-  cardTitle: { fontSize: 15, fontWeight: '700', color: FigmaColors.darkGray },
-  cardVenue: { fontSize: 12, color: '#666' },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: Colors.text },
+  cardVenue: { fontSize: 12, color: Colors.textMuted },
   spotsBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colors.bg,
   },
-  spotsBadgeUrgent: { backgroundColor: '#fff0e8' },
-  spotsText: { fontSize: 11, fontWeight: '600', color: '#666' },
-  spotsTextUrgent: { color: '#e07020' },
+  spotsBadgeUrgent: { backgroundColor: Colors.accentSoft },
+  spotsText: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
+  spotsTextUrgent: { color: Colors.accent },
   cardDetails: { gap: 8 },
-  cardDate: { fontSize: 12, color: '#888' },
+  cardDate: { fontSize: 12, color: Colors.textMuted },
   rolesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   roleChip: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
-    backgroundColor: FigmaColors.lightBlue,
+    backgroundColor: Colors.primarySoft,
   },
-  roleChipLabel: { fontSize: 11, fontWeight: '500', color: FigmaColors.darkGray },
+  roleChipLabel: { fontSize: 11, fontWeight: '500', color: Colors.text },
 
   signUpBtn: {
     height: 44,
-    borderRadius: 12,
-    backgroundColor: FigmaColors.darkGray,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  signUpLabel: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  signUpLabel: { fontSize: 14, fontWeight: '700', color: Colors.onPrimary },
 
-  navSpacer: { height: 100 },
+  navSpacer: { height: NAV_BAR_CLEARANCE },
 });

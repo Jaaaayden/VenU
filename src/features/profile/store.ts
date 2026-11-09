@@ -1,0 +1,122 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { draftToWrite, rowToProfile, type ProfileRow } from './mapping';
+import { PRIVACY_VERSION } from './privacy';
+import type { Profile, ProfileDraft } from './types';
+
+export interface PickedImage {
+  uri: string;
+  mimeType: string | null;
+  /** Present on web, where blob: URIs don't survive a reload. */
+  base64?: string | null;
+}
+
+/** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
+export interface ProfileStore {
+  get(userId: string): Promise<Profile | null>;
+  /** Creates or updates. `existing` keeps the original consent time unless the policy version changed. */
+  save(userId: string, draft: ProfileDraft, existing: Profile | null): Promise<Profile>;
+  /** Stores the picked image and returns the value to keep in `avatarPath`. */
+  uploadAvatar(userId: string, image: PickedImage): Promise<string>;
+  removeAvatar(path: string): Promise<void>;
+  /** A URL `expo-image` can show, or null. */
+  avatarUrl(path: string): Promise<string | null>;
+  /** Removes the profile row and photo. */
+  deleteAll(userId: string): Promise<void>;
+}
+
+function consentTime(existing: Profile | null): string {
+  return existing && existing.privacyVersion === PRIVACY_VERSION
+    ? existing.privacyAcceptedAt
+    : new Date().toISOString();
+}
+
+// ---------------------------------------------------------------------------
+// Local (device-only) store: used when Supabase isn't configured.
+
+export interface KeyValueStorage {
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+  removeItem(key: string): Promise<void>;
+}
+
+const localKey = (userId: string) => `venu.profile.${userId}`;
+
+export function createLocalStore(storage: KeyValueStorage): ProfileStore {
+  return {
+    async get(userId) {
+      const raw = await storage.getItem(localKey(userId));
+      return raw ? rowToProfile(JSON.parse(raw) as ProfileRow) : null;
+    },
+    async save(userId, draft, existing) {
+      const row: ProfileRow = {
+        id: userId,
+        verified: existing?.verified ?? false,
+        ...draftToWrite(draft, consentTime(existing)),
+        // Role is fixed once the profile exists, same as the DB rule.
+        ...(existing ? { role: existing.role } : {}),
+      };
+      await storage.setItem(localKey(userId), JSON.stringify(row));
+      return rowToProfile(row);
+    },
+    async uploadAvatar(_userId, image) {
+      return image.base64 ? `data:${image.mimeType ?? 'image/jpeg'};base64,${image.base64}` : image.uri;
+    },
+    async removeAvatar() {},
+    async avatarUrl(path) {
+      return path;
+    },
+    async deleteAll(userId) {
+      await storage.removeItem(localKey(userId));
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Supabase store: `public.profiles` + private `avatars` bucket.
+
+export function createSupabaseStore(client: SupabaseClient, bucket: string): ProfileStore {
+  const table = () => client.from('profiles');
+
+  return {
+    async get(userId) {
+      const { data, error } = await table().select('*').eq('id', userId).maybeSingle<ProfileRow>();
+      if (error) throw error;
+      return data ? rowToProfile(data) : null;
+    },
+    async save(userId, draft, existing) {
+      const write = draftToWrite(draft, consentTime(existing));
+      // Role can't change after creation; the column isn't updatable for users.
+      const { role: _role, ...updatable } = write;
+      const query = existing
+        ? table().update(updatable).eq('id', userId)
+        : table().insert({ id: userId, ...write });
+      const { data, error } = await query.select('*').single<ProfileRow>();
+      if (error) throw error;
+      return rowToProfile(data);
+    },
+    async uploadAvatar(userId, image) {
+      const contentType = image.mimeType ?? 'image/jpeg';
+      const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
+      const path = `${userId}/avatar.${ext}`;
+      const body = await (await fetch(image.uri)).arrayBuffer();
+      const { error } = await client.storage.from(bucket).upload(path, body, { contentType, upsert: true });
+      if (error) throw error;
+      return path;
+    },
+    async removeAvatar(path) {
+      const { error } = await client.storage.from(bucket).remove([path]);
+      if (error) throw error;
+    },
+    async avatarUrl(path) {
+      const { data, error } = await client.storage.from(bucket).createSignedUrl(path, 60 * 60);
+      return error ? null : data.signedUrl;
+    },
+    async deleteAll(userId) {
+      const { data: files } = await client.storage.from(bucket).list(userId);
+      if (files?.length) await client.storage.from(bucket).remove(files.map(f => `${userId}/${f.name}`));
+      const { error } = await table().delete().eq('id', userId);
+      if (error) throw error;
+    },
+  };
+}
