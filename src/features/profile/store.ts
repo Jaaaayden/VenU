@@ -56,7 +56,13 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
         // Role is fixed once the profile exists, same as the DB rule.
         ...(existing ? { role: existing.role } : {}),
       };
-      await storage.setItem(localKey(userId), JSON.stringify(row));
+      try {
+        await storage.setItem(localKey(userId), JSON.stringify(row));
+      } catch (e) {
+        // Web localStorage caps at ~5 MB; a base64 photo is the only thing big enough to hit it.
+        if (row.avatar_path?.startsWith('data:')) throw new Error('That photo is too big to keep in local dev mode. Try a smaller one.');
+        throw e;
+      }
       return rowToProfile(row);
     },
     async uploadAvatar(_userId, image) {
@@ -74,6 +80,9 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
 
 // ---------------------------------------------------------------------------
 // Supabase store: `public.profiles` + private `avatars` bucket.
+
+/** Signed photo URLs last this long; the provider re-signs a bit before they expire. */
+export const AVATAR_URL_TTL_S = 60 * 60;
 
 export function createSupabaseStore(client: SupabaseClient, bucket: string): ProfileStore {
   const table = () => client.from('profiles');
@@ -97,8 +106,8 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
     },
     async uploadAvatar(userId, image) {
       const contentType = image.mimeType ?? 'image/jpeg';
-      const ext = contentType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
-      const path = `${userId}/avatar.${ext}`;
+      // One fixed name, so a new photo always overwrites the old one whatever its format.
+      const path = `${userId}/avatar`;
       const body = await (await fetch(image.uri)).arrayBuffer();
       const { error } = await client.storage.from(bucket).upload(path, body, { contentType, upsert: true });
       if (error) throw error;
@@ -109,12 +118,17 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       if (error) throw error;
     },
     async avatarUrl(path) {
-      const { data, error } = await client.storage.from(bucket).createSignedUrl(path, 60 * 60);
+      const { data, error } = await client.storage.from(bucket).createSignedUrl(path, AVATAR_URL_TTL_S);
       return error ? null : data.signedUrl;
     },
     async deleteAll(userId) {
-      const { data: files } = await client.storage.from(bucket).list(userId);
-      if (files?.length) await client.storage.from(bucket).remove(files.map(f => `${userId}/${f.name}`));
+      // Photos first: if that fails, stop, so we never report "deleted" with a photo left behind.
+      const listed = await client.storage.from(bucket).list(userId);
+      if (listed.error) throw listed.error;
+      if (listed.data.length) {
+        const removed = await client.storage.from(bucket).remove(listed.data.map(f => `${userId}/${f.name}`));
+        if (removed.error) throw removed.error;
+      }
       const { error } = await table().delete().eq('id', userId);
       if (error) throw error;
     },

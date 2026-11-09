@@ -4,14 +4,15 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import * as auth from '@/lib/auth';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
-import { createLocalStore, createSupabaseStore, type PickedImage, type ProfileStore } from './store';
+import { AVATAR_URL_TTL_S, createLocalStore, createSupabaseStore, type PickedImage, type ProfileStore } from './store';
 import type { Profile, ProfileDraft } from './types';
 
 const store: ProfileStore = supabase
   ? createSupabaseStore(supabase, AVATAR_BUCKET)
   : createLocalStore(AsyncStorage);
 
-type Status = 'loading' | 'signedOut' | 'ready';
+/** `error`: couldn't load (e.g. offline); the saved session is kept and `refresh()` retries. */
+type Status = 'loading' | 'signedOut' | 'ready' | 'error';
 
 /** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */
 export type AvatarChange = PickedImage | 'remove' | null;
@@ -63,20 +64,45 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refresh = useCallback(async () => {
-    const s = await loadSession();
-    applySession(s);
-    return s.profile;
+    try {
+      const s = await loadSession();
+      applySession(s);
+      return s.profile;
+    } catch (e) {
+      setStatus('error');
+      throw e;
+    }
   }, [applySession]);
 
+  // Startup load. A failure (e.g. offline) is 'error', not 'signedOut', so a saved session isn't thrown away.
   useEffect(() => {
     let alive = true;
     loadSession()
       .then(s => alive && applySession(s))
-      .catch(() => alive && setStatus('signedOut'));
+      .catch(() => alive && setStatus('error'));
     return () => {
       alive = false;
     };
   }, [applySession]);
+
+  // Session ended elsewhere (token revoked/expired, signed out on another tab): drop to signed out.
+  useEffect(() => {
+    if (!supabase) return;
+    const { data } = supabase.auth.onAuthStateChange(event => {
+      if (event === 'SIGNED_OUT') applySession({ userId: null, profile: null, avatarUrl: null });
+    });
+    return () => data.subscription.unsubscribe();
+  }, [applySession]);
+
+  // Signed photo URLs expire; re-sign shortly before they do while the app stays open.
+  const avatarPath = profile?.avatarPath ?? null;
+  useEffect(() => {
+    if (!supabase || !avatarPath) return;
+    const timer = setInterval(() => {
+      store.avatarUrl(avatarPath).then(url => url && setAvatarUrl(url)).catch(() => {});
+    }, (AVATAR_URL_TTL_S - 5 * 60) * 1000);
+    return () => clearInterval(timer);
+  }, [avatarPath]);
 
   const save = useCallback(
     async (draft: ProfileDraft, avatar: AvatarChange) => {

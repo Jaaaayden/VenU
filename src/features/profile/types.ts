@@ -1,6 +1,8 @@
 // Profile shapes shared by onboarding, the Profile tab and (later) matching.
 // Codes are stable strings stored in the DB; labels live in options.ts.
 
+import { PRIVACY_VERSION } from './privacy';
+
 export type Role = 'visitor' | 'volunteer';
 
 export type AccessNeed = 'wheelchair' | 'hard_of_hearing' | 'low_vision' | 'walking_aid' | 'other';
@@ -66,7 +68,13 @@ export function emptyDraft(role: Role, mainLanguage = 'en'): ProfileDraft {
   };
 }
 
+/** Consent carries over only if the policy hasn't changed since they agreed. */
 export function draftFromProfile(p: Profile): ProfileDraft {
-  const { id: _id, verified: _v, privacyVersion: _pv, privacyAcceptedAt: _pa, ...rest } = p;
-  return { ...rest, privacyAccepted: true };
+  const { id: _id, verified: _v, privacyVersion, privacyAcceptedAt: _pa, ...rest } = p;
+  return { ...rest, privacyAccepted: privacyVersion === PRIVACY_VERSION };
+}
+
+/** Where each role lands after sign-in or setup. */
+export function homeFor(p: Pick<Profile, 'role'>): '/venue' | '/volunteer' {
+  return p.role === 'volunteer' ? '/volunteer' : '/venue';
 }

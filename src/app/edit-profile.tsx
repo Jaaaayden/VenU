@@ -10,7 +10,8 @@ import { ProfileForm } from '@/features/profile/profile-form';
 import { draftFromProfile } from '@/features/profile/types';
 
 export default function EditProfileScreen() {
-  const { profile, avatarUrl, save } = useProfile();
+  const { status, profile, avatarUrl, save } = useProfile();
+  if (status === 'loading') return null; // e.g. a web reload straight onto /edit-profile
   if (!profile) return <Redirect href="/" />;
 
   return (

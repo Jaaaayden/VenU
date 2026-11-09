@@ -7,7 +7,7 @@ import { TopBar } from '@/components/top-bar';
 import { Colors } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
-import { emptyDraft, type Role } from '@/features/profile/types';
+import { emptyDraft, homeFor, type Role } from '@/features/profile/types';
 
 /** Step 2 of 2: the role-specific questions (mockup 01). */
 export default function ProfileStep() {
@@ -26,8 +26,7 @@ export default function ProfileStep() {
         savedAvatarUrl={null}
         submitLabel="Save and continue"
         onSubmit={async (draft, avatar) => {
-          await save(draft, avatar);
-          router.replace(visitor ? '/venue' : '/volunteer');
+          router.replace(homeFor(await save(draft, avatar)));
         }}
         header={
           <StepHeader

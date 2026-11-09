@@ -5,6 +5,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Avatar } from '@/components/avatar';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import type { PickedImage } from '@/features/profile/store';
+import { isLocalMode } from '@/lib/auth';
 
 interface AvatarPickerProps {
   name: string;
@@ -19,8 +20,8 @@ const PICK_OPTIONS: ImagePicker.ImagePickerOptions = {
   allowsEditing: true,
   aspect: [1, 1],
   quality: 0.6,
-  // Web gives blob: URIs that die on reload; base64 lets the local store keep the photo.
-  base64: Platform.OS === 'web',
+  // Web gives blob: URIs that die on reload; base64 lets the local (no-Supabase) store keep the photo.
+  base64: Platform.OS === 'web' && isLocalMode,
 };
 
 /** Photo + "Choose photo" / "Take photo" / "Remove" actions. Must be launched from a tap (web rule). */

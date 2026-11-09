@@ -38,6 +38,7 @@ export default function ProfileScreen() {
   const { profile, avatarUrl, signOut, deleteAll } = useProfile();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleSignOut() {
     await signOut();
@@ -46,10 +47,13 @@ export default function ProfileScreen() {
 
   async function handleDelete() {
     setBusy(true);
+    setDeleteError(null);
     try {
       await deleteAll();
       await signOut();
       router.replace('/sign-in');
+    } catch (e) {
+      setDeleteError(`Nothing was deleted yet: ${e instanceof Error ? e.message : 'unknown error'}. Try again.`);
     } finally {
       setBusy(false);
     }
@@ -125,6 +129,7 @@ export default function ProfileScreen() {
             {confirmDelete ? (
               <>
                 <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
+                {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
                 <View style={styles.deleteRow}>
                   <Button label="Keep my data" variant="secondary" onPress={() => setConfirmDelete(false)} style={styles.flex} />
                   <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
@@ -191,4 +196,5 @@ const styles = StyleSheet.create({
 
   deleteBox: { marginTop: Spacing.md, gap: Spacing.sm, alignItems: 'stretch' },
   deleteRow: { flexDirection: 'row', gap: Spacing.md },
+  errorText: { color: Colors.danger },
 });

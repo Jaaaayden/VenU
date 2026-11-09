@@ -1,11 +1,12 @@
 import { describe, expect, it } from '@jest/globals';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { createLocalStore, type KeyValueStorage } from '../store';
+import { createLocalStore, createSupabaseStore, type KeyValueStorage } from '../store';
 import { helperSummary, initials } from '../summary';
-import { draftFromProfile, emptyDraft, type ProfileDraft } from '../types';
+import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 
 const rosa: ProfileDraft = {
@@ -139,5 +140,71 @@ describe('small helpers', () => {
     expect(searchLanguages('espanol').map(l => l.code)).toEqual(['es']);
     expect(searchLanguages('KOREAN').map(l => l.code)).toEqual(['ko']);
     expect(searchLanguages('sign').map(l => l.code)).toEqual(['ase']);
+  });
+});
+
+describe('review fixes', () => {
+  const at = '2026-11-09T00:00:00.000Z';
+  const saved = rowToProfile({ id: 'u1', verified: false, ...draftToWrite(rosa, at) });
+
+  it('asks for consent again once the policy version changes', () => {
+    expect(draftFromProfile(saved).privacyAccepted).toBe(true);
+    expect(draftFromProfile({ ...saved, privacyVersion: 'old-version' }).privacyAccepted).toBe(false);
+  });
+
+  it('sends each role to its own home tab', () => {
+    expect(homeFor({ role: 'visitor' })).toBe('/venue');
+    expect(homeFor({ role: 'volunteer' })).toBe('/volunteer');
+  });
+
+  it('turns a storage quota error on a photo into a readable message', async () => {
+    const full: KeyValueStorage = { ...memoryStorage(), setItem: async () => { throw new Error('QuotaExceededError'); } };
+    const store = createLocalStore(full);
+    await expect(store.save('u1', { ...rosa, avatarPath: 'data:image/png;base64,AAA' }, null)).rejects.toThrow('too big');
+    await expect(store.save('u1', rosa, null)).rejects.toThrow('QuotaExceededError');
+  });
+});
+
+describe('supabase store', () => {
+  function fakeClient({ listError = null as Error | null, removeError = null as Error | null } = {}) {
+    const calls: string[] = [];
+    const bucket = {
+      list: async (dir: string) => (calls.push(`list ${dir}`), { data: listError ? null : [{ name: 'avatar' }], error: listError }),
+      remove: async (paths: string[]) => (calls.push(`remove ${paths.join(',')}`), { data: null, error: removeError }),
+      upload: async (path: string, _b: ArrayBuffer, o: { contentType: string }) => (calls.push(`upload ${path} ${o.contentType}`), { error: null }),
+    };
+    const client = {
+      storage: { from: () => bucket },
+      from: () => ({ delete: () => ({ eq: async (_c: string, id: string) => (calls.push(`delete row ${id}`), { error: null }) }) }),
+    };
+    return { client: client as unknown as SupabaseClient, calls };
+  }
+
+  it('deletes photos, then the row', async () => {
+    const { client, calls } = fakeClient();
+    await createSupabaseStore(client, 'avatars').deleteAll('u1');
+    expect(calls).toEqual(['list u1', 'remove u1/avatar', 'delete row u1']);
+  });
+
+  it('keeps the row and throws when the photo can\'t be removed', async () => {
+    for (const opts of [{ listError: new Error('list failed') }, { removeError: new Error('remove failed') }]) {
+      const { client, calls } = fakeClient(opts);
+      await expect(createSupabaseStore(client, 'avatars').deleteAll('u1')).rejects.toThrow('failed');
+      expect(calls).not.toContain('delete row u1');
+    }
+  });
+
+  it('always uploads to one fixed path, whatever the format', async () => {
+    const { client, calls } = fakeClient();
+    const store = createSupabaseStore(client, 'avatars');
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async () => ({ arrayBuffer: async () => new ArrayBuffer(1) })) as unknown as typeof fetch;
+    try {
+      expect(await store.uploadAvatar('u1', { uri: 'file:///a.png', mimeType: 'image/png' })).toBe('u1/avatar');
+      expect(await store.uploadAvatar('u1', { uri: 'file:///b.jpg', mimeType: 'image/jpeg' })).toBe('u1/avatar');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    expect(calls).toEqual(['upload u1/avatar image/png', 'upload u1/avatar image/jpeg']);
   });
 });

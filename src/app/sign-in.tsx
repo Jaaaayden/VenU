@@ -16,6 +16,7 @@ import { Button } from '@/components/button';
 import { Wordmark } from '@/components/wordmark';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
+import { homeFor } from '@/features/profile/types';
 import * as auth from '@/lib/auth';
 
 type Mode = 'signin' | 'signup';
@@ -62,7 +63,9 @@ export default function SignInScreen() {
         return switchMode('signin');
       }
       const profile = await refresh();
-      router.replace(profile ? '/venue' : '/onboarding/role');
+      router.replace(profile ? homeFor(profile) : '/onboarding/role');
+    } catch (e) {
+      setError(e instanceof Error ? `Couldn't load your profile: ${e.message}` : 'Something went wrong. Try again.');
     } finally {
       setBusy(false);
     }
