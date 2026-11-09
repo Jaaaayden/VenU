@@ -20,8 +20,10 @@ const PICK_OPTIONS: ImagePicker.ImagePickerOptions = {
   allowsEditing: true,
   aspect: [1, 1],
   quality: 0.6,
-  // Web gives blob: URIs that die on reload; base64 lets the local (no-Supabase) store keep the photo.
-  base64: Platform.OS === 'web' && isLocalMode,
+  // base64 where the upload needs it:
+  // - web + local mode: blob: URIs die on reload, so the device store keeps a data URI;
+  // - native + Supabase: fetch() on a local file:// URI isn't reliable in RN, so upload decodes base64.
+  base64: Platform.OS === 'web' ? isLocalMode : !isLocalMode,
 };
 
 /** Photo + "Choose photo" / "Take photo" / "Remove" actions. Must be launched from a tap (web rule). */

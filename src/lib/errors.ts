@@ -18,11 +18,21 @@ const KNOWN: [RegExp, string][] = [
   [/mime type/i, PHOTO_WRONG_TYPE],
 ];
 
+/** PostgREST errors have `details` and `hint`; Storage errors are named Storage*Error. */
+function isDatabaseOrStorageError(e: unknown): boolean {
+  if (!e || typeof e !== 'object') return false;
+  const name = (e as { name?: unknown }).name;
+  return ('details' in e && 'hint' in e) || (typeof name === 'string' && name.startsWith('Storage'));
+}
+
 export function friendlyError(e: unknown, fallback = 'Something went wrong. Try again.'): string {
   const message = e instanceof Error ? e.message : typeof e === 'string' ? e : (e as { message?: unknown })?.message;
   // Supabase marks network failures as AuthRetryableFetchError with status 0.
   if ((e as { name?: string })?.name === 'AuthRetryableFetchError') return OFFLINE;
   if (typeof message !== 'string' || !message.trim()) return fallback;
   for (const [pattern, friendly] of KNOWN) if (pattern.test(message)) return friendly;
+  // Unrecognised database/storage errors carry internals (constraint and table names): don't show them.
+  if (isDatabaseOrStorageError(e)) return fallback;
+  // Our own errors (and Supabase auth's) are written for people, so show them as they are.
   return message;
 }

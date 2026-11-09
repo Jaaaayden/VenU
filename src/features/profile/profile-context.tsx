@@ -49,6 +49,8 @@ interface Session {
   avatarUrl: string | null;
 }
 
+const SIGNED_OUT: Session = { userId: null, profile: null, avatarUrl: null };
+
 /** The one place a stored photo path becomes a displayable URL. */
 function urlFor(p: Profile | null): Promise<string | null> {
   return p?.avatarPath ? store.avatarUrl(p.avatarPath) : Promise.resolve(null);
@@ -73,7 +75,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setAvatarUrl(url);
   }, []);
 
+  // Uploads kept after network-failed saves, reused by the next retry (see saveWithAvatar).
+  const pendingUploads = useRef<PendingUpload[]>([]);
+  // Last applied user, read by the auth listener (a ref, so the listener needn't resubscribe).
+  const userIdRef = useRef<string | null>(null);
+
+  /** The single place the session changes, including every way of becoming signed out. */
   const applySession = useCallback((s: Session) => {
+    // Kept uploads belong to one account; never carry them into another session.
+    if (s.userId !== userIdRef.current) pendingUploads.current = [];
+    userIdRef.current = s.userId;
     setUserId(s.userId);
     setProfile(s.profile);
     setAvatarUrl(s.avatarUrl);
@@ -109,17 +120,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [applySession]);
 
   // Session changed elsewhere: signed out (token revoked/expired, another tab) → drop to signed out;
-  // a different user signed in (another tab) → reload so we never show A's data under B's session.
-  const userIdRef = useRef(userId);
-  useEffect(() => {
-    userIdRef.current = userId;
-  }, [userId]);
+  // someone signed in (another tab, whether this one was signed out or showing a different user)
+  // → reload, so we never show A's data under B's session or sit on sign-in with a live session.
   useEffect(() => {
     if (!supabase) return;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
-        applySession({ userId: null, profile: null, avatarUrl: null });
-      } else if (session && userIdRef.current && session.user.id !== userIdRef.current) {
+        applySession(SIGNED_OUT);
+      } else if (session && session.user.id !== userIdRef.current) {
         // Supabase warns against awaiting its own calls inside this callback; defer.
         setTimeout(() => refresh().catch(() => {}), 0);
       }
@@ -146,13 +154,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     };
   }, [avatarPath]);
 
-  // An upload kept after a network-failed save, reused by the next retry (see saveWithAvatar).
-  const pendingUpload = useRef<PendingUpload | null>(null);
 
   const save = useCallback(
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
-      const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUpload);
+      const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUploads);
       await applyProfile(saved);
       return saved;
     },
@@ -162,18 +168,15 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const deleteAll = useCallback(async () => {
     if (!userId) return;
     await store.deleteAll(userId);
-    pendingUpload.current = null;
     // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile.
     await auth.signOut().catch(() => {});
-    applySession({ userId: null, profile: null, avatarUrl: null });
+    applySession(SIGNED_OUT);
   }, [userId, applySession]);
 
   const signOut = useCallback(async () => {
     await auth.signOut();
-    setUserId(null);
-    await applyProfile(null);
-    setStatus('signedOut');
-  }, [applyProfile]);
+    applySession(SIGNED_OUT);
+  }, [applySession]);
 
   const value = useMemo(
     () => ({ status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut }),

@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
+import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
@@ -202,23 +202,23 @@ describe('supabase store', () => {
     return { client: client as unknown as SupabaseClient, calls };
   }
 
-  it('deletes photos, then the row', async () => {
+  it('deletes the row, then sweeps the photos', async () => {
     const { client, calls } = fakeClient();
     await createSupabaseStore(client, 'avatars').deleteAll('u1');
-    expect(calls).toEqual(['list u1', 'remove u1/avatar', 'delete row u1']);
+    expect(calls).toEqual(['delete row u1', 'list u1', 'remove u1/avatar']);
   });
 
   it('deletes every photo across list pages, not just the first 100', async () => {
     const { client, calls } = fakeClient({ fileCount: 150 });
     await createSupabaseStore(client, 'avatars').deleteAll('u1');
-    expect(calls).toEqual(['list u1', 'list u1 @100', 'remove 150 files', 'delete row u1']);
+    expect(calls).toEqual(['delete row u1', 'list u1', 'list u1 @100', 'remove 150 files']);
   });
 
-  it('keeps the row and throws when the photo can\'t be removed', async () => {
+  it('reports a failed photo sweep (the row is already gone, so no profile points at a deleted file)', async () => {
     for (const opts of [{ listError: new Error('list failed') }, { removeError: new Error('remove failed') }]) {
       const { client, calls } = fakeClient(opts);
       await expect(createSupabaseStore(client, 'avatars').deleteAll('u1')).rejects.toThrow('failed');
-      expect(calls).not.toContain('delete row u1');
+      expect(calls[0]).toBe('delete row u1');
     }
   });
 
@@ -427,18 +427,18 @@ describe('saveWithAvatar retries after a network failure', () => {
 
   it('reuses the kept upload when retrying with the same photo', async () => {
     const { store, calls } = flakyStore(1);
-    const pending = { current: null as PendingUpload | null };
+    const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow('Failed to fetch');
-    expect(pending.current).toEqual({ uri: 'file:///same.jpg', path: 'u1/avatar-1' });
+    expect(pending.current).toEqual([{ uri: 'file:///same.jpg', path: 'u1/avatar-1' }]);
     const saved = await saveWithAvatar(store, 'u1', rosa, photo, existing, pending);
     expect(saved.avatarPath).toBe('u1/avatar-1');
     expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'save u1/avatar-1', 'remove u1/avatar-old']); // one upload
-    expect(pending.current).toBeNull();
+    expect(pending.current).toEqual([]);
   });
 
   it('a different photo on retry uploads anew and cleans up the superseded upload', async () => {
     const { store, calls } = flakyStore(1);
-    const pending = { current: null as PendingUpload | null };
+    const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
     await saveWithAvatar(store, 'u1', rosa, { uri: 'file:///other.jpg', mimeType: 'image/jpeg' }, existing, pending);
     expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'upload #2', 'save u1/avatar-2', 'remove u1/avatar-1', 'remove u1/avatar-old']);
@@ -446,10 +446,44 @@ describe('saveWithAvatar retries after a network failure', () => {
 
   it('choosing Remove on retry also cleans up the kept upload', async () => {
     const { store, calls } = flakyStore(1);
-    const pending = { current: null as PendingUpload | null };
+    const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
     await saveWithAvatar(store, 'u1', rosa, 'remove', existing, pending);
     expect(calls).toEqual(['upload #1', 'save u1/avatar-1', 'save null', 'remove u1/avatar-1', 'remove u1/avatar-old']);
+  });
+
+  it('two network failures with different photos keep both, and success cleans up the unused one', async () => {
+    const { store, calls } = flakyStore(2);
+    const pending = { current: [] as PendingUpload[] };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
+    const other = { uri: 'file:///other.jpg', mimeType: 'image/jpeg' };
+    await expect(saveWithAvatar(store, 'u1', rosa, other, existing, pending)).rejects.toThrow();
+    expect(pending.current.map(u => u.path)).toEqual(['u1/avatar-1', 'u1/avatar-2']);
+    await saveWithAvatar(store, 'u1', rosa, other, existing, pending); // reuses #2
+    expect(calls.slice(-3)).toEqual(['save u1/avatar-2', 'remove u1/avatar-1', 'remove u1/avatar-old']);
+  });
+
+  it('a server rejection on retry keeps a reused upload (an earlier lost save may point at it)', async () => {
+    const calls: string[] = [];
+    let attempt = 0;
+    const store: ProfileStore = {
+      get: async () => null,
+      save: async () => {
+        attempt += 1;
+        calls.push(`save #${attempt}`);
+        if (attempt === 1) throw new TypeError('Failed to fetch');
+        throw Object.assign(new Error('rejected'), { code: 'PGRST301' });
+      },
+      uploadAvatar: async () => (calls.push('upload'), 'u1/avatar-1'),
+      removeAvatar: async p => void calls.push(`remove ${p}`),
+      avatarUrl: async p => p,
+      deleteAll: async () => {},
+    };
+    const pending = { current: [] as PendingUpload[] };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow('rejected');
+    expect(calls).toEqual(['upload', 'save #1', 'save #2']); // never removed
+    expect(pending.current).toHaveLength(1);
   });
 });
 
@@ -471,5 +505,30 @@ describe('round five details', () => {
     expect(isKnownLanguage('ase')).toBe(true);
     expect(isKnownLanguage('xx')).toBe(false);
     expect(isKnownLanguage(undefined)).toBe(false);
+  });
+});
+
+describe('round six details', () => {
+  it('hides raw database/storage messages but keeps human ones', () => {
+    const generic = 'Something went wrong. Try again.';
+    expect(friendlyError({ code: '23514', message: 'new row violates check constraint "main_language_listed" for relation "profiles"', details: null, hint: null })).toBe(generic);
+    expect(friendlyError(Object.assign(new Error('The resource already exists'), { name: 'StorageApiError' }))).toBe(generic);
+    // Our own coded error and Supabase auth messages are written for people.
+    expect(friendlyError(Object.assign(new Error('This account is already set up as a volunteer. Reload the app to continue.'), { code: 'VENU_ROLE_MISMATCH' }))).toBe(
+      'This account is already set up as a volunteer. Reload the app to continue.',
+    );
+    expect(friendlyError(Object.assign(new Error('Password should be at least 6 characters.'), { name: 'AuthApiError', code: 'weak_password' }))).toBe(
+      'Password should be at least 6 characters.',
+    );
+  });
+
+  it('decodes picker base64 into the bytes that get uploaded', () => {
+    const buf = base64ToArrayBuffer('iVBORw0KGgo='); // PNG signature
+    expect(Array.from(new Uint8Array(buf))).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+  });
+
+  it('length messages match the limit (40 is allowed)', () => {
+    expect(validateDraft({ ...rosa, firstName: 'a'.repeat(40) }).firstName).toBeUndefined();
+    expect(validateDraft({ ...rosa, firstName: 'a'.repeat(41) }).firstName).toBe('Use 40 characters or fewer.');
   });
 });

@@ -19,7 +19,7 @@ export function validateDraft(d: ProfileDraft): DraftErrors {
   const name = d.firstName.trim();
 
   if (!name) errors.firstName = 'Add your first name.';
-  else if (name.length > FIRST_NAME_MAX) errors.firstName = `Keep it under ${FIRST_NAME_MAX} characters.`;
+  else if (name.length > FIRST_NAME_MAX) errors.firstName = `Use ${FIRST_NAME_MAX} characters or fewer.`;
 
   if (d.languages.length === 0) errors.languages = 'Add at least one language.';
   else if (!d.languages.includes(d.mainLanguage)) errors.languages = 'Pick your main language.';
@@ -27,7 +27,7 @@ export function validateDraft(d: ProfileDraft): DraftErrors {
   if (d.role === 'visitor') {
     const note = d.accessNeedsNote.trim();
     if (d.accessNeeds.includes('other') && !note) errors.accessNeedsNote = 'Tell us a bit about what you need.';
-    else if (note.length > NOTE_MAX) errors.accessNeedsNote = `Keep it under ${NOTE_MAX} characters.`;
+    else if (note.length > NOTE_MAX) errors.accessNeedsNote = `Use ${NOTE_MAX} characters or fewer.`;
   } else {
     // Needed so visitors' "I'd prefer help from" choices can be honoured.
     if (!d.gender) errors.gender = 'Pick one (or "Prefer not to say").';

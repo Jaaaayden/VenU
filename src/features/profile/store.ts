@@ -154,7 +154,9 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       // A fresh name per upload (`<uid>/avatar-<ms>`), so the live photo is never overwritten
       // before the row points at the new one; the provider deletes the old file after saving.
       const path = `${userId}/avatar-${Date.now()}`;
-      const body = await (await fetch(image.uri)).arrayBuffer();
+      // Prefer the picker's base64 (requested on native): fetch() on a local file:// URI isn't
+      // reliable in React Native. Web blob: URIs fetch fine.
+      const body = image.base64 ? base64ToArrayBuffer(image.base64) : await (await fetch(image.uri)).arrayBuffer();
       // No upsert: paths are never reused, so storage never needs to overwrite (and no UPDATE policy).
       const { error } = await client.storage.from(bucket).upload(path, body, { contentType });
       if (error) throw error;
@@ -169,7 +171,11 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       return error ? null : data.signedUrl;
     },
     async deleteAll(userId) {
-      // Photos first: if that fails, stop, so we never report "deleted" with a photo left behind.
+      // Row first: if the photo sweep then fails, there's no live profile pointing at a deleted
+      // file, just files in the user's own (owner-only) folder that a retry removes. The caller
+      // reports any failure, and a retry is safe (deleting a missing row isn't an error).
+      const { error } = await table().delete().eq('id', userId);
+      if (error) throw error;
       // list() returns one page (100 by default), so page through everything in the folder.
       const PAGE = 100;
       const names: string[] = [];
@@ -183,8 +189,6 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         const removed = await client.storage.from(bucket).remove(names);
         if (removed.error) throw removed.error;
       }
-      const { error } = await table().delete().eq('id', userId);
-      if (error) throw error;
     },
   };
 }
@@ -203,9 +207,10 @@ export interface PendingUpload {
  * path, save the row, and only then delete the old file. A failed save leaves the old
  * photo and row untouched.
  *
- * `pending` carries an upload across retries: after a network failure the upload is kept
- * (the row may already point at it) and a retry with the same picked image reuses it.
- * Once a save succeeds, a kept upload that the row no longer uses is deleted.
+ * `pending` carries uploads across retries. After a network failure an upload is kept (the
+ * row may already point at it), and a retry with the same picked image reuses it. Once a save
+ * succeeds, every kept upload the row doesn't use is deleted. Only an upload made in this very
+ * call is deleted on a server rejection: a reused one may be what an earlier, lost save committed.
  */
 export async function saveWithAvatar(
   store: ProfileStore,
@@ -213,32 +218,37 @@ export async function saveWithAvatar(
   draft: ProfileDraft,
   avatar: AvatarChange,
   existing: Profile | null,
-  pending: { current: PendingUpload | null } = { current: null },
+  pending: { current: PendingUpload[] } = { current: [] },
 ): Promise<Profile> {
   const previous = existing?.avatarPath ?? null;
   const picked = avatar && avatar !== 'remove' ? avatar : null;
-  const kept = pending.current;
-  const uploaded = picked ? (kept?.uri === picked.uri ? kept.path : await store.uploadAvatar(userId, picked)) : null;
-  const avatarPath = avatar === 'remove' ? null : (uploaded ?? previous);
+  const reused = picked ? pending.current.find(u => u.uri === picked.uri) : undefined;
+  const fresh = picked && !reused ? await store.uploadAvatar(userId, picked) : null;
+  const avatarPath = avatar === 'remove' ? null : (reused?.path ?? fresh ?? previous);
   let saved: Profile;
   try {
     saved = await store.save(userId, { ...draft, avatarPath }, existing);
   } catch (e) {
-    if (picked && uploaded) {
-      if (isServerRejection(e)) {
-        // The server definitely said no: nothing points at this upload.
-        await store.removeAvatar(uploaded).catch(() => {});
-        pending.current = null;
-      } else {
-        // Network failure: the row may have committed pointing at it, so keep it for the retry.
-        pending.current = { uri: picked.uri, path: uploaded };
-      }
+    if (picked && fresh) {
+      if (isServerRejection(e)) await store.removeAvatar(fresh).catch(() => {});
+      else pending.current = [...pending.current, { uri: picked.uri, path: fresh }];
     }
     throw e;
   }
-  pending.current = null;
+  const leftovers = pending.current.map(u => u.path).filter(p => p !== saved.avatarPath);
+  pending.current = [];
   // Best effort cleanups; anything missed is an orphan in the user's own folder, and deleteAll sweeps it.
-  if (kept && kept.path !== saved.avatarPath) await store.removeAvatar(kept.path).catch(() => {});
-  if (previous && previous !== avatarPath) await store.removeAvatar(previous).catch(() => {});
+  for (const p of leftovers) await store.removeAvatar(p).catch(() => {});
+  if (previous && previous !== saved.avatarPath && !leftovers.includes(previous)) {
+    await store.removeAvatar(previous).catch(() => {});
+  }
   return saved;
+}
+
+/** Decodes base64 (as expo-image-picker returns it) without a dependency; atob is built into Hermes and browsers. */
+export function base64ToArrayBuffer(b64: string): ArrayBuffer {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes.buffer;
 }
