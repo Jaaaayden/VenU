@@ -1,7 +1,9 @@
-import { Href, router, Slot, usePathname } from 'expo-router';
+import { Href, Redirect, router, Slot, usePathname } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import { XrNavigationBar, XrTab } from '@/components/xr-navigation-bar';
+import { Colors } from '@/constants/theme';
+import { useProfile } from '@/features/profile/profile-context';
 
 const TAB_ROUTES: Record<XrTab, Href> = {
   venue:     '/venue',
@@ -17,11 +19,18 @@ function pathnameToTab(pathname: string): XrTab {
 
 export default function TabsLayout() {
   const pathname = usePathname();
+  const { status, profile } = useProfile();
   const activeTab = pathnameToTab(pathname);
 
   function handleTabPress(tab: XrTab) {
     router.replace(TAB_ROUTES[tab]);
   }
+
+  if (status === 'loading') return null;
+  // Session ended (signed out elsewhere, token expired) or couldn't load: back through the entry gate.
+  if (status !== 'ready') return <Redirect href="/" />;
+  // Signed in but never finished setup (e.g. a deep link to /volunteer): set up first.
+  if (!profile) return <Redirect href="/onboarding/role" />;
 
   return (
     <View style={styles.root}>
@@ -37,6 +46,6 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#fff' },
+  root: { flex: 1, backgroundColor: Colors.bg },
   screen: { flex: 1 },
 });

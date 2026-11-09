@@ -26,6 +26,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "VenU uses your photos so you can add a profile picture your helper can recognise.",
+          "cameraPermission": "VenU uses the camera so you can take a profile picture.",
+          "microphonePermission": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",

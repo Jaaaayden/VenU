@@ -13,6 +13,9 @@ import { FigmaColors, FigmaTypography } from '@/constants/theme';
 
 export type XrTab = 'volunteer' | 'venue' | 'profile';
 
+/** Bottom padding a scrolling tab screen needs so its last item clears the floating bar. */
+export const NAV_BAR_CLEARANCE = 112;
+
 interface XrNavigationBarProps {
   activeTab?: XrTab;
   onTabPress?: (tab: XrTab) => void;
