@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+import { PHOTO_MAX_BYTES, PHOTO_TOO_BIG, PHOTO_TYPES, PHOTO_WRONG_TYPE } from '@/constants/photo';
+
 import { draftToWrite, rowToProfile, type ProfileRow } from './mapping';
 import { PRIVACY_VERSION } from './privacy';
 import type { Profile, ProfileDraft } from './types';
@@ -13,15 +15,20 @@ export interface PickedImage {
   base64?: string | null;
 }
 
-/** Same limits as the `avatars` bucket in supabase/migrations, so a bad pick fails here, not on upload. */
-export const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
-export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-
-/** A message to show by the photo, or null if the pick is fine. Unknown size/type passes. */
+/**
+ * A message to show by the photo, or null if the pick is fine. Uses the bucket's limits
+ * (src/constants/photo.ts) so a bad pick fails here, not on upload. Unknown size/type passes.
+ */
 export function checkPhoto(image: Pick<PickedImage, 'mimeType' | 'fileSize'>): string | null {
-  if (image.mimeType && !PHOTO_TYPES.includes(image.mimeType.toLowerCase())) return 'Use a JPG, PNG, WebP or HEIC photo.';
-  if (image.fileSize && image.fileSize > PHOTO_MAX_BYTES) return 'That photo is over 5 MB. Pick a smaller one.';
+  if (image.mimeType && !PHOTO_TYPES.includes(image.mimeType.toLowerCase())) return PHOTO_WRONG_TYPE;
+  if (image.fileSize && image.fileSize > PHOTO_MAX_BYTES) return PHOTO_TOO_BIG;
   return null;
+}
+
+/** A PostgREST error the server actually sent. Transport failures also come back as errors, but with `code: ""`. */
+function isServerRejection(e: unknown): boolean {
+  const code = (e as { code?: unknown } | null)?.code;
+  return typeof code === 'string' && code.length > 0;
 }
 
 /** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
@@ -59,7 +66,15 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
   return {
     async get(userId) {
       const raw = await storage.getItem(localKey(userId));
-      return raw ? rowToProfile(JSON.parse(raw) as ProfileRow) : null;
+      if (!raw) return null;
+      try {
+        return rowToProfile(JSON.parse(raw) as ProfileRow);
+      } catch {
+        // Unreadable (corrupt or from an old format): drop it and start setup again rather than
+        // failing every launch. Device-only dev data, so nothing is lost that the server holds.
+        await storage.removeItem(localKey(userId));
+        return null;
+      }
     },
     async save(userId, draft, existing) {
       const row: ProfileRow = {
@@ -112,9 +127,22 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       // Role can't change after creation; the column isn't updatable for users.
       const { role: _role, ...updatable } = write;
       const update = () => table().update(updatable).eq('id', userId).select('*').single<ProfileRow>();
-      let result = existing ? await update() : await table().insert({ id: userId, ...write }).select('*').single<ProfileRow>();
-      // Row already exists (an earlier insert committed but its response was lost): update it instead.
-      if (!existing && result.error?.code === '23505') result = await update();
+      const insert = () => table().insert({ id: userId, ...write }).select('*').single<ProfileRow>();
+      let result = existing ? await update() : await insert();
+
+      if (!existing && result.error?.code === '23505') {
+        // Row already exists (an earlier insert committed but its response was lost). Update it,
+        // but only if it's the same role: role can't change, so never merge two roles' fields.
+        const current = await table().select('role').eq('id', userId).single<{ role: ProfileRow['role'] }>();
+        if (current.error) throw current.error;
+        if (current.data.role !== write.role) {
+          throw new Error(`This account is already set up as a ${current.data.role}. Reload the app to continue.`);
+        }
+        result = await update();
+      } else if (existing && result.error?.code === 'PGRST116') {
+        // No row to update (deleted on another device): create it again.
+        result = await insert();
+      }
       if (result.error) throw result.error;
       return rowToProfile(result.data);
     },
@@ -172,10 +200,9 @@ export async function saveWithAvatar(
   try {
     saved = await store.save(userId, { ...draft, avatarPath }, existing);
   } catch (e) {
-    // PostgREST rejections carry a string `code`; a network failure doesn't, and the row may
-    // have committed pointing at this photo, so keep it (an orphan at worst; deleteAll sweeps it).
-    const rejected = typeof (e as { code?: unknown } | null)?.code === 'string';
-    if (uploaded && rejected) await store.removeAvatar(uploaded).catch(() => {});
+    // On a network failure the row may have committed pointing at this photo, so keep it
+    // (an orphan at worst; deleteAll sweeps it). Only a definite server rejection cleans up.
+    if (uploaded && isServerRejection(e)) await store.removeAvatar(uploaded).catch(() => {});
     throw e;
   }
   // Best effort: if this fails the file is orphaned in the user's own folder, and deleteAll sweeps it.

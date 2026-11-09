@@ -41,11 +41,17 @@ export default function ProfileScreen() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
   const scrollRef = useRef<ScrollViewInstance>(null);
 
   async function handleSignOut() {
-    await signOut();
-    router.replace('/sign-in');
+    setSignOutError(null);
+    try {
+      await signOut();
+      router.replace('/sign-in');
+    } catch (e) {
+      setSignOutError(`Couldn't sign out. ${friendlyError(e)}`);
+    }
   }
 
   async function handleDelete() {
@@ -130,6 +136,11 @@ export default function ProfileScreen() {
         ))}
 
         <Button label="Sign out" variant="secondary" onPress={handleSignOut} />
+        {signOutError && (
+          <Text style={[Type.caption, styles.errorText, styles.gapSm]} accessibilityLiveRegion="polite">
+            {signOutError}
+          </Text>
+        )}
 
         {profile && (
           <View style={styles.deleteBox}>

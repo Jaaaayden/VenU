@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { AppState } from 'react-native';
 
 import * as auth from '@/lib/auth';
+import { friendlyError } from '@/lib/errors';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
 import { AVATAR_URL_TTL_S, createLocalStore, createSupabaseStore, saveWithAvatar, type AvatarChange, type ProfileStore } from './store';
@@ -18,6 +20,8 @@ export type { AvatarChange };
 
 interface ProfileContextValue {
   status: Status;
+  /** Why loading failed, as one plain sentence (set while status is 'error'). */
+  loadError: string | null;
   userId: string | null;
   profile: Profile | null;
   avatarUrl: string | null;
@@ -49,6 +53,7 @@ async function loadSession(): Promise<Session> {
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status>('loading');
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -64,6 +69,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setProfile(s.profile);
     setAvatarUrl(s.avatarUrl);
     setStatus(s.userId ? 'ready' : 'signedOut');
+    setLoadError(null);
   }, []);
 
   const refresh = useCallback(async () => {
@@ -72,6 +78,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       applySession(s);
       return s.profile;
     } catch (e) {
+      setLoadError(friendlyError(e));
       setStatus('error');
       throw e;
     }
@@ -82,7 +89,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     let alive = true;
     loadSession()
       .then(s => alive && applySession(s))
-      .catch(() => alive && setStatus('error'));
+      .catch(e => {
+        if (!alive) return;
+        setLoadError(friendlyError(e));
+        setStatus('error');
+      });
     return () => {
       alive = false;
     };
@@ -107,14 +118,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, [applySession, refresh]);
 
-  // Signed photo URLs expire; re-sign shortly before they do while the app stays open.
+  // Signed photo URLs expire. Re-sign shortly before they do while the app stays open, and
+  // whenever it comes back to the foreground (JS timers don't run while a phone app is backgrounded).
   const avatarPath = profile?.avatarPath ?? null;
   useEffect(() => {
     if (!supabase || !avatarPath) return;
-    const timer = setInterval(() => {
+    const resign = () => {
       store.avatarUrl(avatarPath).then(url => url && setAvatarUrl(url)).catch(() => {});
-    }, (AVATAR_URL_TTL_S - 5 * 60) * 1000);
-    return () => clearInterval(timer);
+    };
+    const timer = setInterval(resign, (AVATAR_URL_TTL_S - 5 * 60) * 1000);
+    const sub = AppState.addEventListener('change', state => state === 'active' && resign());
+    return () => {
+      clearInterval(timer);
+      sub.remove();
+    };
   }, [avatarPath]);
 
   const save = useCallback(
@@ -141,8 +158,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [applyProfile]);
 
   const value = useMemo(
-    () => ({ status, userId, profile, avatarUrl, refresh, save, deleteAll, signOut }),
-    [status, userId, profile, avatarUrl, refresh, save, deleteAll, signOut],
+    () => ({ status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut }),
+    [status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut],
   );
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 }

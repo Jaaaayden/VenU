@@ -109,6 +109,13 @@ describe('local store', () => {
     expect(storage.data.size).toBe(0);
   });
 
+  it('drops unreadable saved data instead of failing every launch', async () => {
+    const storage = memoryStorage();
+    storage.data.set('venu.profile.u1', '{not json');
+    expect(await createLocalStore(storage).get('u1')).toBeNull();
+    expect(storage.data.has('venu.profile.u1')).toBe(false);
+  });
+
   it('keeps web photos as data URIs so they survive a reload', async () => {
     const store = createLocalStore(memoryStorage());
     expect(await store.uploadAvatar('u1', { uri: 'blob:x', mimeType: 'image/png', base64: 'AAA' })).toBe('data:image/png;base64,AAA');
@@ -258,6 +265,20 @@ describe('saveWithAvatar', () => {
     expect(calls).toEqual(['upload', 'save u1/avatar-new', 'remove u1/avatar-new']);
   });
 
+  it('postgrest transport failure (code "") also keeps the new upload', async () => {
+    const calls: string[] = [];
+    const store: ProfileStore = {
+      get: async () => null,
+      save: async () => { calls.push('save'); throw { code: '', message: 'TypeError: Failed to fetch', details: '', hint: '' }; },
+      uploadAvatar: async () => (calls.push('upload'), 'u1/avatar-new'),
+      removeAvatar: async p => void calls.push(`remove ${p}`),
+      avatarUrl: async p => p,
+      deleteAll: async () => {},
+    };
+    await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toMatchObject({ code: '' });
+    expect(calls).toEqual(['upload', 'save']);
+  });
+
   it('network failure keeps the new upload too (the row may have committed pointing at it)', async () => {
     const { store, calls } = fakeStore({ saveFails: 'network' });
     await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toThrow('Failed to fetch');
@@ -316,35 +337,53 @@ describe('checkPhoto', () => {
 
 describe('supabase store save', () => {
   const row = { id: 'u1', verified: false, ...draftToWrite(rosa, '2026-11-09T00:00:00.000Z') };
+  type Result = { data: unknown; error: unknown };
+  const ok: Result = { data: row, error: null };
 
-  // Minimal PostgREST chain: insert(...).select().single() and update(...).eq().select().single().
-  function tableClient(insertResult: { data: unknown; error: unknown }) {
+  // Minimal PostgREST chain: insert(...).select().single(), update(...).eq().select().single(),
+  // and select('role').eq().single() for the duplicate-key role check.
+  function tableClient({ insert = ok, update = ok, storedRole = 'visitor' }: { insert?: Result; update?: Result; storedRole?: string } = {}) {
     const calls: string[] = [];
-    const single = (name: string, result: { data: unknown; error: unknown }) => ({ select: () => ({ single: async () => (calls.push(name), result) }) });
+    const single = (name: string, result: Result) => ({ select: () => ({ single: async () => (calls.push(name), result) }) });
     const client = {
       from: () => ({
-        insert: (r: { role?: string }) => single(`insert role=${r.role}`, insertResult),
-        update: (r: { role?: string }) => ({ eq: () => single(`update role=${'role' in r ? r.role : 'omitted'}`, { data: row, error: null }) }),
+        insert: (r: { role?: string }) => single(`insert role=${r.role}`, insert),
+        update: (r: { role?: string }) => ({ eq: () => single(`update role=${'role' in r ? r.role : 'omitted'}`, update) }),
+        select: () => ({ eq: () => ({ single: async () => (calls.push('read role'), { data: { role: storedRole }, error: null }) }) }),
       }),
     };
     return { client: client as unknown as SupabaseClient, calls };
   }
+  const duplicate: Result = { data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } };
 
   it('first save inserts with the role', async () => {
-    const { client, calls } = tableClient({ data: row, error: null });
+    const { client, calls } = tableClient();
     await createSupabaseStore(client, 'avatars').save('u1', rosa, null);
     expect(calls).toEqual(['insert role=visitor']);
   });
 
-  it('falls back to update (without role) when the row already exists', async () => {
-    const { client, calls } = tableClient({ data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } });
+  it('duplicate key with the same role falls back to update (without role)', async () => {
+    const { client, calls } = tableClient({ insert: duplicate });
     const saved = await createSupabaseStore(client, 'avatars').save('u1', rosa, null);
-    expect(calls).toEqual(['insert role=visitor', 'update role=omitted']);
+    expect(calls).toEqual(['insert role=visitor', 'read role', 'update role=omitted']);
     expect(saved.firstName).toBe('Rosa');
   });
 
+  it('duplicate key with a different role stops instead of merging two roles', async () => {
+    const { client, calls } = tableClient({ insert: duplicate, storedRole: 'volunteer' });
+    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toThrow('already set up as a volunteer');
+    expect(calls).toEqual(['insert role=visitor', 'read role']); // no update
+  });
+
+  it('update of a row deleted elsewhere (PGRST116) recreates it', async () => {
+    const existing = rowToProfile(row);
+    const { client, calls } = tableClient({ update: { data: null, error: { code: 'PGRST116', message: 'JSON object requested, multiple (or no) rows returned' } } });
+    await createSupabaseStore(client, 'avatars').save('u1', rosa, existing);
+    expect(calls).toEqual(['update role=omitted', 'insert role=visitor']);
+  });
+
   it('other insert errors still throw', async () => {
-    const { client } = tableClient({ data: null, error: { code: '23514', message: 'violates check constraint' } });
+    const { client } = tableClient({ insert: { data: null, error: { code: '23514', message: 'violates check constraint' } } });
     await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: '23514' });
   });
 });

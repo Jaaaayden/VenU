@@ -19,7 +19,7 @@ function pathnameToTab(pathname: string): XrTab {
 
 export default function TabsLayout() {
   const pathname = usePathname();
-  const { status } = useProfile();
+  const { status, profile } = useProfile();
   const activeTab = pathnameToTab(pathname);
 
   function handleTabPress(tab: XrTab) {
@@ -29,6 +29,8 @@ export default function TabsLayout() {
   if (status === 'loading') return null;
   // Session ended (signed out elsewhere, token expired) or couldn't load: back through the entry gate.
   if (status !== 'ready') return <Redirect href="/" />;
+  // Signed in but never finished setup (e.g. a deep link to /volunteer): set up first.
+  if (!profile) return <Redirect href="/onboarding/role" />;
 
   return (
     <View style={styles.root}>

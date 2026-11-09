@@ -1,7 +1,9 @@
 // Turns errors from fetch / Supabase into one plain sentence for the screen.
 // e.g. TypeError("Failed to fetch") → "Can't reach VenU. Check your connection and try again."
 
-const OFFLINE = "Can't reach VenU. Check your connection and try again.";
+import { PHOTO_TOO_BIG, PHOTO_WRONG_TYPE } from '@/constants/photo';
+
+export const OFFLINE = "Can't reach VenU. Check your connection and try again.";
 
 const KNOWN: [RegExp, string][] = [
   [/failed to fetch|network request failed|networkerror|load failed|fetch failed/i, OFFLINE],
@@ -12,8 +14,8 @@ const KNOWN: [RegExp, string][] = [
   [/jwt expired|invalid jwt|refresh token/i, 'Your session expired. Sign out and sign in again.'],
   // Not a session problem: the database or storage policy refused this change.
   [/row-level security|permission denied/i, "VenU couldn't save that change. If it keeps happening, sign out and back in."],
-  [/exceeded the maximum allowed size|payload too large/i, 'That photo is over 5 MB. Pick a smaller one.'],
-  [/mime type/i, 'Use a JPG, PNG, WebP or HEIC photo.'],
+  [/exceeded the maximum allowed size|payload too large/i, PHOTO_TOO_BIG],
+  [/mime type/i, PHOTO_WRONG_TYPE],
 ];
 
 export function friendlyError(e: unknown, fallback = 'Something went wrong. Try again.'): string {

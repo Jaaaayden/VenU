@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 
 import { friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
@@ -45,8 +46,9 @@ export async function currentUserId(): Promise<string | null> {
     return (await AsyncStorage.getItem(LOCAL_SESSION_KEY)) ? LOCAL_USER_ID : null;
   }
   const { data, error } = await supabase.auth.getSession();
-  // An expired token that can't refresh (e.g. offline) is a load error, not "signed out":
-  // throwing lets the app show "Can't reach VenU" and keep the saved session.
-  if (error && !data.session) throw error;
+  // An expired token that can't refresh because we're offline is a load error, not "signed out":
+  // throwing lets the app show "Can't reach VenU" and keep the saved session. Any other error
+  // (revoked refresh token, deleted user) has already cleared the session, so it is signed out.
+  if (error && !data.session && isAuthRetryableFetchError(error)) throw error;
   return data.session?.user.id ?? null;
 }

@@ -6,25 +6,41 @@ import { Button } from '@/components/button';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { homeFor } from '@/features/profile/types';
+import { OFFLINE } from '@/lib/errors';
 
 /** Entry gate: signed out → sign-in, signed in without a profile → onboarding, else the role's home tab. */
 export default function Index() {
-  const { status, profile, refresh } = useProfile();
-  const [retrying, setRetrying] = useState(false);
+  const { status, loadError, profile, refresh, signOut } = useProfile();
+  const [busy, setBusy] = useState<'retry' | 'signout' | null>(null);
 
   if (status === 'loading') return null;
   if (status === 'signedOut') return <Redirect href="/sign-in" />;
   if (status === 'error') {
+    const offline = loadError === OFFLINE;
     return (
       <View style={styles.center}>
-        <Text style={Type.heading}>Can&apos;t reach VenU</Text>
-        <Text style={styles.body}>Check your connection and try again. You&apos;re still signed in.</Text>
+        <Text style={Type.heading} accessibilityRole="header">
+          {offline ? "Can't reach VenU" : "Couldn't load your profile"}
+        </Text>
+        <Text style={styles.body} accessibilityLiveRegion="polite">
+          {offline ? "Check your connection and try again. You're still signed in." : loadError}
+        </Text>
         <Button
           label="Try again"
-          loading={retrying}
+          loading={busy === 'retry'}
           onPress={() => {
-            setRetrying(true);
-            refresh().catch(() => {}).finally(() => setRetrying(false));
+            setBusy('retry');
+            refresh().catch(() => {}).finally(() => setBusy(null));
+          }}
+        />
+        {/* A way out when retrying keeps failing (e.g. a broken saved profile). */}
+        <Button
+          label="Sign out"
+          variant="secondary"
+          loading={busy === 'signout'}
+          onPress={() => {
+            setBusy('signout');
+            signOut().catch(() => {}).finally(() => setBusy(null));
           }}
         />
       </View>

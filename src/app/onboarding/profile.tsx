@@ -1,4 +1,4 @@
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,7 +7,7 @@ import { TopBar } from '@/components/top-bar';
 import { Colors } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
-import { emptyDraft, homeFor, type Role } from '@/features/profile/types';
+import { emptyDraft, type Role } from '@/features/profile/types';
 
 /** Step 2 of 2: the role-specific questions (mockup 01). */
 export default function ProfileStep() {
@@ -25,8 +25,9 @@ export default function ProfileStep() {
         initial={emptyDraft(role, params.lang || 'en')}
         savedAvatarUrl={null}
         submitLabel="Save and continue"
+        // No navigation here: once the profile exists, the onboarding layout redirects to the home tab.
         onSubmit={async (draft, avatar) => {
-          router.replace(homeFor(await save(draft, avatar)));
+          await save(draft, avatar);
         }}
         header={
           <StepHeader
