@@ -75,8 +75,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const userIdRef = useRef<string | null>(null);
   // When the current photo URL was signed, so a foreground resume only re-signs near expiry.
   const signedAt = useRef(0);
-  // One session load at a time: startup, sign-in and the auth listener can all ask at once.
-  const inFlight = useRef<Promise<Session> | null>(null);
+  // Bumped by every load and every sign-out, so a slow load that finishes after something newer
+  // happened (a sign-out, a sign-in, another load) is discarded instead of overwriting it.
+  const generation = useRef(0);
 
   const setSignedUrl = useCallback((url: string | null) => {
     signedAt.current = url ? Date.now() : 0;
@@ -98,61 +99,64 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     [setSignedUrl],
   );
 
-  const loadOnce = useCallback(() => {
-    inFlight.current ??= loadSession().finally(() => {
-      inFlight.current = null;
-    });
-    return inFlight.current;
-  }, []);
+  const goSignedOut = useCallback(() => {
+    generation.current += 1; // drop any load still in flight
+    applySession(SIGNED_OUT);
+  }, [applySession]);
 
-  const refresh = useCallback(async () => {
-    try {
-      const s = await loadOnce();
-      applySession(s);
-      return s.profile;
-    } catch (e) {
-      setLoadError(friendlyError(e));
-      setStatus('error');
-      throw e;
-    }
-  }, [applySession, loadOnce]);
+  /**
+   * Loads the session and applies it, unless something newer happened meanwhile.
+   * `quiet` (background reloads: another tab, after a failed delete) keeps the current screen
+   * on failure; otherwise a failure shows the "Can't reach VenU" / load-error screen.
+   */
+  const load = useCallback(
+    async (quiet: boolean): Promise<Profile | null> => {
+      const mine = ++generation.current;
+      try {
+        const s = await loadSession();
+        if (mine === generation.current) applySession(s);
+        return s.profile;
+      } catch (e) {
+        if (!quiet && mine === generation.current) {
+          setLoadError(friendlyError(e));
+          setStatus('error');
+        }
+        throw e;
+      }
+    },
+    [applySession],
+  );
+
+  const refresh = useCallback(() => load(false), [load]);
 
   // Startup load. A failure (e.g. offline) is 'error', not 'signedOut', so a saved session isn't thrown away.
   useEffect(() => {
-    let alive = true;
-    loadOnce()
-      .then(s => alive && applySession(s))
-      .catch(e => {
-        if (!alive) return;
-        setLoadError(friendlyError(e));
-        setStatus('error');
-      });
-    return () => {
-      alive = false;
-    };
-  }, [applySession, loadOnce]);
+    load(false).catch(() => {});
+  }, [load]);
 
   // Session changed elsewhere: signed out (token revoked/expired, another tab) → drop to signed out;
   // someone signed in (another tab, whether this one was signed out or showing a different user)
-  // → reload, so we never show A's data under B's session or sit on sign-in with a live session.
+  // → reload quietly, so we never show A's data under B's session or sit on sign-in with a live
+  // session, and a blip doesn't throw this tab onto the error screen.
   // INITIAL_SESSION is skipped: the startup load above already covers it.
   useEffect(() => {
     if (!supabase) return;
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'INITIAL_SESSION') return;
       if (event === 'SIGNED_OUT') {
-        applySession(SIGNED_OUT);
+        goSignedOut();
       } else if (session && session.user.id !== userIdRef.current) {
         // Supabase warns against awaiting its own calls inside this callback; defer.
-        setTimeout(() => refresh().catch(() => {}), 0);
+        setTimeout(() => load(true).catch(() => {}), 0);
       }
     });
     return () => data.subscription.unsubscribe();
-  }, [applySession, refresh]);
+  }, [goSignedOut, load]);
 
   // Signed photo URLs expire. Re-sign shortly before they do while the app stays open, and on
   // returning to the foreground (JS timers don't run while a phone app is backgrounded), but only
-  // when the URL is near expiry: a new URL makes the image re-download.
+  // when the URL is near expiry: a new URL makes the image re-download. If there's no URL yet
+  // (signing failed, e.g. a blip right after saving), retry soon instead of waiting an hour.
   const avatarPath = profile?.avatarPath ?? null;
   useEffect(() => {
     if (!supabase || !avatarPath) return;
@@ -163,12 +167,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       store.avatarUrl(avatarPath).then(url => alive && url && setSignedUrl(url)).catch(() => {});
     };
     const timer = setInterval(resign, refreshAfterMs);
+    const retries = signedAt.current === 0 ? [5_000, 30_000, 120_000].map(ms => setTimeout(() => signedAt.current === 0 && resign(), ms)) : [];
     const sub = AppState.addEventListener('change', state => {
       if (state === 'active' && Date.now() - signedAt.current > refreshAfterMs) resign();
     });
     return () => {
       alive = false;
       clearInterval(timer);
+      retries.forEach(clearTimeout);
       sub.remove();
     };
   }, [avatarPath, setSignedUrl]);
@@ -177,6 +183,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
       const saved = await saveWithAvatar(store, userId, draft, avatar, profile, pendingUploads);
+      generation.current += 1; // a reload that started before this save mustn't put the old profile back
       // Same photo: keep the current URL (no extra round trip, no re-download).
       if (saved.avatarPath !== (profile?.avatarPath ?? null)) setSignedUrl(await urlFor(saved));
       setProfile(saved);
@@ -187,22 +194,25 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   const deleteAll = useCallback(async () => {
     if (!userId) return;
+    // Any kept upload is in the folder this sweeps, so it can't be reused afterwards either way.
+    pendingUploads.current = [];
     try {
       await store.deleteAll(userId);
     } catch (e) {
-      // Part of it may be gone (e.g. the photo). Show what's actually there now, then report.
-      await refresh().catch(() => {});
+      // Part of it may be gone (e.g. the photo). Show what's actually there now, quietly, so the
+      // Profile screen stays up to report the failure even if this reload fails too.
+      await load(true).catch(() => {});
       throw e;
     }
     // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile.
     await auth.signOut().catch(() => {});
-    applySession(SIGNED_OUT);
-  }, [userId, applySession, refresh]);
+    goSignedOut();
+  }, [userId, load, goSignedOut]);
 
   const signOut = useCallback(async () => {
     await auth.signOut();
-    applySession(SIGNED_OUT);
-  }, [applySession]);
+    goSignedOut();
+  }, [goSignedOut]);
 
   const value = useMemo(
     () => ({ status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut }),

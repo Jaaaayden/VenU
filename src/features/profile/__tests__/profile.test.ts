@@ -539,3 +539,33 @@ describe('round six details', () => {
     expect(validateDraft({ ...rosa, firstName: 'a'.repeat(41) }).firstName).toBe('Use 40 characters or fewer.');
   });
 });
+
+describe('what counts as a definite rejection', () => {
+  const at = '2026-11-09T00:00:00.000Z';
+  const existing = rowToProfile({ id: 'u1', verified: false, ...draftToWrite({ ...rosa, avatarPath: 'u1/avatar-old' }, at) });
+  const photo = { uri: 'file:///n.jpg', mimeType: 'image/jpeg' };
+
+  async function outcome(error: unknown) {
+    const calls: string[] = [];
+    const store: ProfileStore = {
+      get: async () => null,
+      save: async () => { throw error; },
+      uploadAvatar: async () => 'u1/avatar-new',
+      removeAvatar: async p => void calls.push(`remove ${p}`),
+      avatarUrl: async p => p,
+      deleteAll: async () => {},
+    };
+    const pending = { current: [] as PendingUpload[] };
+    await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toBe(error);
+    return calls.includes('remove u1/avatar-new') ? 'cleaned up' : pending.current.length ? 'kept for retry' : 'neither';
+  }
+
+  it('cleans up after a 4xx even without a PostgREST code (e.g. an HTML error page)', async () => {
+    expect(await outcome({ code: '', message: '<html>Bad Request</html>', status: 400 })).toBe('cleaned up');
+  });
+
+  it('keeps the upload after a 5xx or a transport failure (the write may have happened)', async () => {
+    expect(await outcome({ code: '', message: '<html>Bad Gateway</html>', status: 502 })).toBe('kept for retry');
+    expect(await outcome({ code: '', message: 'TypeError: Failed to fetch', status: 0 })).toBe('kept for retry');
+  });
+});

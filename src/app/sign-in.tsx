@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -49,12 +49,17 @@ export default function SignInScreen() {
     return null;
   }
 
+  // Enter (onSubmitEditing) plus a tap can both fire before `busy` renders; a ref blocks the second.
+  const inFlight = useRef(false);
+
   async function handleContinue() {
+    if (inFlight.current) return;
     setNotice(null);
     const invalid = localError();
     setError(invalid);
     if (invalid) return;
 
+    inFlight.current = true;
     setBusy(true);
     try {
       const result = mode === 'signin' ? await auth.signIn(email, password) : await auth.signUp(email, password);
@@ -70,6 +75,7 @@ export default function SignInScreen() {
     } catch (e) {
       setError(friendlyError(e));
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }

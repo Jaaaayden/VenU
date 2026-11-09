@@ -25,10 +25,15 @@ export function checkPhoto(image: Pick<PickedImage, 'mimeType' | 'fileSize'>): s
   return null;
 }
 
-/** A PostgREST error the server actually sent. Transport failures also come back as errors, but with `code: ""`. */
+/**
+ * The server definitely refused (so nothing was written): a PostgREST/our own error code, or an
+ * HTTP 4xx. Transport failures come back as errors too, but with `code: ""` and status 0; a 5xx
+ * is also ambiguous (the write may have happened), so neither counts.
+ */
 function isServerRejection(e: unknown): boolean {
-  const code = (e as { code?: unknown } | null)?.code;
-  return typeof code === 'string' && code.length > 0;
+  const { code, status } = (e ?? {}) as { code?: unknown; status?: unknown };
+  if (typeof code === 'string' && code.length > 0) return true;
+  return typeof status === 'number' && status >= 400 && status < 500;
 }
 
 /** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
@@ -160,7 +165,8 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         // No row to update (deleted on another device): create it again.
         result = await insert();
       }
-      if (result.error) throw result.error;
+      // Keep the HTTP status: a 4xx is a definite "no" even when the body has no PostgREST code.
+      if (result.error) throw Object.assign(result.error, { status: result.status });
       return rowToProfile(result.data);
     },
     async uploadAvatar(userId, image) {
