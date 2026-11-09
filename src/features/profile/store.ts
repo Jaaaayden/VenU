@@ -66,6 +66,7 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
       return rowToProfile(row);
     },
     async uploadAvatar(_userId, image) {
+      // Native keeps the picker's cache URI, which the OS may clear. Fine for this dev-only fallback.
       return image.base64 ? `data:${image.mimeType ?? 'image/jpeg'};base64,${image.base64}` : image.uri;
     },
     async removeAvatar() {},
@@ -106,8 +107,9 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
     },
     async uploadAvatar(userId, image) {
       const contentType = image.mimeType ?? 'image/jpeg';
-      // One fixed name, so a new photo always overwrites the old one whatever its format.
-      const path = `${userId}/avatar`;
+      // A fresh name per upload (`<uid>/avatar-<ms>`), so the live photo is never overwritten
+      // before the row points at the new one; the provider deletes the old file after saving.
+      const path = `${userId}/avatar-${Date.now()}`;
       const body = await (await fetch(image.uri)).arrayBuffer();
       const { error } = await client.storage.from(bucket).upload(path, body, { contentType, upsert: true });
       if (error) throw error;
@@ -133,4 +135,34 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       if (error) throw error;
     },
   };
+}
+
+/** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */
+export type AvatarChange = PickedImage | 'remove' | null;
+
+/**
+ * Saves a profile and its photo change in a safe order: upload the new photo to a fresh
+ * path, save the row, and only then delete the old file. A failed save leaves the old
+ * photo and row untouched (and cleans up the new upload).
+ */
+export async function saveWithAvatar(
+  store: ProfileStore,
+  userId: string,
+  draft: ProfileDraft,
+  avatar: AvatarChange,
+  existing: Profile | null,
+): Promise<Profile> {
+  const previous = existing?.avatarPath ?? null;
+  const uploaded = avatar && avatar !== 'remove' ? await store.uploadAvatar(userId, avatar) : null;
+  const avatarPath = avatar === 'remove' ? null : (uploaded ?? previous);
+  let saved: Profile;
+  try {
+    saved = await store.save(userId, { ...draft, avatarPath }, existing);
+  } catch (e) {
+    if (uploaded) await store.removeAvatar(uploaded).catch(() => {});
+    throw e;
+  }
+  // Best effort: if this fails the file is orphaned in the user's own folder, and deleteAll sweeps it.
+  if (previous && previous !== avatarPath) await store.removeAvatar(previous).catch(() => {});
+  return saved;
 }

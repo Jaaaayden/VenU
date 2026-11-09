@@ -17,7 +17,7 @@ export interface Profile {
   id: string;
   role: Role;
   firstName: string;
-  /** Storage path (`<uid>/avatar.jpg`) on Supabase, or a local file URI on the device store. */
+  /** Storage path (`<uid>/avatar-<ms>`) on Supabase, or a data/file URI on the device store. */
   avatarPath: string | null;
   /** Language codes, main language included. For volunteers: fluent languages only. */
   languages: string[];

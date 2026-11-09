@@ -12,7 +12,7 @@ import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
-import { helperSummary } from './summary';
+import { SummaryTags } from './summary-tags';
 import type { ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
 
@@ -142,11 +142,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
             <Avatar name={d.firstName} uri={shownAvatar} size={40} />
             <Text style={Type.bodyStrong}>{d.firstName.trim() || 'Your name'}</Text>
           </View>
-          <View style={styles.tags}>
-            {helperSummary(d).map(t => (
-              <Text key={t} style={styles.tag}>{t}</Text>
-            ))}
-          </View>
+          <SummaryTags draft={d} />
         </View>
 
         <Pressable
@@ -215,8 +211,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   previewRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { ...Type.caption, color: Colors.text, backgroundColor: Colors.bg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: Radius.sm, overflow: 'hidden' },
 
   consent: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
   box: {

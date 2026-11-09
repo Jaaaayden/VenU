@@ -9,7 +9,7 @@ import { FormSection, StepHeader } from '@/components/form-section';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { TopBar } from '@/components/top-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
-import { languageName } from '@/features/profile/options';
+import { isolatedLanguageName } from '@/features/profile/options';
 import type { Role } from '@/features/profile/types';
 
 // Shown as one-tap chips; everything else is behind "More languages".
@@ -37,7 +37,7 @@ export default function RoleStep() {
         <FormSection title="Your main language" hint="We'll use it for the app and to match you.">
           <View style={styles.chips}>
             {chips.map(code => (
-              <Chip key={code} label={languageName(code)} selected={lang === code} role="radio" onPress={() => setLang(code)} />
+              <Chip key={code} label={isolatedLanguageName(code)} selected={lang === code} role="radio" onPress={() => setLang(code)} />
             ))}
             <Chip label="+ More languages" dashed role="button" onPress={() => setSearchOpen(true)} />
           </View>

@@ -55,7 +55,8 @@ const styles = StyleSheet.create({
   chipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primarySoft },
   chipDashed: { borderStyle: 'dashed', borderColor: Colors.primary },
   main: { paddingVertical: Spacing.sm },
-  label: { ...Type.label, fontWeight: '500' },
+  // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
+  label: { ...Type.label, fontWeight: '500', writingDirection: 'ltr' },
   labelSelected: { color: Colors.primary, fontWeight: '700' },
   remove: { fontSize: 18, lineHeight: 20, color: Colors.textMuted },
 });

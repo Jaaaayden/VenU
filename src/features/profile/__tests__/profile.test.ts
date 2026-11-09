@@ -2,9 +2,9 @@ import { describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
-import { searchLanguages } from '../options';
+import { isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { createLocalStore, createSupabaseStore, type KeyValueStorage } from '../store';
+import { createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type ProfileStore } from '../store';
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
@@ -136,6 +136,11 @@ describe('small helpers', () => {
     expect(initials('  ')).toBe('?');
   });
 
+  it('wraps language names in Unicode isolates so RTL names keep chip order', () => {
+    expect(isolatedLanguageName('fa')).toBe('\u2068فارسی\u2069');
+    expect(`${isolatedLanguageName('ar')} · main`).toBe('\u2068العربية\u2069 · main');
+  });
+
   it('language search ignores case and accents and matches English names', () => {
     expect(searchLanguages('espanol').map(l => l.code)).toEqual(['es']);
     expect(searchLanguages('KOREAN').map(l => l.code)).toEqual(['ko']);
@@ -194,17 +199,70 @@ describe('supabase store', () => {
     }
   });
 
-  it('always uploads to one fixed path, whatever the format', async () => {
+  it('uploads each photo to a fresh path in the user folder', async () => {
     const { client, calls } = fakeClient();
     const store = createSupabaseStore(client, 'avatars');
     const realFetch = globalThis.fetch;
     globalThis.fetch = (async () => ({ arrayBuffer: async () => new ArrayBuffer(1) })) as unknown as typeof fetch;
     try {
-      expect(await store.uploadAvatar('u1', { uri: 'file:///a.png', mimeType: 'image/png' })).toBe('u1/avatar');
-      expect(await store.uploadAvatar('u1', { uri: 'file:///b.jpg', mimeType: 'image/jpeg' })).toBe('u1/avatar');
+      const a = await store.uploadAvatar('u1', { uri: 'file:///a.png', mimeType: 'image/png' });
+      await new Promise(r => setTimeout(r, 2));
+      const b = await store.uploadAvatar('u1', { uri: 'file:///b.jpg', mimeType: 'image/jpeg' });
+      expect(a).toMatch(/^u1\/avatar-\d+$/);
+      expect(b).toMatch(/^u1\/avatar-\d+$/);
+      expect(a).not.toBe(b);
+      expect(calls).toEqual([`upload ${a} image/png`, `upload ${b} image/jpeg`]);
     } finally {
       globalThis.fetch = realFetch;
     }
-    expect(calls).toEqual(['upload u1/avatar image/png', 'upload u1/avatar image/jpeg']);
+  });
+});
+
+describe('saveWithAvatar', () => {
+  const at = '2026-11-09T00:00:00.000Z';
+  const existing = rowToProfile({ id: 'u1', verified: false, ...draftToWrite({ ...rosa, avatarPath: 'u1/avatar-old' }, at) });
+
+  function fakeStore({ saveFails = false, removeFails = false } = {}) {
+    const calls: string[] = [];
+    const store: ProfileStore = {
+      get: async () => null,
+      save: async (_u, d) => { calls.push(`save ${d.avatarPath}`); if (saveFails) throw new Error('save failed'); return { ...existing, avatarPath: d.avatarPath }; },
+      uploadAvatar: async () => (calls.push('upload'), 'u1/avatar-new'),
+      removeAvatar: async p => { calls.push(`remove ${p}`); if (removeFails) throw new Error('remove failed'); },
+      avatarUrl: async p => p,
+      deleteAll: async () => {},
+    };
+    return { store, calls };
+  }
+  const pick = { uri: 'file:///n.jpg', mimeType: 'image/jpeg' };
+
+  it('new photo: upload, save, then delete the old file', async () => {
+    const { store, calls } = fakeStore();
+    const saved = await saveWithAvatar(store, 'u1', rosa, pick, existing);
+    expect(calls).toEqual(['upload', 'save u1/avatar-new', 'remove u1/avatar-old']);
+    expect(saved.avatarPath).toBe('u1/avatar-new');
+  });
+
+  it('failed save keeps the old photo and cleans up the new upload', async () => {
+    const { store, calls } = fakeStore({ saveFails: true });
+    await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toThrow('save failed');
+    expect(calls).toEqual(['upload', 'save u1/avatar-new', 'remove u1/avatar-new']);
+  });
+
+  it('remove: clears the row first, deletes the file only after', async () => {
+    const { store, calls } = fakeStore();
+    await saveWithAvatar(store, 'u1', rosa, 'remove', existing);
+    expect(calls).toEqual(['save null', 'remove u1/avatar-old']);
+    const failing = fakeStore({ saveFails: true });
+    await expect(saveWithAvatar(failing.store, 'u1', rosa, 'remove', existing)).rejects.toThrow();
+    expect(failing.calls).toEqual(['save null']); // photo untouched
+  });
+
+  it('no change keeps the path; a failed old-file cleanup still saves', async () => {
+    const same = fakeStore();
+    expect((await saveWithAvatar(same.store, 'u1', rosa, null, existing)).avatarPath).toBe('u1/avatar-old');
+    expect(same.calls).toEqual(['save u1/avatar-old']);
+    const flaky = fakeStore({ removeFails: true });
+    expect((await saveWithAvatar(flaky.store, 'u1', rosa, pick, existing)).avatarPath).toBe('u1/avatar-new');
   });
 });

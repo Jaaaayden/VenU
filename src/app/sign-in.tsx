@@ -59,8 +59,10 @@ export default function SignInScreen() {
       const result = mode === 'signin' ? await auth.signIn(email, password) : await auth.signUp(email, password);
       if (!result.ok) return setError(result.error);
       if (result.needsConfirmation) {
+        // Not switchMode(): that clears the notice in the same render batch.
+        setMode('signin');
         setNotice('Check your email to confirm your account, then sign in.');
-        return switchMode('signin');
+        return;
       }
       const profile = await refresh();
       router.replace(profile ? homeFor(profile) : '/onboarding/role');

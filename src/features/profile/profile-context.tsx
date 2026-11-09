@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import * as auth from '@/lib/auth';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
-import { AVATAR_URL_TTL_S, createLocalStore, createSupabaseStore, type PickedImage, type ProfileStore } from './store';
+import { AVATAR_URL_TTL_S, createLocalStore, createSupabaseStore, saveWithAvatar, type AvatarChange, type ProfileStore } from './store';
 import type { Profile, ProfileDraft } from './types';
 
 const store: ProfileStore = supabase
@@ -14,8 +14,7 @@ const store: ProfileStore = supabase
 /** `error`: couldn't load (e.g. offline); the saved session is kept and `refresh()` retries. */
 type Status = 'loading' | 'signedOut' | 'ready' | 'error';
 
-/** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */
-export type AvatarChange = PickedImage | 'remove' | null;
+export type { AvatarChange };
 
 interface ProfileContextValue {
   status: Status;
@@ -37,11 +36,15 @@ interface Session {
   avatarUrl: string | null;
 }
 
+/** The one place a stored photo path becomes a displayable URL. */
+function urlFor(p: Profile | null): Promise<string | null> {
+  return p?.avatarPath ? store.avatarUrl(p.avatarPath) : Promise.resolve(null);
+}
+
 async function loadSession(): Promise<Session> {
   const userId = await auth.currentUserId();
   const profile = userId ? await store.get(userId) : null;
-  const avatarUrl = profile?.avatarPath ? await store.avatarUrl(profile.avatarPath) : null;
-  return { userId, profile, avatarUrl };
+  return { userId, profile, avatarUrl: await urlFor(profile) };
 }
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
@@ -51,7 +54,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const applyProfile = useCallback(async (p: Profile | null) => {
-    const url = p?.avatarPath ? await store.avatarUrl(p.avatarPath) : null;
+    const url = await urlFor(p);
     setProfile(p);
     setAvatarUrl(url);
   }, []);
@@ -107,14 +110,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const save = useCallback(
     async (draft: ProfileDraft, avatar: AvatarChange) => {
       if (!userId) throw new Error('Not signed in');
-      let avatarPath = profile?.avatarPath ?? null;
-      if (avatar === 'remove') {
-        if (avatarPath) await store.removeAvatar(avatarPath);
-        avatarPath = null;
-      } else if (avatar) {
-        avatarPath = await store.uploadAvatar(userId, avatar);
-      }
-      const saved = await store.save(userId, { ...draft, avatarPath }, profile);
+      const saved = await saveWithAvatar(store, userId, draft, avatar, profile);
       await applyProfile(saved);
       return saved;
     },

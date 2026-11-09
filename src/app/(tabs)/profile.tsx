@@ -1,6 +1,6 @@
 import { router, type Href } from 'expo-router';
-import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/avatar';
@@ -8,7 +8,7 @@ import { Button } from '@/components/button';
 import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
-import { helperSummary } from '@/features/profile/summary';
+import { SummaryTags } from '@/features/profile/summary-tags';
 
 interface MenuItem {
   icon: string;
@@ -29,7 +29,8 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     title: 'Support',
     items: [
       { icon: '💬', label: 'Help & feedback' },
-      { icon: '📄', label: 'Terms & privacy', href: '/privacy' },
+      // Placeholder until there's a terms doc; the privacy policy lives under Account → Privacy & data.
+      { icon: '📄', label: 'Terms of use' },
     ],
   },
 ];
@@ -39,6 +40,7 @@ export default function ProfileScreen() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   async function handleSignOut() {
     await signOut();
@@ -50,18 +52,26 @@ export default function ProfileScreen() {
     setDeleteError(null);
     try {
       await deleteAll();
-      await signOut();
-      router.replace('/sign-in');
     } catch (e) {
-      setDeleteError(`Nothing was deleted yet: ${e instanceof Error ? e.message : 'unknown error'}. Try again.`);
-    } finally {
+      // Photos go first, so a failure can be partial; don't claim nothing changed.
+      setDeleteError(`Couldn't finish deleting your data: ${e instanceof Error ? e.message : 'unknown error'}. Try again.`);
       setBusy(false);
+      return;
     }
+    // Data is gone at this point; a sign-out hiccup shouldn't strand them on this screen.
+    await signOut().catch(() => {});
+    router.replace('/sign-in');
   }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollRef}
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        // Opening the delete confirmation grows the page; bring its buttons out from under the tab bar.
+        onContentSizeChange={() => confirmDelete && scrollRef.current?.scrollToEnd({ animated: true })}>
         <Text style={styles.pageTitle} accessibilityRole="header">Profile</Text>
 
         {profile ? (
@@ -85,11 +95,7 @@ export default function ProfileScreen() {
             <Text style={[Type.overline, styles.shareTitle]}>
               {profile.role === 'visitor' ? 'Shared with your helper' : 'Shown to visitors'}
             </Text>
-            <View style={styles.tags}>
-              {helperSummary(profile).map(t => (
-                <Text key={t} style={styles.tag}>{t}</Text>
-              ))}
-            </View>
+            <SummaryTags draft={profile} />
           </View>
         ) : (
           <View style={styles.card}>
@@ -131,7 +137,7 @@ export default function ProfileScreen() {
                 <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
                 {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
                 <View style={styles.deleteRow}>
-                  <Button label="Keep my data" variant="secondary" onPress={() => setConfirmDelete(false)} style={styles.flex} />
+                  <Button label="Cancel" variant="secondary" onPress={() => setConfirmDelete(false)} style={styles.flex} />
                   <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
                 </View>
               </>
@@ -174,8 +180,6 @@ const styles = StyleSheet.create({
   badgePending: { backgroundColor: Colors.accentSoft, color: Colors.accent },
   editBtn: { minHeight: 36, paddingHorizontal: 14 },
   shareTitle: { marginTop: Spacing.lg, marginBottom: Spacing.sm },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { ...Type.caption, color: Colors.text, backgroundColor: Colors.bg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: Radius.sm, overflow: 'hidden' },
 
   section: { marginBottom: Spacing.xl },
   sectionTitle: { marginBottom: Spacing.sm },

@@ -2,7 +2,7 @@
 // this isn't legal text. Bump PRIVACY_VERSION whenever a section changes so
 // profiles store which version the person agreed to.
 
-export const PRIVACY_VERSION = '2026-11-draft-1';
+export const PRIVACY_VERSION = '2026-11-draft-2';
 
 export interface PrivacySection {
   title: string;
@@ -43,7 +43,7 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
     title: 'Where it\'s stored',
     points: [
       'In our database (Supabase), encrypted in transit and protected so each account can only read its own profile.',
-      'Profile photos are in private storage and only shown to signed-in VenU users.',
+      'Profile photos are in private storage. Only you can open yours; during a help request the other person gets a short-lived link to it.',
     ],
   },
   {

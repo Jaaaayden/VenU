@@ -51,6 +51,14 @@ export function languageName(code: string): string {
   return BY_CODE.get(code)?.native ?? code;
 }
 
+/**
+ * The native name wrapped in Unicode isolate marks (FSI…PDI), for mixing into a longer label.
+ * Without it, an RTL name flips the whole string: "فارسی · main" renders as "main · فارسی".
+ */
+export function isolatedLanguageName(code: string): string {
+  return `\u2068${languageName(code)}\u2069`;
+}
+
 export function englishLanguageName(code: string): string {
   return BY_CODE.get(code)?.english ?? code;
 }

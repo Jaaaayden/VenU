@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   base: { minHeight: 50, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   primary: { backgroundColor: Colors.primary },
   secondary: { backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border },
-  danger: { backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.dangerSoft },
+  danger: { backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.danger },
   link: { minHeight: 36, paddingHorizontal: 0 },
   pressed: { opacity: 0.8 },
   inactive: { opacity: 0.5 },
