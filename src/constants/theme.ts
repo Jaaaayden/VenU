@@ -7,7 +7,7 @@ export const Colors = {
   primarySoft: '#E8EEFB', // selected chip fill, info banners
   accent: '#C2410C',      // the "U" in VenU, Get help
   accentSoft: '#FDEDE6',
-  success: '#15803D',
+  success: '#137535',
   successSoft: '#E7F5EC',
   danger: '#B91C1C',
   dangerSoft: '#FDECEC',
@@ -17,7 +17,7 @@ export const Colors = {
   divider: '#EEF0F3',
   text: '#16181D',
   textMuted: '#5F6673',
-  textFaint: '#9AA0AB',   // placeholders, chevrons
+  textFaint: '#767D8A',   // placeholders, chevrons, control borders: >= 3:1 on bg and surface; never for sentences
   onPrimary: '#FFFFFF',
 } as const;
 

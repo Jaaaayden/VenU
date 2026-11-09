@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   typeBadgeLabel: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
   heartIcon: { fontSize: 20 },
   cardLocation: { fontSize: 13, color: Colors.textMuted, marginTop: 2 },
-  cardCapacity: { fontSize: 12, color: Colors.textFaint },
+  cardCapacity: { fontSize: 12, color: Colors.textMuted },
 
   navSpacer: { height: NAV_BAR_CLEARANCE },
 });

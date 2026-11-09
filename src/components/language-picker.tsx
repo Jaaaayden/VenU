@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 
   modal: { flex: 1, backgroundColor: Colors.bg, paddingHorizontal: Spacing.gutter },
   // Phone-width column even on a desktop browser.
-  modalBody: { flex: 1, width: '100%', maxWidth: 560, alignSelf: 'center' },
+  modalBody: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' }, // matches the web app column
   // Arabic, Persian, Hebrew names: keep each word's script direction but line the rows up on the left
   // (RN web otherwise auto-detects RTL and pushes them to the right edge).
   ltr: { writingDirection: 'ltr', textAlign: 'left' },

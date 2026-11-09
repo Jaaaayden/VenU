@@ -8,6 +8,7 @@ import { createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueSto
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
+import { friendlyError } from '@/lib/errors';
 
 const rosa: ProfileDraft = {
   ...emptyDraft('visitor', 'es'),
@@ -134,6 +135,8 @@ describe('small helpers', () => {
     expect(initials('Daniel Martinez')).toBe('DM');
     expect(initials('rosa')).toBe('R');
     expect(initials('  ')).toBe('?');
+    expect(initials('😀 Rosa')).toBe('😀R'); // whole emoji, not a lone surrogate
+    expect(initials('李 小龙')).toBe('李小');
   });
 
   it('wraps language names in Unicode isolates so RTL names keep chip order', () => {
@@ -264,5 +267,21 @@ describe('saveWithAvatar', () => {
     expect(same.calls).toEqual(['save u1/avatar-old']);
     const flaky = fakeStore({ removeFails: true });
     expect((await saveWithAvatar(flaky.store, 'u1', rosa, pick, existing)).avatarPath).toBe('u1/avatar-new');
+  });
+});
+
+describe('friendlyError', () => {
+  it('turns network and auth errors into plain sentences', () => {
+    const offline = "Can't reach VenU. Check your connection and try again.";
+    expect(friendlyError(new TypeError('Failed to fetch'))).toBe(offline);
+    expect(friendlyError({ name: 'AuthRetryableFetchError', message: '{}' })).toBe(offline);
+    expect(friendlyError(new Error('Invalid login credentials'))).toBe('Wrong email or password.');
+    expect(friendlyError({ message: 'new row violates row-level security policy for table "profiles"' })).toBe('Your session expired. Sign in again.');
+  });
+
+  it('keeps unknown messages and falls back when there is none', () => {
+    expect(friendlyError(new Error('That photo is too big'))).toBe('That photo is too big');
+    expect(friendlyError(undefined)).toBe('Something went wrong. Try again.');
+    expect(friendlyError({}, 'Custom fallback')).toBe('Custom fallback');
   });
 });

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
 
 export const LOCAL_USER_ID = 'local-guest';
@@ -15,7 +16,7 @@ export async function signIn(email: string, password: string): Promise<AuthResul
     return { ok: true };
   }
   const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-  return error ? { ok: false, error: error.message } : { ok: true };
+  return error ? { ok: false, error: friendlyError(error) } : { ok: true };
 }
 
 export async function signUp(email: string, password: string): Promise<AuthResult> {
@@ -24,7 +25,7 @@ export async function signUp(email: string, password: string): Promise<AuthResul
     return { ok: true };
   }
   const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: friendlyError(error) };
   // With email confirmation on, Supabase returns a user but no session yet.
   return { ok: true, needsConfirmation: !data.session };
 }

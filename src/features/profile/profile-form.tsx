@@ -9,6 +9,7 @@ import { ChipGroup } from '@/components/chip-group';
 import { FormSection } from '@/components/form-section';
 import { LanguagePicker } from '@/components/language-picker';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { friendlyError } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
@@ -49,7 +50,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
     try {
       await onSubmit(d, avatar);
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      setSaveError(friendlyError(e));
     } finally {
       setSaving(false);
     }

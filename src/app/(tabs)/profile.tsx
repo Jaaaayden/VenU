@@ -9,6 +9,7 @@ import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { SummaryTags } from '@/features/profile/summary-tags';
+import { friendlyError } from '@/lib/errors';
 
 interface MenuItem {
   icon: string;
@@ -54,7 +55,7 @@ export default function ProfileScreen() {
       await deleteAll();
     } catch (e) {
       // Photos go first, so a failure can be partial; don't claim nothing changed.
-      setDeleteError(`Couldn't finish deleting your data: ${e instanceof Error ? e.message : 'unknown error'}. Try again.`);
+      setDeleteError(`Couldn't finish deleting your data. ${friendlyError(e)}`);
       setBusy(false);
       return;
     }

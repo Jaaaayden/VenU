@@ -25,5 +25,6 @@ export function helperSummary(d: Pick<ProfileDraft, 'role' | 'languages' | 'main
 
 export function initials(firstName: string): string {
   const parts = firstName.trim().split(/\s+/).filter(Boolean);
-  return parts.slice(0, 2).map(p => p[0]!.toUpperCase()).join('') || '?';
+  // Array.from splits by code point, so "😀 Rosa" gives "😀R", not half an emoji.
+  return parts.slice(0, 2).map(p => Array.from(p)[0]!.toUpperCase()).join('') || '?';
 }

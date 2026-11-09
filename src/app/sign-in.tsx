@@ -18,6 +18,7 @@ import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { homeFor } from '@/features/profile/types';
 import * as auth from '@/lib/auth';
+import { friendlyError } from '@/lib/errors';
 
 type Mode = 'signin' | 'signup';
 
@@ -67,7 +68,7 @@ export default function SignInScreen() {
       const profile = await refresh();
       router.replace(profile ? homeFor(profile) : '/onboarding/role');
     } catch (e) {
-      setError(e instanceof Error ? `Couldn't load your profile: ${e.message}` : 'Something went wrong. Try again.');
+      setError(friendlyError(e));
     } finally {
       setBusy(false);
     }
@@ -127,6 +128,8 @@ export default function SignInScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                returnKeyType={mode === 'signin' ? 'go' : 'next'}
+                onSubmitEditing={mode === 'signin' ? handleContinue : undefined}
                 accessibilityLabel="Password"
               />
             </View>
@@ -142,6 +145,8 @@ export default function SignInScreen() {
                   onChangeText={setConfirm}
                   secureTextEntry
                   autoComplete="new-password"
+                  returnKeyType="go"
+                  onSubmitEditing={handleContinue}
                   accessibilityLabel="Confirm password"
                 />
               </View>
@@ -226,5 +231,5 @@ const styles = StyleSheet.create({
   cta: { marginTop: Spacing.sm },
   forgotBtn: { alignItems: 'center', paddingVertical: Spacing.xs },
   forgotLabel: { ...Type.label, fontWeight: '500', color: Colors.textMuted },
-  localNote: { ...Type.caption, textAlign: 'center', color: Colors.textFaint },
+  localNote: { ...Type.caption, textAlign: 'center' },
 });
