@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
 
 interface ChipProps {
   label: string;
@@ -45,19 +45,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    minHeight: 40,
+    // Figma "Filter chip": 32 tall, radius 8, 1px outline; 36 here for an easier tap.
+    minHeight: 36,
     paddingHorizontal: 14,
-    borderRadius: Radius.pill,
-    borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.controlBorder,
     backgroundColor: Colors.surface,
   },
   chipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primarySoft },
   chipDashed: { borderStyle: 'dashed', borderColor: Colors.primary },
-  main: { paddingVertical: Spacing.sm },
+  main: { paddingVertical: 6 },
   // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
-  label: { ...Type.label, fontWeight: '500', writingDirection: 'ltr' },
-  labelSelected: { color: Colors.primary, fontWeight: '700' },
+  label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text, writingDirection: 'ltr' },
+  labelSelected: { color: Colors.primary },
   // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's right padding.
   removeTarget: { minWidth: 28, minHeight: 28, marginRight: -8, alignItems: 'center', justifyContent: 'center' },
   remove: { fontSize: 18, lineHeight: 20, color: Colors.textMuted },
