@@ -27,7 +27,7 @@ export function NoteBanner({ notice, onDismiss }: { notice: NonNullable<RequestS
 }
 
 const styles = StyleSheet.create({
-  box: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, borderRadius: Radius.md, paddingLeft: Spacing.lg },
+  box: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, borderRadius: Radius.md, paddingStart: Spacing.lg },
   ok: { backgroundColor: Colors.successSoft },
   bad: { backgroundColor: Colors.dangerSoft },
   text: { ...Type.bodyStrong, flex: 1, paddingVertical: Spacing.md },

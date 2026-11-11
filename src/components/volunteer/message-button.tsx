@@ -17,12 +17,12 @@ export function MessageButton({ unread, onPress }: { unread: number; onPress: ()
 }
 
 const styles = StyleSheet.create({
-  target: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginRight: -9 },
+  target: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginEnd: -9 },
   pressed: { opacity: 0.6 },
   dot: {
     position: 'absolute',
     top: 6,
-    right: 4,
+    end: 4,
     width: 13,
     height: 13,
     borderRadius: 7,

@@ -1,7 +1,8 @@
 /**
  * Figma "chat-bubble" (231:25791): incoming white with a gray outline and a tail at the bottom left,
  * outgoing blue with the tail at the bottom right. The time sits beside a short message and drops
- * under a long one. Incoming bubbles carry the "listen" link (Frame 2271).
+ * under a long one. Incoming bubbles carry the "listen" link (Frame 2271). In a right-to-left
+ * layout the sides swap: incoming on the right with its tail at the bottom right, yours on the left.
  */
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
@@ -11,7 +12,7 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { formatClock } from '@/features/volunteer/format';
 import type { ChatMessage } from '@/features/volunteer/types';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 const TAIL = 7;
 const INCOMING_EDGE = Colors.controlBorder;
@@ -42,6 +43,7 @@ function bubblePath(w: number, h: number, mirror: boolean): string {
 export function ChatBubble({ message, onListen }: { message: ChatMessage; onListen?: () => void }) {
   const mine = message.from === 'me';
   const t = useT('volunteer');
+  const rtl = useLayoutRtl();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const onLayout = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
@@ -59,7 +61,7 @@ export function ChatBubble({ message, onListen }: { message: ChatMessage; onList
         {size.w > 0 && (
           <Svg width={size.w} height={size.h} style={StyleSheet.absoluteFill} aria-hidden>
             <Path
-              d={bubblePath(size.w, size.h, mine)}
+              d={bubblePath(size.w, size.h, mine !== rtl)}
               fill={mine ? Colors.primary : Colors.surface}
               stroke={mine ? Colors.primary : INCOMING_EDGE}
               strokeWidth={1}
@@ -89,8 +91,9 @@ const styles = StyleSheet.create({
   rowTheirs: { alignSelf: 'flex-start' },
   rowMine: { alignSelf: 'flex-end' },
   bubble: { minHeight: 44 },
-  bubbleTheirs: { paddingLeft: TAIL + 16, paddingRight: 16 },
-  bubbleMine: { paddingLeft: 16, paddingRight: TAIL + 16 },
+  // The tail sits on the start side of incoming bubbles and the end side of yours.
+  bubbleTheirs: { paddingStart: TAIL + 16, paddingEnd: 16 },
+  bubbleMine: { paddingStart: 16, paddingEnd: TAIL + 16 },
   content: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -101,9 +104,9 @@ const styles = StyleSheet.create({
   },
   text: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flexShrink: 1 },
   textMine: { color: Colors.onPrimary },
-  meta: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4 },
+  meta: { marginStart: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4 },
   time: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: MUTED_TIME },
   timeMine: { color: Colors.onPrimary },
-  listen: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 32, paddingLeft: TAIL + 2, paddingRight: Spacing.sm, alignSelf: 'flex-start' },
+  listen: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 32, paddingStart: TAIL + 2, paddingEnd: Spacing.sm, alignSelf: 'flex-start' },
   listenText: { fontFamily: Fonts.text, fontSize: 13, color: Colors.primary },
 });

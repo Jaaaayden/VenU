@@ -14,7 +14,7 @@ import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
 import { goBack } from '@/lib/navigation';
 
@@ -28,6 +28,7 @@ export default function ChatScreen() {
   const scrollRef = useRef<ScrollViewInstance>(null);
   const t = useT('volunteer');
   const tc = useT('common');
+  const rtl = useLayoutRtl();
   const active = status === 'matched' && request?.id === id && !!match;
 
   // Reading the chat clears the dot on "Volunteer found", including for messages that arrive while open.
@@ -51,7 +52,9 @@ export default function ChatScreen() {
       <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <View style={styles.header}>
           <Pressable onPress={() => goBack('/volunteer')} accessibilityRole="button" accessibilityLabel={tc('actions.back')} style={styles.back}>
-            <FigmaIcon name="arrow-left" size={36} color={Colors.ink} />
+            <View style={rtl && styles.flip}>
+              <FigmaIcon name="arrow-left" size={36} color={Colors.ink} />
+            </View>
           </Pressable>
           <Avatar name={v.firstName} uri={null} size={40} />
           <View style={styles.headerText}>
@@ -135,7 +138,8 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.surface },
   flex: { flex: 1 },
   pressed: { opacity: 0.7 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingLeft: Spacing.md, paddingRight: Spacing.gutter, paddingVertical: Spacing.lg },
+  flip: { transform: [{ scaleX: -1 }] },
+  header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingStart: Spacing.md, paddingEnd: Spacing.gutter, paddingVertical: Spacing.lg },
   back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   headerText: { flex: 1, gap: 4 },
   name: { fontFamily: Fonts.display, fontSize: 24, lineHeight: 28, color: Colors.text },
@@ -147,7 +151,7 @@ const styles = StyleSheet.create({
   empty: { fontFamily: Fonts.text, fontSize: 14, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.xl },
   separator: { fontFamily: Fonts.textSemiBold, fontSize: 13, lineHeight: 16, color: Colors.textMuted, textAlign: 'center' },
   // Sits under the last bubble, lined up with the incoming bubbles' text.
-  typing: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, marginTop: -Spacing.sm, paddingLeft: Spacing.lg },
+  typing: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, marginTop: -Spacing.sm, paddingStart: Spacing.lg },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.controlBorder,
     backgroundColor: Colors.surface,
-    paddingLeft: 14,
+    paddingStart: 14,
   },
   inputText: { flex: 1, fontFamily: Fonts.text, fontSize: 17, color: Colors.text, paddingVertical: 8, outlineStyle: 'none' } as object,
   sticker: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
