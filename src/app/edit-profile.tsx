@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepHeader } from '@/components/form-section';
-import { TopBar } from '@/components/top-bar';
+import { BackLink } from '@/components/top-bar';
 import { Colors } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
@@ -17,7 +17,7 @@ export default function EditProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <TopBar back backLabel="Profile" fallback="/profile" />
+      <BackLink label="Profile" fallback="/profile" />
       <ProfileForm
         initial={draftFromProfile(profile)}
         savedAvatarUrl={avatarUrl}
