@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface ChipProps {
   label: string;
@@ -16,6 +17,7 @@ interface ChipProps {
 }
 
 export function Chip({ label, selected = false, onPress, role = 'checkbox', dashed, onRemove, removeLabel }: ChipProps) {
+  const t = useT('common');
   return (
     <View style={[styles.chip, selected && styles.chipSelected, dashed && styles.chipDashed]}>
       <Pressable
@@ -32,7 +34,7 @@ export function Chip({ label, selected = false, onPress, role = 'checkbox', dash
         </Text>
       </Pressable>
       {onRemove && (
-        <Pressable onPress={onRemove} hitSlop={8} style={styles.removeTarget} accessibilityRole="button" accessibilityLabel={removeLabel ?? `Remove ${label}`}>
+        <Pressable onPress={onRemove} hitSlop={8} style={styles.removeTarget} accessibilityRole="button" accessibilityLabel={removeLabel ?? t('chip.remove', { label })}>
           <Text style={[styles.remove, selected && styles.labelSelected]}>×</Text>
         </Pressable>
       )}

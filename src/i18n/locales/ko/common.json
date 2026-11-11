@@ -49,5 +49,47 @@
   },
   "count": {
     "people_other": "{{count}}명"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>(선택)</muted>",
+    "step": "{{total}}단계 중 {{step}}단계"
+  },
+  "nav": {
+    "backTo": "{{label}}(으)로 돌아가기"
+  },
+  "chip": {
+    "remove": "{{label}} 삭제"
+  },
+  "photo": {
+    "add": "사진 추가",
+    "change": "사진 변경",
+    "take": "사진 찍기",
+    "remove": "삭제",
+    "hint": "도우미가 나를 알아보기 쉬워요. 선택 사항.",
+    "cameraOff": "카메라 접근이 꺼져 있습니다. 설정에서 켜 주세요.",
+    "libraryOff": "사진 접근이 꺼져 있습니다. 설정에서 켜 주세요.",
+    "labelNamed": "{{name}}님의 프로필 사진",
+    "labelYours": "내 프로필 사진",
+    "labelNone": "프로필 사진 없음"
+  },
+  "language": {
+    "primary": "주 언어",
+    "secondary": "두 번째 언어",
+    "another": "다른 언어",
+    "add": "다른 언어 추가",
+    "search": "언어 검색",
+    "fieldLabel": "언어 검색",
+    "searchFor": "{{field}} 검색",
+    "examples": "예: 한국어, Español, ASL",
+    "searchExamples": "검색, 예: 한국어, Español, ASL",
+    "field": "{{field}}: {{language}}",
+    "fieldEmpty": "{{field}}: 없음",
+    "openHint": "언어 검색을 엽니다",
+    "choose": "언어 선택",
+    "closeSearch": "언어 검색 닫기",
+    "remove": "{{language}} 삭제",
+    "removeField": "이 언어 칸 삭제",
+    "noMatch": "결과가 없습니다. 영어 이름으로 검색해 보세요.",
+    "addTitle": "언어 추가"
   }
 }

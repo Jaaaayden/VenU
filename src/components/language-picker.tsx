@@ -7,6 +7,12 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
 import { LANGUAGES, languageName, searchLanguages, type Language } from '@/features/profile/options';
+import { useT } from '@/i18n';
+
+/** "Primary language", "Secondary language", then "Another language". */
+function slotName(t: ReturnType<typeof useT<'common'>>, index: number): string {
+  return index === 0 ? t('language.primary') : index === 1 ? t('language.secondary') : t('language.another');
+}
 
 interface LanguagePickerProps {
   languages: string[];
@@ -20,6 +26,7 @@ interface LanguagePickerProps {
  * "Add another language". e.g. Primary [Español ⊗] / Secondary [English ⊗] / [⊕ Add another language]
  */
 export function LanguagePicker({ languages, main, onChange }: LanguagePickerProps) {
+  const t = useT('common');
   // Every field on screen, in order: [Primary, Secondary, …]; null is an empty field.
   // e.g. ['es', 'en', null] = Español / English / an added field not filled in yet.
   const [slots, setSlots] = useState<(string | null)[]>(() => slotsFrom(languages, main));
@@ -45,10 +52,10 @@ export function LanguagePicker({ languages, main, onChange }: LanguagePickerProp
     <View style={styles.list}>
       {rows.map((code, i) => (
         <View key={`${i}-${code ?? 'empty'}`} style={styles.slot}>
-          <Text style={styles.slotLabel}>{i === 0 ? 'Primary language' : i === 1 ? 'Secondary language' : 'Another language'}</Text>
+          <Text style={styles.slotLabel}>{slotName(t, i)}</Text>
           <LanguageMenuField
             value={code}
-            fieldName={i === 0 ? 'Primary language' : i === 1 ? 'Secondary language' : 'Another language'}
+            fieldName={slotName(t, i)}
             exclude={rows.filter((c): c is string => !!c && c !== code)}
             onSelect={c => select(i, c)}
             // An empty extra field can be removed; an empty Primary/Secondary has nothing to clear.
@@ -58,7 +65,7 @@ export function LanguagePicker({ languages, main, onChange }: LanguagePickerProp
       ))}
       {rows.length < LANGUAGES.length && (
         <Button
-          label="Add another language"
+          label={t('language.add')}
           variant="neutral"
           icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
           onPress={() => setSlots([...rows, null])}
@@ -108,6 +115,7 @@ interface LanguageMenuFieldProps {
  * it into a search box with a menu of matches underneath; picking one closes it.
  */
 export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear }: LanguageMenuFieldProps) {
+  const t = useT('common');
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -134,12 +142,12 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
         </View>
         {open ? (
           <View style={styles.content}>
-            <Text style={styles.label}>Search languages</Text>
+            <Text style={styles.label}>{t('language.search')}</Text>
             <TextInput
               style={styles.input}
               value={query}
               onChangeText={setQuery}
-              placeholder={value ? languageName(value) : 'e.g. Español, Korean, ASL'}
+              placeholder={value ? languageName(value) : t('language.examples')}
               placeholderTextColor={Colors.textFaint}
               autoFocus
               autoCorrect={false}
@@ -147,7 +155,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
               onSubmitEditing={() => (results[0] ? pick(results[0].code) : close())}
               // Let a tap on a menu item land before the menu closes (web blurs on mousedown).
               onBlur={() => { blurTimer.current = setTimeout(close, 200); }}
-              accessibilityLabel={`Search languages for ${fieldName}`}
+              accessibilityLabel={t('language.searchFor', { field: fieldName })}
             />
           </View>
         ) : (
@@ -155,11 +163,11 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
             style={styles.content}
             onPress={() => setOpen(true)}
             accessibilityRole="button"
-            accessibilityLabel={`${fieldName}: ${value ? languageName(value) : 'none'}`}
-            accessibilityHint="Opens a language search">
-            <Text style={styles.label}>Search Languages</Text>
+            accessibilityLabel={value ? t('language.field', { field: fieldName, language: languageName(value) }) : t('language.fieldEmpty', { field: fieldName })}
+            accessibilityHint={t('language.openHint')}>
+            <Text style={styles.label}>{t('language.fieldLabel')}</Text>
             <Text style={[styles.value, !value && styles.placeholder]} numberOfLines={1}>
-              {value ? languageName(value) : 'Choose a language'}
+              {value ? languageName(value) : t('language.choose')}
             </Text>
           </Pressable>
         )}
@@ -168,7 +176,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
             onPress={open ? close : onClear}
             style={styles.trail}
             accessibilityRole="button"
-            accessibilityLabel={open ? 'Close language search' : value ? `Remove ${languageName(value)}` : `Remove this language field`}>
+            accessibilityLabel={open ? t('language.closeSearch') : value ? t('language.remove', { language: languageName(value) }) : t('language.removeField')}>
             <ClearIcon />
           </Pressable>
         ) : (
@@ -178,7 +186,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
       {open && (
         <View style={styles.menu} accessibilityRole="menu">
           {results.length === 0 ? (
-            <Text style={styles.empty}>No match. Try the English name.</Text>
+            <Text style={styles.empty}>{t('language.noMatch')}</Text>
           ) : (
             results.map(l => (
               <Pressable
@@ -208,7 +216,8 @@ interface LanguageSearchModalProps {
 }
 
 /** Full-screen searchable list; names shown in their own script with the English name underneath. */
-export function LanguageSearchModal({ visible, title = 'Add a language', exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
+export function LanguageSearchModal({ visible, title, exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
+  const t = useT('common');
   const [query, setQuery] = useState('');
   const results = searchLanguages(query).filter(l => !exclude.includes(l.code));
 
@@ -222,22 +231,22 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
       <SafeAreaView style={styles.modal}>
         <View style={styles.modalBody}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle} accessibilityRole="header">{title}</Text>
+            <Text style={styles.modalTitle} accessibilityRole="header">{title ?? t('language.addTitle')}</Text>
             <Pressable onPress={close} style={styles.doneTarget} accessibilityRole="button">
-              <Text style={styles.done}>Done</Text>
+              <Text style={styles.done}>{t('actions.done')}</Text>
             </Pressable>
           </View>
           <View style={styles.searchBox}>
             <FigmaIcon name="leading-icon-de9321" size={40} color={Colors.ink} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search, e.g. Español, Korean, ASL"
+              placeholder={t('language.searchExamples')}
               placeholderTextColor={Colors.textFaint}
               value={query}
               onChangeText={setQuery}
               autoFocus
               autoCorrect={false}
-              accessibilityLabel="Search languages"
+              accessibilityLabel={t('language.search')}
             />
           </View>
           <FlatList<Language>
@@ -245,7 +254,7 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
             keyExtractor={l => l.code}
             keyboardShouldPersistTaps="handled"
             ItemSeparatorComponent={() => <View style={styles.sep} />}
-            ListEmptyComponent={<Text style={styles.empty}>No match. Try the English name.</Text>}
+            ListEmptyComponent={<Text style={styles.empty}>{t('language.noMatch')}</Text>}
             renderItem={({ item }) => (
               <Pressable
                 style={({ pressed }) => [styles.item, pressed && styles.menuItemPressed]}

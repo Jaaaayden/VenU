@@ -50,5 +50,47 @@
   "count": {
     "people_one": "{{count}} tao",
     "people_other": "{{count}} tao"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>(opsyonal)</muted>",
+    "step": "Hakbang {{step}} sa {{total}}"
+  },
+  "nav": {
+    "backTo": "Bumalik sa {{label}}"
+  },
+  "chip": {
+    "remove": "Alisin ang {{label}}"
+  },
+  "photo": {
+    "add": "Magdagdag ng larawan",
+    "change": "Palitan ang larawan",
+    "take": "Kumuha ng larawan",
+    "remove": "Alisin",
+    "hint": "Para madali kang makita ng tutulong sa iyo. Opsyonal.",
+    "cameraOff": "Naka-off ang access sa camera. I-on ito sa Settings.",
+    "libraryOff": "Naka-off ang access sa mga larawan. I-on ito sa Settings.",
+    "labelNamed": "Larawan sa profile ni {{name}}",
+    "labelYours": "Ang iyong larawan sa profile",
+    "labelNone": "Walang larawan sa profile"
+  },
+  "language": {
+    "primary": "Pangunahing wika",
+    "secondary": "Pangalawang wika",
+    "another": "Iba pang wika",
+    "add": "Magdagdag ng iba pang wika",
+    "search": "Maghanap ng wika",
+    "fieldLabel": "Maghanap ng wika",
+    "searchFor": "Maghanap ng wika para sa {{field}}",
+    "examples": "hal. Tagalog, Español, ASL",
+    "searchExamples": "Maghanap, hal. Tagalog, Español, ASL",
+    "field": "{{field}}: {{language}}",
+    "fieldEmpty": "{{field}}: wala",
+    "openHint": "Binubuksan ang paghahanap ng wika",
+    "choose": "Pumili ng wika",
+    "closeSearch": "Isara ang paghahanap ng wika",
+    "remove": "Alisin ang {{language}}",
+    "removeField": "Alisin ang field na ito",
+    "noMatch": "Walang tugma. Subukan ang pangalan sa English.",
+    "addTitle": "Magdagdag ng wika"
   }
 }

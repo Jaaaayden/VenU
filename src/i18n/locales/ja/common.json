@@ -49,5 +49,47 @@
   },
   "count": {
     "people_other": "{{count}}人"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>（任意）</muted>",
+    "step": "ステップ {{step}}/{{total}}"
+  },
+  "nav": {
+    "backTo": "{{label}}に戻る"
+  },
+  "chip": {
+    "remove": "{{label}}を削除"
+  },
+  "photo": {
+    "add": "写真を追加",
+    "change": "写真を変更",
+    "take": "写真を撮る",
+    "remove": "削除",
+    "hint": "サポーターがあなたを見つけやすくなります。任意です。",
+    "cameraOff": "カメラへのアクセスがオフです。設定でオンにしてください。",
+    "libraryOff": "写真へのアクセスがオフです。設定でオンにしてください。",
+    "labelNamed": "{{name}}さんのプロフィール写真",
+    "labelYours": "あなたのプロフィール写真",
+    "labelNone": "プロフィール写真なし"
+  },
+  "language": {
+    "primary": "メインの言語",
+    "secondary": "2番目の言語",
+    "another": "その他の言語",
+    "add": "言語を追加",
+    "search": "言語を検索",
+    "fieldLabel": "言語を検索",
+    "searchFor": "{{field}}を検索",
+    "examples": "例：日本語、Español、ASL",
+    "searchExamples": "検索（例：日本語、Español、ASL）",
+    "field": "{{field}}：{{language}}",
+    "fieldEmpty": "{{field}}：未選択",
+    "openHint": "言語の検索を開きます",
+    "choose": "言語を選ぶ",
+    "closeSearch": "言語の検索を閉じる",
+    "remove": "{{language}}を削除",
+    "removeField": "この言語欄を削除",
+    "noMatch": "見つかりません。英語名で試してください。",
+    "addTitle": "言語を追加"
   }
 }
