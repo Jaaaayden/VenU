@@ -12,17 +12,10 @@ import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { Checkbox } from '@/features/auth/auth-ui';
 import { friendlyError } from '@/lib/errors';
 
-import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, TRAININGS, type Option } from './options';
+import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
-import type { HelperGenderPref, ProfileDraft } from './types';
+import type { ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
-
-// Figma's wording and order for the helper preference ("No preference / Male / Female").
-const HELPER_GENDER_CHIPS: Option<HelperGenderPref>[] = [
-  { value: 'none', label: 'No preference' },
-  { value: 'man', label: 'Male' },
-  { value: 'woman', label: 'Female' },
-];
 
 interface ProfileFormProps {
   initial: ProfileDraft;
@@ -128,7 +121,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
 
             <FormSection title="I’d prefer help from">
               <LabeledRow label="Gender">
-                <ChipGroup options={HELPER_GENDER_CHIPS} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel="Helper gender" />
+                <ChipGroup options={HELPER_GENDER} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel="Helper gender" />
               </LabeledRow>
               <LabeledRow label="Age">
                 <ChipGroup options={HELPER_AGE} value={d.helperAgePref} onChange={v => set('helperAgePref', v)} accessibilityLabel="Helper age" />
