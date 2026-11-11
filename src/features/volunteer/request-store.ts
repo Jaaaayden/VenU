@@ -17,6 +17,7 @@ export const INITIAL_STATE: RequestState = {
   unread: 0,
   notice: null,
   draft: null,
+  typing: false,
 };
 
 export const EMPTY_DRAFT: RequestDraft = { helpTypes: [], note: '', photoUri: null, language: null };
@@ -28,6 +29,7 @@ export type RequestAction =
   | { type: 'cancel' }
   | { type: 'send'; message: ChatMessage }
   | { type: 'receive'; requestId: string; message: ChatMessage }
+  | { type: 'typing'; requestId: string; typing: boolean }
   | { type: 'read' }
   | { type: 'end' }
   | { type: 'finish'; notice: RequestState['notice'] }
@@ -55,13 +57,17 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
       return state.status === 'matched' ? { ...state, messages: [...state.messages, action.message] } : state;
     case 'receive':
       return state.status === 'matched' && state.request?.id === action.requestId
-        ? { ...state, messages: [...state.messages, action.message], unread: state.unread + 1 }
+        ? { ...state, messages: [...state.messages, action.message], unread: state.unread + 1, typing: false }
+        : state;
+    case 'typing':
+      return state.status === 'matched' && state.request?.id === action.requestId && state.typing !== action.typing
+        ? { ...state, typing: action.typing }
         : state;
     case 'read':
       return state.unread ? { ...state, unread: 0 } : state;
     case 'end':
       // The help happened: the next request starts from an empty form.
-      return state.status === 'matched' ? { ...state, status: 'done', unread: 0, draft: null } : state;
+      return state.status === 'matched' ? { ...state, status: 'done', unread: 0, draft: null, typing: false } : state;
     case 'finish':
       return state.status === 'done' ? { ...INITIAL_STATE, notice: action.notice } : state;
     case 'dismissNotice':
@@ -153,7 +159,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     const snapshot = state;
     // Nothing worth keeping (e.g. the help ended): no key at all.
     if (snapshot.status === 'idle' && !snapshot.draft) return queueWrite((s, k) => s.removeItem(k));
-    const saved: Saved = { v: 1, owner: who, state: { ...snapshot, notice: null } };
+    const saved: Saved = { v: 1, owner: who, state: { ...snapshot, notice: null, typing: false } };
     queueWrite((s, k) => s.setItem(k, JSON.stringify(saved)));
   }
 
@@ -172,7 +178,12 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
 
   function listen(requestId: string) {
     stopListening();
-    unsubscribe = backend.onMessage(requestId, message => dispatch({ type: 'receive', requestId, message }));
+    const offMessage = backend.onMessage(requestId, message => dispatch({ type: 'receive', requestId, message }));
+    const offTyping = backend.onTyping?.(requestId, typing => dispatch({ type: 'typing', requestId, typing }));
+    unsubscribe = () => {
+      offMessage();
+      offTyping?.();
+    };
   }
 
   /** Waits for a volunteer for a request that is already in the 'searching' state. */
@@ -183,8 +194,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const match = await backend.findVolunteer(request, ctl.signal);
       if (search !== ctl) return;
       search = null;
-      listen(request.id);
       dispatch({ type: 'matched', requestId: request.id, match });
+      listen(request.id); // after "matched", so the typing state it reports right away applies
     } catch {
       if (search !== ctl) return; // cancelled: cancel() already reset the state
       search = null;

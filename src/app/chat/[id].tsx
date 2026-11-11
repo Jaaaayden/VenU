@@ -18,7 +18,7 @@ import { goBack } from '@/lib/navigation';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { status, request, match, messages, unread } = useVolunteerRequest();
+  const { status, request, match, messages, unread, typing } = useVolunteerRequest();
   const restored = useVolunteerRestored();
   const [text, setText] = useState('');
   const { hint, show } = useHint();
@@ -78,6 +78,9 @@ export default function ChatScreen() {
               <ChatBubble key={m.id} message={m} onListen={() => show('Read aloud is coming soon.')} />
             ))
           )}
+          {typing ? (
+            <Text style={styles.typing} accessibilityLiveRegion="polite">{v.firstName} is typing…</Text>
+          ) : null}
         </ScrollView>
 
         <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 6) }]}>
@@ -132,6 +135,8 @@ const styles = StyleSheet.create({
   messages: { flex: 1, backgroundColor: Colors.surfaceAlt },
   messagesContent: { gap: Spacing.xl, paddingHorizontal: Spacing.gutter - 6, paddingVertical: Spacing.lg },
   empty: { fontFamily: Fonts.text, fontSize: 14, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.xl },
+  // Sits under the last bubble, lined up with the incoming bubbles' text.
+  typing: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, marginTop: -Spacing.sm, paddingLeft: Spacing.lg },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -102,6 +102,8 @@ export interface RequestState {
   notice: { tone: 'success' | 'error'; text: string } | null;
   /** The form's contents; survives a failed search or a cancel, cleared once the help ends. */
   draft: RequestDraft | null;
+  /** The volunteer is writing a reply ("Daniel is typing…"). */
+  typing: boolean;
 }
 
 /** An open request as a volunteer sees it (volunteer role's placeholder list). */

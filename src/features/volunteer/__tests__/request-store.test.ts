@@ -90,6 +90,28 @@ describe('volunteer request store', () => {
     expect(messages.map(m => m.from)).toEqual(['volunteer', 'me', 'volunteer']);
   });
 
+  it('shows the volunteer typing while a reply is on its way', async () => {
+    const store = setup();
+    const done = store.sendRequest(rosaNeedsHelp);
+    await advance(TIMING.search);
+    await done;
+    expect(store.getState().typing).toBe(true); // the greeting is coming
+    await advance(TIMING.greeting);
+    expect(store.getState().typing).toBe(false);
+
+    store.sendMessage('Where are you?');
+    await advance(0);
+    expect(store.getState().typing).toBe(true);
+    await advance(TIMING.reply);
+    expect(store.getState().typing).toBe(false);
+    expect(store.getState().messages.at(-1)?.from).toBe('volunteer');
+
+    store.sendMessage('Thanks');
+    await advance(0);
+    store.endHelp();
+    expect(store.getState().typing).toBe(false);
+  });
+
   it('cancelling while searching drops the late match', async () => {
     const store = setup();
     const done = store.sendRequest(rosaNeedsHelp);
