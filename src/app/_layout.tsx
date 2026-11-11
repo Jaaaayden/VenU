@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { WEB_COLUMN_MAX } from '@/constants/theme';
@@ -19,6 +19,8 @@ export default function RootLayout() {
     AlbertSans_400Regular, AlbertSans_500Medium, AlbertSans_600SemiBold, AlbertSans_700Bold,
   });
   const ready = fontsLoaded || !!fontError; // a font that fails to load falls back to the system font
+  // The column's edge lines only make sense when there's backdrop beside it; on a phone they're stray lines.
+  const framed = useWindowDimensions().width > WEB_COLUMN_MAX;
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
@@ -31,7 +33,7 @@ export default function RootLayout() {
       <ProfileProvider>
         {/* Web only: keep the phone layout in a centred column instead of stretching across a desktop screen. */}
         <View style={styles.backdrop}>
-          <View style={styles.column}>
+          <View style={[styles.column, framed && styles.columnFramed]}>
             <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
               {/* index decides: sign-in → onboarding (no profile yet) → (tabs) */}
               <Stack.Screen name="index" />
@@ -69,11 +71,12 @@ const styles = StyleSheet.create({
       width: '100%',
       maxWidth: WEB_COLUMN_MAX,
       overflow: 'hidden',
-      // Hairline edges so the column reads as "the app" on a wide screen.
-      borderLeftWidth: StyleSheet.hairlineWidth,
-      borderRightWidth: StyleSheet.hairlineWidth,
-      borderColor: '#D5D8DE',
     },
     default: { flex: 1 },
+  }),
+  // Hairline edges so the column reads as "the app" on a wide screen.
+  columnFramed: Platform.select({
+    web: { borderLeftWidth: StyleSheet.hairlineWidth, borderRightWidth: StyleSheet.hairlineWidth, borderColor: '#D5D8DE' },
+    default: {},
   }),
 });
