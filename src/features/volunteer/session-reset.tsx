@@ -10,8 +10,8 @@ export function VolunteerSessionReset() {
   const { status, userId } = useProfile();
   useEffect(() => {
     // 'loading' and 'error' keep the session (and the request) as it was.
-    if (status === 'signedOut') volunteerRequests.setUser(null);
-    else if (status === 'ready') volunteerRequests.setUser(userId);
+    if (status === 'signedOut') void volunteerRequests.setUser(null);
+    else if (status === 'ready') void volunteerRequests.setUser(userId);
   }, [status, userId]);
   return null;
 }

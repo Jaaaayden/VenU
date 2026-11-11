@@ -13,12 +13,13 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
-import { useVolunteerRequest, volunteerRequests } from '@/features/volunteer/request-store';
+import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
 import { goBack } from '@/lib/navigation';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { status, request, match, messages, unread } = useVolunteerRequest();
+  const restored = useVolunteerRestored();
   const [text, setText] = useState('');
   const { hint, show } = useHint();
   const insets = useSafeAreaInsets();
@@ -30,8 +31,9 @@ export default function ChatScreen() {
     if (active && unread) volunteerRequests.markRead();
   }, [active, unread]);
 
-  // The request ended or was cancelled (or this is a stale link after a reload).
-  if (!active) return <Redirect href="/volunteer" />;
+  // The request ended or was cancelled (or this is a stale link). After a reload, wait for the
+  // saved request to come back before deciding.
+  if (!active) return restored ? <Redirect href="/volunteer" /> : null;
   const v = match.volunteer;
 
   function send() {

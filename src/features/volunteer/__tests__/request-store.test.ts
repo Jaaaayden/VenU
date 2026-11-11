@@ -2,8 +2,24 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 
 import { createMockBackend } from '../backend';
 import { MOCK_LOCATION } from '../mock';
-import { createRequestStore, INITIAL_STATE, reduce, type NewRequest } from '../request-store';
+import { createRequestStore, INITIAL_STATE, parseSaved, reduce, type KeyValueStorage, type NewRequest } from '../request-store';
 import { formatClock } from '../format';
+
+// The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
+jest.mock('@react-native-async-storage/async-storage', () => jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'));
+
+const KEY = 'venu.volunteer.request';
+
+/** In-memory storage, standing in for AsyncStorage across an "app restart". */
+function memoryStorage(): KeyValueStorage & { data: Map<string, string> } {
+  const data = new Map<string, string>();
+  return {
+    data,
+    getItem: async k => data.get(k) ?? null,
+    setItem: async (k, v) => { data.set(k, v); },
+    removeItem: async k => { data.delete(k); },
+  };
+}
 
 const TIMING = { search: 1000, greeting: 500, reply: 800 };
 
@@ -189,6 +205,85 @@ describe('volunteer request store', () => {
     await done;
     store.setUser('rosa');
     expect(store.getState().status).toBe('matched');
+  });
+
+  describe('saving across a restart', () => {
+    it('brings back a matched request with its chat, and the chat keeps working', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search + TIMING.greeting);
+      await done;
+      before.sendMessage('I am by the blue sign');
+      await advance(0);
+      const saved = before.getState();
+
+      // A reload: a fresh store and backend over the same storage.
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      expect(after.isRestored()).toBe(false);
+      await after.setUser('rosa');
+      expect(after.isRestored()).toBe(true);
+      expect(after.getState()).toMatchObject({ status: 'matched', match: saved.match, messages: saved.messages, request: saved.request });
+
+      after.sendMessage('Are you close?');
+      await advance(TIMING.reply);
+      expect(after.getState().messages.map(m => m.from)).toEqual(['volunteer', 'me', 'me', 'volunteer']);
+    });
+
+    it('resumes a search that was in progress', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      void before.sendRequest(rosaNeedsHelp);
+      await advance(0);
+
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await after.setUser('rosa');
+      expect(after.getState().status).toBe('searching');
+      await advance(TIMING.search);
+      expect(after.getState().status).toBe('matched');
+    });
+
+    it('does not give one user the request saved for another, and sign-out deletes it', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      expect(storage.data.has(KEY)).toBe(true);
+
+      const other = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await other.setUser('sam');
+      expect(other.getState()).toEqual(INITIAL_STATE);
+
+      await before.setUser(null);
+      await advance(0);
+      expect(storage.data.has(KEY)).toBe(false);
+    });
+
+    it('removes the key once the help is over', async () => {
+      const storage = memoryStorage();
+      const store = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await store.setUser('rosa');
+      const done = store.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      store.endHelp();
+      store.skipFeedback();
+      await advance(0);
+      expect(storage.data.has(KEY)).toBe(false);
+    });
+
+    it('ignores saved data that is corrupt or from someone else', () => {
+      expect(parseSaved(null, 'rosa')).toBeNull();
+      expect(parseSaved('{not json', 'rosa')).toBeNull();
+      expect(parseSaved(JSON.stringify({ v: 1, owner: 'sam', state: INITIAL_STATE }), 'rosa')).toBeNull();
+      expect(parseSaved(JSON.stringify({ v: 1, owner: 'rosa', state: { ...INITIAL_STATE, status: 'matched' } }), 'rosa')).toBeNull();
+      const draft = { helpTypes: ['quiet'], note: 'hi', photoUri: 'blob:http://x/1', language: null };
+      expect(parseSaved(JSON.stringify({ v: 1, owner: 'rosa', state: { ...INITIAL_STATE, draft } }), 'rosa')?.draft).toEqual({ ...draft, photoUri: null });
+    });
   });
 
   it('ignores actions that do not fit the current status', () => {

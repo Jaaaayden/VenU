@@ -9,7 +9,7 @@ import { RequestForm } from '@/components/volunteer/request-form';
 import { SearchingView } from '@/components/volunteer/searching-view';
 import { Colors, Spacing } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
-import { useVolunteerRequest } from '@/features/volunteer/request-store';
+import { useVolunteerRequest, useVolunteerRestored } from '@/features/volunteer/request-store';
 
 /**
  * The Volunteer tab follows the visitor's request: form → searching → "Volunteer found" →
@@ -18,8 +18,10 @@ import { useVolunteerRequest } from '@/features/volunteer/request-store';
 export default function VolunteerScreen() {
   const { profile } = useProfile();
   const state = useVolunteerRequest();
-  // The tabs layout only renders tabs for a signed-in user with a profile.
-  if (!profile) return null;
+  const restored = useVolunteerRestored();
+  // The tabs layout only renders tabs for a signed-in user with a profile. Until a saved request
+  // has been read back (a moment after start), show nothing rather than flash the empty form.
+  if (!profile || !restored) return null;
 
   const { status, request, match } = state;
   const isVolunteer = profile.role === 'volunteer';
