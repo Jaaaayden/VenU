@@ -55,7 +55,7 @@
     "stop": "node scripts/dev.mjs stop",
     "lint": "expo lint --max-warnings 0",
     "typecheck": "expo customize tsconfig.json && tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm test && npx expo-doctor",
+    "check": "npm run lint && npm run typecheck && npm test && npx expo-doctor@1.21.6",
     "test": "jest"
   },
   "private": true,
