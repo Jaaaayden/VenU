@@ -14,11 +14,24 @@ import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, TagRow, venueText } from './ui';
 
 export function FacilityDetail() {
-  const { venue, facilities, snap, setSnap } = useVenueScreen();
+  const { venue, facilities, snap, setSnap, freshReport, setFreshReport } = useVenueScreen();
   const { facilityId, submitted } = useLocalSearchParams<{ facilityId: string; submitted?: string }>();
   const facility = facilities.find(f => f.id === facilityId);
   const reports = useFacilityReports(venue.id, facilityId);
   const [directions, setDirections] = useState(false);
+
+  // The form returns here with ?submitted=<id>. Closing the notification drops that param, so the
+  // venue screen remembers the id and keeps "New" on the card while the user stays on this
+  // facility (its reports included). Opening another facility, or the list, ends it.
+  const isHere = freshReport?.venueId === venue.id && freshReport.facilityId === facilityId;
+  useEffect(() => {
+    if (submitted) {
+      if (!isHere || freshReport.reportId !== submitted) setFreshReport({ venueId: venue.id, facilityId, reportId: submitted });
+    } else if (freshReport && !isHere) {
+      setFreshReport(null);
+    }
+  }, [venue.id, facilityId, submitted, freshReport, isHere, setFreshReport]);
+  const freshId = submitted ?? (isHere ? freshReport.reportId : undefined);
 
   // A deep link or a tap on a pin while the sheet is lowered: bring the card into view.
   useEffect(() => {
@@ -86,7 +99,7 @@ export function FacilityDetail() {
             <ReportCard
               key={r.id}
               report={r}
-              fresh={r.id === submitted}
+              fresh={r.id === freshId}
               onPress={() => {
                 setSnap('up');
                 router.push({ pathname: '/venue/[venueId]/[facilityId]/reports/[reportId]', params: { venueId: venue.id, facilityId: facility.id, reportId: r.id } });

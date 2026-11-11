@@ -31,6 +31,15 @@ interface VenueScreenState {
   setSnap: (s: SheetSnap) => void;
   /** Bottom padding sheet content needs so its end clears the tab bar at the current height. */
   contentInset: number;
+  /** The report just submitted here, highlighted as "New" until the user leaves its facility. */
+  freshReport: FreshReport | null;
+  setFreshReport: (r: FreshReport | null) => void;
+}
+
+export interface FreshReport {
+  venueId: string;
+  facilityId: string;
+  reportId: string;
 }
 
 const VenueScreenContext = createContext<VenueScreenState | null>(null);
@@ -77,6 +86,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const [category, setCategory] = useState<FacilityCategory | null>(null);
   const [snap, setSnap] = useState<SheetSnap>('mid');
   const [box, setBox] = useState({ w: 0, h: 0 });
+  // Set by the facility card after a submit; the list and other facilities clear it.
+  const [freshReport, setFreshReport] = useState<FreshReport | null>(null);
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
   const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
@@ -163,6 +174,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     snap,
     setSnap,
     contentInset: positions[snap] - positions.up + tabClearance + Spacing.xl,
+    freshReport,
+    setFreshReport,
   };
 
   return (

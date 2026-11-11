@@ -1,6 +1,6 @@
 /** Sheet content: "Facilities Near You", nearest first, filtered by the header chip and the search. */
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Spacing } from '@/constants/theme';
@@ -12,10 +12,13 @@ import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { SearchField, venueText } from './ui';
 
 export function FacilityList() {
-  const { venue, facilities, category, setCategory, snap, setSnap } = useVenueScreen();
+  const { venue, facilities, category, setCategory, snap, setSnap, setFreshReport } = useVenueScreen();
   const [query, setQuery] = useState('');
   const results = searchFacilities(facilities, query, category).sort((a, b) => a.walkMinutes - b.walkMinutes);
   const categoryLabel = CATEGORIES.find(c => c.value === category)?.label;
+
+  // Back on the list = the user left the facility, so a just-submitted report is no longer "New".
+  useEffect(() => { setFreshReport(null); }, [setFreshReport]);
 
   return (
     <SheetScroll contentContainerStyle={styles.content}>
