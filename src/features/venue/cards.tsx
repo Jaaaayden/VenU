@@ -3,18 +3,19 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
 import { eventsLabel, facilityMeta } from './labels';
 import type { FacilityReport } from './reports';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
 import type { Facility, Venue } from './types';
-import { venueText } from './ui';
+import { inset, venueText } from './ui';
 
 /** Gray card with the venue name, address and a drawing of its map (the Figma photo slot). */
 export function StadiumCard({ venue, onPress }: { venue: Venue; onPress: () => void }) {
   const t = useT('venue');
+  const rtl = useLayoutRtl();
   return (
     <Pressable
       onPress={onPress}
@@ -26,15 +27,16 @@ export function StadiumCard({ venue, onPress }: { venue: Venue; onPress: () => v
       <Text style={venueText.caption}>{venue.address}</Text>
       <View style={styles.tile}>
         <VenueDrawing shape={venue.shape} width={170} height={130} />
-        <Text style={styles.tileTag}>{eventsLabel(venue, t)}</Text>
+        <Text style={[styles.tileTag, inset('start', 10, rtl)]}>{eventsLabel(venue, t)}</Text>
       </View>
     </Pressable>
   );
 }
 
-/** White row: category icon, name, distance and wait, chevron. */
+/** White row: category icon, name, distance and wait, chevron (pointing left in RTL). */
 export function FacilityRow({ facility, onPress }: { facility: Facility; onPress: () => void }) {
   const t = useT('venue');
+  const rtl = useLayoutRtl();
   const meta = facilityMeta(facility, t);
   return (
     <Pressable
@@ -50,7 +52,9 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
         <Text style={venueText.caption} numberOfLines={1}>{meta}</Text>
       </View>
       {facility.accessible ? <FigmaIcon name="wheelchair-6dc801" size={22} color={Colors.primary} /> : null}
-      <FigmaIcon name="group-2-af556f" size={32} color={Colors.ink} />
+      <View style={rtl && styles.flip}>
+        <FigmaIcon name="group-2-af556f" size={32} color={Colors.ink} />
+      </View>
     </Pressable>
   );
 }
@@ -117,7 +121,6 @@ const styles = StyleSheet.create({
   },
   tileTag: {
     position: 'absolute',
-    left: 10,
     bottom: 10,
     fontFamily: Fonts.textSemiBold,
     fontSize: 13,
@@ -134,8 +137,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.md,
     minHeight: 60,
-    paddingLeft: Spacing.lg,
-    paddingRight: Spacing.sm,
+    paddingStart: Spacing.lg,
+    paddingEnd: Spacing.sm,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.surfaceAlt,
@@ -145,6 +148,7 @@ const styles = StyleSheet.create({
   rowPressed: { backgroundColor: Colors.surfaceAlt },
   rowIcon: { width: 32, alignItems: 'center' },
   rowText: { flex: 1, gap: 2 },
+  flip: { transform: [{ scaleX: -1 }] },
   rowTitle: { fontFamily: Fonts.display, fontSize: 20, lineHeight: 25, color: Colors.text },
 
   report: { backgroundColor: Colors.surfaceAlt, borderRadius: Radius.md, paddingHorizontal: Spacing.lg, paddingTop: Spacing.md, paddingBottom: 10, gap: 4, ...Shadow.card },
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     ...Shadow.float,
   },
   toastHead: { flexDirection: 'row', alignItems: 'center' },
-  toastClose: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginRight: -10, marginTop: -8 },
+  toastClose: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginEnd: -10, marginTop: -8 },
   toastBody: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text },
   toastButton: { alignSelf: 'flex-start', marginTop: 10, minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.lg, borderRadius: Radius.sm, backgroundColor: Colors.ink },
   toastButtonText: { fontFamily: Fonts.text, fontSize: 15, color: Colors.onPrimary },

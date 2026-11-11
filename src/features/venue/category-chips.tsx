@@ -3,24 +3,25 @@
  * page gutter, with a soft fade on whichever edge has more chips behind it.
  */
 import { useCallback, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Chip } from '@/components/chip';
 import { Colors, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 import { CATEGORIES } from './categories';
 import { categoryLabel } from './labels';
+import { inset } from './ui';
 import type { FacilityCategory } from './types';
 
 const FADE = 36;
 
-/** A strip that fades the header background in over the chips at one edge. */
-function EdgeFade({ side }: { side: 'start' | 'end' }) {
+/** A strip that fades the header background in over the chips at one edge (mirrored with the layout). */
+function EdgeFade({ side, rtl }: { side: 'start' | 'end'; rtl: boolean }) {
   const id = `venue-chip-fade-${side}`;
   return (
-    <View pointerEvents="none" style={[styles.fade, side === 'start' ? styles.fadeStart : styles.fadeEnd]} aria-hidden>
+    <View pointerEvents="none" style={[styles.fade, inset(side, 0, rtl), rtl && styles.flip]} aria-hidden>
       <Svg width={FADE} height="100%">
         <Defs>
           <LinearGradient id={id} x1={side === 'start' ? 1 : 0} y1={0} x2={side === 'start' ? 0 : 1} y2={0}>
@@ -39,6 +40,7 @@ export function CategoryChips({ value, onChange }: {
   onChange: (c: FacilityCategory | null) => void;
 }) {
   const t = useT('venue');
+  const rtl = useLayoutRtl();
   const size = useRef({ view: 0, content: 0, x: 0 });
   const [edges, setEdges] = useState({ start: false, end: false });
 
@@ -49,7 +51,9 @@ export function CategoryChips({ value, onChange }: {
   }, []);
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    size.current.x = e.nativeEvent.contentOffset.x;
+    // Right-to-left on web, the row starts at scrollLeft 0 and goes negative; measure from the start edge.
+    const x = e.nativeEvent.contentOffset.x;
+    size.current.x = rtl && Platform.OS === 'web' ? Math.abs(x) : x;
     update();
   };
 
@@ -70,8 +74,8 @@ export function CategoryChips({ value, onChange }: {
           <Chip key={c} label={categoryLabel(c, t)} role="radio" selected={value === c} onPress={() => onChange(value === c ? null : c)} />
         ))}
       </ScrollView>
-      {edges.start ? <EdgeFade side="start" /> : null}
-      {edges.end ? <EdgeFade side="end" /> : null}
+      {edges.start ? <EdgeFade side="start" rtl={rtl} /> : null}
+      {edges.end ? <EdgeFade side="end" rtl={rtl} /> : null}
     </View>
   );
 }
@@ -80,6 +84,5 @@ const styles = StyleSheet.create({
   // Same 20pt gutter as the page at both ends; equal space above and below the chips.
   row: { gap: Spacing.sm, paddingHorizontal: Spacing.gutter, paddingVertical: Spacing.md },
   fade: { position: 'absolute', top: 0, bottom: 0, width: FADE },
-  fadeStart: { left: 0 },
-  fadeEnd: { right: 0 },
+  flip: { transform: [{ scaleX: -1 }] },
 });

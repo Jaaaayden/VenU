@@ -8,7 +8,7 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 import { isolatedLanguageName } from '@/features/profile/options';
 import { useProfile } from '@/features/profile/profile-context';
 
@@ -18,6 +18,7 @@ import { InlineNote, SearchField, venueText } from './ui';
 
 export function ChooseVenueScreen() {
   const t = useT('venue');
+  const rtl = useLayoutRtl();
   const { profile } = useProfile();
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState<string | null>(null);
@@ -60,7 +61,9 @@ export function ChooseVenueScreen() {
             <Text style={venueText.label}>{t('choose.assistTitle')}</Text>
             <Text style={venueText.caption}>{t('choose.assistBody')}</Text>
           </View>
-          <FigmaIcon name="group-2-7ecb6b" size={34} color={Colors.primary} />
+          <View style={rtl && styles.flip}>
+            <FigmaIcon name="group-2-7ecb6b" size={34} color={Colors.primary} />
+          </View>
         </Pressable>
 
         <View style={styles.list}>
@@ -108,13 +111,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.lg,
     minHeight: 73,
-    paddingLeft: Spacing.xl,
-    paddingRight: Spacing.md,
+    paddingStart: Spacing.xl,
+    paddingEnd: Spacing.md,
     borderRadius: Radius.md,
     backgroundColor: Colors.primarySoft,
     marginBottom: Spacing.md,
   },
   assistText: { flex: 1, gap: 2 },
+  flip: { transform: [{ scaleX: -1 }] },
   list: { gap: 24 },
   empty: { ...venueText.caption, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.lg },
 });

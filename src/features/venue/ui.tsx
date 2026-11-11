@@ -1,10 +1,10 @@
 /** Small pieces the venue screens share: search pill, tag pill, back arrow, section heading. */
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 /** A tag as shown: its translated label and tone (green good news, orange heads-up). */
 export interface TagView {
@@ -19,6 +19,16 @@ export function SearchGlyph({ size = 18, color = Colors.ink }: { size?: number; 
       <Line x1={11.8} y1={11.8} x2={16} y2={16} stroke={color} strokeWidth={2.2} strokeLinecap="round" />
     </Svg>
   );
+}
+
+/**
+ * Absolute offset from the start or end edge. react-native-web ignores `start`/`end`, so web gets
+ * left/right by direction; native keeps `start`/`end`, which flip on their own.
+ * e.g. inset('start', 10, rtl) → { left: 10 } (en, web), { right: 10 } (ar, web), { start: 10 } (native)
+ */
+export function inset(edge: 'start' | 'end', value: number, rtl: boolean) {
+  if (Platform.OS !== 'web') return edge === 'start' ? { start: value } : { end: value };
+  return (edge === 'start') !== rtl ? { left: value } : { right: value };
 }
 
 /** Figma "Search Field": a white pill with a magnifier; × clears it. */
@@ -74,11 +84,14 @@ export function TagRow({ tags }: { tags: TagView[] }) {
   );
 }
 
-/** The 40pt Figma "Arrow left", in a 44pt target, pulled left so the arrow itself sits on the gutter. */
+/** The 40pt Figma "Arrow left", in a 44pt target, pulled to the start so the arrow itself sits on the gutter. Points right in RTL. */
 export function BackArrow({ onPress, label }: { onPress: () => void; label: string }) {
+  const rtl = useLayoutRtl();
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.back, pressed && styles.pressed]} accessibilityRole="button" accessibilityLabel={label}>
-      <FigmaIcon name="arrow-left" size={34} color={Colors.ink} />
+      <View style={rtl && styles.flip}>
+        <FigmaIcon name="arrow-left" size={34} color={Colors.ink} />
+      </View>
     </Pressable>
   );
 }
@@ -105,8 +118,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     minHeight: 44,
-    paddingLeft: 14,
-    paddingRight: 6,
+    paddingStart: 14,
+    paddingEnd: 6,
     borderRadius: Radius.pill,
     borderWidth: 1,
     borderColor: Colors.controlBorder,
@@ -125,7 +138,8 @@ const styles = StyleSheet.create({
   tagTextGood: { fontFamily: Fonts.textBold, color: Colors.onPrimary },
 
   // The 34pt glyph starts 5.6pt into its box, which is centred in the 44pt target: 5 + 5.6 ≈ 11.
-  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -11 },
+  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginStart: -11 },
+  flip: { transform: [{ scaleX: -1 }] },
   pressed: { opacity: 0.6 },
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 18, color: Colors.textMuted, textAlign: 'center' },
 });

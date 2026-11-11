@@ -3,7 +3,7 @@
  * arena drawn in a 400×400 space, with a tappable pin per facility laid over it.
  * Picking a category fills its pins blue and fades the rest; the open facility's pin turns dark.
  */
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Colors, Fonts, Shadow } from '@/constants/theme';
@@ -79,7 +79,7 @@ function Arena() {
   );
 }
 
-/** The drawing alone, no pins: also the tile on the "Choose Your Venue" cards. */
+/** The drawing alone, no pins (always north-up, never mirrored for RTL): also the tile on the "Choose Your Venue" cards. */
 export function VenueDrawing({ shape, width, height }: { shape: VenueShape; width: number; height: number }) {
   const t = useT('venue');
   return (
@@ -107,6 +107,9 @@ interface StadiumMapProps {
   onPinPress: (facility: Facility) => void;
 }
 
+// Not in a StyleSheet: react-native-web rejects the `direction` style.
+const NATIVE_LTR = Platform.OS === 'web' ? null : ({ direction: 'ltr' } as const);
+
 const PIN = 34;
 const PIN_SELECTED = 42;
 
@@ -118,7 +121,9 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
   const selected = facilities.find(f => f.id === selectedId);
 
   return (
-    <View style={{ width, height }}>
+    // The map is geographic: east stays on the right in right-to-left languages. Web keeps `left`
+    // physical already; native swaps left/right in RTL unless this subtree is laid out LTR.
+    <View style={[NATIVE_LTR, { width, height }]}>
       <VenueDrawing shape={shape} width={width} height={height} />
       {facilities.map(f => {
         const isSelected = f.id === selectedId;
