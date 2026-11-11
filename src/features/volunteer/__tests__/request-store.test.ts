@@ -123,6 +123,32 @@ describe('volunteer request store', () => {
     expect(store.getState().notice?.tone).toBe('error');
   });
 
+  it('keeps the form draft through a failed search and a cancel, and clears it once help ends', async () => {
+    const backend = createMockBackend(TIMING);
+    const find = backend.findVolunteer;
+    backend.findVolunteer = () => Promise.reject(new Error('offline'));
+    const store = createRequestStore(backend);
+    store.editDraft({ helpTypes: ['physical', 'language'], note: 'By the ramp', language: 'es' });
+    store.editDraft({ photoUri: 'file:///ramp.jpg' });
+    const draft = { helpTypes: ['physical', 'language'], note: 'By the ramp', photoUri: 'file:///ramp.jpg', language: 'es' };
+
+    await store.sendRequest(rosaNeedsHelp);
+    expect(store.getState().notice?.tone).toBe('error');
+    expect(store.getState().draft).toEqual(draft);
+
+    backend.findVolunteer = find;
+    void store.sendRequest(rosaNeedsHelp);
+    expect(store.getState().draft).toEqual(draft); // still there while searching
+    store.cancel();
+    expect(store.getState().draft).toEqual(draft);
+
+    const done = store.sendRequest(rosaNeedsHelp);
+    await advance(TIMING.search);
+    await done;
+    store.endHelp();
+    expect(store.getState().draft).toBeNull();
+  });
+
   it('signing out calls off the request and clears it, so the next user starts fresh', async () => {
     const backend = createMockBackend(TIMING);
     const cancelRequest = jest.spyOn(backend, 'cancelRequest');

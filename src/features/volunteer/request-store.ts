@@ -5,7 +5,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { createMockBackend, newId, type VolunteerBackend } from './backend';
-import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestState } from './types';
+import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestDraft, RequestState } from './types';
 
 export const INITIAL_STATE: RequestState = {
   status: 'idle',
@@ -14,7 +14,10 @@ export const INITIAL_STATE: RequestState = {
   messages: [],
   unread: 0,
   notice: null,
+  draft: null,
 };
+
+export const EMPTY_DRAFT: RequestDraft = { helpTypes: [], note: '', photoUri: null, language: null };
 
 export type RequestAction =
   | { type: 'search'; request: HelpRequest }
@@ -27,23 +30,24 @@ export type RequestAction =
   | { type: 'end' }
   | { type: 'finish'; notice: RequestState['notice'] }
   | { type: 'dismissNotice' }
+  | { type: 'editDraft'; patch: Partial<RequestDraft> }
   | { type: 'reset' };
 
 /** Pure state transitions. Actions that don't fit the current status return the same state. */
 export function reduce(state: RequestState, action: RequestAction): RequestState {
   switch (action.type) {
     case 'search':
-      return state.status === 'idle' ? { ...INITIAL_STATE, status: 'searching', request: action.request } : state;
+      return state.status === 'idle' ? { ...INITIAL_STATE, status: 'searching', request: action.request, draft: state.draft } : state;
     case 'matched':
       return state.status === 'searching' && state.request?.id === action.requestId
         ? { ...state, status: 'matched', match: action.match }
         : state;
     case 'searchFailed':
       return state.status === 'searching' && state.request?.id === action.requestId
-        ? { ...INITIAL_STATE, notice: { tone: 'error', text: action.text } }
+        ? { ...INITIAL_STATE, draft: state.draft, notice: { tone: 'error', text: action.text } }
         : state;
     case 'cancel':
-      return state.status === 'searching' || state.status === 'matched' ? INITIAL_STATE : state;
+      return state.status === 'searching' || state.status === 'matched' ? { ...INITIAL_STATE, draft: state.draft } : state;
     case 'send':
       return state.status === 'matched' ? { ...state, messages: [...state.messages, action.message] } : state;
     case 'receive':
@@ -53,11 +57,14 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
     case 'read':
       return state.unread ? { ...state, unread: 0 } : state;
     case 'end':
-      return state.status === 'matched' ? { ...state, status: 'done', unread: 0 } : state;
+      // The help happened: the next request starts from an empty form.
+      return state.status === 'matched' ? { ...state, status: 'done', unread: 0, draft: null } : state;
     case 'finish':
       return state.status === 'done' ? { ...INITIAL_STATE, notice: action.notice } : state;
     case 'dismissNotice':
       return state.notice ? { ...state, notice: null } : state;
+    case 'editDraft':
+      return { ...state, draft: { ...(state.draft ?? EMPTY_DRAFT), ...action.patch } };
     case 'reset':
       return state === INITIAL_STATE ? state : INITIAL_STATE;
   }
@@ -176,6 +183,11 @@ export function createRequestStore(backend: VolunteerBackend) {
 
     dismissNotice() {
       dispatch({ type: 'dismissNotice' });
+    },
+
+    /** The request form's fields live here, so they come back after a failed search or a cancel. */
+    editDraft(patch: Partial<RequestDraft>) {
+      dispatch({ type: 'editDraft', patch });
     },
 
     reset,

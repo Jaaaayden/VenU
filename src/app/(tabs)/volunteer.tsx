@@ -28,7 +28,7 @@ export default function VolunteerScreen() {
   else if (status === 'searching' && request) body = <SearchingView request={request} />;
   else if (status === 'matched' && request && match) body = <MatchView request={request} match={match} unread={state.unread} />;
   else if (status === 'done' && match) body = <FeedbackView match={match} />;
-  else body = <RequestForm visitorName={profile.firstName} defaultLanguage={profile.mainLanguage || 'en'} notice={state.notice} />;
+  else body = <RequestForm visitorName={profile.firstName} defaultLanguage={profile.mainLanguage || 'en'} notice={state.notice} draft={state.draft} />;
   const bleed = !isVolunteer && status === 'matched'; // the map runs edge to edge
 
   return (
