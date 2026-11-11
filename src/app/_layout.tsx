@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { WEB_COLUMN_MAX } from '@/constants/theme';
 import { ProfileProvider } from '@/features/profile/profile-context';
@@ -26,23 +27,35 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <ProfileProvider>
-      {/* Web only: keep the phone layout in a centred column instead of stretching across a desktop screen. */}
-      <View style={styles.backdrop}>
-        <View style={styles.column}>
-          <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-            {/* index decides: sign-in → onboarding (no profile yet) → (tabs) */}
-            <Stack.Screen name="index" />
-            <Stack.Screen name="sign-in" />
-            <Stack.Screen name="onboarding" />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="edit-profile" options={{ animation: 'slide_from_right' }} />
-            <Stack.Screen name="privacy" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
-          </Stack>
+    <WebSafeArea>
+      <ProfileProvider>
+        {/* Web only: keep the phone layout in a centred column instead of stretching across a desktop screen. */}
+        <View style={styles.backdrop}>
+          <View style={styles.column}>
+            <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+              {/* index decides: sign-in → onboarding (no profile yet) → (tabs) */}
+              <Stack.Screen name="index" />
+              <Stack.Screen name="sign-in" />
+              <Stack.Screen name="onboarding" />
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="edit-profile" options={{ animation: 'slide_from_right' }} />
+              <Stack.Screen name="privacy" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+            </Stack>
+          </View>
         </View>
-      </View>
-    </ProfileProvider>
+      </ProfileProvider>
+    </WebSafeArea>
   );
+}
+
+/**
+ * On web, Expo Router reports zero safe-area insets, so in a phone browser the screens ran under the
+ * status bar and home indicator. This provider reads the browser's real insets (env(safe-area-inset-*))
+ * instead. Native already gets real insets from Expo Router, so it's a pass-through there.
+ */
+function WebSafeArea({ children }: { children: React.ReactNode }) {
+  if (Platform.OS !== 'web') return children;
+  return <SafeAreaProvider>{children}</SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({
