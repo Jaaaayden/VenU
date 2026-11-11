@@ -91,7 +91,7 @@ export default function TermsScreen() {
           <Trans
             t={t}
             i18nKey="terms.privacyLink"
-            components={{ link: <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link" /> }}
+            components={{ a: <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link" /> }}
           />
         </Text>
         <Text style={styles.version}>{t('terms.version', { version: TERMS_VERSION })}</Text>

@@ -50,7 +50,7 @@
     "yourGenderHint": "Ginagamit lang kapag humingi ang bisita ng babae o lalaking tutulong. Hindi ipinapakita.",
     "yourAge": "Ang iyong edad",
     "yourAgeHint": "Para lang sa pagtutugma, hindi ipinapakita.",
-    "privacyAgree": "Sumasang-ayon ako sa paggamit ng VenU sa aking impormasyon, ayon sa <link>patakaran sa privacy</link>.",
+    "privacyAgree": "Sumasang-ayon ako sa paggamit ng VenU sa aking impormasyon, ayon sa <a>patakaran sa privacy</a>.",
     "privacyAgreeLabel": "Sumasang-ayon ako sa paggamit ng VenU sa aking impormasyon, ayon sa patakaran sa privacy",
     "fixAbove": "May mga sagot sa itaas na kailangang ayusin (nakapula)."
   },
@@ -156,7 +156,7 @@
     "title": "Mga tuntunin ng paggamit",
     "subtitle": "Ang maikling bersyon ng mga patakaran sa paggamit ng VenU.",
     "englishNotice": "Ipinapakita ang mga tuntuning ito sa English.",
-    "privacyLink": "Nasa <link>patakaran sa privacy</link> kung paano namin ginagamit ang iyong impormasyon.",
+    "privacyLink": "Nasa <a>patakaran sa privacy</a> kung paano namin ginagamit ang iyong impormasyon.",
     "version": "Bersyon {{version}}. Draft para sa pagsusuri ng team.",
     "sections": {
       "what": "Ano ang VenU",

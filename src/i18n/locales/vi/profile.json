@@ -50,7 +50,7 @@
     "yourGenderHint": "Chỉ dùng khi khán giả yêu cầu người hỗ trợ nữ hoặc nam. Không bao giờ hiển thị.",
     "yourAge": "Độ tuổi của bạn",
     "yourAgeHint": "Chỉ để ghép đôi, không bao giờ hiển thị.",
-    "privacyAgree": "Tôi đồng ý với cách VenU dùng thông tin của tôi, theo <link>chính sách quyền riêng tư</link>.",
+    "privacyAgree": "Tôi đồng ý với cách VenU dùng thông tin của tôi, theo <a>chính sách quyền riêng tư</a>.",
     "privacyAgreeLabel": "Tôi đồng ý với cách VenU dùng thông tin của tôi, theo chính sách quyền riêng tư",
     "fixAbove": "Một số câu trả lời ở trên cần sửa (đánh dấu màu đỏ)."
   },
@@ -156,7 +156,7 @@
     "title": "Điều khoản sử dụng",
     "subtitle": "Bản tóm tắt các quy tắc khi dùng VenU.",
     "englishNotice": "Các điều khoản này hiển thị bằng tiếng Anh.",
-    "privacyLink": "Cách chúng tôi dùng thông tin của bạn có trong <link>chính sách quyền riêng tư</link>.",
+    "privacyLink": "Cách chúng tôi dùng thông tin của bạn có trong <a>chính sách quyền riêng tư</a>.",
     "version": "Phiên bản {{version}}. Bản nháp để nhóm duyệt.",
     "sections": {
       "what": "VenU là gì",

@@ -50,7 +50,7 @@
     "yourGenderHint": "仅在观众要求女性或男性帮手时使用，从不显示。",
     "yourAge": "你的年龄段",
     "yourAgeHint": "仅用于匹配，从不显示。",
-    "privacyAgree": "我同意 VenU 按照<link>隐私政策</link>使用我的信息。",
+    "privacyAgree": "我同意 VenU 按照<a>隐私政策</a>使用我的信息。",
     "privacyAgreeLabel": "我同意 VenU 按照隐私政策使用我的信息",
     "fixAbove": "上面有些回答需要修改（已用红色标出）。"
   },
@@ -156,7 +156,7 @@
     "title": "使用条款",
     "subtitle": "使用 VenU 的规则简要版。",
     "englishNotice": "本条款以英文显示。",
-    "privacyLink": "我们如何使用你的信息，请参阅<link>隐私政策</link>。",
+    "privacyLink": "我们如何使用你的信息，请参阅<a>隐私政策</a>。",
     "version": "版本 {{version}}。供团队审阅的草稿。",
     "sections": {
       "what": "VenU 是什么",

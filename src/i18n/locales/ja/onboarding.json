@@ -32,7 +32,7 @@
     "title": "アカウント作成",
     "haveAccount": "すでにアカウントをお持ちですか？",
     "signIn": "ログイン",
-    "agree": "<link>利用規約</link>に同意します",
+    "agree": "<a>利用規約</a>に同意します",
     "agreeLabel": "利用規約に同意します",
     "submit": "アカウント作成"
   },

@@ -88,7 +88,7 @@ export default function SignUpScreen() {
             <Trans
               t={t}
               i18nKey="signUp.agree"
-              components={{ link: <Text style={styles.link} onPress={() => router.push('/terms')} accessibilityRole="link" /> }}
+              components={{ a: <Text style={styles.link} onPress={() => router.push('/terms')} accessibilityRole="link" /> }}
             />
           </Text>
         </Checkbox>

@@ -32,7 +32,7 @@
     "title": "Gumawa ng Account",
     "haveAccount": "May account ka na?",
     "signIn": "Mag-sign In",
-    "agree": "Sumasang-ayon sa <link>Mga Tuntunin at Kundisyon</link>",
+    "agree": "Sumasang-ayon sa <a>Mga Tuntunin at Kundisyon</a>",
     "agreeLabel": "Sumasang-ayon sa Mga Tuntunin at Kundisyon",
     "submit": "Gumawa ng Account"
   },

@@ -50,7 +50,7 @@
     "yourGenderHint": "来場者が女性または男性のサポーターを希望したときだけ使います。表示されません。",
     "yourAge": "あなたの年齢層",
     "yourAgeHint": "マッチングのみに使い、表示されません。",
-    "privacyAgree": "VenU が<link>プライバシーポリシー</link>に沿って私の情報を使うことに同意します。",
+    "privacyAgree": "VenU が<a>プライバシーポリシー</a>に沿って私の情報を使うことに同意します。",
     "privacyAgreeLabel": "VenU がプライバシーポリシーに沿って私の情報を使うことに同意します",
     "fixAbove": "上の回答に修正が必要なものがあります（赤で表示）。"
   },
@@ -156,7 +156,7 @@
     "title": "利用規約",
     "subtitle": "VenU を使うときのルールの要約です。",
     "englishNotice": "この規約は英語で表示されます。",
-    "privacyLink": "情報の使い方は<link>プライバシーポリシー</link>をご覧ください。",
+    "privacyLink": "情報の使い方は<a>プライバシーポリシー</a>をご覧ください。",
     "version": "バージョン {{version}}。チーム確認用の草案です。",
     "sections": {
       "what": "VenU とは",

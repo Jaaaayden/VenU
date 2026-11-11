@@ -50,7 +50,7 @@
     "yourGenderHint": "Only used when a visitor asks for a woman or man helper. Never shown.",
     "yourAge": "Your age range",
     "yourAgeHint": "Only for matching, never shown.",
-    "privacyAgree": "I agree to how VenU uses my info, as set out in the <link>privacy policy</link>.",
+    "privacyAgree": "I agree to how VenU uses my info, as set out in the <a>privacy policy</a>.",
     "privacyAgreeLabel": "I agree to how VenU uses my info, as set out in the privacy policy",
     "fixAbove": "Some answers above need a fix (marked in red)."
   },
@@ -156,7 +156,7 @@
     "title": "Terms of use",
     "subtitle": "The short version of the rules for using VenU.",
     "englishNotice": "These terms are shown in English.",
-    "privacyLink": "How we use your info is in the <link>privacy policy</link>.",
+    "privacyLink": "How we use your info is in the <a>privacy policy</a>.",
     "version": "Version {{version}}. Draft for team review.",
     "sections": {
       "what": "What VenU is",

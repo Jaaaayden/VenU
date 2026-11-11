@@ -32,7 +32,7 @@
     "title": "Criar conta",
     "haveAccount": "Já tem uma conta?",
     "signIn": "Entrar",
-    "agree": "Concordo com os <link>Termos e Condições</link>",
+    "agree": "Concordo com os <a>Termos e Condições</a>",
     "agreeLabel": "Concordo com os Termos e Condições",
     "submit": "Criar conta"
   },

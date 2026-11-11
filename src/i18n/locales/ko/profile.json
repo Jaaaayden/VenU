@@ -50,7 +50,7 @@
     "yourGenderHint": "관람객이 여성 또는 남성 도우미를 요청할 때만 사용하며, 표시되지 않습니다.",
     "yourAge": "내 연령대",
     "yourAgeHint": "연결에만 사용하며, 표시되지 않습니다.",
-    "privacyAgree": "VenU가 <link>개인정보 처리방침</link>에 따라 내 정보를 사용하는 데 동의합니다.",
+    "privacyAgree": "VenU가 <a>개인정보 처리방침</a>에 따라 내 정보를 사용하는 데 동의합니다.",
     "privacyAgreeLabel": "VenU가 개인정보 처리방침에 따라 내 정보를 사용하는 데 동의합니다",
     "fixAbove": "위의 일부 답변을 수정해야 합니다(빨간색 표시)."
   },
@@ -156,7 +156,7 @@
     "title": "이용 약관",
     "subtitle": "VenU 이용 규칙 요약본입니다.",
     "englishNotice": "이 약관은 영어로 표시됩니다.",
-    "privacyLink": "정보 사용 방법은 <link>개인정보 처리방침</link>에서 확인하세요.",
+    "privacyLink": "정보 사용 방법은 <a>개인정보 처리방침</a>에서 확인하세요.",
     "version": "버전 {{version}}. 팀 검토용 초안.",
     "sections": {
       "what": "VenU 소개",

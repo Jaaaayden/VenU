@@ -32,7 +32,7 @@
     "title": "创建账户",
     "haveAccount": "已有账户？",
     "signIn": "登录",
-    "agree": "同意<link>条款与条件</link>",
+    "agree": "同意<a>条款与条件</a>",
     "agreeLabel": "同意条款与条件",
     "submit": "创建账户"
   },

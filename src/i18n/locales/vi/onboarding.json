@@ -32,7 +32,7 @@
     "title": "Tạo tài khoản",
     "haveAccount": "Đã có tài khoản?",
     "signIn": "Đăng nhập",
-    "agree": "Đồng ý với <link>Điều khoản & Điều kiện</link>",
+    "agree": "Đồng ý với <a>Điều khoản & Điều kiện</a>",
     "agreeLabel": "Đồng ý với Điều khoản & Điều kiện",
     "submit": "Tạo tài khoản"
   },

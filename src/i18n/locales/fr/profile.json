@@ -50,7 +50,7 @@
     "yourGenderHint": "Utilisé seulement si un spectateur demande une femme ou un homme. Jamais affiché.",
     "yourAge": "Votre tranche d'âge",
     "yourAgeHint": "Uniquement pour la mise en relation, jamais affichée.",
-    "privacyAgree": "J'accepte que VenU utilise mes informations comme décrit dans la <link>politique de confidentialité</link>.",
+    "privacyAgree": "J'accepte que VenU utilise mes informations comme décrit dans la <a>politique de confidentialité</a>.",
     "privacyAgreeLabel": "J'accepte que VenU utilise mes informations comme décrit dans la politique de confidentialité",
     "fixAbove": "Certaines réponses ci-dessus sont à corriger (en rouge)."
   },
@@ -156,7 +156,7 @@
     "title": "Conditions d'utilisation",
     "subtitle": "La version courte des règles d'utilisation de VenU.",
     "englishNotice": "Ces conditions sont affichées en anglais.",
-    "privacyLink": "L'usage de vos informations est décrit dans la <link>politique de confidentialité</link>.",
+    "privacyLink": "L'usage de vos informations est décrit dans la <a>politique de confidentialité</a>.",
     "version": "Version {{version}}. Brouillon à relire par l'équipe.",
     "sections": {
       "what": "Ce qu'est VenU",

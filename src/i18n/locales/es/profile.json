@@ -50,7 +50,7 @@
     "yourGenderHint": "Solo se usa si un visitante pide ayuda de una mujer o de un hombre. Nunca se muestra.",
     "yourAge": "Tu rango de edad",
     "yourAgeHint": "Solo para el emparejamiento, nunca se muestra.",
-    "privacyAgree": "Acepto cómo VenU usa mi información, según la <link>política de privacidad</link>.",
+    "privacyAgree": "Acepto cómo VenU usa mi información, según la <a>política de privacidad</a>.",
     "privacyAgreeLabel": "Acepto cómo VenU usa mi información, según la política de privacidad",
     "fixAbove": "Hay respuestas arriba que corregir (marcadas en rojo)."
   },
@@ -156,7 +156,7 @@
     "title": "Términos de uso",
     "subtitle": "La versión corta de las reglas para usar VenU.",
     "englishNotice": "Estos términos se muestran en inglés.",
-    "privacyLink": "Cómo usamos tu información está en la <link>política de privacidad</link>.",
+    "privacyLink": "Cómo usamos tu información está en la <a>política de privacidad</a>.",
     "version": "Versión {{version}}. Borrador para revisión del equipo.",
     "sections": {
       "what": "Qué es VenU",

@@ -156,7 +156,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
             <Trans
               t={t}
               i18nKey="form.privacyAgree"
-              components={{ link: <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link" /> }}
+              components={{ a: <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link" /> }}
             />
           </Text>
         </Checkbox>
