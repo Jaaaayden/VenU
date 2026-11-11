@@ -31,7 +31,7 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
   {
     title: 'Support',
     items: [
-      { icon: 'message-unread', label: 'Help & feedback' },
+      { icon: 'message-unread', label: 'Help & feedback', href: '/help' },
       // Placeholder until there's a terms doc; the privacy policy lives under Account → Privacy & data.
       { icon: 'attachment', label: 'Terms of use' },
     ],
