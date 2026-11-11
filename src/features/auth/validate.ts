@@ -1,4 +1,7 @@
 // Checks for the Sign In and Create Account forms (pure, so jest can run them without a backend).
+// Messages are in the UI language (onboarding:validate.*).
+
+import i18n from '@/i18n';
 
 export type AuthMode = 'signin' | 'signup';
 export type AuthField = 'email' | 'password' | 'terms';
@@ -25,12 +28,12 @@ export const MIN_PASSWORD = 8;
  */
 export function validateAuth(mode: AuthMode, v: AuthValues, local: boolean): AuthError | null {
   if (!local) {
-    if (!/^\S+@\S+\.\S+$/.test(v.email.trim())) return { field: 'email', message: 'Enter a valid email.' };
+    if (!/^\S+@\S+\.\S+$/.test(v.email.trim())) return { field: 'email', message: i18n.t('onboarding:validate.email') };
     if (mode === 'signup' && v.password.length < MIN_PASSWORD)
-      return { field: 'password', message: `Use at least ${MIN_PASSWORD} characters for your password.` };
-    if (!v.password) return { field: 'password', message: 'Enter your password.' };
+      return { field: 'password', message: i18n.t('onboarding:validate.passwordLength', { min: MIN_PASSWORD }) };
+    if (!v.password) return { field: 'password', message: i18n.t('onboarding:validate.password') };
   }
   if (mode === 'signup' && !v.termsAccepted)
-    return { field: 'terms', message: 'Agree to the Terms & Conditions to continue.' };
+    return { field: 'terms', message: i18n.t('onboarding:validate.terms') };
   return null;
 }

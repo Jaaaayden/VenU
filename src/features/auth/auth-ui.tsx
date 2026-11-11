@@ -9,6 +9,7 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
 import { TextField } from '@/components/text-field';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 /** Alexandria field label over the Figma "msft_TextInput" box. */
 export function AuthField({ label, ...field }: { label: string } & ComponentProps<typeof TextField>) {
@@ -52,11 +53,14 @@ export function Checkbox({ checked, onToggle, error, children, accessibilityLabe
   );
 }
 
-/** "Already have an account? Sign In": plain text with the action as an underlined blue link. */
+/**
+ * "Already have an account?" then a "Sign In" link: a whole question plus a separate action, so each
+ * translates on its own; the row mirrors in RTL (question on the right, link to its left).
+ */
 export function FooterPrompt({ text, action, href }: { text: string; action: string; href: Href }) {
   return (
     <View style={styles.footer}>
-      <Text style={styles.footerText}>{text} </Text>
+      <Text style={styles.footerText}>{text}</Text>
       <Pressable onPress={() => router.replace(href)} style={styles.linkTarget} accessibilityRole="link" accessibilityLabel={action}>
         <Text style={styles.link}>{action}</Text>
       </Pressable>
@@ -72,6 +76,7 @@ const SOCIAL = [
 
 /** Figma "Frame 2105": the three logos come out of Figma as one 200x50 SVG; each button shows its 50x50 slice. */
 export function SocialButtons({ onPress }: { onPress: (provider: string) => void }) {
+  const t = useT('onboarding');
   const xml = FIGMA_ICONS['group-35-265b5a'];
   return (
     <View style={styles.socialRow}>
@@ -81,7 +86,7 @@ export function SocialButtons({ onPress }: { onPress: (provider: string) => void
           onPress={() => onPress(s.name)}
           style={({ pressed }) => [styles.social, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel={`Sign up with ${s.name}`}>
+          accessibilityLabel={t('auth.signUpWith', { provider: s.name })}>
           <SvgXml xml={xml.replace('width="200"', 'width="50"').replace('viewBox="0 0 200 50"', `viewBox="${s.x} 0 50 50"`)} width={56} height={56} />
         </Pressable>
       ))}
@@ -104,13 +109,14 @@ function Globe({ size = 22, color = Colors.ink }: { size?: number; color?: strin
 
 /** Top-right "🌐 English" pill on the landing page. */
 export function LanguagePill({ label, onPress }: { label: string; onPress: () => void }) {
+  const t = useT('onboarding');
   return (
     <Pressable
       onPress={onPress}
       style={styles.pillTarget}
       accessibilityRole="button"
-      accessibilityLabel={`App language: ${label}`}
-      accessibilityHint="Opens the language list">
+      accessibilityLabel={t('auth.languagePill', { language: label })}
+      accessibilityHint={t('auth.languagePillHint')}>
       {({ pressed }) => (
         <View style={[styles.pill, pressed && styles.pressed]}>
           <Globe />
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
   checkLabel: { flex: 1 },
   error: { ...Type.caption, color: Colors.danger },
 
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
+  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', columnGap: 6 },
   footerText: { ...Type.body },
   linkTarget: { minHeight: 44, justifyContent: 'center' },
   link: { ...Type.body, color: Colors.primary, textDecorationLine: 'underline' },

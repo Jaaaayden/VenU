@@ -8,12 +8,15 @@ import { LogoMark } from '@/components/wordmark';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { homeFor } from '@/features/profile/types';
+import { useT } from '@/i18n';
 import { OFFLINE } from '@/lib/errors';
 
 /** Entry gate: signed out → landing (/welcome), signed in without a profile → onboarding, else the role's home tab. */
 export default function Index() {
   const { status, loadError, profile, refresh, signOut } = useProfile();
   const [busy, setBusy] = useState<'retry' | 'signout' | null>(null);
+  const t = useT('onboarding');
+  const tc = useT('common');
 
   if (status === 'loading') return null;
   if (status === 'signedOut') return <Redirect href="/welcome" />;
@@ -24,14 +27,14 @@ export default function Index() {
         <View style={styles.center}>
           <LogoMark size={80} />
           <Text style={styles.title} accessibilityRole="header">
-            {offline ? "Can't reach VenU" : "Couldn't load your profile"}
+            {offline ? t('gate.offlineTitle') : t('gate.errorTitle')}
           </Text>
           <Text style={styles.body} accessibilityLiveRegion="polite">
-            {offline ? "Check your connection and try again. You're still signed in." : loadError}
+            {offline ? t('gate.offlineBody') : loadError}
           </Text>
           <View style={styles.actions}>
             <Button
-              label="Try again"
+              label={tc('actions.tryAgain')}
               variant="dark"
               loading={busy === 'retry'}
               style={styles.action}
@@ -42,7 +45,7 @@ export default function Index() {
             />
             {/* A way out when retrying keeps failing (e.g. a broken saved profile). */}
             <Button
-              label="Sign out"
+              label={tc('actions.signOut')}
               variant="secondary"
               loading={busy === 'signout'}
               style={styles.action}

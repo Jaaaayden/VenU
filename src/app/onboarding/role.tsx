@@ -8,10 +8,12 @@ import { StepHeader } from '@/components/form-section';
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import type { Role } from '@/features/profile/types';
+import { useT } from '@/i18n';
 
-const ROLES: { value: Role; icon: FigmaIconName; title: string; body: string }[] = [
-  { value: 'visitor', icon: 'person', title: "I'm visiting", body: 'Get help at the venue in your language.' },
-  { value: 'volunteer', icon: 'volunteer', title: "I'm an LA28 volunteer", body: "Help visitors near you. You'll show as unverified until LA28 confirms you." },
+// Text: onboarding:role.<value>Title / <value>Body.
+const ROLES: { value: Role; icon: FigmaIconName }[] = [
+  { value: 'visitor', icon: 'person' },
+  { value: 'volunteer', icon: 'volunteer' },
 ];
 
 /**
@@ -20,15 +22,19 @@ const ROLES: { value: Role; icon: FigmaIconName; title: string; body: string }[]
  */
 export default function RoleStep() {
   const [role, setRole] = useState<Role | null>(null);
+  const t = useT('onboarding');
+  const tc = useT('common');
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <StepHeader title="How will you use VenU?" subtitle="So we can ask you the right questions." />
+        <StepHeader title={t('role.title')} subtitle={t('role.subtitle')} />
 
         <View style={styles.cards} accessibilityRole="radiogroup">
           {ROLES.map(r => {
             const on = role === r.value;
+            const title = t(`role.${r.value}Title`);
+            const body = t(`role.${r.value}Body`);
             return (
               <Pressable
                 key={r.value}
@@ -36,13 +42,13 @@ export default function RoleStep() {
                 style={({ pressed }) => [styles.card, on && styles.cardOn, pressed && !on && styles.cardPressed]}
                 accessibilityRole="radio"
                 accessibilityState={{ checked: on }}
-                accessibilityLabel={`${r.title}. ${r.body}`}>
+                accessibilityLabel={`${title}. ${body}`}>
                 <View style={[styles.iconTile, on && styles.iconTileOn]}>
                   <FigmaIcon name={r.icon} size={26} color={on ? Colors.onPrimary : Colors.ink} />
                 </View>
                 <View style={styles.cardText}>
-                  <Text style={[styles.cardTitle, on && styles.textOn]}>{r.title}</Text>
-                  <Text style={Type.caption}>{r.body}</Text>
+                  <Text style={[styles.cardTitle, on && styles.textOn]}>{title}</Text>
+                  <Text style={Type.caption}>{body}</Text>
                 </View>
                 <View style={[styles.radio, on && styles.radioOn]}>{on && <View style={styles.radioDot} />}</View>
               </Pressable>
@@ -52,7 +58,7 @@ export default function RoleStep() {
 
         <View style={styles.spacer} />
         <Button
-          label="Continue"
+          label={tc('actions.continue')}
           size="lg"
           disabled={!role}
           onPress={() => role && router.push({ pathname: '/onboarding/profile', params: { role } })}

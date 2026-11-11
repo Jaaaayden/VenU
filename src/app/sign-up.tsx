@@ -1,5 +1,6 @@
 import { Redirect, router } from 'expo-router';
 import { useRef, useState, type ComponentRef } from 'react';
+import { Trans } from 'react-i18next';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Button } from '@/components/button';
@@ -8,6 +9,7 @@ import { AuthField, Checkbox, FooterPrompt } from '@/features/auth/auth-ui';
 import { AuthScreen } from '@/features/auth/auth-screen';
 import { useAuthForm, useSignedInHref } from '@/features/auth/use-auth-form';
 import { FIRST_NAME_MAX } from '@/features/profile/validate';
+import { useT } from '@/i18n';
 
 /**
  * Figma onboarding__create-account. No "Username" field: accounts are email + password and
@@ -15,6 +17,7 @@ import { FIRST_NAME_MAX } from '@/features/profile/validate';
  */
 export default function SignUpScreen() {
   const signedInHref = useSignedInHref();
+  const t = useT('onboarding');
   const { busy, error, errorFor, setError, submit } = useAuthForm('signup');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -32,11 +35,11 @@ export default function SignUpScreen() {
   }
 
   return (
-    <AuthScreen title="Create Account" footer={<FooterPrompt text="Already have an account?" action="Sign In" href="/sign-in" />}>
+    <AuthScreen title={t('signUp.title')} footer={<FooterPrompt text={t('signUp.haveAccount')} action={t('signUp.signIn')} href="/sign-in" />}>
       <View style={styles.form}>
         <AuthField
-          label="Name"
-          placeholder="Enter name"
+          label={t('auth.name')}
+          placeholder={t('auth.namePlaceholder')}
           value={name}
           onChangeText={setName}
           maxLength={FIRST_NAME_MAX}
@@ -47,8 +50,8 @@ export default function SignUpScreen() {
         />
         <AuthField
           ref={emailRef}
-          label="Email"
-          placeholder="Enter email"
+          label={t('auth.email')}
+          placeholder={t('auth.emailPlaceholder')}
           value={email}
           onChangeText={setEmail}
           error={errorFor('email')}
@@ -62,8 +65,8 @@ export default function SignUpScreen() {
         />
         <AuthField
           ref={passwordRef}
-          label="Password"
-          placeholder="Enter password"
+          label={t('auth.password')}
+          placeholder={t('auth.passwordPlaceholder')}
           value={password}
           onChangeText={setPassword}
           error={errorFor('password')}
@@ -80,19 +83,20 @@ export default function SignUpScreen() {
             if (error?.field === 'terms') setError(null);
           }}
           error={errorFor('terms')}
-          accessibilityLabel="Agree with Terms & Conditions">
+          accessibilityLabel={t('signUp.agreeLabel')}>
           <Text style={Type.body}>
-            Agree with{' '}
-            <Text style={styles.link} onPress={() => router.push('/terms')} accessibilityRole="link">
-              Terms & Conditions
-            </Text>
+            <Trans
+              t={t}
+              i18nKey="signUp.agree"
+              components={{ link: <Text style={styles.link} onPress={() => router.push('/terms')} accessibilityRole="link" /> }}
+            />
           </Text>
         </Checkbox>
       </View>
 
       {error?.field === null && <Text style={styles.error} accessibilityLiveRegion="polite">{error.message}</Text>}
 
-      <Button label="Create Account" variant="dark" onPress={go} loading={busy} style={styles.cta} />
+      <Button label={t('signUp.submit')} variant="dark" onPress={go} loading={busy} style={styles.cta} />
     </AuthScreen>
   );
 }

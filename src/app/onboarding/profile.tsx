@@ -10,11 +10,13 @@ import { clearPendingName, readPendingSetup, type PendingSetup } from '@/feature
 import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
 import { emptyDraft, type Role } from '@/features/profile/types';
+import { useT } from '@/i18n';
 
 /** Figma onboarding__profile-setup ("Set up your profile"); volunteers get their own questions. */
 export default function ProfileStep() {
   const params = useLocalSearchParams<{ role?: string }>();
   const { save } = useProfile();
+  const t = useT('onboarding');
   // The landing page's language and Create Account's name; null until read.
   const [pending, setPending] = useState<PendingSetup | null>(null);
 
@@ -35,7 +37,7 @@ export default function ProfileStep() {
       <ProfileForm
         initial={{ ...emptyDraft(role, pending.language ?? 'en'), firstName: pending.firstName ?? '' }}
         savedAvatarUrl={null}
-        submitLabel="Save and continue"
+        submitLabel={t('setup.submit')}
         // No navigation here: once the profile exists, the onboarding layout redirects to the home tab.
         onSubmit={async (draft, avatar) => {
           await save(draft, avatar);
@@ -43,8 +45,8 @@ export default function ProfileStep() {
         }}
         header={
           <StepHeader
-            title={visitor ? 'Set up your profile' : 'Your volunteer profile'}
-            subtitle={visitor ? 'So we can find the right helper for you. Change it anytime in your settings.' : 'So we can send you the visitors you can help most.'}
+            title={visitor ? t('setup.visitorTitle') : t('setup.volunteerTitle')}
+            subtitle={visitor ? t('setup.visitorSubtitle') : t('setup.volunteerSubtitle')}
           />
         }
       />
