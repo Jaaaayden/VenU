@@ -56,7 +56,8 @@ export function FeedbackView({ match }: { match: Match }) {
 
       <View style={styles.section}>
         <Text style={styles.label}>What went well?</Text>
-        <ChipGroup multiple options={FEEDBACK_TAGS} value={tags} onChange={setTags} accessibilityLabel="What went well?" />
+        {/* Three even columns (Figma's 3 + 3); a free wrap breaks 2 + 3 + 1 on a 390pt phone. */}
+        <ChipGroup multiple columns={3} options={FEEDBACK_TAGS} value={tags} onChange={setTags} accessibilityLabel="What went well?" />
       </View>
 
       <NoteBox value={note} onChangeText={setNote} placeholder={`e.g. ${v.firstName} found me a seat out of the sun`} />
