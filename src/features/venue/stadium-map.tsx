@@ -138,7 +138,9 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
                 isSelected && styles.pinSelected,
                 dim && styles.pinDim,
               ]}>
-              <FacilityIcon category={f.category} size={isSelected ? 22 : 18} color={match || isSelected ? Colors.onPrimary : Colors.ink} />
+              <FacilityIcon category={f.category} size={isSelected ? 22 : 18} color={match || isSelected ? Colors.onPrimary : Colors.ink}
+                background={isSelected ? Colors.inkDeep : match ? Colors.primary : Colors.surface}
+              />
             </View>
           </Pressable>
         );

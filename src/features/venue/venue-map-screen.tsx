@@ -4,7 +4,7 @@
  * is the current child route (facility list, facility card, report, add report).
  */
 import { router, Slot, useGlobalSearchParams } from 'expo-router';
-import { createContext, use, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent, type ScrollViewProps } from 'react-native';
 import { GestureDetector, GestureHandlerRootView, usePanGesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -90,11 +90,23 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     top.set(withSpring(positions[snap], SPRING));
   }, [positions, snap, snaps, top]);
 
+  // A drag that ends over the handle also reads as a tap on web; ignore that tap.
+  const lastDrag = useRef(0);
+  const markDragged = useCallback(() => { lastDrag.current = Date.now(); }, []);
+  const tapHandle = () => {
+    if (Date.now() - lastDrag.current < 600) return;
+    setSnap(NEXT[snap]);
+  };
+
   const pan = usePanGesture({
     minDistance: 4,
     onBegin: () => {
       'worklet';
       start.set(top.get());
+    },
+    onActivate: () => {
+      'worklet';
+      scheduleOnRN(markDragged);
     },
     onUpdate: e => {
       'worklet';
@@ -108,6 +120,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
       let best = 0;
       for (let i = 1; i < 3; i++) if (Math.abs(snaps.get()[i] - projected) < Math.abs(snaps.get()[best] - projected)) best = i;
       top.set(withSpring(snaps.get()[best], SPRING));
+      scheduleOnRN(markDragged);
       scheduleOnRN(setSnap, SNAP_NAMES[best]);
     },
   });
@@ -175,7 +188,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
                 <GestureDetector gesture={pan}>
                   <View style={styles.handleZone}>
                     <Pressable
-                      onPress={() => setSnap(NEXT[snap])}
+                      onPress={tapHandle}
                       style={styles.handleTarget}
                       accessibilityRole="adjustable"
                       accessibilityLabel={`Facility panel, ${SNAP_LABEL[snap]}`}

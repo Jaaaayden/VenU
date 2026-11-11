@@ -33,11 +33,19 @@ const CROPS: Record<FacilityCategory, [number, number, number]> = {
   info: [179.5, 54.5, 34],
 };
 
-const SHEET = FIGMA_ICONS['icons-82d19f'];
+// The sheet mixes #242222 and black for the glyphs, with white details (the first-aid cross) on top:
+// glyphs take `color`, details take `background` so they read on any pin.
+const SHEET = FIGMA_ICONS['icons-82d19f'].replace(/(fill|stroke)="(#242222|black)"/g, '$1="currentColor"');
 
-export function FacilityIcon({ category, size = 24, color = Colors.ink }: { category: FacilityCategory; size?: number; color?: string }) {
+export function FacilityIcon({ category, size = 24, color = Colors.ink, background = Colors.surface }: {
+  category: FacilityCategory;
+  size?: number;
+  color?: string;
+  /** Colour behind the icon, for its cut-out details. */
+  background?: string;
+}) {
   const [x, y, s] = CROPS[category];
-  const xml = SHEET.replace(/width="213" height="88" viewBox="0 0 213 88"/, `width="${s}" height="${s}" viewBox="${x} ${y} ${s} ${s}"`);
+  const xml = SHEET.replace(/(fill|stroke)="white"/g, `$1="${background}"`).replace(/width="213" height="88" viewBox="0 0 213 88"/, `width="${s}" height="${s}" viewBox="${x} ${y} ${s} ${s}"`);
   return (
     <View style={{ width: size, height: size }} aria-hidden>
       <SvgXml xml={xml} width={size} height={size} color={color} />
