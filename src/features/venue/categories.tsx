@@ -37,6 +37,22 @@ const CROPS: Record<FacilityCategory, [number, number, number]> = {
 // glyphs take `color`, details take `background` so they read on any pin.
 const SHEET = FIGMA_ICONS['icons-82d19f'].replace(/(fill|stroke)="(#242222|black)"/g, '$1="currentColor"');
 
+// One cropped copy of the sheet per (category, background), built on first use: the map and list
+// draw ~26 of these, and re-running the replaces on every render was wasted work.
+const cropCache = new Map<string, string>();
+
+/** The icon sheet cropped to one glyph, with its white details painted `background`. */
+export function facilityIconXml(category: FacilityCategory, background: string): string {
+  const key = `${category}|${background}`;
+  let xml = cropCache.get(key);
+  if (!xml) {
+    const [x, y, s] = CROPS[category];
+    xml = SHEET.replace(/(fill|stroke)="white"/g, `$1="${background}"`).replace(/width="213" height="88" viewBox="0 0 213 88"/, `width="${s}" height="${s}" viewBox="${x} ${y} ${s} ${s}"`);
+    cropCache.set(key, xml);
+  }
+  return xml;
+}
+
 export function FacilityIcon({ category, size = 24, color = Colors.ink, background = Colors.surface }: {
   category: FacilityCategory;
   size?: number;
@@ -44,8 +60,7 @@ export function FacilityIcon({ category, size = 24, color = Colors.ink, backgrou
   /** Colour behind the icon, for its cut-out details. */
   background?: string;
 }) {
-  const [x, y, s] = CROPS[category];
-  const xml = SHEET.replace(/(fill|stroke)="white"/g, `$1="${background}"`).replace(/width="213" height="88" viewBox="0 0 213 88"/, `width="${s}" height="${s}" viewBox="${x} ${y} ${s} ${s}"`);
+  const xml = facilityIconXml(category, background);
   return (
     <View style={{ width: size, height: size }} aria-hidden>
       <SvgXml xml={xml} width={size} height={size} color={color} />
