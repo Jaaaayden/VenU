@@ -26,7 +26,8 @@ export type RequestAction =
   | { type: 'read' }
   | { type: 'end' }
   | { type: 'finish'; notice: RequestState['notice'] }
-  | { type: 'dismissNotice' };
+  | { type: 'dismissNotice' }
+  | { type: 'reset' };
 
 /** Pure state transitions. Actions that don't fit the current status return the same state. */
 export function reduce(state: RequestState, action: RequestAction): RequestState {
@@ -57,6 +58,8 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
       return state.status === 'done' ? { ...INITIAL_STATE, notice: action.notice } : state;
     case 'dismissNotice':
       return state.notice ? { ...state, notice: null } : state;
+    case 'reset':
+      return state === INITIAL_STATE ? state : INITIAL_STATE;
   }
 }
 
@@ -67,6 +70,8 @@ export function createRequestStore(backend: VolunteerBackend) {
   const listeners = new Set<() => void>();
   let search: AbortController | null = null;
   let unsubscribe: (() => void) | null = null;
+  /** The signed-in user the request belongs to. */
+  let owner: string | null = null;
 
   function dispatch(action: RequestAction) {
     const next = reduce(state, action);
@@ -78,6 +83,19 @@ export function createRequestStore(backend: VolunteerBackend) {
   function stopListening() {
     unsubscribe?.();
     unsubscribe = null;
+  }
+
+  /**
+   * Drops everything (calling off a live request) and goes back to the empty form. The request,
+   * note, location and chat belong to whoever asked; the next person on this device mustn't see them.
+   */
+  function reset() {
+    const live = state.status === 'searching' || state.status === 'matched' ? state.request?.id : undefined;
+    search?.abort();
+    search = null;
+    stopListening();
+    dispatch({ type: 'reset' });
+    if (live) backend.cancelRequest(live).catch(() => {});
   }
 
   return {
@@ -158,6 +176,14 @@ export function createRequestStore(backend: VolunteerBackend) {
 
     dismissNotice() {
       dispatch({ type: 'dismissNotice' });
+    },
+
+    reset,
+
+    /** Called as the session changes: signing out (null) or another user signing in resets. */
+    setUser(userId: string | null) {
+      if (userId === null || (owner !== null && owner !== userId)) reset();
+      owner = userId;
     },
   };
 }

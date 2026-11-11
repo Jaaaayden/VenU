@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { WEB_COLUMN_MAX } from '@/constants/theme';
 import { ProfileProvider } from '@/features/profile/profile-context';
+import { VolunteerSessionReset } from '@/features/volunteer/session-reset';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +30,8 @@ export default function RootLayout() {
   return (
     <WebSafeArea>
       <ProfileProvider>
+        {/* Drops a volunteer request when its user signs out or someone else signs in. */}
+        <VolunteerSessionReset />
         {/* Web only: keep the phone layout in a centred column instead of stretching across a desktop screen. */}
         <View style={styles.backdrop}>
           <View style={styles.column}>

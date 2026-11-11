@@ -123,6 +123,48 @@ describe('volunteer request store', () => {
     expect(store.getState().notice?.tone).toBe('error');
   });
 
+  it('signing out calls off the request and clears it, so the next user starts fresh', async () => {
+    const backend = createMockBackend(TIMING);
+    const cancelRequest = jest.spyOn(backend, 'cancelRequest');
+    const store = createRequestStore(backend);
+    store.setUser('rosa');
+    const done = store.sendRequest(rosaNeedsHelp);
+    await advance(TIMING.search + TIMING.greeting);
+    await done;
+    store.sendMessage('I am by the blue sign');
+    const requestId = store.getState().request!.id;
+
+    store.setUser(null);
+    expect(store.getState()).toEqual(INITIAL_STATE);
+    expect(cancelRequest).toHaveBeenCalledWith(requestId);
+    await advance(TIMING.reply * 2); // the pending reply never lands
+    expect(store.getState()).toEqual(INITIAL_STATE);
+
+    store.setUser('sam');
+    expect(store.getState()).toEqual(INITIAL_STATE);
+  });
+
+  it('another user signing in drops a search in progress', async () => {
+    const store = setup();
+    store.setUser('rosa');
+    const done = store.sendRequest(rosaNeedsHelp);
+    store.setUser('sam');
+    expect(store.getState()).toEqual(INITIAL_STATE);
+    await advance(TIMING.search * 2);
+    await done;
+    expect(store.getState().status).toBe('idle');
+  });
+
+  it('the same user loading again keeps the request', async () => {
+    const store = setup();
+    store.setUser('rosa');
+    const done = store.sendRequest(rosaNeedsHelp);
+    await advance(TIMING.search);
+    await done;
+    store.setUser('rosa');
+    expect(store.getState().status).toBe('matched');
+  });
+
   it('ignores actions that do not fit the current status', () => {
     expect(reduce(INITIAL_STATE, { type: 'end' })).toBe(INITIAL_STATE);
     expect(reduce(INITIAL_STATE, { type: 'cancel' })).toBe(INITIAL_STATE);
