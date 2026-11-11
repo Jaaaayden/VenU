@@ -12,7 +12,7 @@ import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { Checkbox } from '@/features/auth/auth-ui';
 import { friendlyError } from '@/lib/errors';
 
-import { ACCESS_NEEDS, AGE_BANDS, GENDERS, HELPER_AGE, TRAININGS, type Option } from './options';
+import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, TRAININGS, type Option } from './options';
 import type { AvatarChange } from './profile-context';
 import type { HelperGenderPref, ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
@@ -119,6 +119,11 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
                   />
                 </View>
               )}
+            </FormSection>
+
+            {/* Not in Figma, but helpers see it ("Prefers sign language"), so it has to stay editable. */}
+            <FormSection title="How do you like to communicate?" optional hint="Your helper sees this before they reach you.">
+              <ChipGroup multiple options={COMMUNICATION} value={d.communication} onChange={v => set('communication', v)} accessibilityLabel="Communication" />
             </FormSection>
 
             <FormSection title="I’d prefer help from">
