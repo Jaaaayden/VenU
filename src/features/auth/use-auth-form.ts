@@ -9,7 +9,7 @@ import { homeFor } from '@/features/profile/types';
 import * as auth from '@/lib/auth';
 import { friendlyError } from '@/lib/errors';
 
-import { writePendingSetup } from './pending-setup';
+import { forgetPendingNameUnlessFor, rememberPendingName } from './pending-setup';
 import { validateAuth, type AuthError, type AuthField, type AuthMode, type AuthValues } from './validate';
 
 export type { AuthError, AuthField, AuthMode, AuthValues };
@@ -50,9 +50,10 @@ export function useAuthForm(mode: AuthMode) {
         setError({ field: null, message: result.error });
         return 'failed';
       }
-      // Profile setup starts with this name. Set (or cleared) on every sign-up so an earlier
-      // account's name on this device never carries over.
-      if (mode === 'signup') await writePendingSetup({ firstName: values.name?.trim() || undefined });
+      // Profile setup starts with the name typed on Create Account, tied to that email: a sign-in
+      // to any other account on this device drops it, but signing in after confirming keeps it.
+      if (mode === 'signup') await rememberPendingName(values.email, values.name);
+      else await forgetPendingNameUnlessFor(values.email);
       if (result.needsConfirmation) return 'confirm';
       // No navigation here: once the provider is 'ready' (from this load or the auth listener's,
       // whichever lands last), the screen's redirect sends the user on.

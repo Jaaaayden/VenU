@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,11 +18,15 @@ export default function WelcomeScreen() {
   const [language, setLanguage] = useState('en');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [socialNote, setSocialNote] = useState(false);
+  // Set once the user picks a language, so the slower read below can't overwrite their choice.
+  const picked = useRef(false);
 
   // The language picked here on an earlier visit.
   useEffect(() => {
     let live = true;
-    readPendingSetup().then(p => live && p.language && setLanguage(p.language));
+    readPendingSetup().then(p => {
+      if (live && !picked.current && p.language) setLanguage(p.language);
+    });
     return () => { live = false; };
   }, []);
 
@@ -62,6 +66,7 @@ export default function WelcomeScreen() {
         visible={pickerOpen}
         title="App language"
         onSelect={code => {
+          picked.current = true;
           setLanguage(code);
           setPickerOpen(false);
           // Profile setup starts with this as the primary language.

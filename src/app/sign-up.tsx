@@ -83,7 +83,7 @@ export default function SignUpScreen() {
           accessibilityLabel="Agree with Terms & Conditions">
           <Text style={Type.body}>
             Agree with{' '}
-            <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link">
+            <Text style={styles.link} onPress={() => router.push('/terms')} accessibilityRole="link">
               Terms & Conditions
             </Text>
           </Text>

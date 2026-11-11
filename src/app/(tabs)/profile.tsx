@@ -15,8 +15,7 @@ import { friendlyError } from '@/lib/errors';
 interface MenuItem {
   icon: FigmaIconName;
   label: string;
-  /** No screen yet: tapping says it's coming soon. */
-  href?: Href;
+  href: Href;
 }
 
 const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
@@ -24,16 +23,15 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     title: 'Account',
     items: [
       { icon: 'person', label: 'Edit profile', href: '/edit-profile' },
-      { icon: 'volume', label: 'Notifications' },
+      { icon: 'volume', label: 'Notifications', href: '/notifications' },
       { icon: 'check-circle', label: 'Privacy & data', href: '/privacy' },
     ],
   },
   {
     title: 'Support',
     items: [
-      { icon: 'message-unread', label: 'Help & feedback' },
-      // Placeholder until there's a terms doc; the privacy policy lives under Account → Privacy & data.
-      { icon: 'attachment', label: 'Terms of use' },
+      { icon: 'message-unread', label: 'Help & feedback', href: '/help' },
+      { icon: 'attachment', label: 'Terms of use', href: '/terms' },
     ],
   },
 ];
@@ -44,7 +42,6 @@ export default function ProfileScreen() {
   const [busy, setBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState<string | null>(null);
-  const [soon, setSoon] = useState<string | null>(null);
   const scrollRef = useRef<ScrollViewInstance>(null);
 
   async function handleSignOut() {
@@ -114,19 +111,16 @@ export default function ProfileScreen() {
               {section.items.map((item, idx) => (
                 <View key={item.label}>
                   <Pressable
-                    onPress={() => (item.href ? router.push(item.href) : setSoon(item.label))}
+                    onPress={() => router.push(item.href)}
                     accessibilityRole="button"
-                    accessibilityLabel={item.href ? item.label : `${item.label}, coming soon`}
+                    accessibilityLabel={item.label}
                     style={({ pressed }) => [styles.menuRow, pressed && styles.menuRowPressed]}>
                     <View style={styles.menuIconBox}>
                       <FigmaIcon name={item.icon} size={20} color={Colors.ink} />
                     </View>
-                    <Text style={[styles.menuLabel, !item.href && styles.menuLabelSoon]}>{item.label}</Text>
-                    {item.href ? <Text style={styles.menuChevron}>›</Text> : <Text style={styles.soonTag}>Soon</Text>}
+                    <Text style={styles.menuLabel}>{item.label}</Text>
+                    <Text style={styles.menuChevron}>›</Text>
                   </Pressable>
-                  {soon === item.label && (
-                    <Text style={styles.soonNote} accessibilityLiveRegion="polite">{item.label} is coming soon.</Text>
-                  )}
                   {idx < section.items.length - 1 && <View style={styles.divider} />}
                 </View>
               ))}
@@ -192,9 +186,6 @@ const styles = StyleSheet.create({
   menuIconBox: { width: 36, height: 36, borderRadius: Radius.sm, backgroundColor: Colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   menuLabel: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flex: 1 },
   menuChevron: { fontSize: 22, color: Colors.textFaint },
-  menuLabelSoon: { color: Colors.textMuted },
-  soonTag: { ...Type.caption, fontFamily: Fonts.textSemiBold },
-  soonNote: { ...Type.caption, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md, marginLeft: 48 },
   divider: { height: 1, backgroundColor: Colors.divider, marginLeft: 64 },
 
   deleteBox: { marginTop: Spacing.md, gap: Spacing.sm, alignItems: 'stretch' },

@@ -20,28 +20,25 @@ interface LanguagePickerProps {
  * "Add another language". e.g. Primary [Español ⊗] / Secondary [English ⊗] / [⊕ Add another language]
  */
 export function LanguagePicker({ languages, main, onChange }: LanguagePickerProps) {
-  // Empty fields added with "Add another language" and not filled in yet.
-  const [empty, setEmpty] = useState(0);
+  // Every field on screen, in order: [Primary, Secondary, …]; null is an empty field.
+  // e.g. ['es', 'en', null] = Español / English / an added field not filled in yet.
+  const [slots, setSlots] = useState<(string | null)[]>(() => slotsFrom(languages, main));
+  // Languages changed from outside (e.g. the form reset): start over from them.
+  const rows = slotsMatch(slots, languages, main) ? slots : slotsFrom(languages, main);
 
-  const primary = main && languages.includes(main) ? main : null;
-  const others = languages.filter(l => l !== primary);
-  const rows: (string | null)[] = [primary, ...others, ...Array<null>(empty).fill(null)];
-  if (rows.length < 2) rows.push(null); // Secondary is always offered
+  function update(next: (string | null)[]) {
+    while (next.length < 2) next.push(null); // Secondary is always offered
+    setSlots(next);
+    onChange(next.filter((c): c is string => !!c), next[0] ?? '');
+  }
 
   function select(index: number, code: string) {
-    if (index === 0) return onChange([code, ...others.filter(c => c !== code)], code);
-    const current = rows[index];
-    if (current) return onChange(languages.map(c => (c === current ? code : c)), main);
-    // Filling an added field uses it up (the padding Secondary field isn't counted in `empty`).
-    if (index > others.length && empty > 0) setEmpty(n => n - 1);
-    onChange([...languages, code], main);
+    update(rows.map((c, i) => (i === index ? code : c)));
   }
 
   function clear(index: number) {
-    const current = rows[index];
-    if (!current) return setEmpty(n => Math.max(0, n - 1));
-    if (index === 0) return onChange(others, '');
-    onChange(languages.filter(c => c !== current), main);
+    // Primary keeps its place while empty; any other field goes, and the ones below move up.
+    update(index === 0 ? [null, ...rows.slice(1)] : rows.filter((_, i) => i !== index));
   }
 
   return (
@@ -64,12 +61,27 @@ export function LanguagePicker({ languages, main, onChange }: LanguagePickerProp
           label="Add another language"
           variant="neutral"
           icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
-          onPress={() => setEmpty(n => n + 1)}
+          onPress={() => setSlots([...rows, null])}
           style={styles.add}
         />
       )}
     </View>
   );
+}
+
+/** Fields for saved languages: primary first, then the rest, padded to Primary + Secondary. */
+function slotsFrom(languages: string[], main: string): (string | null)[] {
+  const primary = main && languages.includes(main) ? main : null;
+  const rows: (string | null)[] = [primary, ...languages.filter(l => l !== primary)];
+  while (rows.length < 2) rows.push(null);
+  return rows;
+}
+
+/** True when the fields hold exactly these languages, with `main` (if any) in the Primary field. */
+function slotsMatch(slots: (string | null)[], languages: string[], main: string): boolean {
+  const filled = slots.filter((c): c is string => !!c);
+  const primary = main && languages.includes(main) ? main : null;
+  return slots[0] === primary && filled.length === languages.length && filled.every(c => languages.includes(c));
 }
 
 /** ⊗ from the Figma text field's trailing icon. */

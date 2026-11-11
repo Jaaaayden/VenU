@@ -90,10 +90,11 @@ export const COMMUNICATION: Option<CommunicationMethod>[] = [
   { value: 'sign_language', label: 'Sign language' },
 ];
 
+// Figma's wording and order ("No preference / Male / Female"); stored values stay 'man' / 'woman'.
 export const HELPER_GENDER: Option<HelperGenderPref>[] = [
   { value: 'none', label: 'No preference' },
-  { value: 'woman', label: 'Woman' },
-  { value: 'man', label: 'Man' },
+  { value: 'man', label: 'Male' },
+  { value: 'woman', label: 'Female' },
 ];
 
 export const HELPER_AGE: Option<HelperAgePref>[] = [
