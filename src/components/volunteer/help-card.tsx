@@ -2,20 +2,23 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
 import { Colors, Fonts, Radius, Shadow } from '@/constants/theme';
-import type { HelpType } from '@/features/volunteer/types';
+import type { HelpTypeId } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
 
-export function HelpCard({ type, selected, onPress }: { type: HelpType; selected: boolean; onPress: () => void }) {
+export function HelpCard({ type, selected, onPress }: { type: HelpTypeId; selected: boolean; onPress: () => void }) {
+  const t = useT('volunteer');
+  const label = t(`helpTypes.${type}`);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: selected }}
-      accessibilityLabel={type.label}
+      accessibilityLabel={label}
       style={({ pressed }) => [styles.card, selected && styles.selected, pressed && styles.pressed]}>
-      <HelpIcon type={type.id} />
-      <Text style={[styles.label, selected && styles.labelSelected]}>{type.label}</Text>
+      <HelpIcon type={type} />
+      <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
     </Pressable>
   );
 }

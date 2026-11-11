@@ -3,29 +3,31 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
-import { languageName } from '@/features/profile/options';
+import { isolatedLanguageName } from '@/features/profile/options';
 import { formatDistance } from '@/features/volunteer/format';
-import { HELP_TYPES, MOCK_INCOMING } from '@/features/volunteer/mock';
+import { mockIncoming } from '@/features/volunteer/mock';
+import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
 import { Hint, useHint } from './hint';
 
 export function IncomingRequests() {
   const { hint, show } = useHint();
+  const t = useT('volunteer');
   return (
     <View style={styles.page}>
       <View style={styles.titles}>
-        <Text style={styles.title} accessibilityRole="header">Incoming requests</Text>
-        <Text style={styles.subtitle}>Visitors near you who asked for help</Text>
+        <Text style={styles.title} accessibilityRole="header">{t('incoming.title')}</Text>
+        <Text style={styles.subtitle}>{t('incoming.subtitle')}</Text>
       </View>
 
       <View style={styles.preview}>
-        <Text style={styles.previewText}>Preview: matching isn’t live yet, so these are examples.</Text>
+        <Text style={styles.previewText}>{t('incoming.preview')}</Text>
       </View>
       <Hint text={hint} />
 
-      {MOCK_INCOMING.map(r => {
-        const label = HELP_TYPES.find(h => h.id === r.helpType)?.label ?? 'Help';
+      {mockIncoming().map(r => {
+        const help = t(`helpTypes.${r.helpType}`);
         return (
           <View key={r.id} style={styles.card}>
             <View style={styles.top}>
@@ -33,14 +35,14 @@ export function IncomingRequests() {
                 <HelpIcon type={r.helpType} size={28} color={Colors.primary} />
               </View>
               <View style={styles.text}>
-                <Text style={Type.bodyStrong}>{label} · {r.visitorName}</Text>
-                <Text style={styles.where}>{r.spot} · {r.venue}</Text>
+                <Text style={Type.bodyStrong}>{t('incoming.who', { help, name: r.visitorName })}</Text>
+                <Text style={styles.where}>{t('place', { spot: r.spot, venue: r.venue })}</Text>
                 <Text style={styles.meta}>
-                  {formatDistance(r.distanceFeet)} away · {r.minutesAgo} min ago · {languageName(r.language)}
+                  {t('incoming.meta', { distance: formatDistance(r.distanceFeet), minutes: r.minutesAgo, language: isolatedLanguageName(r.language) })}
                 </Text>
               </View>
             </View>
-            <Button label="Accept" variant="outline" onPress={() => show('Accepting requests opens when matching goes live.')} />
+            <Button label={t('incoming.accept')} variant="outline" onPress={() => show(t('incoming.acceptSoon'))} />
           </View>
         );
       })}

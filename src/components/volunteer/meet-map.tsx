@@ -1,12 +1,14 @@
 /**
  * The map strip on "Volunteer found". Figma has a placeholder image here; this draws a simple
  * stylized corner of the stadium: the bowl, the concourse, Gate 2, you, and the volunteer's route.
+ * The map never mirrors in a right-to-left language; only its labels are translated.
  */
 import { useState } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Svg, { Circle, G, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Colors, Fonts } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 const H = 200;
 const GRASS = Colors.successSoft;
@@ -14,8 +16,18 @@ const BOWL = Colors.border;
 const CONCOURSE = Colors.surface;
 const LINE = Colors.controlBorder;
 
+/** Width of a pill holding `label` in 12pt text: about 7pt per character plus padding. */
+function pillWidth(label: string, min: number): number {
+  return Math.max(min, Math.round(label.length * 7.2 + 18));
+}
+
 export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: string; distanceLabel: string }) {
   const [w, setW] = useState(0);
+  const t = useT('volunteer');
+  const gate = t('map.gate');
+  const youLabel = t('map.you');
+  const gateW = pillWidth(gate, 64);
+  const youW = pillWidth(youLabel, 40);
   const onLayout = (e: LayoutChangeEvent) => setW(Math.round(e.nativeEvent.layout.width));
 
   // You stand at the ramp near the left; the volunteer walks in along the concourse from the right.
@@ -28,7 +40,7 @@ export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: strin
       style={styles.wrap}
       onLayout={onLayout}
       role="img"
-      aria-label={`Map: ${volunteerName} is ${distanceLabel} away, walking to you at Gate 2.`}>
+      aria-label={t('map.label', { name: volunteerName, distance: distanceLabel })}>
       {w > 0 && (
         <Svg width={w} height={H}>
           <Rect x={0} y={0} width={w} height={H} fill={Colors.surfaceAlt} />
@@ -45,9 +57,9 @@ export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: strin
           <Path d={`M-10 ${H * 0.55} Q${w * 0.55} ${H * 0.98} ${w + 10} ${H * 0.45}`} stroke={LINE} strokeWidth={1} fill="none" strokeDasharray="6 6" />
           {/* Gate 2 */}
           <G>
-            <Rect x={w * 0.1} y={H * 0.78} width={64} height={24} rx={6} fill={Colors.ink} />
-            <SvgText x={w * 0.1 + 32} y={H * 0.78 + 16} fontSize={12} fontFamily={Fonts.textBold} fill={Colors.onPrimary} textAnchor="middle">
-              Gate 2
+            <Rect x={w * 0.1} y={H * 0.78} width={gateW} height={24} rx={6} fill={Colors.ink} />
+            <SvgText x={w * 0.1 + gateW / 2} y={H * 0.78 + 16} fontSize={12} fontFamily={Fonts.textBold} fill={Colors.onPrimary} textAnchor="middle">
+              {gate}
             </SvgText>
           </G>
           {/* Route */}
@@ -64,9 +76,9 @@ export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: strin
           {/* You */}
           <Circle cx={you.x} cy={you.y} r={22} fill={Colors.primary} opacity={0.18} />
           <Circle cx={you.x} cy={you.y} r={10} fill={Colors.primary} stroke={Colors.surface} strokeWidth={3} />
-          <Rect x={you.x - 20} y={you.y - 44} width={40} height={20} rx={10} fill={Colors.surface} />
+          <Rect x={you.x - youW / 2} y={you.y - 44} width={youW} height={20} rx={10} fill={Colors.surface} />
           <SvgText x={you.x} y={you.y - 30} fontSize={12} fontFamily={Fonts.textSemiBold} fill={Colors.primary} textAnchor="middle">
-            You
+            {youLabel}
           </SvgText>
         </Svg>
       )}

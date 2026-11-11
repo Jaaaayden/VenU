@@ -3,19 +3,21 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 export function EmergencyCard() {
+  const t = useT('volunteer');
   return (
     <Pressable
       onPress={() => Linking.openURL('tel:911').catch(() => {})}
       accessibilityRole="button"
-      accessibilityLabel="Emergency? Call 911 now"
-      accessibilityHint="Opens your phone to call 911"
+      accessibilityLabel={t('emergency.label')}
+      accessibilityHint={t('emergency.hint')}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <FigmaIcon name="alert-triangle" size={44} color={Colors.danger} />
       <View style={styles.text}>
-        <Text style={styles.title}>Emergency?</Text>
-        <Text style={styles.sub}>Call 911 now</Text>
+        <Text style={styles.title}>{t('emergency.title')}</Text>
+        <Text style={styles.sub}>{t('emergency.call')}</Text>
       </View>
       <FigmaIcon name="group-2-77b14c" size={36} color={Colors.danger} />
     </Pressable>

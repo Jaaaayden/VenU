@@ -50,5 +50,10 @@
   "count": {
     "people_one": "{{count}} person",
     "people_other": "{{count}} people"
+  },
+  "media": {
+    "addPicture": "Add picture",
+    "changePicture": "Change picture",
+    "holdToSpeak": "Or hold to speak"
   }
 }

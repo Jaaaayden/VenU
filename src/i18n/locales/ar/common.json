@@ -54,5 +54,10 @@
     "people_few": "{{count}} أشخاص",
     "people_many": "{{count}} شخصًا",
     "people_other": "{{count}} شخص"
+  },
+  "media": {
+    "addPicture": "إضافة صورة",
+    "changePicture": "تغيير الصورة",
+    "holdToSpeak": "أو اضغط مطولًا للتحدث"
   }
 }

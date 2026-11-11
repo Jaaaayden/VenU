@@ -3,10 +3,6 @@
 
 export type HelpTypeId = 'physical' | 'directions' | 'language' | 'quiet' | 'lost' | 'other';
 
-export interface HelpType {
-  id: HelpTypeId;
-  label: string;
-}
 
 /** Where the visitor is waiting, e.g. "Near Gate 2 Ramp" at "SoFi Stadium". */
 export interface MeetPoint {
@@ -30,6 +26,9 @@ export interface HelpRequest {
 
 export type TagTone = 'success' | 'warning';
 
+/** Trainings shown as green tags; the label comes from volunteer `skills.<code>`. */
+export type SkillCode = 'wheelchair' | 'first_aid' | 'asl';
+
 export interface Volunteer {
   id: string;
   /** "Daniel K.": first name plus last initial, never a full name. */
@@ -39,7 +38,8 @@ export interface Volunteer {
   possessive: 'his' | 'her' | 'their';
   languages: string[];
   rating: number;
-  tags: { label: string; tone: TagTone }[];
+  /** `label` shows as is (language names are native names) unless `skill` names a translated training. */
+  tags: { label: string; tone: TagTone; skill?: SkillCode }[];
 }
 
 /** What the backend returns once someone accepts the request. */

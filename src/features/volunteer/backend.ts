@@ -1,7 +1,7 @@
 // The seam between the volunteer flow and the matching service. The app talks only to
 // `VolunteerBackend`; `createMockBackend()` fakes it on the device. A Supabase version (matching owned
 // by Krisha) implements the same interface and is swapped in where the store is created.
-import { greetingFrom, MOCK_REPLIES, MOCK_VOLUNTEERS } from './mock';
+import { greetingFrom, mockReply, MOCK_VOLUNTEERS } from './mock';
 import type { ChatMessage, Feedback, HelpRequest, Match, ProblemReport } from './types';
 
 export interface VolunteerBackend {
@@ -97,8 +97,7 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
     async sendMessage(requestId) {
       const i = replyIndex.get(requestId) ?? 0;
       replyIndex.set(requestId, i + 1);
-      const text = MOCK_REPLIES[Math.min(i, MOCK_REPLIES.length - 1)]!;
-      replyLater(requestId, timing.reply, text);
+      replyLater(requestId, timing.reply, mockReply(i));
     },
     onMessage(requestId, listener) {
       const set = listeners.get(requestId) ?? new Set();

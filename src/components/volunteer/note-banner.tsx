@@ -4,9 +4,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import type { RequestState } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
 
 export function NoteBanner({ notice, onDismiss }: { notice: NonNullable<RequestState['notice']>; onDismiss: () => void }) {
   const ok = notice.tone === 'success';
+  const t = useT('volunteer');
   // Thanks fade on their own; errors stay until dismissed or the next request.
   useEffect(() => {
     if (!ok) return;
@@ -17,7 +19,7 @@ export function NoteBanner({ notice, onDismiss }: { notice: NonNullable<RequestS
   return (
     <View style={[styles.box, ok ? styles.ok : styles.bad]} accessibilityLiveRegion="polite" role="status">
       <Text style={[styles.text, { color: ok ? Colors.success : Colors.danger }]}>{notice.text}</Text>
-      <Pressable onPress={onDismiss} accessibilityRole="button" accessibilityLabel="Dismiss" style={styles.close}>
+      <Pressable onPress={onDismiss} accessibilityRole="button" accessibilityLabel={t('dismiss')} style={styles.close}>
         <Text style={styles.closeText}>×</Text>
       </Pressable>
     </View>

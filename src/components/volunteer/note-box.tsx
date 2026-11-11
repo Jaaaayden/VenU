@@ -3,45 +3,48 @@
  * `onAddPicture` / `onSpeak`) the "Add picture" and "Or hold to speak" buttons under it.
  */
 import { Image } from 'expo-image';
+import { Trans } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { MediaActions } from '@/components/media-actions';
 import { TextField } from '@/components/text-field';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface NoteBoxProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  label?: string;
   photoUri?: string | null;
   onAddPicture?: () => void;
   onRemovePicture?: () => void;
   onSpeak?: () => void;
 }
 
-export function NoteBox({ value, onChangeText, placeholder = 'Enter text', label = 'Add a note', photoUri, onAddPicture, onRemovePicture, onSpeak }: NoteBoxProps) {
+export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPicture, onRemovePicture, onSpeak }: NoteBoxProps) {
+  const t = useT('volunteer');
   return (
     <View style={styles.wrap}>
       <View style={styles.field}>
+        {/* One sentence for translators; the "(optional)" part is muted. */}
         <Text style={styles.label}>
-          {label} <Text style={styles.optional}>(optional)</Text>
+          <Trans t={t} i18nKey="note.label" components={{ muted: <Text style={styles.optional} /> }} />
         </Text>
         <TextField
           value={value}
           onChangeText={onChangeText}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('note.placeholder')}
           multiline
           maxLength={500}
-          accessibilityLabel={`${label} (optional)`}
+          accessibilityLabel={t('note.labelPlain')}
         />
       </View>
 
       {photoUri ? (
         <View style={styles.photoRow}>
-          <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" accessibilityLabel="Attached picture" />
-          <Pressable onPress={onRemovePicture} style={styles.remove} accessibilityRole="button" accessibilityLabel="Remove picture">
-            <Text style={styles.removeText}>Remove picture</Text>
+          <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" accessibilityLabel={t('note.attached')} />
+          <Pressable onPress={onRemovePicture} style={styles.remove} accessibilityRole="button" accessibilityLabel={t('note.remove')}>
+            <Text style={styles.removeText}>{t('note.remove')}</Text>
           </Pressable>
         </View>
       ) : null}

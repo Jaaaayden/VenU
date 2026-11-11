@@ -50,5 +50,10 @@
   "count": {
     "people_one": "{{count}} մարդ",
     "people_other": "{{count}} մարդ"
+  },
+  "media": {
+    "addPicture": "Ավելացնել նկար",
+    "changePicture": "Փոխել նկարը",
+    "holdToSpeak": "Կամ սեղմած պահեք՝ խոսելու համար"
   }
 }

@@ -50,5 +50,10 @@
   "count": {
     "people_one": "{{count}} نفر",
     "people_other": "{{count}} نفر"
+  },
+  "media": {
+    "addPicture": "افزودن عکس",
+    "changePicture": "تغییر عکس",
+    "holdToSpeak": "یا نگه دارید و صحبت کنید"
   }
 }

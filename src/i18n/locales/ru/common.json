@@ -52,5 +52,10 @@
     "people_few": "{{count}} человека",
     "people_many": "{{count}} человек",
     "people_other": "{{count}} человека"
+  },
+  "media": {
+    "addPicture": "Добавить фото",
+    "changePicture": "Заменить фото",
+    "holdToSpeak": "Или удерживайте, чтобы сказать"
   }
 }

@@ -49,5 +49,10 @@
   },
   "count": {
     "people_other": "{{count}} người"
+  },
+  "media": {
+    "addPicture": "Thêm ảnh",
+    "changePicture": "Đổi ảnh",
+    "holdToSpeak": "Hoặc giữ để nói"
   }
 }

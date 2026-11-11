@@ -14,6 +14,7 @@ import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
+import { useT } from '@/i18n';
 import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
 import { goBack } from '@/lib/navigation';
 
@@ -25,6 +26,8 @@ export default function ChatScreen() {
   const { hint, show } = useHint();
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollViewInstance>(null);
+  const t = useT('volunteer');
+  const tc = useT('common');
   const active = status === 'matched' && request?.id === id && !!match;
 
   // Reading the chat clears the dot on "Volunteer found", including for messages that arrive while open.
@@ -47,18 +50,18 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <KeyboardAvoidingView style={styles.flex} behavior="padding">
         <View style={styles.header}>
-          <Pressable onPress={() => goBack('/volunteer')} accessibilityRole="button" accessibilityLabel="Back" style={styles.back}>
+          <Pressable onPress={() => goBack('/volunteer')} accessibilityRole="button" accessibilityLabel={tc('actions.back')} style={styles.back}>
             <FigmaIcon name="arrow-left" size={36} color={Colors.ink} />
           </Pressable>
           <Avatar name={v.firstName} uri={null} size={40} />
           <View style={styles.headerText}>
             <Text style={styles.name} accessibilityRole="header" numberOfLines={1}>{v.name}</Text>
-            <Text style={styles.away}>{match.etaMinutes} min away</Text>
+            <Text style={styles.away}>{t('chat.away', { minutes: match.etaMinutes })}</Text>
           </View>
           <Pressable
-            onPress={() => show(`Calling isn't available yet. Send ${v.firstName} a message instead.`)}
+            onPress={() => show(t('chat.callSoon', { name: v.firstName }))}
             accessibilityRole="button"
-            accessibilityLabel={`Call ${v.firstName}`}
+            accessibilityLabel={t('chat.call', { name: v.firstName })}
             style={({ pressed }) => [styles.call, pressed && styles.pressed]}>
             <FigmaIcon name="group-43-c358d1" size={50} />
           </Pressable>
@@ -71,9 +74,9 @@ export default function ChatScreen() {
           contentContainerStyle={styles.messagesContent}
           keyboardShouldPersistTaps="handled"
           onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
-          accessibilityLabel="Messages">
+          accessibilityLabel={t('chat.messages')}>
           {messages.length === 0 ? (
-            <Text style={styles.empty}>Say hello to {v.firstName}. They can see where you are.</Text>
+            <Text style={styles.empty}>{t('chat.empty', { name: v.firstName })}</Text>
           ) : (
             messages.map((m, i) => (
               <Fragment key={m.id}>
@@ -81,44 +84,44 @@ export default function ChatScreen() {
                 {i > 0 && needsSeparator(messages[i - 1]!.sentAt, m.sentAt) ? (
                   <Text style={styles.separator}>{formatDayTime(m.sentAt)}</Text>
                 ) : null}
-                <ChatBubble message={m} onListen={() => show('Read aloud is coming soon.')} />
+                <ChatBubble message={m} onListen={() => show(t('chat.listenSoon'))} />
               </Fragment>
             ))
           )}
           {typing ? (
-            <Text style={styles.typing} accessibilityLiveRegion="polite">{v.firstName} is typing…</Text>
+            <Text style={styles.typing} accessibilityLiveRegion="polite">{t('chat.typing', { name: v.firstName })}</Text>
           ) : null}
         </ScrollView>
 
         <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 6) }]}>
-          <Pressable onPress={() => show('Sending photos is coming soon.')} accessibilityRole="button" accessibilityLabel="Attach a photo" style={styles.barButton}>
+          <Pressable onPress={() => show(t('chat.attachSoon'))} accessibilityRole="button" accessibilityLabel={t('chat.attach')} style={styles.barButton}>
             <FigmaIcon name="attachment" size={24} color={Colors.textFaint} />
           </Pressable>
           <View style={styles.input}>
             <TextInput
               value={text}
               onChangeText={setText}
-              placeholder="Message"
+              placeholder={t('chat.placeholder')}
               placeholderTextColor={Colors.textFaint}
               style={styles.inputText}
               onSubmitEditing={send}
               submitBehavior="submit"
               returnKeyType="send"
-              accessibilityLabel={`Message ${v.firstName}`}
+              accessibilityLabel={t('chat.messageTo', { name: v.firstName })}
               maxLength={1000}
             />
-            <Pressable onPress={() => show('Stickers are coming soon.')} accessibilityRole="button" accessibilityLabel="Stickers" style={styles.sticker}>
+            <Pressable onPress={() => show(t('chat.stickersSoon'))} accessibilityRole="button" accessibilityLabel={t('chat.stickers')} style={styles.sticker}>
               <FigmaIcon name="stickers" size={18} color={Colors.textFaint} />
             </Pressable>
           </View>
           {text.trim() ? (
-            <Pressable onPress={send} accessibilityRole="button" accessibilityLabel="Send" style={[styles.barButton, styles.sendButton]}>
+            <Pressable onPress={send} accessibilityRole="button" accessibilityLabel={tc('actions.send')} style={[styles.barButton, styles.sendButton]}>
               <Svg width={20} height={20} viewBox="0 0 24 24" aria-hidden>
                 <Path d="M12 19V5M5 12l7-7 7 7" stroke={Colors.onPrimary} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </Svg>
             </Pressable>
           ) : (
-            <Pressable onPress={() => show('Voice messages are coming soon.')} accessibilityRole="button" accessibilityLabel="Record a voice message" style={styles.barButton}>
+            <Pressable onPress={() => show(t('chat.voiceSoon'))} accessibilityRole="button" accessibilityLabel={t('chat.record')} style={styles.barButton}>
               <FigmaIcon name="record" size={16} color={Colors.textFaint} />
             </Pressable>
           )}

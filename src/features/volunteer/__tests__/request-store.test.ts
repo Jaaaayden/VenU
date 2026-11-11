@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
+import i18n from '@/i18n';
+
 import { createMockBackend } from '../backend';
-import { MOCK_LOCATION } from '../mock';
+import { mockLocation } from '../mock';
 import { createRequestStore, INITIAL_STATE, parseSaved, reduce, type KeyValueStorage, type NewRequest } from '../request-store';
-import { formatClock, formatDayTime, needsSeparator } from '../format';
+import { formatClock, formatDayTime, formatDistance, needsSeparator } from '../format';
 
 // The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
 jest.mock('@react-native-async-storage/async-storage', () => jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'));
@@ -29,7 +31,7 @@ const rosaNeedsHelp: NewRequest = {
   note: 'Stuck near ramp 2',
   photoUri: null,
   language: 'en',
-  location: MOCK_LOCATION,
+  location: mockLocation(),
 };
 
 function setup() {
@@ -60,7 +62,9 @@ describe('volunteer request store', () => {
 
     await advance(TIMING.greeting);
     expect(store.getState().messages.map(m => m.from)).toEqual(['volunteer']);
-    expect(store.getState().messages[0]!.text).toContain('Hi Rosa!');
+    expect(store.getState().messages[0]!.text).toBe(
+      "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+    );
     expect(store.getState().unread).toBe(1);
 
     store.markRead();
@@ -315,11 +319,52 @@ describe('volunteer request store', () => {
   });
 });
 
+describe('the mock volunteer in another language', () => {
+  beforeEach(() => { jest.useFakeTimers(); });
+  afterEach(async () => {
+    jest.useRealTimers();
+    await i18n.changeLanguage('en');
+  });
+
+  it('greets and replies in the UI language', async () => {
+    await i18n.changeLanguage('es');
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, location: mockLocation() });
+    await advance(TIMING.search + TIMING.greeting);
+    expect(store.getState().messages[0]!.text).toBe(
+      '¡Hola, Rosa! Soy Daniel, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: Cerca de la rampa de la Puerta 2.',
+    );
+    store.sendMessage('Gracias');
+    await advance(TIMING.reply);
+    expect(store.getState().messages.at(-1)!.text).toBe('¡Entendido, gracias! Llego en un par de minutos.');
+  });
+});
+
 describe('formatClock', () => {
-  it('prints Figma-style times', () => {
+  afterEach(async () => { await i18n.changeLanguage('en'); });
+
+  it('prints Figma-style times in English', () => {
     expect(formatClock(new Date(2026, 6, 14, 14, 0).getTime())).toBe('2:00pm');
     expect(formatClock(new Date(2026, 6, 14, 0, 5).getTime())).toBe('12:05am');
     expect(formatClock(new Date(2026, 6, 14, 12, 30).getTime())).toBe('12:30pm');
+  });
+
+  it("uses the language's own clock elsewhere", async () => {
+    await i18n.changeLanguage('es');
+    expect(formatClock(new Date(2026, 6, 14, 14, 0).getTime())).toBe('14:00');
+    expect(formatClock(new Date(2026, 6, 14, 14, 0).getTime(), 'ko')).toBe('오후 2:00');
+  });
+});
+
+describe('formatDistance', () => {
+  afterEach(async () => { await i18n.changeLanguage('en'); });
+
+  it('rounds feet and switches to miles at 1000 ft', async () => {
+    expect(formatDistance(183)).toBe('180 ft');
+    expect(formatDistance(1584)).toBe('0.3 mi');
+    await i18n.changeLanguage('es');
+    expect(formatDistance(183)).toBe('180 pies');
+    expect(formatDistance(1584)).toBe('0,3 mi');
   });
 });
 
@@ -337,5 +382,13 @@ describe('chat day/time separators', () => {
     expect(formatDayTime(at(14, 5), now)).toBe('Today 2:05pm');
     expect(formatDayTime(at(9, 30, 13), now)).toBe('Yesterday 9:30am');
     expect(formatDayTime(at(14, 0, 10), now)).toBe('Fri, Jul 10 2:00pm');
+  });
+
+  it('names the day in the UI language', async () => {
+    const now = at(18, 0);
+    await i18n.changeLanguage('es');
+    expect(formatDayTime(at(14, 5), now)).toBe('Hoy 14:05');
+    expect(formatDayTime(at(9, 30, 13), now)).toBe('Ayer 9:30');
+    await i18n.changeLanguage('en');
   });
 });

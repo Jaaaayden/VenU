@@ -49,5 +49,10 @@
   },
   "count": {
     "people_other": "{{count}}명"
+  },
+  "media": {
+    "addPicture": "사진 추가",
+    "changePicture": "사진 변경",
+    "holdToSpeak": "또는 길게 눌러 말하기"
   }
 }

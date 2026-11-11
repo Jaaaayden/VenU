@@ -28,6 +28,7 @@ const DATE_STYLES = {
   short: { year: 'numeric', month: '2-digit', day: '2-digit' }, // 10/24/2026
   medium: { year: 'numeric', month: 'short', day: 'numeric' }, // Oct 24, 2026
   long: { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }, // Saturday, October 24, 2026
+  weekday: { weekday: 'short', month: 'short', day: 'numeric' }, // Sat, Oct 24
 } satisfies Record<string, Intl.DateTimeFormatOptions>;
 
 export function formatDate(value: DateInput, style: keyof typeof DATE_STYLES = 'short', language = i18n.language): string {

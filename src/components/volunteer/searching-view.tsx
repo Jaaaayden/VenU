@@ -8,14 +8,16 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
-import { languageName } from '@/features/profile/options';
+import { isolatedLanguageName } from '@/features/profile/options';
 import { HELP_TYPES } from '@/features/volunteer/mock';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
 
 export function SearchingView({ request }: { request: HelpRequest }) {
+  const t = useT('volunteer');
   const [pulse] = useState(() => new Animated.Value(0));
   useEffect(() => {
     const loop = Animated.loop(
@@ -25,13 +27,13 @@ export function SearchingView({ request }: { request: HelpRequest }) {
     return () => loop.stop();
   }, [pulse]);
 
-  const asked = HELP_TYPES.filter(h => request.helpTypes.includes(h.id));
+  const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
 
   return (
     <View style={styles.page}>
       <View style={styles.titles}>
-        <Text style={styles.title} accessibilityRole="header">Finding a volunteer</Text>
-        <Text style={styles.subtitle} accessibilityLiveRegion="polite">Usually under a minute · Stay where you are</Text>
+        <Text style={styles.title} accessibilityRole="header">{t('searching.title')}</Text>
+        <Text style={styles.subtitle} accessibilityLiveRegion="polite">{t('searching.subtitle')}</Text>
       </View>
 
       <View style={styles.radar} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -49,21 +51,21 @@ export function SearchingView({ request }: { request: HelpRequest }) {
         </View>
       </View>
 
-      <Text style={styles.where}>{request.location.spot} · {request.location.venue}</Text>
+      <Text style={styles.where}>{t('place', { spot: request.location.spot, venue: request.location.venue })}</Text>
 
       <View style={styles.summary}>
-        <Text style={styles.summaryLabel}>You asked for</Text>
-        {asked.map(h => (
-          <View key={h.id} style={styles.askedRow}>
-            <HelpIcon type={h.id} size={22} />
-            <Text style={Type.body}>{h.label}</Text>
+        <Text style={styles.summaryLabel}>{t('searching.askedFor')}</Text>
+        {asked.map(id => (
+          <View key={id} style={styles.askedRow}>
+            <HelpIcon type={id} size={22} />
+            <Text style={Type.body}>{t(`helpTypes.${id}`)}</Text>
           </View>
         ))}
-        <Text style={styles.meta}>Help in {languageName(request.language)}</Text>
-        {request.note ? <Text style={styles.note}>“{request.note}”</Text> : null}
+        <Text style={styles.meta}>{t('helpIn', { language: isolatedLanguageName(request.language) })}</Text>
+        {request.note ? <Text style={styles.note}>{t('quoted', { text: request.note })}</Text> : null}
       </View>
 
-      <Button label="Cancel request" variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
+      <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
     </View>
   );
 }

@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface MediaActionsProps {
   onAddPicture?: () => void;
@@ -16,8 +17,9 @@ interface MediaActionsProps {
 }
 
 export function MediaActions({ onAddPicture, hasPicture = false, onSpeak }: MediaActionsProps) {
+  const t = useT('common');
   if (!onAddPicture && !onSpeak) return null;
-  const pictureLabel = hasPicture ? 'Change picture' : 'Add picture';
+  const pictureLabel = hasPicture ? t('media.changePicture') : t('media.addPicture');
   return (
     <View style={styles.row}>
       {onAddPicture ? (
@@ -34,10 +36,10 @@ export function MediaActions({ onAddPicture, hasPicture = false, onSpeak }: Medi
         <Pressable
           onPress={onSpeak}
           accessibilityRole="button"
-          accessibilityLabel="Or hold to speak"
+          accessibilityLabel={t('media.holdToSpeak')}
           style={({ pressed }) => [styles.action, styles.speak, pressed && styles.speakPressed]}>
           <FigmaIcon name="icon-c230e9" size={14} color={Colors.primary} />
-          <Text style={[styles.text, styles.speakText]}>Or hold to speak</Text>
+          <Text style={[styles.text, styles.speakText]}>{t('media.holdToSpeak')}</Text>
         </Pressable>
       ) : null}
     </View>

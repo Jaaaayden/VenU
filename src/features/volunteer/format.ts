@@ -1,14 +1,22 @@
-/** "2:00pm", as in the Figma chat bubbles. Device-locale formats vary too much across platforms. */
-export function formatClock(ms: number): string {
-  const d = new Date(ms);
-  const h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  return `${h % 12 || 12}:${m}${h < 12 ? 'am' : 'pm'}`;
+// Times, distances and chat separators for the volunteer flow, in the current UI language.
+import i18n from '@/i18n';
+import { formatDate, formatNumber, formatTime } from '@/i18n/format';
+
+/**
+ * A chat bubble's time: "2:00pm" in English (as in the Figma bubbles), the language's own clock
+ * elsewhere ("14:00" in Spanish, "오후 2:00" in Korean).
+ */
+export function formatClock(ms: number, language: string = i18n.language): string {
+  const time = formatTime(ms, language);
+  // Intl writes "2:00 PM" (often with a narrow no-break space); Figma's English style is "2:00pm".
+  return language === 'en' ? time.replace(/[\s ]*([AP])M$/, (_, p: string) => `${p.toLowerCase()}m`) : time;
 }
 
-/** "180 ft", "0.3 mi". */
+/** "180 ft", "0.3 mi": units stay imperial; the number and abbreviation follow the language. */
 export function formatDistance(feet: number): string {
-  return feet < 1000 ? `${Math.round(feet / 10) * 10} ft` : `${(feet / 5280).toFixed(1)} mi`;
+  if (feet < 1000) return i18n.t('volunteer:distance.feet', { value: formatNumber(Math.round(feet / 10) * 10) });
+  const miles = formatNumber(feet / 5280, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return i18n.t('volunteer:distance.miles', { value: miles });
 }
 
 /** Messages further apart than this get a day/time line between them. */
@@ -19,14 +27,15 @@ export function needsSeparator(prevSentAt: number, nextSentAt: number): boolean 
   return nextSentAt - prevSentAt > SEPARATOR_GAP_MS;
 }
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-/** "Today 2:14pm", "Yesterday 9:05am", "Mon, Jul 14 2:14pm": the chat's day/time separator. */
+/**
+ * The chat's day/time separator: "Today 2:14pm", "Yesterday 9:05am", "Mon, Jul 14 2:14pm".
+ * Hermes has no Intl.RelativeTimeFormat, so "Today" and "Yesterday" come from the string table.
+ */
 export function formatDayTime(ms: number, now: number = Date.now()): string {
-  const d = new Date(ms);
   const startOfDay = (t: number) => { const x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime(); };
   const days = Math.round((startOfDay(now) - startOfDay(ms)) / 86_400_000);
-  const day = days === 0 ? 'Today' : days === 1 ? 'Yesterday' : `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
-  return `${day} ${formatClock(ms)}`;
+  const time = formatClock(ms);
+  if (days === 0) return i18n.t('volunteer:chat.today', { time });
+  if (days === 1) return i18n.t('volunteer:chat.yesterday', { time });
+  return i18n.t('volunteer:chat.dayTime', { day: formatDate(ms, 'weekday'), time });
 }

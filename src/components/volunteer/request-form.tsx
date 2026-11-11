@@ -7,10 +7,11 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
-import { languageName } from '@/features/profile/options';
-import { HELP_TYPES, MOCK_LOCATION } from '@/features/volunteer/mock';
+import { isolatedLanguageName, languageName } from '@/features/profile/options';
+import { HELP_TYPES, mockLocation } from '@/features/volunteer/mock';
 import { EMPTY_DRAFT, volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpTypeId, RequestDraft, RequestState } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
 
 import { EmergencyCard } from './emergency-card';
 import { HelpCard } from './help-card';
@@ -33,6 +34,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   const [pickingLanguage, setPickingLanguage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { hint, show } = useHint();
+  const t = useT('volunteer');
+  const location = mockLocation();
 
   function toggle(id: HelpTypeId) {
     setError(null);
@@ -41,17 +44,17 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 
   async function addPicture() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return show('Photo access is off. Turn it on in Settings.');
+    if (!perm.granted) return show(t('form.photoOff'));
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.6 });
     if (!result.canceled && result.assets[0]) edit({ photoUri: result.assets[0].uri });
   }
 
   function send() {
-    if (!helpTypes.length) return setError('Pick at least one thing you need help with.');
+    if (!helpTypes.length) return setError(t('form.pickOne'));
     volunteerRequests.dismissNotice();
     // Ordered as on screen, so the volunteer sees the same list.
-    const ordered = HELP_TYPES.map(h => h.id).filter(id => helpTypes.includes(id));
-    void volunteerRequests.sendRequest({ visitorName, helpTypes: ordered, note: note.trim(), photoUri, language, location: MOCK_LOCATION });
+    const ordered = HELP_TYPES.filter(id => helpTypes.includes(id));
+    void volunteerRequests.sendRequest({ visitorName, helpTypes: ordered, note: note.trim(), photoUri, language, location });
   }
 
   return (
@@ -61,34 +64,34 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         <Pressable
           onPress={() => setPickingLanguage(true)}
           accessibilityRole="button"
-          accessibilityLabel={`Help in ${languageName(language)}. Change language`}
+          accessibilityLabel={t('form.languageLabel', { language: isolatedLanguageName(language) })}
           style={({ pressed }) => [styles.langPill, pressed && styles.langPressed]}>
           <FigmaIcon name="icon-c513eb" size={18} color={Colors.ink} />
           <Text style={styles.langText} numberOfLines={1}>{languageName(language)}</Text>
         </Pressable>
         <View style={styles.titles}>
-          <Text style={styles.title} accessibilityRole="header">Find a Volunteer</Text>
-          <Text style={styles.subtitle}>We’ll match you with someone nearby</Text>
+          <Text style={styles.title} accessibilityRole="header">{t('form.title')}</Text>
+          <Text style={styles.subtitle}>{t('form.subtitle')}</Text>
         </View>
       </View>
 
       {notice ? <NoteBanner notice={notice} onDismiss={volunteerRequests.dismissNotice} /> : null}
 
-      <View style={styles.location} accessible accessibilityLabel={`Your location: ${MOCK_LOCATION.spot}, ${MOCK_LOCATION.venue}`}>
+      <View style={styles.location} accessible accessibilityLabel={t('form.locationLabel', { spot: location.spot, venue: location.venue })}>
         <FigmaIcon name="location-on" size={36} color={Colors.ink} />
         <View style={styles.locationText}>
-          <Text style={styles.spot}>{MOCK_LOCATION.spot}</Text>
-          <Text style={styles.venue}>{MOCK_LOCATION.venue}</Text>
+          <Text style={styles.spot}>{location.spot}</Text>
+          <Text style={styles.venue}>{location.venue}</Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.question} accessibilityRole="header">What do you need help with?</Text>
+        <Text style={styles.question} accessibilityRole="header">{t('form.question')}</Text>
         <View style={styles.grid}>
           {[0, 3].map(start => (
             <View key={start} style={styles.gridRow}>
-              {HELP_TYPES.slice(start, start + 3).map(t => (
-                <HelpCard key={t.id} type={t} selected={helpTypes.includes(t.id)} onPress={() => toggle(t.id)} />
+              {HELP_TYPES.slice(start, start + 3).map(id => (
+                <HelpCard key={id} type={id} selected={helpTypes.includes(id)} onPress={() => toggle(id)} />
               ))}
             </View>
           ))}
@@ -98,17 +101,17 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
       <NoteBox
         value={note}
         onChangeText={text => edit({ note: text })}
-        placeholder="e.g. I'm stuck near ramp 2"
+        placeholder={t('form.notePlaceholder')}
         photoUri={photoUri}
         onAddPicture={addPicture}
         onRemovePicture={() => edit({ photoUri: null })}
-        onSpeak={() => show('Voice notes are coming soon. Type a note for now.')}
+        onSpeak={() => show(t('form.voiceSoon'))}
       />
       <Hint text={hint} />
 
       <View style={styles.actions}>
         {error ? <Text style={styles.error} accessibilityLiveRegion="polite">{error}</Text> : null}
-        <Button label="Send Request" size="lg" onPress={send} style={styles.send} />
+        <Button label={t('form.send')} size="lg" onPress={send} style={styles.send} />
         <EmergencyCard />
       </View>
 

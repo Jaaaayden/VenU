@@ -50,5 +50,10 @@
   "count": {
     "people_one": "{{count}} tao",
     "people_other": "{{count}} tao"
+  },
+  "media": {
+    "addPicture": "Magdagdag ng larawan",
+    "changePicture": "Palitan ang larawan",
+    "holdToSpeak": "O pindutin para magsalita"
   }
 }

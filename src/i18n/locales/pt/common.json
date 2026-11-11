@@ -51,5 +51,10 @@
     "people_one": "{{count}} pessoa",
     "people_many": "{{count}} de pessoas",
     "people_other": "{{count}} pessoas"
+  },
+  "media": {
+    "addPicture": "Adicionar foto",
+    "changePicture": "Trocar foto",
+    "holdToSpeak": "Ou segure para falar"
   }
 }

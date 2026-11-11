@@ -11,6 +11,7 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { formatClock } from '@/features/volunteer/format';
 import type { ChatMessage } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
 
 const TAIL = 7;
 const INCOMING_EDGE = Colors.controlBorder;
@@ -40,6 +41,7 @@ function bubblePath(w: number, h: number, mirror: boolean): string {
 
 export function ChatBubble({ message, onListen }: { message: ChatMessage; onListen?: () => void }) {
   const mine = message.from === 'me';
+  const t = useT('volunteer');
   const [size, setSize] = useState({ w: 0, h: 0 });
   const onLayout = (e: LayoutChangeEvent) => {
     const { width, height } = e.nativeEvent.layout;
@@ -53,7 +55,7 @@ export function ChatBubble({ message, onListen }: { message: ChatMessage; onList
         onLayout={onLayout}
         style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs]}
         accessible
-        accessibilityLabel={`${mine ? 'You' : 'Volunteer'}, ${time}: ${message.text}`}>
+        accessibilityLabel={mine ? t('bubble.mine', { time, text: message.text }) : t('bubble.theirs', { time, text: message.text })}>
         {size.w > 0 && (
           <Svg width={size.w} height={size.h} style={StyleSheet.absoluteFill} aria-hidden>
             <Path
@@ -73,9 +75,9 @@ export function ChatBubble({ message, onListen }: { message: ChatMessage; onList
         </View>
       </View>
       {!mine && onListen ? (
-        <Pressable onPress={onListen} accessibilityRole="button" accessibilityLabel="Listen to this message" style={styles.listen}>
+        <Pressable onPress={onListen} accessibilityRole="button" accessibilityLabel={t('bubble.listenLabel')} style={styles.listen}>
           <FigmaIcon name="volume" size={16} color={Colors.primary} />
-          <Text style={styles.listenText}>listen</Text>
+          <Text style={styles.listenText}>{t('bubble.listen')}</Text>
         </Pressable>
       ) : null}
     </View>

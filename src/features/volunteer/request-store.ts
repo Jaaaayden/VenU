@@ -6,6 +6,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
+import i18n from '@/i18n';
+
 import { createMockBackend, newId, type VolunteerBackend } from './backend';
 import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestDraft, RequestState } from './types';
 
@@ -199,7 +201,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     } catch {
       if (search !== ctl) return; // cancelled: cancel() already reset the state
       search = null;
-      dispatch({ type: 'searchFailed', requestId: request.id, text: "Couldn't reach a volunteer. Check your connection and try again." });
+      dispatch({ type: 'searchFailed', requestId: request.id, text: i18n.t('volunteer:notice.searchFailed') });
     }
   }
 
@@ -296,7 +298,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const { request, match } = state;
       if (state.status !== 'done' || !request || !match) return;
       await backend.submitFeedback({ requestId: request.id, volunteerId: match.volunteer.id, stars, tags, note: note.trim() });
-      dispatch({ type: 'finish', notice: { tone: 'success', text: `Thanks! Your feedback helps ${match.volunteer.firstName} and the LA28 team.` } });
+      dispatch({ type: 'finish', notice: { tone: 'success', text: i18n.t('volunteer:notice.thanks', { name: match.volunteer.firstName }) } });
     },
 
     async reportProblem(kind: ProblemKind, note: string) {

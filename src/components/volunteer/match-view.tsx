@@ -9,20 +9,28 @@ import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { formatDistance } from '@/features/volunteer/format';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest, Match } from '@/features/volunteer/types';
+import { useT } from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 
 import { MeetMap } from './meet-map';
 import { MessageButton } from './message-button';
 
 export function MatchView({ request, match, unread }: { request: HelpRequest; match: Match; unread: number }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const t = useT('volunteer');
   const v = match.volunteer;
+  const onTheWay = {
+    his: t('match.onTheWay.his', { name: v.firstName }),
+    her: t('match.onTheWay.her', { name: v.firstName }),
+    their: t('match.onTheWay.their', { name: v.firstName }),
+  }[v.possessive];
   const openChat = () => router.push({ pathname: '/chat/[id]', params: { id: request.id } });
   const distance = formatDistance(match.distanceFeet);
 
   return (
     <View style={styles.page}>
       <View style={[styles.gutter, styles.header]}>
-        <Text style={styles.title} accessibilityRole="header">Volunteer found</Text>
+        <Text style={styles.title} accessibilityRole="header">{t('match.title')}</Text>
         <MessageButton unread={unread} onPress={openChat} />
       </View>
 
@@ -30,8 +38,8 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         <View style={styles.status} accessibilityLiveRegion="polite">
           <FigmaIcon name="check-circle" size={40} color={Colors.onPrimary} />
           <View style={styles.statusText}>
-            <Text style={styles.statusTitle}>{v.firstName} is on {v.possessive} way</Text>
-            <Text style={styles.statusSub}>Stay where you are.</Text>
+            <Text style={styles.statusTitle}>{onTheWay}</Text>
+            <Text style={styles.statusSub}>{t('match.stay')}</Text>
           </View>
         </View>
       </View>
@@ -43,53 +51,58 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
           <FigmaIcon name="person" size={24} color={Colors.ink} />
           <View style={styles.whoText}>
             <Text style={styles.name}>{v.name}</Text>
-            <Text style={styles.role}>LA28 volunteer</Text>
+            <Text style={styles.role}>{t('role')}</Text>
           </View>
-          <View style={styles.rating} accessible accessibilityLabel={`Rated ${v.rating} out of 5`}>
+          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating) })}>
             <FigmaIcon name="star" size={18} color={Colors.warning} />
-            <Text style={styles.ratingText}>{v.rating.toFixed(1)}</Text>
+            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</Text>
           </View>
         </View>
 
         <View style={styles.tagsBlock}>
-          <Text style={styles.tagsLabel}>Skills and languages</Text>
+          <Text style={styles.tagsLabel}>{t('match.skills')}</Text>
           <View style={styles.tags}>
-            {v.tags.map(t => (
-              <View key={t.label} style={[styles.tag, t.tone === 'success' ? styles.tagSuccess : styles.tagWarning]}>
-                <Text style={[styles.tagText, t.tone === 'success' && styles.tagTextSuccess]}>{t.label}</Text>
+            {v.tags.map(tag => (
+              <View key={tag.label} style={[styles.tag, tag.tone === 'success' ? styles.tagSuccess : styles.tagWarning]}>
+                <Text style={[styles.tagText, tag.tone === 'success' && styles.tagTextSuccess]}>{tag.skill ? t(`skills.${tag.skill}`) : tag.label}</Text>
               </View>
             ))}
           </View>
         </View>
 
         <View style={styles.infoRow}>
-          <InfoTile icon="clock" main={`${match.etaMinutes} min`} sub="until arrival" />
-          <InfoTile icon="map-pin" main={distance} sub="away from you" />
+          <InfoTile
+            icon="clock"
+            main={t('match.etaMain', { minutes: match.etaMinutes })}
+            sub={t('match.etaSub')}
+            label={t('match.etaLabel', { minutes: match.etaMinutes })}
+          />
+          <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
         </View>
       </View>
 
       <View style={[styles.gutter, styles.actions]}>
-        <Button label="Message Volunteer" size="lg" onPress={openChat} />
-        <Button label="Mark help as done" variant="outline" onPress={volunteerRequests.endHelp} accessibilityHint={`Ends the request and asks you to rate ${v.firstName}`} />
+        <Button label={t('match.message')} size="lg" onPress={openChat} />
+        <Button label={t('match.done')} variant="outline" onPress={volunteerRequests.endHelp} accessibilityHint={t('match.doneHint', { name: v.firstName })} />
         {confirmCancel ? (
           <View style={styles.confirm} accessibilityLiveRegion="polite">
-            <Text style={styles.confirmText}>Cancel your request? {v.firstName} will stop coming to you.</Text>
+            <Text style={styles.confirmText}>{t('match.confirmCancel', { name: v.firstName })}</Text>
             <View style={styles.confirmButtons}>
-              <Button label="Keep request" variant="neutral" onPress={() => setConfirmCancel(false)} style={styles.flex} />
-              <Button label="Yes, cancel" variant="danger" onPress={volunteerRequests.cancel} style={styles.flex} />
+              <Button label={t('match.keep')} variant="neutral" onPress={() => setConfirmCancel(false)} style={styles.flex} />
+              <Button label={t('match.yesCancel')} variant="danger" onPress={volunteerRequests.cancel} style={styles.flex} />
             </View>
           </View>
         ) : (
-          <Button label="Cancel request" variant="link" onPress={() => setConfirmCancel(true)} style={styles.cancel} />
+          <Button label={t('cancelRequest')} variant="link" onPress={() => setConfirmCancel(true)} style={styles.cancel} />
         )}
       </View>
     </View>
   );
 }
 
-function InfoTile({ icon, main, sub }: { icon: FigmaIconName; main: string; sub: string }) {
+function InfoTile({ icon, main, sub, label }: { icon: FigmaIconName; main: string; sub: string; label: string }) {
   return (
-    <View style={styles.tile} accessible accessibilityLabel={`${main} ${sub}`}>
+    <View style={styles.tile} accessible accessibilityLabel={label}>
       <FigmaIcon name={icon} size={22} color={Colors.textFaint} />
       <View>
         <Text style={styles.tileMain}>{main}</Text>

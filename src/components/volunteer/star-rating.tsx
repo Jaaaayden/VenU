@@ -3,14 +3,17 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 const STAR = 'M16 3L20.08 10.73L28.68 12.22L22.59 18.48L23.84 27.12L16 23.27L8.16 27.12L9.41 18.48L3.32 12.22L11.92 10.73Z';
-const WORDS = ['', 'Poor', 'Not great', 'OK', 'Good', 'Excellent'];
+const WORDS = ['poor', 'notGreat', 'ok', 'good', 'excellent'] as const;
 
 export function StarRating({ value, onChange }: { value: number; onChange: (stars: number) => void }) {
+  const t = useT('volunteer');
+  const word = (n: number) => (n >= 1 && n <= 5 ? t(`rating.words.${WORDS[n - 1]!}`) : '');
   return (
     <View style={styles.wrap}>
-      <View style={styles.row} accessibilityRole="radiogroup" accessibilityLabel="Rating">
+      <View style={styles.row} accessibilityRole="radiogroup" accessibilityLabel={t('rating.label')}>
         {[1, 2, 3, 4, 5].map(n => {
           const filled = n <= value;
           return (
@@ -19,7 +22,7 @@ export function StarRating({ value, onChange }: { value: number; onChange: (star
               onPress={() => onChange(n)}
               accessibilityRole="radio"
               accessibilityState={{ checked: n === value }}
-              accessibilityLabel={`${n} star${n > 1 ? 's' : ''}, ${WORDS[n]}`}
+              accessibilityLabel={t('rating.star', { count: n, word: word(n) })}
               style={({ pressed }) => [styles.star, pressed && styles.pressed]}>
               <Svg width={40} height={40} viewBox="0 0 32 32" aria-hidden>
                 <Path d={STAR} stroke={Colors.warning} strokeWidth={2} strokeLinejoin="round" fill={filled ? Colors.warning : 'none'} />
@@ -28,7 +31,7 @@ export function StarRating({ value, onChange }: { value: number; onChange: (star
           );
         })}
       </View>
-      <Text style={styles.word} accessibilityLiveRegion="polite">{WORDS[value] || ' '}</Text>
+      <Text style={styles.word} accessibilityLiveRegion="polite">{word(value) || ' '}</Text>
     </View>
   );
 }
