@@ -13,10 +13,12 @@ import {
   type NotificationKind,
   type NotificationPrefs,
 } from '@/features/settings/notification-prefs';
+import { useT } from '@/i18n';
 
 /** Profile → Notifications: which alerts to get, saved on this device (no push yet). */
 export default function NotificationsScreen() {
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+  const t = useT('profile');
 
   useEffect(() => {
     let live = true;
@@ -33,46 +35,50 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <BackLink label="Profile" fallback="/profile" />
+      <BackLink label={t('tab.title')} fallback="/profile" />
       <ScrollView contentContainerStyle={styles.content}>
-        <StepHeader title="Notifications" subtitle="Choose what VenU tells you about." />
+        <StepHeader title={t('notifications.title')} subtitle={t('notifications.subtitle')} />
 
         {prefs && (
           <View style={styles.card}>
-            {NOTIFICATION_OPTIONS.map((option, i) => (
-              <View key={option.kind}>
-                {/* The whole row is the switch; the Switch itself only shows the state. */}
-                <Pressable
-                  onPress={() => toggle(option.kind)}
-                  accessibilityRole="switch"
-                  accessibilityLabel={option.label}
-                  accessibilityHint={option.hint}
-                  accessibilityState={{ checked: prefs[option.kind] }}
-                  aria-checked={prefs[option.kind]}
-                  style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
-                  <View style={styles.rowText}>
-                    <Text style={styles.label}>{option.label}</Text>
-                    <Text style={styles.hint}>{option.hint}</Text>
-                  </View>
-                  <View pointerEvents="none" aria-hidden>
-                    <Switch
-                      value={prefs[option.kind]}
-                      trackColor={{ false: Colors.controlBorder, true: Colors.primary }}
-                      thumbColor={Colors.surface}
-                      // react-native-web's prop for the "on" thumb color.
-                      {...({ activeThumbColor: Colors.surface } as object)}
-                    />
-                  </View>
-                </Pressable>
-                {i < NOTIFICATION_OPTIONS.length - 1 && <View style={styles.divider} />}
-              </View>
-            ))}
+            {NOTIFICATION_OPTIONS.map(({ kind }, i) => {
+              const label = t(`notifications.options.${kind}.label`);
+              const hint = t(`notifications.options.${kind}.hint`);
+              return (
+                <View key={kind}>
+                  {/* The whole row is the switch; the Switch itself only shows the state. */}
+                  <Pressable
+                    onPress={() => toggle(kind)}
+                    accessibilityRole="switch"
+                    accessibilityLabel={label}
+                    accessibilityHint={hint}
+                    accessibilityState={{ checked: prefs[kind] }}
+                    aria-checked={prefs[kind]}
+                    style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
+                    <View style={styles.rowText}>
+                      <Text style={styles.label}>{label}</Text>
+                      <Text style={styles.hint}>{hint}</Text>
+                    </View>
+                    <View pointerEvents="none" aria-hidden>
+                      <Switch
+                        value={prefs[kind]}
+                        trackColor={{ false: Colors.controlBorder, true: Colors.primary }}
+                        thumbColor={Colors.surface}
+                        // react-native-web's prop for the "on" thumb color.
+                        {...({ activeThumbColor: Colors.surface } as object)}
+                      />
+                    </View>
+                  </Pressable>
+                  {i < NOTIFICATION_OPTIONS.length - 1 && <View style={styles.divider} />}
+                </View>
+              );
+            })}
           </View>
         )}
 
         <View style={styles.note}>
           <FigmaIcon name="volume" size={20} color={Colors.textMuted} />
-          <Text style={styles.noteText}>Alerts start arriving once notifications are set up for VenU.</Text>
+          <Text style={styles.noteText}>{t('notifications.note')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -10,28 +10,30 @@ import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { SummaryTags } from '@/features/profile/summary-tags';
+import { useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
+// Section and row labels: profile:tab.<key>.
 interface MenuItem {
   icon: FigmaIconName;
-  label: string;
+  key: 'editProfile' | 'notifications' | 'privacy' | 'help' | 'terms';
   href: Href;
 }
 
-const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
+const MENU_SECTIONS: { key: 'account' | 'support'; items: MenuItem[] }[] = [
   {
-    title: 'Account',
+    key: 'account',
     items: [
-      { icon: 'person', label: 'Edit profile', href: '/edit-profile' },
-      { icon: 'volume', label: 'Notifications', href: '/notifications' },
-      { icon: 'check-circle', label: 'Privacy & data', href: '/privacy' },
+      { icon: 'person', key: 'editProfile', href: '/edit-profile' },
+      { icon: 'volume', key: 'notifications', href: '/notifications' },
+      { icon: 'check-circle', key: 'privacy', href: '/privacy' },
     ],
   },
   {
-    title: 'Support',
+    key: 'support',
     items: [
-      { icon: 'message-unread', label: 'Help & feedback', href: '/help' },
-      { icon: 'attachment', label: 'Terms of use', href: '/terms' },
+      { icon: 'message-unread', key: 'help', href: '/help' },
+      { icon: 'attachment', key: 'terms', href: '/terms' },
     ],
   },
 ];
@@ -43,6 +45,8 @@ export default function ProfileScreen() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const scrollRef = useRef<ScrollViewInstance>(null);
+  const t = useT('profile');
+  const tc = useT('common');
 
   async function handleSignOut() {
     setSignOutError(null);
@@ -50,7 +54,7 @@ export default function ProfileScreen() {
       await signOut();
       router.replace('/welcome');
     } catch (e) {
-      setSignOutError(`Couldn't sign out. ${friendlyError(e)}`);
+      setSignOutError(t('tab.signOutFailed', { reason: friendlyError(e) }));
     }
   }
 
@@ -62,7 +66,7 @@ export default function ProfileScreen() {
       router.replace('/welcome');
     } catch (e) {
       // Photos go first, so a failure can be partial (the context has already reloaded what's left).
-      setDeleteError(`Couldn't finish deleting your data. ${friendlyError(e)}`);
+      setDeleteError(t('tab.deleteFailed', { reason: friendlyError(e) }));
       setBusy(false);
     }
   }
@@ -79,7 +83,7 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         // Opening the delete confirmation grows the page; bring its buttons out from under the tab bar.
         onContentSizeChange={() => confirmDelete && scrollRef.current?.scrollToEnd({ animated: true })}>
-        <Text style={styles.pageTitle} accessibilityRole="header">Profile</Text>
+        <Text style={styles.pageTitle} accessibilityRole="header">{t('tab.title')}</Text>
 
         <View style={styles.card}>
           <View style={styles.profileRow}>
@@ -87,38 +91,38 @@ export default function ProfileScreen() {
             <View style={styles.profileInfo}>
               <Text style={styles.name}>{profile.firstName}</Text>
               <View style={styles.badges}>
-                <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? 'Visitor' : 'Volunteer'}</Text>
+                <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? t('tab.visitor') : t('tab.volunteer')}</Text>
                 {profile.role === 'volunteer' && (
                   <Text style={[styles.badge, profile.verified ? styles.badgeOk : styles.badgePending]}>
-                    {profile.verified ? '✓ Verified LA28' : 'Unverified'}
+                    {profile.verified ? t('tab.verified') : t('tab.unverified')}
                   </Text>
                 )}
               </View>
             </View>
-            <Button label="Edit" variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
+            <Button label={tc('actions.edit')} variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
           </View>
 
           <Text style={styles.shareTitle}>
-            {profile.role === 'visitor' ? 'Shared with your helper' : 'Shown to visitors'}
+            {profile.role === 'visitor' ? t('tab.sharedVisitor') : t('tab.sharedVolunteer')}
           </Text>
           <SummaryTags draft={profile} />
         </View>
 
         {MENU_SECTIONS.map(section => (
-          <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle} accessibilityRole="header">{section.title}</Text>
+          <View key={section.key} style={styles.section}>
+            <Text style={styles.sectionTitle} accessibilityRole="header">{t(`tab.${section.key}`)}</Text>
             <View style={styles.menuCard}>
               {section.items.map((item, idx) => (
-                <View key={item.label}>
+                <View key={item.key}>
                   <Pressable
                     onPress={() => router.push(item.href)}
                     accessibilityRole="button"
-                    accessibilityLabel={item.label}
+                    accessibilityLabel={t(`tab.${item.key}`)}
                     style={({ pressed }) => [styles.menuRow, pressed && styles.menuRowPressed]}>
                     <View style={styles.menuIconBox}>
                       <FigmaIcon name={item.icon} size={20} color={Colors.ink} />
                     </View>
-                    <Text style={styles.menuLabel}>{item.label}</Text>
+                    <Text style={styles.menuLabel}>{t(`tab.${item.key}`)}</Text>
                     <Text style={styles.menuChevron}>›</Text>
                   </Pressable>
                   {idx < section.items.length - 1 && <View style={styles.divider} />}
@@ -128,7 +132,7 @@ export default function ProfileScreen() {
           </View>
         ))}
 
-        <Button label="Sign out" variant="secondary" onPress={handleSignOut} />
+        <Button label={tc('actions.signOut')} variant="secondary" onPress={handleSignOut} />
         {signOutError && (
           <Text style={[Type.caption, styles.errorText, styles.gapSm]} accessibilityLiveRegion="polite">
             {signOutError}
@@ -138,15 +142,15 @@ export default function ProfileScreen() {
         <View style={styles.deleteBox}>
           {confirmDelete ? (
             <>
-              <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
+              <Text style={Type.caption}>{t('tab.deleteWarning')}</Text>
               {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
               <View style={styles.deleteRow}>
-                <Button label="Cancel" variant="neutral" onPress={() => setConfirmDelete(false)} style={styles.flex} />
-                <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
+                <Button label={tc('actions.cancel')} variant="neutral" onPress={() => setConfirmDelete(false)} style={styles.flex} />
+                <Button label={tc('actions.delete')} variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
               </View>
             </>
           ) : (
-            <Button label="Delete my data" variant="link" onPress={() => setConfirmDelete(true)} />
+            <Button label={t('tab.deleteData')} variant="link" onPress={() => setConfirmDelete(true)} />
           )}
         </View>
 

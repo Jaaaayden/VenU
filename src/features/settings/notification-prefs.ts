@@ -8,11 +8,12 @@ export type NotificationPrefs = Record<NotificationKind, boolean>;
 
 export const NOTIFICATION_KEY = 'venu.notifications';
 
-export const NOTIFICATION_OPTIONS: { kind: NotificationKind; label: string; hint: string }[] = [
-  { kind: 'volunteer', label: 'Volunteer updates', hint: 'e.g. Daniel accepted and is on his way' },
-  { kind: 'chat', label: 'Chat messages', hint: 'New messages from your helper or visitor' },
-  { kind: 'venue', label: 'Venue alerts', hint: 'e.g. Gate C at SoFi Stadium is closed' },
-  { kind: 'reports', label: 'Report replies', hint: 'When staff answer a facility report' },
+/** In screen order. Label and hint: profile:notifications.options.<kind>.label / .hint. */
+export const NOTIFICATION_OPTIONS: { kind: NotificationKind }[] = [
+  { kind: 'volunteer' },
+  { kind: 'chat' },
+  { kind: 'venue' },
+  { kind: 'reports' },
 ];
 
 export const DEFAULT_PREFS: NotificationPrefs = { volunteer: true, chat: true, venue: true, reports: true };
