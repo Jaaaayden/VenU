@@ -8,8 +8,10 @@
  *                    author_name text, title text, topic text, body text, created_at timestamptz)
  *
  * and call `setReportStore(createSupabaseReportStore(client))` at startup.
- * Until then reports live in memory: new ones last for the session.
+ * Until then reports live on the device: the seed reports plus the ones this device submitted,
+ * which are kept in AsyncStorage under one key so they survive a reload.
  */
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
 import type { Option } from '@/features/profile/options';
@@ -132,6 +134,60 @@ export function createMemoryReportStore(
   };
 }
 
+/** The slice of AsyncStorage the persistent store uses; tests pass a Map-backed fake. */
+export interface ReportStorage {
+  getItem(key: string): Promise<string | null>;
+  setItem(key: string, value: string): Promise<void>;
+}
+
+export const REPORTS_STORAGE_KEY = 'venu.reports.v1';
+
+function isReport(x: unknown): x is FacilityReport {
+  if (!x || typeof x !== 'object') return false;
+  const r = x as Record<string, unknown>;
+  return ['id', 'venueId', 'facilityId', 'title', 'topic', 'body', 'authorName', 'createdAt'].every(k => typeof r[k] === 'string');
+}
+
+/**
+ * The memory store, plus the reports added on this device saved to `storage` under
+ * `REPORTS_STORAGE_KEY` (a JSON array). Seed reports are never written; they come from `seed` on
+ * every load. An unreadable saved value is ignored, and a failed save keeps the report for the session.
+ */
+export function createPersistentReportStore(
+  storage: ReportStorage,
+  seed: FacilityReport[] = [],
+  options: Parameters<typeof createMemoryReportStore>[1] = {},
+): ReportStore {
+  let added: FacilityReport[] = [];
+  let loaded: Promise<ReportStore> | null = null;
+  const load = () => (loaded ??= (async () => {
+    try {
+      const parsed: unknown = JSON.parse((await storage.getItem(REPORTS_STORAGE_KEY)) ?? '[]');
+      if (Array.isArray(parsed)) added = parsed.filter(isReport);
+    } catch {}
+    const seedIds = new Set(seed.map(r => r.id));
+    return createMemoryReportStore([...seed, ...added.filter(r => !seedIds.has(r.id))], options);
+  })());
+  return {
+    async list(venueId, facilityId) {
+      return (await load()).list(venueId, facilityId);
+    },
+    async get(id) {
+      return (await load()).get(id);
+    },
+    async add(report) {
+      const saved = await (await load()).add(report);
+      added = [...added, saved];
+      try {
+        await storage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(added));
+      } catch {
+        // Storage full or unavailable: the report still shows until the app reloads.
+      }
+      return saved;
+    },
+  };
+}
+
 const RAMP_REPORT =
   'I arrived around 45 minutes before kickoff from the east side of the stadium. Gate 2 was a little difficult to find, and the ramp was also pretty far from the gate.\n\n' +
   'As a wheelchair user, I thought the ramp was pretty old and outdated. There were cracks which made it a bit hard to use, and I almost got stuck.';
@@ -158,7 +214,7 @@ export const SEED_REPORTS: FacilityReport[] = [
   },
 ];
 
-let store: ReportStore = createMemoryReportStore(SEED_REPORTS);
+let store: ReportStore = createPersistentReportStore(AsyncStorage, SEED_REPORTS);
 const listeners = new Set<() => void>();
 
 /** The seam for a real backend: swap the store once at startup. */

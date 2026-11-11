@@ -1,14 +1,20 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 
 import { facilitiesFor, matchesCategory, searchFacilities, searchVenues } from '../mock';
 import {
   createMemoryReportStore,
+  createPersistentReportStore,
   formatReportDate,
+  REPORTS_STORAGE_KEY,
   ReportValidationError,
   SEED_REPORTS,
   validateReport,
   type ReportDraft,
 } from '../reports';
+
+// reports.ts builds the app's store on AsyncStorage, which has no native module under jest.
+// These tests pass their own storage, so the app's one only needs to exist (jest hoists this).
+jest.mock('@react-native-async-storage/async-storage', () => ({ __esModule: true, default: { getItem: async () => null, setItem: async () => {} } }));
 
 const good: ReportDraft = { title: '  Elevator out at Gate 2 ', topic: 'accessibility', body: ' Use the ramp instead. ' };
 
@@ -80,5 +86,57 @@ describe('venue search', () => {
     // "Accessibility" also matches accessible gates, restrooms and so on.
     expect(all.filter(f => matchesCategory(f, 'accessible')).length).toBeGreaterThan(1);
     expect(all.filter(f => matchesCategory(f, 'accessible')).every(f => f.accessible)).toBe(true);
+  });
+});
+
+describe('persistent report store', () => {
+  const now = () => new Date('2026-11-11T12:00:00.000Z');
+  const fakeStorage = (initial: Record<string, string> = {}) => {
+    const data = new Map(Object.entries(initial));
+    return {
+      data,
+      getItem: async (k: string) => data.get(k) ?? null,
+      setItem: async (k: string, v: string) => { data.set(k, v); },
+    };
+  };
+
+  it('saves only user reports, under one key, and loads them back after a reload', async () => {
+    const storage = fakeStorage();
+    const first = createPersistentReportStore(storage, SEED_REPORTS, { now, makeId: () => 'mine-1' });
+    await first.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
+
+    expect([...storage.data.keys()]).toEqual([REPORTS_STORAGE_KEY]);
+    const saved = JSON.parse(storage.data.get(REPORTS_STORAGE_KEY)!);
+    expect(saved.map((r: { id: string }) => r.id)).toEqual(['mine-1']);
+
+    // A fresh store over the same storage = the app after a reload.
+    const second = createPersistentReportStore(storage, SEED_REPORTS, { now });
+    const list = await second.list('sofi', 'gate-2');
+    expect(list.map(r => r.id)).toEqual(['mine-1', 'seed-ramp', 'seed-bags']);
+    expect(await second.get('mine-1')).toMatchObject({ title: 'Elevator out at Gate 2' });
+  });
+
+  it('keeps adding to what was saved before', async () => {
+    const storage = fakeStorage();
+    let n = 0;
+    const makeId = () => `mine-${++n}`;
+    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
+    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'gate-1', authorName: 'Rosa', draft: good });
+    expect(JSON.parse(storage.data.get(REPORTS_STORAGE_KEY)!).map((r: { id: string }) => r.id)).toEqual(['mine-1', 'mine-2']);
+  });
+
+  it('ignores an unreadable saved value and bad rows, and still serves the seed', async () => {
+    const broken = createPersistentReportStore(fakeStorage({ [REPORTS_STORAGE_KEY]: '{not json' }), SEED_REPORTS);
+    expect((await broken.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['seed-ramp', 'seed-bags']);
+
+    const mixed = createPersistentReportStore(fakeStorage({ [REPORTS_STORAGE_KEY]: JSON.stringify([{ id: 'x' }, SEED_REPORTS[0]]) }), SEED_REPORTS);
+    expect((await mixed.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['seed-ramp', 'seed-bags']); // no duplicate seed
+  });
+
+  it('keeps the report for the session when saving fails', async () => {
+    const storage = { getItem: async () => null, setItem: async () => { throw new Error('quota'); } };
+    const s = createPersistentReportStore(storage, [], { now, makeId: () => 'mine-1' });
+    await s.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
+    expect((await s.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['mine-1']);
   });
 });
