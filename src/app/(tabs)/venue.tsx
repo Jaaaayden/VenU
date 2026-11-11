@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/avatar';
-import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
+import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 

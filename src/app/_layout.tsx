@@ -1,3 +1,6 @@
+import { AlbertSans_400Regular, AlbertSans_500Medium, AlbertSans_600SemiBold, AlbertSans_700Bold } from '@expo-google-fonts/albert-sans';
+import { Alexandria_400Regular, Alexandria_500Medium, Alexandria_600SemiBold } from '@expo-google-fonts/alexandria';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -9,9 +12,18 @@ import { ProfileProvider } from '@/features/profile/profile-context';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  // Names must match Fonts in constants/theme.ts.
+  const [fontsLoaded, fontError] = useFonts({
+    Alexandria_400Regular, Alexandria_500Medium, Alexandria_600SemiBold,
+    AlbertSans_400Regular, AlbertSans_500Medium, AlbertSans_600SemiBold, AlbertSans_700Bold,
+  });
+  const ready = fontsLoaded || !!fontError; // a font that fails to load falls back to the system font
+
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (ready) SplashScreen.hideAsync();
+  }, [ready]);
+
+  if (!ready) return null;
 
   return (
     <ProfileProvider>

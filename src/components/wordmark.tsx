@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { Colors, Fonts } from '@/constants/theme';
 
 /** "VenU" with the blue "Ven" and orange "U" from the mockups. */
 export function Wordmark({ size = 22 }: { size?: number }) {
@@ -12,6 +12,6 @@ export function Wordmark({ size = 22 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  base: { fontWeight: '800', color: Colors.primary },
+  base: { fontFamily: Fonts.displaySemiBold, color: Colors.primary },
   u: { color: Colors.accent },
 });

@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { NAV_BAR_CLEARANCE } from '@/components/xr-navigation-bar';
+import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 
 const OPPORTUNITIES = [
