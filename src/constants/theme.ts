@@ -1,71 +1,41 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://unistyl.es/), etc.
- */
-
-import '@/global.css';
-
-import { Platform } from 'react-native';
+// Design tokens. `Colors`, `Spacing`, `Radius` and `Type` are sampled from the
+// VenU mockups (VenU_Mockups_Readable.pdf); swap the values for the hi-fi Figma
+// tokens when they land and every screen follows.
 
 export const Colors = {
-  light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
-  },
-  dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
-  },
+  primary: '#1B47A8',     // buttons, selected chips, links
+  primarySoft: '#E8EEFB', // selected chip fill, info banners
+  accent: '#C2410C',      // the "U" in VenU, Get help
+  accentSoft: '#FDEDE6',
+  success: '#137535',
+  successSoft: '#E7F5EC',
+  danger: '#B91C1C',
+  dangerSoft: '#FDECEC',
+  bg: '#F4F5F7',          // page background
+  surface: '#FFFFFF',     // cards, inputs
+  border: '#E3E5EA',
+  divider: '#EEF0F3',
+  text: '#16181D',
+  textMuted: '#5F6673',
+  textFaint: '#767D8A',   // placeholders, chevrons, control borders: >= 3:1 on bg and surface; never for sentences
+  onPrimary: '#FFFFFF',
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export const Spacing = { xs: 4, sm: 8, md: 12, lg: 16, gutter: 20, xl: 24, xxl: 32 } as const;
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: 'var(--font-display)',
-    serif: 'var(--font-serif)',
-    rounded: 'var(--font-rounded)',
-    mono: 'var(--font-mono)',
-  },
-});
+export const Radius = { sm: 8, md: 12, lg: 16, pill: 999 } as const;
 
-export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
+export const Type = {
+  title: { fontSize: 24, fontWeight: '700', color: Colors.text, letterSpacing: -0.3 },
+  heading: { fontSize: 18, fontWeight: '700', color: Colors.text },
+  body: { fontSize: 15, fontWeight: '400', color: Colors.text },
+  bodyStrong: { fontSize: 15, fontWeight: '600', color: Colors.text },
+  label: { fontSize: 13, fontWeight: '600', color: Colors.text },
+  caption: { fontSize: 12, fontWeight: '400', color: Colors.textMuted },
+  overline: { fontSize: 11, fontWeight: '700', color: Colors.textMuted, letterSpacing: 0.8, textTransform: 'uppercase' },
 } as const;
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
-
-// ─── Figma design tokens (XR Navigation Bar) ────────────────────────────────
-
+// Original tokens from the XR navigation bar Figma component.
 export const FigmaColors = {
   darkGray: 'rgba(36, 34, 34, 1)',
   lightBlue: 'rgba(223, 235, 253, 1)',
@@ -105,3 +75,6 @@ export const FigmaShadows = {
     elevation: 4,
   },
 } as const;
+
+/** Web only: the app renders in a centred column this wide instead of stretching across a desktop. */
+export const WEB_COLUMN_MAX = 520;
