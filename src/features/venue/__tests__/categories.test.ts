@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 
-import { facilityIconXml } from '../categories';
+import { emptyFacilitiesMessage, facilityIconXml } from '../categories';
 
 describe('facilityIconXml', () => {
   afterEach(() => { jest.restoreAllMocks(); });
@@ -21,5 +21,17 @@ describe('facilityIconXml', () => {
     expect(replace.mock.calls.length).toBe(built);
     facilityIconXml('restroom', '#000000'); // another background is its own entry
     expect(replace.mock.calls.length).toBeGreaterThan(built);
+  });
+});
+
+describe('emptyFacilitiesMessage', () => {
+  it('names the search and the category', () => {
+    expect(emptyFacilitiesMessage('restroom', ' xyz ', 'SoFi Stadium')).toBe('No restrooms match “xyz”');
+    expect(emptyFacilitiesMessage(null, 'xyz', 'SoFi Stadium')).toBe('No facilities match “xyz”');
+  });
+
+  it('says when a category has nothing at this venue', () => {
+    expect(emptyFacilitiesMessage('parking', '', 'Crypto.com Arena')).toBe('No parking lots at Crypto.com Arena yet');
+    expect(emptyFacilitiesMessage(null, '  ', 'Intuit Dome')).toBe('No facilities at Intuit Dome yet');
   });
 });

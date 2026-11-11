@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Colors, Spacing } from '@/constants/theme';
 
 import { FacilityRow } from './cards';
-import { CATEGORIES } from './categories';
+import { CATEGORIES, emptyFacilitiesMessage } from './categories';
 import { searchFacilities } from './mock';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { SearchField, venueText } from './ui';
@@ -45,7 +45,9 @@ export function FacilityList() {
             }}
           />
         ))}
-        {!results.length ? <Text style={styles.empty}>No facilities match. Try another word or pick All.</Text> : null}
+        {!results.length ? (
+          <Text style={styles.empty} accessibilityLiveRegion="polite">{emptyFacilitiesMessage(category, query, venue.name)}</Text>
+        ) : null}
       </View>
     </SheetScroll>
   );

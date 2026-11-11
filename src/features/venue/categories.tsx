@@ -21,6 +21,25 @@ export const CATEGORIES: { value: FacilityCategory; label: string }[] = [
   { value: 'parking', label: 'Parking' },
 ];
 
+/** Plural nouns for sentences: "No restrooms match …". */
+const NOUNS: Record<FacilityCategory, string> = {
+  gate: 'gates',
+  restroom: 'restrooms',
+  food: 'food or drink stands',
+  first_aid: 'first aid stations',
+  lost_found: 'lost & found desks',
+  info: 'info desks',
+  accessible: 'accessible facilities',
+  parking: 'parking lots',
+};
+
+/** The facility list's empty line: `No restrooms match "xyz"`, or `No parking lots at SoFi Stadium yet`. */
+export function emptyFacilitiesMessage(category: FacilityCategory | null, query: string, venueName: string): string {
+  const noun = category ? NOUNS[category] : 'facilities';
+  const q = query.trim();
+  return q ? `No ${noun} match “${q}”` : `No ${noun} at ${venueName} yet`;
+}
+
 /** Square crops (x y size) of each glyph in the icon sheet. */
 const CROPS: Record<FacilityCategory, [number, number, number]> = {
   restroom: [0, 1.5, 33],
