@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { WEB_COLUMN_MAX } from '@/constants/theme';
 import { ProfileProvider } from '@/features/profile/profile-context';
+import { LanguageSync } from '@/i18n/language-sync';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +32,7 @@ export default function RootLayout() {
   return (
     <WebSafeArea>
       <ProfileProvider>
+        <LanguageSync />
         {/* Web only: keep the phone layout in a centred column instead of stretching across a desktop screen. */}
         <View style={styles.backdrop}>
           <View style={[styles.column, framed && styles.columnFramed]}>

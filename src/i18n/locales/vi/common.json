@@ -1,0 +1,53 @@
+{
+  "tabs": {
+    "volunteer": "Tình nguyện",
+    "venue": "Địa điểm",
+    "profile": "Hồ sơ"
+  },
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "continue": "Tiếp tục",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "done": "Xong",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "send": "Gửi",
+    "tryAgain": "Thử lại",
+    "signIn": "Đăng nhập",
+    "signOut": "Đăng xuất",
+    "ok": "OK"
+  },
+  "status": {
+    "loading": "Đang tải…",
+    "comingSoon": "Sắp ra mắt",
+    "optional": "Không bắt buộc"
+  },
+  "field": {
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu"
+  },
+  "errors": {
+    "offline": "Không thể kết nối VenU. Hãy kiểm tra kết nối và thử lại.",
+    "wrongLogin": "Sai email hoặc mật khẩu.",
+    "confirmEmail": "Hãy xác nhận email trước. Kiểm tra hộp thư để lấy liên kết.",
+    "alreadyRegistered": "Email này đã có tài khoản. Hãy thử đăng nhập.",
+    "rateLimit": "Thử quá nhiều lần. Đợi một phút rồi thử lại.",
+    "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "cantSave": "VenU không lưu được thay đổi này. Nếu vẫn xảy ra, hãy đăng xuất rồi đăng nhập lại.",
+    "photoTooBig": "Ảnh lớn hơn {{size}} MB. Hãy chọn ảnh nhỏ hơn.",
+    "photoWrongType": "Hãy dùng ảnh JPG, PNG, WebP hoặc HEIC.",
+    "generic": "Đã xảy ra lỗi. Hãy thử lại."
+  },
+  "direction": {
+    "restartTitle": "Khởi động lại để hoàn tất",
+    "restartBody": "VenU cần khởi động lại để đổi bố cục giữa phải sang trái và trái sang phải.",
+    "restartNow": "Khởi động lại",
+    "later": "Để sau",
+    "ok": "OK"
+  },
+  "count": {
+    "people_other": "{{count}} người"
+  }
+}

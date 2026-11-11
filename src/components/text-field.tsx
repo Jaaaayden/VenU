@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } fro
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface TextFieldProps extends Omit<TextInputProps, 'style' | 'secureTextEntry'> {
   label?: string;
@@ -22,6 +23,7 @@ interface TextFieldProps extends Omit<TextInputProps, 'style' | 'secureTextEntry
 export function TextField({ label, secure, error, hint, multiline, onFocus, onBlur, ref, ...input }: TextFieldProps) {
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
+  const t = useT('common');
   return (
     <View style={styles.wrap}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -44,7 +46,7 @@ export function TextField({ label, secure, error, hint, multiline, onFocus, onBl
             hitSlop={8}
             style={styles.eye}
             accessibilityRole="button"
-            accessibilityLabel={hidden ? 'Show password' : 'Hide password'}>
+            accessibilityLabel={hidden ? t('field.showPassword') : t('field.hidePassword')}>
             <FigmaIcon name="eye-off" size={18} color={Colors.ink} />
           </Pressable>
         ) : null}
@@ -62,6 +64,7 @@ const styles = StyleSheet.create({
   wrap: { gap: 6 },
   label: { ...Type.label },
   box: {
+    gap: Spacing.sm, // keeps the eye toggle off the text, whichever side it sits (RTL puts it on the left)
     flexDirection: 'row',
     alignItems: 'center',
     minHeight: 48,
@@ -76,7 +79,7 @@ const styles = StyleSheet.create({
   invalid: { borderColor: Colors.danger },
   input: { ...Type.input, flex: 1, paddingVertical: 12, outlineStyle: 'none' } as object,
   inputMultiline: { paddingVertical: 0, textAlignVertical: 'top', minHeight: 70 },
-  eye: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center', marginRight: -6 },
+  eye: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center', marginEnd: -6 },
   error: { ...Type.caption, color: Colors.danger },
   hint: { ...Type.caption },
 });

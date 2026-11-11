@@ -6,6 +6,8 @@
 // - control borders are #8C8C8C, not #A6A6A6, so inputs and chips keep a 3:1 edge on white (WCAG 1.4.11);
 // - placeholders are #767676 (4.5:1), not #A6A6A6.
 
+import { Platform } from 'react-native';
+
 export const Colors = {
   primary: '#1D5DBC',     // links, selected chips, primary actions ("Send Request", "Save and continue")
   primarySoft: '#DFEBFD', // selected chip fill, info cards, active nav pill
@@ -34,14 +36,23 @@ export const Colors = {
 
 /** Font family names, as loaded in src/app/_layout.tsx. Set `fontFamily`, not `fontWeight`: each name is one weight. */
 export const Fonts = {
-  display: 'Alexandria_400Regular',      // titles, body copy, buttons
-  displayMedium: 'Alexandria_500Medium',
-  displaySemiBold: 'Alexandria_600SemiBold',
-  text: 'AlbertSans_400Regular',         // captions, inputs, small print
-  textMedium: 'AlbertSans_500Medium',
-  textSemiBold: 'AlbertSans_600SemiBold',
-  textBold: 'AlbertSans_700Bold',        // field labels, tab labels
+  display: withFallback('Alexandria_400Regular'),      // titles, body copy, buttons
+  displayMedium: withFallback('Alexandria_500Medium'),
+  displaySemiBold: withFallback('Alexandria_600SemiBold'),
+  text: withFallback('AlbertSans_400Regular'),         // captions, inputs, small print
+  textMedium: withFallback('AlbertSans_500Medium'),
+  textSemiBold: withFallback('AlbertSans_600SemiBold'),
+  textBold: withFallback('AlbertSans_700Bold'),        // field labels, tab labels
 } as const;
+
+/**
+ * Alexandria covers Latin, Vietnamese and Arabic; Albert Sans only Latin. Phones fall back to the
+ * system sans for other scripts (Cyrillic, Armenian, CJK…), but a browser falls back to its default
+ * serif, so on web the name gets a sans-serif stack: "Alexandria_400Regular, system-ui, sans-serif".
+ */
+function withFallback<F extends string>(family: F): F {
+  return (Platform.OS === 'web' ? `${family}, system-ui, sans-serif` : family) as F;
+}
 
 export const Spacing = { xs: 4, sm: 8, md: 12, lg: 16, gutter: 20, xl: 24, xxl: 32 } as const;
 

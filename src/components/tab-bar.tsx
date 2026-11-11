@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Shadow } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 export type Tab = 'volunteer' | 'venue' | 'profile';
 
@@ -16,19 +17,22 @@ const BAR_GAP = 12; // between the bar and the bottom edge (or home indicator)
 /** Bottom padding a scrolling tab screen needs so its last item clears the bar (safe area not included). */
 export const NAV_BAR_CLEARANCE = BAR_HEIGHT + BAR_GAP + 24;
 
-const TABS: { key: Tab; label: string; icon: FigmaIconName }[] = [
-  { key: 'volunteer', label: 'Volunteer', icon: 'tab-volunteer' },
-  { key: 'venue', label: 'Venue', icon: 'tab-venue' },
-  { key: 'profile', label: 'Profile', icon: 'tab-profile' },
+// Labels are common:tabs.<key>.
+const TABS: { key: Tab; icon: FigmaIconName }[] = [
+  { key: 'volunteer', icon: 'tab-volunteer' },
+  { key: 'venue', icon: 'tab-venue' },
+  { key: 'profile', icon: 'tab-profile' },
 ];
 
 export function TabBar({ active, onPress }: { active: Tab; onPress: (tab: Tab) => void }) {
   const insets = useSafeAreaInsets();
+  const t = useT('common');
   return (
     <View style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, BAR_GAP) }]} pointerEvents="box-none">
       <View style={styles.bar} accessibilityRole="tablist">
-        {TABS.map(({ key, label, icon }) => {
+        {TABS.map(({ key, icon }) => {
           const selected = active === key;
+          const label = t(`tabs.${key}`);
           return (
             <Pressable
               key={key}
