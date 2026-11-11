@@ -3,11 +3,11 @@
  * `secure` adds the eye toggle; `multiline` is the 80-tall "Describe…" box.
  */
 import { useState, type ComponentRef, type Ref } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 interface TextFieldProps extends Omit<TextInputProps, 'style' | 'secureTextEntry'> {
   label?: string;
@@ -24,6 +24,11 @@ export function TextField({ label, secure, error, hint, multiline, onFocus, onBl
   const [hidden, setHidden] = useState(true);
   const [focused, setFocused] = useState(false);
   const t = useT('common');
+  const rtl = useLayoutRtl();
+  // Web inputs default to dir="auto", which reads an empty field as left-to-right, so in Arabic the
+  // placeholder sat on the left. Empty: follow the layout. Typed: auto again, so an email stays LTR.
+  // (Native inputs already follow the layout direction.)
+  const webDir = Platform.OS === 'web' && !input.value ? { dir: rtl ? 'rtl' : 'ltr' } : null;
   return (
     <View style={styles.wrap}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -31,6 +36,7 @@ export function TextField({ label, secure, error, hint, multiline, onFocus, onBl
         <TextInput
           ref={ref}
           {...input}
+          {...webDir}
           multiline={multiline}
           secureTextEntry={secure && hidden}
           placeholderTextColor={Colors.textFaint}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View, type TextStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 
@@ -7,6 +7,23 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
 import { LANGUAGES, languageName, searchLanguages, type Language } from '@/features/profile/options';
+import { useLayoutRtl, useT } from '@/i18n';
+
+/**
+ * Language names line up at the start edge whatever their script: "العربية" sits left in an English
+ * list and "English" sits right in an Arabic one (otherwise each name aligns by its own script).
+ * Web: `direction` picks the start edge. Native already reads 'left' as the start edge in RTL.
+ */
+function useNameDirection(): TextStyle {
+  const rtl = useLayoutRtl();
+  const writingDirection = rtl ? 'rtl' : 'ltr';
+  return Platform.OS === 'web' ? { writingDirection } : { writingDirection, textAlign: 'left' };
+}
+
+/** "Primary language", "Secondary language", then "Another language". */
+function slotName(t: ReturnType<typeof useT<'common'>>, index: number): string {
+  return index === 0 ? t('language.primary') : index === 1 ? t('language.secondary') : t('language.another');
+}
 
 interface LanguagePickerProps {
   languages: string[];
@@ -20,6 +37,7 @@ interface LanguagePickerProps {
  * "Add another language". e.g. Primary [Español ⊗] / Secondary [English ⊗] / [⊕ Add another language]
  */
 export function LanguagePicker({ languages, main, onChange }: LanguagePickerProps) {
+  const t = useT('common');
   // Every field on screen, in order: [Primary, Secondary, …]; null is an empty field.
   // e.g. ['es', 'en', null] = Español / English / an added field not filled in yet.
   const [slots, setSlots] = useState<(string | null)[]>(() => slotsFrom(languages, main));
@@ -45,10 +63,10 @@ export function LanguagePicker({ languages, main, onChange }: LanguagePickerProp
     <View style={styles.list}>
       {rows.map((code, i) => (
         <View key={`${i}-${code ?? 'empty'}`} style={styles.slot}>
-          <Text style={styles.slotLabel}>{i === 0 ? 'Primary language' : i === 1 ? 'Secondary language' : 'Another language'}</Text>
+          <Text style={styles.slotLabel}>{slotName(t, i)}</Text>
           <LanguageMenuField
             value={code}
-            fieldName={i === 0 ? 'Primary language' : i === 1 ? 'Secondary language' : 'Another language'}
+            fieldName={slotName(t, i)}
             exclude={rows.filter((c): c is string => !!c && c !== code)}
             onSelect={c => select(i, c)}
             // An empty extra field can be removed; an empty Primary/Secondary has nothing to clear.
@@ -58,7 +76,7 @@ export function LanguagePicker({ languages, main, onChange }: LanguagePickerProp
       ))}
       {rows.length < LANGUAGES.length && (
         <Button
-          label="Add another language"
+          label={t('language.add')}
           variant="neutral"
           icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
           onPress={() => setSlots([...rows, null])}
@@ -108,6 +126,8 @@ interface LanguageMenuFieldProps {
  * it into a search box with a menu of matches underneath; picking one closes it.
  */
 export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear }: LanguageMenuFieldProps) {
+  const t = useT('common');
+  const nameDirection = useNameDirection();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -134,12 +154,12 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
         </View>
         {open ? (
           <View style={styles.content}>
-            <Text style={styles.label}>Search languages</Text>
+            <Text style={styles.label}>{t('language.search')}</Text>
             <TextInput
               style={styles.input}
               value={query}
               onChangeText={setQuery}
-              placeholder={value ? languageName(value) : 'e.g. Español, Korean, ASL'}
+              placeholder={value ? languageName(value) : t('language.examples')}
               placeholderTextColor={Colors.textFaint}
               autoFocus
               autoCorrect={false}
@@ -147,7 +167,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
               onSubmitEditing={() => (results[0] ? pick(results[0].code) : close())}
               // Let a tap on a menu item land before the menu closes (web blurs on mousedown).
               onBlur={() => { blurTimer.current = setTimeout(close, 200); }}
-              accessibilityLabel={`Search languages for ${fieldName}`}
+              accessibilityLabel={t('language.searchFor', { field: fieldName })}
             />
           </View>
         ) : (
@@ -155,11 +175,11 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
             style={styles.content}
             onPress={() => setOpen(true)}
             accessibilityRole="button"
-            accessibilityLabel={`${fieldName}: ${value ? languageName(value) : 'none'}`}
-            accessibilityHint="Opens a language search">
-            <Text style={styles.label}>Search Languages</Text>
-            <Text style={[styles.value, !value && styles.placeholder]} numberOfLines={1}>
-              {value ? languageName(value) : 'Choose a language'}
+            accessibilityLabel={value ? t('language.field', { field: fieldName, language: languageName(value) }) : t('language.fieldEmpty', { field: fieldName })}
+            accessibilityHint={t('language.openHint')}>
+            <Text style={styles.label}>{t('language.fieldLabel')}</Text>
+            <Text style={[styles.value, value ? nameDirection : styles.placeholder]} numberOfLines={1}>
+              {value ? languageName(value) : t('language.choose')}
             </Text>
           </Pressable>
         )}
@@ -168,7 +188,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
             onPress={open ? close : onClear}
             style={styles.trail}
             accessibilityRole="button"
-            accessibilityLabel={open ? 'Close language search' : value ? `Remove ${languageName(value)}` : `Remove this language field`}>
+            accessibilityLabel={open ? t('language.closeSearch') : value ? t('language.remove', { language: languageName(value) }) : t('language.removeField')}>
             <ClearIcon />
           </Pressable>
         ) : (
@@ -178,7 +198,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
       {open && (
         <View style={styles.menu} accessibilityRole="menu">
           {results.length === 0 ? (
-            <Text style={styles.empty}>No match. Try the English name.</Text>
+            <Text style={styles.empty}>{t('language.noMatch')}</Text>
           ) : (
             results.map(l => (
               <Pressable
@@ -187,8 +207,8 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
                 style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
                 accessibilityRole="menuitem"
                 accessibilityLabel={`${l.native}, ${l.english}`}>
-                <Text style={[styles.menuNative, styles.ltr]}>{l.native}</Text>
-                {l.native !== l.english && <Text style={[styles.menuEnglish, styles.ltr]}>{l.english}</Text>}
+                <Text style={[styles.menuNative, nameDirection]}>{l.native}</Text>
+                {l.native !== l.english && <Text style={[styles.menuEnglish, nameDirection]}>{l.english}</Text>}
               </Pressable>
             ))
           )}
@@ -208,7 +228,9 @@ interface LanguageSearchModalProps {
 }
 
 /** Full-screen searchable list; names shown in their own script with the English name underneath. */
-export function LanguageSearchModal({ visible, title = 'Add a language', exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
+export function LanguageSearchModal({ visible, title, exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
+  const t = useT('common');
+  const nameDirection = useNameDirection();
   const [query, setQuery] = useState('');
   const results = searchLanguages(query).filter(l => !exclude.includes(l.code));
 
@@ -222,22 +244,22 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
       <SafeAreaView style={styles.modal}>
         <View style={styles.modalBody}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle} accessibilityRole="header">{title}</Text>
+            <Text style={styles.modalTitle} accessibilityRole="header">{title ?? t('language.addTitle')}</Text>
             <Pressable onPress={close} style={styles.doneTarget} accessibilityRole="button">
-              <Text style={styles.done}>Done</Text>
+              <Text style={styles.done}>{t('actions.done')}</Text>
             </Pressable>
           </View>
           <View style={styles.searchBox}>
             <FigmaIcon name="leading-icon-de9321" size={40} color={Colors.ink} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search, e.g. Español, Korean, ASL"
+              placeholder={t('language.searchExamples')}
               placeholderTextColor={Colors.textFaint}
               value={query}
               onChangeText={setQuery}
               autoFocus
               autoCorrect={false}
-              accessibilityLabel="Search languages"
+              accessibilityLabel={t('language.search')}
             />
           </View>
           <FlatList<Language>
@@ -245,7 +267,7 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
             keyExtractor={l => l.code}
             keyboardShouldPersistTaps="handled"
             ItemSeparatorComponent={() => <View style={styles.sep} />}
-            ListEmptyComponent={<Text style={styles.empty}>No match. Try the English name.</Text>}
+            ListEmptyComponent={<Text style={styles.empty}>{t('language.noMatch')}</Text>}
             renderItem={({ item }) => (
               <Pressable
                 style={({ pressed }) => [styles.item, pressed && styles.menuItemPressed]}
@@ -255,8 +277,8 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={`${item.native}, ${item.english}`}>
-                <Text style={[styles.menuNative, styles.ltr]}>{item.native}</Text>
-                {item.native !== item.english && <Text style={[styles.menuEnglish, styles.ltr]}>{item.english}</Text>}
+                <Text style={[styles.menuNative, nameDirection]}>{item.native}</Text>
+                {item.native !== item.english && <Text style={[styles.menuEnglish, nameDirection]}>{item.english}</Text>}
               </Pressable>
             )}
           />
@@ -269,19 +291,19 @@ export function LanguageSearchModal({ visible, title = 'Add a language', exclude
 const styles = StyleSheet.create({
   list: { gap: Spacing.lg },
   slot: { gap: 6 },
-  slotLabel: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text, paddingLeft: Spacing.xs },
+  slotLabel: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text, paddingStart: Spacing.xs },
   add: { marginHorizontal: Spacing.xl, marginTop: Spacing.sm },
 
   // Figma: #F5F5F5 fill, radius 10, 45 tall; 56 here for two readable lines.
   field: { flexDirection: 'row', alignItems: 'center', minHeight: 56, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
-  fieldOpen: { borderBottomLeftRadius: 4, borderBottomRightRadius: 4, borderBottomWidth: 3, borderBottomColor: Colors.ink },
+  fieldOpen: { borderBottomStartRadius: 4, borderBottomEndRadius: 4, borderBottomWidth: 3, borderBottomColor: Colors.ink },
   lead: { width: 52, alignItems: 'center', justifyContent: 'center' },
   content: { flex: 1, minHeight: 52, justifyContent: 'center', paddingVertical: 4 },
   label: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted },
-  value: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text, writingDirection: 'ltr', textAlign: 'left' },
+  value: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text },
   placeholder: { color: Colors.textFaint },
   input: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text, paddingVertical: 0, outlineStyle: 'none' } as object,
-  trail: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginRight: 4 },
+  trail: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginEnd: 4 },
   trailSpacer: { width: 52 },
 
   menu: { marginTop: 2, paddingVertical: Spacing.sm, borderRadius: 4, backgroundColor: Colors.surfaceAlt, ...Shadow.card },
@@ -289,9 +311,6 @@ const styles = StyleSheet.create({
   menuItemPressed: { backgroundColor: Colors.primarySoft },
   menuNative: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text },
   menuEnglish: { ...Type.caption },
-  // Arabic, Persian, Hebrew names: keep each word's script direction but line the rows up on the left
-  // (RN web otherwise auto-detects RTL and pushes them to the right edge).
-  ltr: { writingDirection: 'ltr', textAlign: 'left' },
   empty: { ...Type.caption, textAlign: 'center', paddingVertical: Spacing.md },
 
   modal: { flex: 1, backgroundColor: Colors.bg, paddingHorizontal: Spacing.gutter },
@@ -301,8 +320,8 @@ const styles = StyleSheet.create({
   modalTitle: { fontFamily: Fonts.display, fontSize: 22, lineHeight: 28, color: Colors.text },
   doneTarget: { minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' },
   done: { ...Type.bodyStrong, color: Colors.primary },
-  searchBox: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt, paddingLeft: 4, marginBottom: Spacing.md },
-  searchInput: { ...Type.input, flex: 1, paddingVertical: 12, paddingRight: Spacing.lg, outlineStyle: 'none' } as object,
+  searchBox: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt, paddingStart: 4, marginBottom: Spacing.md },
+  searchInput: { ...Type.input, flex: 1, paddingVertical: 12, paddingEnd: Spacing.lg, outlineStyle: 'none' } as object,
   item: { minHeight: 52, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.xs, gap: 2, justifyContent: 'center' },
   sep: { height: 1, backgroundColor: Colors.divider },
 });

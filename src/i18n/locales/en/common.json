@@ -55,5 +55,47 @@
     "addPicture": "Add picture",
     "changePicture": "Change picture",
     "holdToSpeak": "Or hold to speak"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>(optional)</muted>",
+    "step": "Step {{step}} of {{total}}"
+  },
+  "nav": {
+    "backTo": "Back to {{label}}"
+  },
+  "chip": {
+    "remove": "Remove {{label}}"
+  },
+  "photo": {
+    "add": "Add a photo",
+    "change": "Change photo",
+    "take": "Take photo",
+    "remove": "Remove",
+    "hint": "Helps your helper spot you. Optional.",
+    "cameraOff": "Camera access is off. Turn it on in Settings.",
+    "libraryOff": "Photo access is off. Turn it on in Settings.",
+    "labelNamed": "Profile photo of {{name}}",
+    "labelYours": "Your profile photo",
+    "labelNone": "No profile photo"
+  },
+  "language": {
+    "primary": "Primary language",
+    "secondary": "Secondary language",
+    "another": "Another language",
+    "add": "Add another language",
+    "search": "Search languages",
+    "fieldLabel": "Search Languages",
+    "searchFor": "Search languages for {{field}}",
+    "examples": "e.g. Español, Korean, ASL",
+    "searchExamples": "Search, e.g. Español, Korean, ASL",
+    "field": "{{field}}: {{language}}",
+    "fieldEmpty": "{{field}}: none",
+    "openHint": "Opens a language search",
+    "choose": "Choose a language",
+    "closeSearch": "Close language search",
+    "remove": "Remove {{language}}",
+    "removeField": "Remove this language field",
+    "noMatch": "No match. Try the English name.",
+    "addTitle": "Add a language"
   }
 }

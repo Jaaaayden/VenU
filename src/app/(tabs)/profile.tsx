@@ -2,6 +2,7 @@ import { router, type Href } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
@@ -10,31 +11,43 @@ import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { SummaryTags } from '@/features/profile/summary-tags';
+import { useLayoutRtl, useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
+// Section and row labels: profile:tab.<key>.
 interface MenuItem {
   icon: FigmaIconName;
-  label: string;
+  key: 'editProfile' | 'notifications' | 'privacy' | 'help' | 'terms';
   href: Href;
 }
 
-const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
+const MENU_SECTIONS: { key: 'account' | 'support'; items: MenuItem[] }[] = [
   {
-    title: 'Account',
+    key: 'account',
     items: [
-      { icon: 'person', label: 'Edit profile', href: '/edit-profile' },
-      { icon: 'volume', label: 'Notifications', href: '/notifications' },
-      { icon: 'check-circle', label: 'Privacy & data', href: '/privacy' },
+      { icon: 'person', key: 'editProfile', href: '/edit-profile' },
+      { icon: 'volume', key: 'notifications', href: '/notifications' },
+      { icon: 'check-circle', key: 'privacy', href: '/privacy' },
     ],
   },
   {
-    title: 'Support',
+    key: 'support',
     items: [
-      { icon: 'message-unread', label: 'Help & feedback', href: '/help' },
-      { icon: 'attachment', label: 'Terms of use', href: '/terms' },
+      { icon: 'message-unread', key: 'help', href: '/help' },
+      { icon: 'attachment', key: 'terms', href: '/terms' },
     ],
   },
 ];
+
+/** Row chevron; points the other way in a mirrored (RTL) layout. */
+function Chevron() {
+  const rtl = useLayoutRtl();
+  return (
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" style={rtl ? styles.flip : undefined}>
+      <Path d="M9 6l6 6-6 6" stroke={Colors.textFaint} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 
 export default function ProfileScreen() {
   const { profile, avatarUrl, signOut, deleteAll } = useProfile();
@@ -43,6 +56,8 @@ export default function ProfileScreen() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const scrollRef = useRef<ScrollViewInstance>(null);
+  const t = useT('profile');
+  const tc = useT('common');
 
   async function handleSignOut() {
     setSignOutError(null);
@@ -50,7 +65,7 @@ export default function ProfileScreen() {
       await signOut();
       router.replace('/welcome');
     } catch (e) {
-      setSignOutError(`Couldn't sign out. ${friendlyError(e)}`);
+      setSignOutError(t('tab.signOutFailed', { reason: friendlyError(e) }));
     }
   }
 
@@ -62,7 +77,7 @@ export default function ProfileScreen() {
       router.replace('/welcome');
     } catch (e) {
       // Photos go first, so a failure can be partial (the context has already reloaded what's left).
-      setDeleteError(`Couldn't finish deleting your data. ${friendlyError(e)}`);
+      setDeleteError(t('tab.deleteFailed', { reason: friendlyError(e) }));
       setBusy(false);
     }
   }
@@ -79,7 +94,7 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
         // Opening the delete confirmation grows the page; bring its buttons out from under the tab bar.
         onContentSizeChange={() => confirmDelete && scrollRef.current?.scrollToEnd({ animated: true })}>
-        <Text style={styles.pageTitle} accessibilityRole="header">Profile</Text>
+        <Text style={styles.pageTitle} accessibilityRole="header">{t('tab.title')}</Text>
 
         <View style={styles.card}>
           <View style={styles.profileRow}>
@@ -87,39 +102,39 @@ export default function ProfileScreen() {
             <View style={styles.profileInfo}>
               <Text style={styles.name}>{profile.firstName}</Text>
               <View style={styles.badges}>
-                <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? 'Visitor' : 'Volunteer'}</Text>
+                <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? t('tab.visitor') : t('tab.volunteer')}</Text>
                 {profile.role === 'volunteer' && (
                   <Text style={[styles.badge, profile.verified ? styles.badgeOk : styles.badgePending]}>
-                    {profile.verified ? '✓ Verified LA28' : 'Unverified'}
+                    {profile.verified ? t('tab.verified') : t('tab.unverified')}
                   </Text>
                 )}
               </View>
             </View>
-            <Button label="Edit" variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
+            <Button label={tc('actions.edit')} variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
           </View>
 
           <Text style={styles.shareTitle}>
-            {profile.role === 'visitor' ? 'Shared with your helper' : 'Shown to visitors'}
+            {profile.role === 'visitor' ? t('tab.sharedVisitor') : t('tab.sharedVolunteer')}
           </Text>
           <SummaryTags draft={profile} />
         </View>
 
         {MENU_SECTIONS.map(section => (
-          <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle} accessibilityRole="header">{section.title}</Text>
+          <View key={section.key} style={styles.section}>
+            <Text style={styles.sectionTitle} accessibilityRole="header">{t(`tab.${section.key}`)}</Text>
             <View style={styles.menuCard}>
               {section.items.map((item, idx) => (
-                <View key={item.label}>
+                <View key={item.key}>
                   <Pressable
                     onPress={() => router.push(item.href)}
                     accessibilityRole="button"
-                    accessibilityLabel={item.label}
+                    accessibilityLabel={t(`tab.${item.key}`)}
                     style={({ pressed }) => [styles.menuRow, pressed && styles.menuRowPressed]}>
                     <View style={styles.menuIconBox}>
                       <FigmaIcon name={item.icon} size={20} color={Colors.ink} />
                     </View>
-                    <Text style={styles.menuLabel}>{item.label}</Text>
-                    <Text style={styles.menuChevron}>›</Text>
+                    <Text style={styles.menuLabel}>{t(`tab.${item.key}`)}</Text>
+                    <Chevron />
                   </Pressable>
                   {idx < section.items.length - 1 && <View style={styles.divider} />}
                 </View>
@@ -128,7 +143,7 @@ export default function ProfileScreen() {
           </View>
         ))}
 
-        <Button label="Sign out" variant="secondary" onPress={handleSignOut} />
+        <Button label={tc('actions.signOut')} variant="secondary" onPress={handleSignOut} />
         {signOutError && (
           <Text style={[Type.caption, styles.errorText, styles.gapSm]} accessibilityLiveRegion="polite">
             {signOutError}
@@ -138,15 +153,15 @@ export default function ProfileScreen() {
         <View style={styles.deleteBox}>
           {confirmDelete ? (
             <>
-              <Text style={Type.caption}>This removes your profile and photo for good. You can make a new one later.</Text>
+              <Text style={Type.caption}>{t('tab.deleteWarning')}</Text>
               {deleteError && <Text style={[Type.caption, styles.errorText]}>{deleteError}</Text>}
               <View style={styles.deleteRow}>
-                <Button label="Cancel" variant="neutral" onPress={() => setConfirmDelete(false)} style={styles.flex} />
-                <Button label="Delete" variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
+                <Button label={tc('actions.cancel')} variant="neutral" onPress={() => setConfirmDelete(false)} style={styles.flex} />
+                <Button label={tc('actions.delete')} variant="danger" onPress={handleDelete} loading={busy} style={styles.flex} />
               </View>
             </>
           ) : (
-            <Button label="Delete my data" variant="link" onPress={() => setConfirmDelete(true)} />
+            <Button label={t('tab.deleteData')} variant="link" onPress={() => setConfirmDelete(true)} />
           )}
         </View>
 
@@ -185,8 +200,8 @@ const styles = StyleSheet.create({
   menuRowPressed: { backgroundColor: Colors.surfaceAlt },
   menuIconBox: { width: 36, height: 36, borderRadius: Radius.sm, backgroundColor: Colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   menuLabel: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flex: 1 },
-  menuChevron: { fontSize: 22, color: Colors.textFaint },
-  divider: { height: 1, backgroundColor: Colors.divider, marginLeft: 64 },
+  flip: { transform: [{ scaleX: -1 }] },
+  divider: { height: 1, backgroundColor: Colors.divider, marginStart: 64 },
 
   deleteBox: { marginTop: Spacing.md, gap: Spacing.sm, alignItems: 'stretch' },
   deleteRow: { flexDirection: 'row', gap: Spacing.md },

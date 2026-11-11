@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LogoMark } from '@/components/wordmark';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 import { isLocalMode } from '@/lib/auth';
 
 /**
@@ -11,6 +12,7 @@ import { isLocalMode } from '@/lib/auth';
  * pinned to the bottom ("Don't have an account? Sign Up").
  */
 export function AuthScreen({ title, children, footer }: { title: string; children: ReactNode; footer: ReactNode }) {
+  const t = useT('onboarding');
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -24,7 +26,7 @@ export function AuthScreen({ title, children, footer }: { title: string; childre
           <View style={styles.footer}>
             {footer}
             {isLocalMode && (
-              <Text style={styles.localNote}>Dev mode: no Supabase keys set, so sign-in is skipped and data stays on this device.</Text>
+              <Text style={styles.localNote}>{t('auth.devMode')}</Text>
             )}
           </View>
         </ScrollView>

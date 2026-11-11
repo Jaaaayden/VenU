@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { useRef, useState, type ReactNode } from 'react';
+import { Trans } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AvatarPicker } from '@/components/avatar-picker';
@@ -10,6 +11,7 @@ import { LanguagePicker } from '@/components/language-picker';
 import { TextField } from '@/components/text-field';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { Checkbox } from '@/features/auth/auth-ui';
+import { useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, TRAININGS } from './options';
@@ -34,6 +36,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const t = useT('profile');
 
   const visitor = d.role === 'visitor';
   const errors = submitted ? validateDraft(d) : {};
@@ -69,24 +72,24 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
       <ScrollView style={styles.flex} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         {header}
 
-        <FormSection title="About you">
+        <FormSection title={t('form.aboutYou')}>
           <View style={styles.about}>
             <AvatarPicker name={d.firstName} uri={shownAvatar} onPick={setAvatar} onRemove={() => setAvatar('remove')} />
             <TextField
-              label="First name"
+              label={t('form.firstName')}
               value={d.firstName}
               onChangeText={v => set('firstName', v)}
-              placeholder={visitor ? 'e.g. Rosa' : 'e.g. Daniel'}
+              placeholder={visitor ? t('form.firstNamePlaceholderVisitor') : t('form.firstNamePlaceholderVolunteer')}
               maxLength={FIRST_NAME_MAX}
               autoComplete="given-name"
               textContentType="givenName"
               error={errors.firstName}
-              hint="Only your first name is shown to the people you meet."
+              hint={t('form.firstNameHint')}
             />
           </View>
         </FormSection>
 
-        <FormSection title={visitor ? 'Languages you speak' : 'Languages you’re fluent in'} error={errors.languages}>
+        <FormSection title={visitor ? t('form.languagesVisitor') : t('form.languagesVolunteer')} error={errors.languages}>
           <LanguagePicker
             languages={d.languages}
             main={d.mainLanguage}
@@ -97,17 +100,17 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
 
         {visitor ? (
           <>
-            <FormSection title="Anything we should know?" optional error={errors.accessNeedsNote}>
-              <ChipGroup multiple options={ACCESS_NEEDS} value={d.accessNeeds} onChange={v => set('accessNeeds', v)} accessibilityLabel="Access needs" />
+            <FormSection title={t('form.accessNeeds')} optional error={errors.accessNeedsNote}>
+              <ChipGroup multiple options={ACCESS_NEEDS} value={d.accessNeeds} onChange={v => set('accessNeeds', v)} accessibilityLabel={t('form.accessNeedsLabel')} />
               {d.accessNeeds.includes('other') && (
                 <View style={styles.note}>
                   <TextField
                     value={d.accessNeedsNote}
                     onChangeText={v => set('accessNeedsNote', v)}
-                    placeholder="e.g. I use a service dog"
+                    placeholder={t('form.otherNeedsPlaceholder')}
                     maxLength={NOTE_MAX}
                     multiline
-                    accessibilityLabel="Other access needs"
+                    accessibilityLabel={t('form.otherNeedsLabel')}
                     error={errors.accessNeedsNote}
                   />
                 </View>
@@ -115,31 +118,31 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
             </FormSection>
 
             {/* Not in Figma, but helpers see it ("Prefers sign language"), so it has to stay editable. */}
-            <FormSection title="How do you like to communicate?" optional hint="Your helper sees this before they reach you.">
-              <ChipGroup multiple options={COMMUNICATION} value={d.communication} onChange={v => set('communication', v)} accessibilityLabel="Communication" />
+            <FormSection title={t('form.communication')} optional hint={t('form.communicationHint')}>
+              <ChipGroup multiple options={COMMUNICATION} value={d.communication} onChange={v => set('communication', v)} accessibilityLabel={t('form.communicationLabel')} />
             </FormSection>
 
-            <FormSection title="I’d prefer help from">
-              <LabeledRow label="Gender">
-                <ChipGroup options={HELPER_GENDER} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel="Helper gender" />
+            <FormSection title={t('form.helperPref')}>
+              <LabeledRow label={t('form.gender')}>
+                <ChipGroup options={HELPER_GENDER} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel={t('form.helperGenderLabel')} />
               </LabeledRow>
-              <LabeledRow label="Age">
-                <ChipGroup options={HELPER_AGE} value={d.helperAgePref} onChange={v => set('helperAgePref', v)} accessibilityLabel="Helper age" />
+              <LabeledRow label={t('form.age')}>
+                <ChipGroup options={HELPER_AGE} value={d.helperAgePref} onChange={v => set('helperAgePref', v)} accessibilityLabel={t('form.helperAgeLabel')} />
               </LabeledRow>
             </FormSection>
           </>
         ) : (
           <>
-            <FormSection title="Training" optional hint="LA28 checks these when verifying you.">
-              <ChipGroup multiple options={TRAININGS} value={d.trainings} onChange={v => set('trainings', v)} accessibilityLabel="Training" />
+            <FormSection title={t('form.training')} optional hint={t('form.trainingHint')}>
+              <ChipGroup multiple options={TRAININGS} value={d.trainings} onChange={v => set('trainings', v)} accessibilityLabel={t('form.training')} />
             </FormSection>
 
-            <FormSection title="Your gender" hint="Only used when a visitor asks for a woman or man helper. Never shown." error={errors.gender}>
-              <ChipGroup options={GENDERS} value={d.gender} onChange={v => set('gender', v)} accessibilityLabel="Gender" />
+            <FormSection title={t('form.yourGender')} hint={t('form.yourGenderHint')} error={errors.gender}>
+              <ChipGroup options={GENDERS} value={d.gender} onChange={v => set('gender', v)} accessibilityLabel={t('form.yourGender')} />
             </FormSection>
 
-            <FormSection title="Your age range" hint="Only for matching, never shown." error={errors.ageBand}>
-              <ChipGroup options={AGE_BANDS} value={d.ageBand} onChange={v => set('ageBand', v)} accessibilityLabel="Age range" />
+            <FormSection title={t('form.yourAge')} hint={t('form.yourAgeHint')} error={errors.ageBand}>
+              <ChipGroup options={AGE_BANDS} value={d.ageBand} onChange={v => set('ageBand', v)} accessibilityLabel={t('form.yourAge')} />
             </FormSection>
           </>
         )}
@@ -148,18 +151,18 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
           checked={d.privacyAccepted}
           onToggle={() => set('privacyAccepted', !d.privacyAccepted)}
           error={errors.privacyAccepted}
-          accessibilityLabel="I agree to how VenU uses my info, as set out in the privacy policy">
+          accessibilityLabel={t('form.privacyAgreeLabel')}>
           <Text style={Type.body}>
-            I agree to how VenU uses my info, as set out in the{' '}
-            <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link">
-              privacy policy
-            </Text>
-            .
+            <Trans
+              t={t}
+              i18nKey="form.privacyAgree"
+              components={{ a: <Text style={styles.link} onPress={() => router.push('/privacy')} accessibilityRole="link" /> }}
+            />
           </Text>
         </Checkbox>
 
         {Object.keys(errors).some(k => k !== 'privacyAccepted') && (
-          <Text style={styles.error} accessibilityLiveRegion="polite">Some answers above need a fix (marked in red).</Text>
+          <Text style={styles.error} accessibilityLiveRegion="polite">{t('form.fixAbove')}</Text>
         )}
         {saveError && <Text style={styles.error}>{saveError}</Text>}
         <Button label={submitLabel} size="lg" onPress={submit} loading={saving} style={styles.submit} />

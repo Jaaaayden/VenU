@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface ChipProps {
   label: string;
@@ -18,6 +19,7 @@ interface ChipProps {
 }
 
 export function Chip({ label, selected = false, onPress, role = 'checkbox', dashed, onRemove, removeLabel, fill }: ChipProps) {
+  const t = useT('common');
   return (
     <View style={[styles.chip, fill && styles.chipFill, selected && styles.chipSelected, dashed && styles.chipDashed]}>
       <Pressable
@@ -34,7 +36,7 @@ export function Chip({ label, selected = false, onPress, role = 'checkbox', dash
         </Text>
       </Pressable>
       {onRemove && (
-        <Pressable onPress={onRemove} hitSlop={8} style={styles.removeTarget} accessibilityRole="button" accessibilityLabel={removeLabel ?? `Remove ${label}`}>
+        <Pressable onPress={onRemove} hitSlop={8} style={styles.removeTarget} accessibilityRole="button" accessibilityLabel={removeLabel ?? t('chip.remove', { label })}>
           <Text style={[styles.remove, selected && styles.labelSelected]}>×</Text>
         </Pressable>
       )}
@@ -62,10 +64,11 @@ const styles = StyleSheet.create({
   chipFill: { flex: 1, minHeight: 54, paddingHorizontal: 0 },
   mainFill: { flex: 1, alignSelf: 'stretch', justifyContent: 'center', paddingHorizontal: Spacing.sm },
   labelFill: { textAlign: 'center' },
-  // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
-  label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text, writingDirection: 'ltr' },
+  // Follows the UI direction (an Arabic label reads right to left, ✓ first); wrap a name from the
+  // other direction in isolatedLanguageName() so it doesn't reorder the label.
+  label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text },
   labelSelected: { color: Colors.primary },
-  // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's right padding.
-  removeTarget: { minWidth: 28, minHeight: 28, marginRight: -8, alignItems: 'center', justifyContent: 'center' },
+  // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's end padding (right, or left in RTL).
+  removeTarget: { minWidth: 28, minHeight: 28, marginEnd: -8, alignItems: 'center', justifyContent: 'center' },
   remove: { fontSize: 18, lineHeight: 20, color: Colors.textMuted },
 });

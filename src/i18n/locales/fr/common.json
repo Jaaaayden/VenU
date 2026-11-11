@@ -56,5 +56,47 @@
     "addPicture": "Ajouter une photo",
     "changePicture": "Changer la photo",
     "holdToSpeak": "Maintenir pour parler"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>(facultatif)</muted>",
+    "step": "Étape {{step}} sur {{total}}"
+  },
+  "nav": {
+    "backTo": "Retour à {{label}}"
+  },
+  "chip": {
+    "remove": "Retirer {{label}}"
+  },
+  "photo": {
+    "add": "Ajouter une photo",
+    "change": "Changer de photo",
+    "take": "Prendre une photo",
+    "remove": "Retirer",
+    "hint": "Aide votre accompagnant à vous repérer. Facultatif.",
+    "cameraOff": "L'accès à l'appareil photo est désactivé. Activez-le dans Réglages.",
+    "libraryOff": "L'accès aux photos est désactivé. Activez-le dans Réglages.",
+    "labelNamed": "Photo de profil de {{name}}",
+    "labelYours": "Votre photo de profil",
+    "labelNone": "Pas de photo de profil"
+  },
+  "language": {
+    "primary": "Langue principale",
+    "secondary": "Deuxième langue",
+    "another": "Autre langue",
+    "add": "Ajouter une autre langue",
+    "search": "Rechercher une langue",
+    "fieldLabel": "Rechercher une langue",
+    "searchFor": "Rechercher une langue pour {{field}}",
+    "examples": "p. ex. Français, Español, ASL",
+    "searchExamples": "Rechercher, p. ex. Français, Español, ASL",
+    "field": "{{field}} : {{language}}",
+    "fieldEmpty": "{{field}} : aucune",
+    "openHint": "Ouvre la recherche de langue",
+    "choose": "Choisissez une langue",
+    "closeSearch": "Fermer la recherche de langue",
+    "remove": "Retirer {{language}}",
+    "removeField": "Retirer ce champ de langue",
+    "noMatch": "Aucun résultat. Essayez le nom anglais.",
+    "addTitle": "Ajouter une langue"
   }
 }

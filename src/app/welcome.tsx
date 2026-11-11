@@ -8,13 +8,16 @@ import { LanguageSearchModal } from '@/components/language-picker';
 import { LogoMark } from '@/components/wordmark';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { LanguagePill, SocialButtons } from '@/features/auth/auth-ui';
-import { readPendingSetup, writePendingSetup } from '@/features/auth/pending-setup';
+import { readPendingSetup } from '@/features/auth/pending-setup';
 import { useSignedInHref } from '@/features/auth/use-auth-form';
 import { languageName } from '@/features/profile/options';
+import { useT } from '@/i18n';
+import { choosePendingLanguage } from '@/i18n/pending-language';
 
 /** Landing page for signed-out users (Figma onboarding__landing). */
 export default function WelcomeScreen() {
   const signedInHref = useSignedInHref();
+  const t = useT('onboarding');
   const [language, setLanguage] = useState('en');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [socialNote, setSocialNote] = useState(false);
@@ -46,17 +49,17 @@ export default function WelcomeScreen() {
         </View>
 
         <View style={styles.actions}>
-          <Button label="Create Account" variant="secondary" onPress={() => router.push('/sign-up')} style={styles.action} />
-          <Text style={styles.or}>or</Text>
-          <Button label="Sign In" variant="dark" onPress={() => router.push('/sign-in')} style={styles.action} />
+          <Button label={t('welcome.createAccount')} variant="secondary" onPress={() => router.push('/sign-up')} style={styles.action} />
+          <Text style={styles.or}>{t('welcome.or')}</Text>
+          <Button label={t('welcome.signIn')} variant="dark" onPress={() => router.push('/sign-in')} style={styles.action} />
         </View>
 
         <View style={styles.social}>
-          <Text style={styles.socialTitle}>OR sign up using</Text>
+          <Text style={styles.socialTitle}>{t('welcome.socialTitle')}</Text>
           <SocialButtons onPress={() => setSocialNote(true)} />
           {socialNote && (
             <Text style={styles.note} accessibilityLiveRegion="polite">
-              Google, Apple and Facebook sign-in are coming soon.
+              {t('welcome.socialSoon')}
             </Text>
           )}
         </View>
@@ -64,13 +67,13 @@ export default function WelcomeScreen() {
 
       <LanguageSearchModal
         visible={pickerOpen}
-        title="App language"
+        title={t('welcome.languageTitle')}
         onSelect={code => {
           picked.current = true;
           setLanguage(code);
           setPickerOpen(false);
-          // Profile setup starts with this as the primary language.
-          writePendingSetup({ language: code });
+          // Switches the app to this language now; profile setup also starts with it as the primary language.
+          choosePendingLanguage(code);
         }}
         onClose={() => setPickerOpen(false)}
       />

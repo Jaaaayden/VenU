@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+import { Trans } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 interface FormSectionProps {
   title: string;
@@ -14,11 +16,16 @@ interface FormSectionProps {
 
 /** A titled block in a form, with an optional hint and an error line. */
 export function FormSection({ title, hint, optional, error, children }: FormSectionProps) {
+  const t = useT('common');
   return (
     <View style={styles.section}>
       <Text style={styles.title} accessibilityRole="header">
-        {title}
-        {optional && <Text style={styles.optional}> (optional)</Text>}
+        {/* One string, so a language can put "(optional)" where it belongs: "{{title}} <muted>(optional)</muted>". */}
+        {optional ? (
+          <Trans t={t} i18nKey="form.optionalTitle" values={{ title }} components={{ muted: <Text style={styles.optional} /> }} />
+        ) : (
+          title
+        )}
       </Text>
       {hint && <Text style={styles.hint}>{hint}</Text>}
       <View style={styles.body}>{children}</View>
@@ -33,9 +40,10 @@ export function FormSection({ title, hint, optional, error, children }: FormSect
 
 /** Optional "STEP 1 OF 2" overline + title + subtitle, as in the Figma "Set up your profile" header. */
 export function StepHeader({ step, total, title, subtitle }: { step?: number; total?: number; title: string; subtitle?: string }) {
+  const t = useT('common');
   return (
     <View style={styles.header}>
-      {step != null && total != null && <Text style={styles.step}>{`Step ${step} of ${total}`}</Text>}
+      {step != null && total != null && <Text style={styles.step}>{t('form.step', { step, total })}</Text>}
       <Text style={styles.headerTitle} accessibilityRole="header">
         {title}
       </Text>

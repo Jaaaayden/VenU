@@ -57,5 +57,47 @@
     "addPicture": "Добавить фото",
     "changePicture": "Заменить фото",
     "holdToSpeak": "Скажите голосом"
+  },
+  "form": {
+    "optionalTitle": "{{title}} <muted>(необязательно)</muted>",
+    "step": "Шаг {{step}} из {{total}}"
+  },
+  "nav": {
+    "backTo": "Назад: {{label}}"
+  },
+  "chip": {
+    "remove": "Убрать: {{label}}"
+  },
+  "photo": {
+    "add": "Добавить фото",
+    "change": "Сменить фото",
+    "take": "Сделать фото",
+    "remove": "Удалить",
+    "hint": "Помощнику будет проще вас найти. Необязательно.",
+    "cameraOff": "Доступ к камере выключен. Включите его в Настройках.",
+    "libraryOff": "Доступ к фото выключен. Включите его в Настройках.",
+    "labelNamed": "Фото профиля: {{name}}",
+    "labelYours": "Ваше фото профиля",
+    "labelNone": "Нет фото профиля"
+  },
+  "language": {
+    "primary": "Основной язык",
+    "secondary": "Второй язык",
+    "another": "Ещё язык",
+    "add": "Добавить ещё язык",
+    "search": "Поиск языков",
+    "fieldLabel": "Поиск языков",
+    "searchFor": "Поиск языка: {{field}}",
+    "examples": "напр. Русский, Español, ASL",
+    "searchExamples": "Поиск, напр. Русский, Español, ASL",
+    "field": "{{field}}: {{language}}",
+    "fieldEmpty": "{{field}}: не выбран",
+    "openHint": "Открывает поиск языка",
+    "choose": "Выберите язык",
+    "closeSearch": "Закрыть поиск языка",
+    "remove": "Удалить: {{language}}",
+    "removeField": "Удалить это поле языка",
+    "noMatch": "Ничего не найдено. Попробуйте английское название.",
+    "addTitle": "Добавить язык"
   }
 }
