@@ -64,6 +64,12 @@ const SNAP_NAMES: SheetSnap[] = ['up', 'mid', 'down'];
 const SNAP_LABEL: Record<SheetSnap, string> = { down: 'lowered', mid: 'half open', up: 'raised' };
 const SPRING = { damping: 26, stiffness: 260, mass: 0.9 };
 
+/** Sheet tops for each snap, in the map area's coordinates, for a map area `h` tall. */
+function snapPositions(h: number, tabClearance: number): Record<SheetSnap, number> {
+  const down = Math.max(h - PEEK - tabClearance, UP_GAP);
+  return { up: UP_GAP, mid: Math.min(Math.round(h * 0.5), down), down };
+}
+
 export function VenueMapScreen({ venue }: { venue: Venue }) {
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
@@ -73,21 +79,31 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const [box, setBox] = useState({ w: 0, h: 0 });
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
-  const positions = useMemo(() => {
-    const h = box.h;
-    const down = Math.max(h - PEEK - tabClearance, UP_GAP);
-    return { up: UP_GAP, mid: Math.min(Math.round(h * 0.5), down), down };
-  }, [box.h, tabClearance]);
+  const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
 
   // Sheet top, in the map area's coordinates.
   const top = useSharedValue(0);
   const snaps = useSharedValue([positions.up, positions.mid, positions.down]);
   const start = useSharedValue(0);
 
+  // Later snap or size changes spring there. The first placement happens in onAreaLayout instead.
   useEffect(() => {
+    if (!box.h) return;
     snaps.set([positions.up, positions.mid, positions.down]);
     top.set(withSpring(positions[snap], SPRING));
-  }, [positions, snap, snaps, top]);
+  }, [box.h, positions, snap, snaps, top]);
+
+  // The sheet only renders once the map area has a size. On that first layout, put it straight at
+  // its snap, so it doesn't spring down over the map from the top on every visit.
+  const onAreaLayout = (e: LayoutChangeEvent) => {
+    const { width: w, height: h } = e.nativeEvent.layout;
+    if (!box.w) {
+      const p = snapPositions(h, tabClearance);
+      snaps.set([p.up, p.mid, p.down]);
+      top.set(p[snap]);
+    }
+    setBox({ w, h });
+  };
 
   // A drag that ends over the handle also reads as a tap on web; ignore that tap.
   const lastDrag = useRef(0);
@@ -163,7 +179,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
           <CategoryChips value={category} onChange={pickCategory} />
         </SafeAreaView>
 
-        <View style={styles.area} onLayout={(e: LayoutChangeEvent) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+        <View style={styles.area} onLayout={onAreaLayout}>
           {box.w > 0 ? (
             <>
               <Animated.View style={[styles.map, mapStyle]}>
