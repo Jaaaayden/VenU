@@ -15,6 +15,7 @@ export const Colors = {
   accentSoft: '#FDEDE6',
   warning: '#FF9F4B',     // stars, "busy" badges (never for text on white: 2:1)
   success: '#368847',
+  successStrong: '#2F7D40', // behind white text ("Accessible" tag): 5.1:1, where success is 4.4:1
   successSoft: '#E7F5EC',
   danger: '#A81C1C',
   dangerSoft: '#FDECEC',  // error banners

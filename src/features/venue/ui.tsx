@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   tagsLabel: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.text },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   tag: { minHeight: 28, minWidth: 78, paddingHorizontal: 14, borderRadius: Radius.sm, alignItems: 'center', justifyContent: 'center' },
-  tagGood: { backgroundColor: Colors.success },
+  tagGood: { backgroundColor: Colors.successStrong },
   tagNote: { backgroundColor: Colors.warning },
   tagText: { fontFamily: Fonts.textMedium, fontSize: 13, lineHeight: 17, color: Colors.ink },
   tagTextGood: { fontFamily: Fonts.textBold, color: Colors.onPrimary },
