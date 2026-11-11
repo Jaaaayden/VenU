@@ -24,7 +24,7 @@ const MENU_SECTIONS: { title: string; items: MenuItem[] }[] = [
     title: 'Account',
     items: [
       { icon: 'person', label: 'Edit profile', href: '/edit-profile' },
-      { icon: 'volume', label: 'Notifications' },
+      { icon: 'volume', label: 'Notifications', href: '/notifications' },
       { icon: 'check-circle', label: 'Privacy & data', href: '/privacy' },
     ],
   },
