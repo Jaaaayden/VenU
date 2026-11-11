@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearPendingName, forgetPendingNameUnlessFor, readPendingSetup, rememberPendingName, writePendingSetup } from '../pending-setup';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 describe('pending setup name', () => {

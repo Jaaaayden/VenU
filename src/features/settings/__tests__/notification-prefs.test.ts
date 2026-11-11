@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_PREFS, loadNotificationPrefs, NOTIFICATION_KEY, saveNotificationPrefs } from '../notification-prefs';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 describe('notification prefs', () => {
