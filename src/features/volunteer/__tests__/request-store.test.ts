@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 import { createMockBackend } from '../backend';
 import { MOCK_LOCATION } from '../mock';
 import { createRequestStore, INITIAL_STATE, parseSaved, reduce, type KeyValueStorage, type NewRequest } from '../request-store';
-import { formatClock } from '../format';
+import { formatClock, formatDayTime, needsSeparator } from '../format';
 
 // The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
 jest.mock('@react-native-async-storage/async-storage', () => jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'));
@@ -320,5 +320,22 @@ describe('formatClock', () => {
     expect(formatClock(new Date(2026, 6, 14, 14, 0).getTime())).toBe('2:00pm');
     expect(formatClock(new Date(2026, 6, 14, 0, 5).getTime())).toBe('12:05am');
     expect(formatClock(new Date(2026, 6, 14, 12, 30).getTime())).toBe('12:30pm');
+  });
+});
+
+describe('chat day/time separators', () => {
+  const at = (h: number, m: number, day = 14) => new Date(2026, 6, day, h, m).getTime();
+
+  it('only separates messages more than 10 minutes apart', () => {
+    expect(needsSeparator(at(14, 0), at(14, 10))).toBe(false);
+    expect(needsSeparator(at(14, 0), at(14, 11))).toBe(true);
+    expect(needsSeparator(at(23, 58, 13), at(0, 2))).toBe(false); // across midnight but close together
+  });
+
+  it('names the day relative to now', () => {
+    const now = at(18, 0);
+    expect(formatDayTime(at(14, 5), now)).toBe('Today 2:05pm');
+    expect(formatDayTime(at(9, 30, 13), now)).toBe('Yesterday 9:30am');
+    expect(formatDayTime(at(14, 0, 10), now)).toBe('Fri, Jul 10 2:00pm');
   });
 });
