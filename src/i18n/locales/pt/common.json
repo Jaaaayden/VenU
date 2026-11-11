@@ -1,0 +1,55 @@
+{
+  "tabs": {
+    "volunteer": "Voluntário",
+    "venue": "Local",
+    "profile": "Perfil"
+  },
+  "actions": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "close": "Fechar",
+    "done": "Concluir",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "send": "Enviar",
+    "tryAgain": "Tentar de novo",
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "ok": "OK"
+  },
+  "status": {
+    "loading": "Carregando…",
+    "comingSoon": "Em breve",
+    "optional": "Opcional"
+  },
+  "field": {
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha"
+  },
+  "errors": {
+    "offline": "Não foi possível conectar ao VenU. Verifique sua conexão e tente de novo.",
+    "wrongLogin": "E-mail ou senha incorretos.",
+    "confirmEmail": "Confirme seu e-mail primeiro. Procure o link na sua caixa de entrada.",
+    "alreadyRegistered": "Esse e-mail já tem uma conta. Tente entrar.",
+    "rateLimit": "Muitas tentativas. Aguarde um minuto e tente de novo.",
+    "sessionExpired": "Sua sessão expirou. Entre novamente.",
+    "cantSave": "O VenU não conseguiu salvar essa alteração. Se continuar acontecendo, saia e entre de novo.",
+    "photoTooBig": "Essa foto tem mais de {{size}} MB. Escolha uma menor.",
+    "photoWrongType": "Use uma foto JPG, PNG, WebP ou HEIC.",
+    "generic": "Algo deu errado. Tente de novo."
+  },
+  "direction": {
+    "restartTitle": "Reinicie para concluir",
+    "restartBody": "O VenU precisa reiniciar para alternar o layout entre direita para esquerda e esquerda para direita.",
+    "restartNow": "Reiniciar agora",
+    "later": "Depois",
+    "ok": "OK"
+  },
+  "count": {
+    "people_one": "{{count}} pessoa",
+    "people_many": "{{count}} de pessoas",
+    "people_other": "{{count}} pessoas"
+  }
+}

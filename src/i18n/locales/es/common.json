@@ -1,0 +1,55 @@
+{
+  "tabs": {
+    "volunteer": "Voluntario",
+    "venue": "Sede",
+    "profile": "Perfil"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "continue": "Continuar",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "done": "Listo",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "send": "Enviar",
+    "tryAgain": "Reintentar",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "ok": "Aceptar"
+  },
+  "status": {
+    "loading": "Cargando…",
+    "comingSoon": "Próximamente",
+    "optional": "Opcional"
+  },
+  "field": {
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
+  },
+  "errors": {
+    "offline": "No se puede conectar con VenU. Revisa tu conexión e inténtalo de nuevo.",
+    "wrongLogin": "Correo o contraseña incorrectos.",
+    "confirmEmail": "Primero confirma tu correo. Busca el enlace en tu bandeja de entrada.",
+    "alreadyRegistered": "Ese correo ya tiene una cuenta. Prueba a iniciar sesión.",
+    "rateLimit": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+    "sessionExpired": "Tu sesión caducó. Vuelve a iniciar sesión.",
+    "cantSave": "VenU no pudo guardar ese cambio. Si sigue pasando, cierra sesión y vuelve a entrar.",
+    "photoTooBig": "Esa foto pesa más de {{size}} MB. Elige una más pequeña.",
+    "photoWrongType": "Usa una foto JPG, PNG, WebP o HEIC.",
+    "generic": "Algo salió mal. Inténtalo de nuevo."
+  },
+  "direction": {
+    "restartTitle": "Reinicia para terminar",
+    "restartBody": "VenU debe reiniciarse para cambiar el diseño entre derecha a izquierda e izquierda a derecha.",
+    "restartNow": "Reiniciar ahora",
+    "later": "Más tarde",
+    "ok": "Aceptar"
+  },
+  "count": {
+    "people_one": "{{count}} persona",
+    "people_many": "{{count}} de personas",
+    "people_other": "{{count}} personas"
+  }
+}

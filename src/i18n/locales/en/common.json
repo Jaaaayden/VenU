@@ -1,0 +1,54 @@
+{
+  "tabs": {
+    "volunteer": "Volunteer",
+    "venue": "Venue",
+    "profile": "Profile"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "back": "Back",
+    "close": "Close",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete",
+    "send": "Send",
+    "tryAgain": "Try again",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "ok": "OK"
+  },
+  "status": {
+    "loading": "Loading…",
+    "comingSoon": "Coming soon",
+    "optional": "Optional"
+  },
+  "field": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "errors": {
+    "offline": "Can't reach VenU. Check your connection and try again.",
+    "wrongLogin": "Wrong email or password.",
+    "confirmEmail": "Confirm your email first. Check your inbox for the link.",
+    "alreadyRegistered": "That email already has an account. Try signing in.",
+    "rateLimit": "Too many tries. Wait a minute and try again.",
+    "sessionExpired": "Your session expired. Please sign in again.",
+    "cantSave": "VenU couldn't save that change. If it keeps happening, sign out and back in.",
+    "photoTooBig": "That photo is over {{size}} MB. Pick a smaller one.",
+    "photoWrongType": "Use a JPG, PNG, WebP or HEIC photo.",
+    "generic": "Something went wrong. Try again."
+  },
+  "direction": {
+    "restartTitle": "Restart to finish",
+    "restartBody": "VenU needs to restart to switch the layout between right-to-left and left-to-right.",
+    "restartNow": "Restart now",
+    "later": "Later",
+    "ok": "OK"
+  },
+  "count": {
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people"
+  }
+}
