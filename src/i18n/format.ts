@@ -52,3 +52,9 @@ export function formatDateTime(value: DateInput, language = i18n.language): stri
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions, language = i18n.language): string {
   return safely(tag => new Intl.NumberFormat(tag, options).format(value), language);
 }
+
+/** A short list in the language's style: "Opening Ceremony, Swimming" (en), "开幕式、游泳" (zh), "Ceremonia de apertura y Natación" (es). Plain ", " without Intl.ListFormat. */
+export function formatList(items: string[], language = i18n.language): string {
+  if (typeof Intl.ListFormat !== 'function') return items.join(', ');
+  return safely(tag => new Intl.ListFormat(tag, { style: 'narrow', type: 'conjunction' }).format(items), language);
+}

@@ -8,36 +8,17 @@ import { SvgXml } from 'react-native-svg';
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
 import { Colors } from '@/constants/theme';
 
+import { venueT, type VenueT } from './labels';
 import type { FacilityCategory } from './types';
 
-export const CATEGORIES: { value: FacilityCategory; label: string }[] = [
-  { value: 'gate', label: 'Gates' },
-  { value: 'restroom', label: 'Restrooms' },
-  { value: 'food', label: 'Food & Drinks' },
-  { value: 'first_aid', label: 'First Aid' },
-  { value: 'lost_found', label: 'Lost & Found' },
-  { value: 'info', label: 'Info Desk' },
-  { value: 'accessible', label: 'Accessibility' },
-  { value: 'parking', label: 'Parking' },
-];
-
-/** Plural nouns for sentences: "No restrooms match …". */
-const NOUNS: Record<FacilityCategory, string> = {
-  gate: 'gates',
-  restroom: 'restrooms',
-  food: 'food or drink stands',
-  first_aid: 'first aid stations',
-  lost_found: 'lost & found desks',
-  info: 'info desks',
-  accessible: 'accessible facilities',
-  parking: 'parking lots',
-};
+/** Header chip order; labels come from venue:category.<value> (categoryLabel in ./labels). */
+export const CATEGORIES: FacilityCategory[] = ['gate', 'restroom', 'food', 'first_aid', 'lost_found', 'info', 'accessible', 'parking'];
 
 /** The facility list's empty line: `No restrooms match "xyz"`, or `No parking lots at SoFi Stadium yet`. */
-export function emptyFacilitiesMessage(category: FacilityCategory | null, query: string, venueName: string): string {
-  const noun = category ? NOUNS[category] : 'facilities';
+export function emptyFacilitiesMessage(category: FacilityCategory | null, query: string, venueName: string, t: VenueT = venueT()): string {
+  const kind = category ?? 'all';
   const q = query.trim();
-  return q ? `No ${noun} match “${q}”` : `No ${noun} at ${venueName} yet`;
+  return q ? t(`emptyMatch.${kind}`, { query: q }) : t(`emptyNone.${kind}`, { venue: venueName });
 }
 
 /** Square crops (x y size) of each glyph in the icon sheet. */

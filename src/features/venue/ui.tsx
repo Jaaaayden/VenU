@@ -1,11 +1,16 @@
 /** Small pieces the venue screens share: search pill, tag pill, back arrow, section heading. */
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { useLayoutRtl, useT } from '@/i18n';
 
-import type { FacilityTag } from './types';
+/** A tag as shown: its translated label and tone (green good news, orange heads-up). */
+export interface TagView {
+  label: string;
+  tone: 'good' | 'note';
+}
 
 export function SearchGlyph({ size = 18, color = Colors.ink }: { size?: number; color?: string }) {
   return (
@@ -16,20 +21,31 @@ export function SearchGlyph({ size = 18, color = Colors.ink }: { size?: number; 
   );
 }
 
+/**
+ * Absolute offset from the start or end edge. react-native-web ignores `start`/`end`, so web gets
+ * left/right by direction; native keeps `start`/`end`, which flip on their own.
+ * e.g. inset('start', 10, rtl) → { left: 10 } (en, web), { right: 10 } (ar, web), { start: 10 } (native)
+ */
+export function inset(edge: 'start' | 'end', value: number, rtl: boolean) {
+  if (Platform.OS !== 'web') return edge === 'start' ? { start: value } : { end: value };
+  return (edge === 'start') !== rtl ? { left: value } : { right: value };
+}
+
 /** Figma "Search Field": a white pill with a magnifier; × clears it. */
-export function SearchField({ value, onChangeText, placeholder = 'Search', accessibilityLabel }: {
+export function SearchField({ value, onChangeText, placeholder, accessibilityLabel }: {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
   accessibilityLabel: string;
 }) {
+  const t = useT('venue');
   return (
     <View style={styles.search}>
       <SearchGlyph />
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('search.placeholder')}
         placeholderTextColor={Colors.textFaint}
         accessibilityLabel={accessibilityLabel}
         autoCorrect={false}
@@ -37,7 +53,7 @@ export function SearchField({ value, onChangeText, placeholder = 'Search', acces
         style={styles.searchInput}
       />
       {value ? (
-        <Pressable onPress={() => onChangeText('')} style={styles.clear} accessibilityRole="button" accessibilityLabel="Clear search">
+        <Pressable onPress={() => onChangeText('')} style={styles.clear} accessibilityRole="button" accessibilityLabel={t('search.clear')}>
           <FigmaIcon name="icon-button-c1cfb2" size={28} color={Colors.textMuted} />
         </Pressable>
       ) : null}
@@ -46,7 +62,7 @@ export function SearchField({ value, onChangeText, placeholder = 'Search', acces
 }
 
 /** Solid tag from the facility popup: green for good news ("Accessible"), orange for a heads-up. */
-export function TagPill({ tag }: { tag: FacilityTag }) {
+export function TagPill({ tag }: { tag: TagView }) {
   const good = tag.tone === 'good';
   return (
     <View style={[styles.tag, good ? styles.tagGood : styles.tagNote]}>
@@ -55,23 +71,27 @@ export function TagPill({ tag }: { tag: FacilityTag }) {
   );
 }
 
-export function TagRow({ tags }: { tags: FacilityTag[] }) {
+export function TagRow({ tags }: { tags: TagView[] }) {
+  const t = useT('venue');
   if (!tags.length) return null;
   return (
     <View style={styles.tagBlock}>
-      <Text style={styles.tagsLabel}>Tags:</Text>
+      <Text style={styles.tagsLabel}>{t('tags.label')}</Text>
       <View style={styles.tagRow}>
-        {tags.map(t => <TagPill key={t.label} tag={t} />)}
+        {tags.map(tag => <TagPill key={tag.label} tag={tag} />)}
       </View>
     </View>
   );
 }
 
-/** The 40pt Figma "Arrow left", in a 44pt target, pulled left so the arrow itself sits on the gutter. */
+/** The 40pt Figma "Arrow left", in a 44pt target, pulled to the start so the arrow itself sits on the gutter. Points right in RTL. */
 export function BackArrow({ onPress, label }: { onPress: () => void; label: string }) {
+  const rtl = useLayoutRtl();
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.back, pressed && styles.pressed]} accessibilityRole="button" accessibilityLabel={label}>
-      <FigmaIcon name="arrow-left" size={34} color={Colors.ink} />
+      <View style={rtl && styles.flip}>
+        <FigmaIcon name="arrow-left" size={34} color={Colors.ink} />
+      </View>
     </Pressable>
   );
 }
@@ -98,8 +118,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     minHeight: 44,
-    paddingLeft: 14,
-    paddingRight: 6,
+    paddingStart: 14,
+    paddingEnd: 6,
     borderRadius: Radius.pill,
     borderWidth: 1,
     borderColor: Colors.controlBorder,
@@ -118,7 +138,8 @@ const styles = StyleSheet.create({
   tagTextGood: { fontFamily: Fonts.textBold, color: Colors.onPrimary },
 
   // The 34pt glyph starts 5.6pt into its box, which is centred in the 44pt target: 5 + 5.6 ≈ 11.
-  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -11 },
+  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginStart: -11 },
+  flip: { transform: [{ scaleX: -1 }] },
   pressed: { opacity: 0.6 },
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 18, color: Colors.textMuted, textAlign: 'center' },
 });

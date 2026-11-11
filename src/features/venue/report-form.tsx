@@ -9,12 +9,13 @@ import { MediaActions } from '@/components/media-actions';
 import { TextField } from '@/components/text-field';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
+import { useT } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
 import {
   emptyReportDraft,
   REPORT_TITLE_MAX,
-  REPORT_TOPICS,
+  reportTopicOptions,
   ReportValidationError,
   submitReport,
   validateReport,
@@ -25,6 +26,7 @@ import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, venueText } from './ui';
 
 export function ReportForm() {
+  const t = useT('venue');
   const { venue, facilities, setSnap } = useVenueScreen();
   const { profile } = useProfile();
   const { facilityId } = useLocalSearchParams<{ facilityId: string }>();
@@ -56,7 +58,7 @@ export function ReportForm() {
       router.dismissTo({ ...facilityHref, params: { ...facilityHref.params, submitted: saved.id } });
     } catch (e) {
       if (e instanceof ReportValidationError) setErrors(e.errors);
-      else setErrors({ body: 'Couldn’t send the report. Check your connection and try again.' });
+      else setErrors({ body: t('form.sendFailed') });
     } finally {
       setSaving(false);
     }
@@ -64,15 +66,15 @@ export function ReportForm() {
 
   return (
     <SheetScroll contentContainerStyle={styles.content}>
-      <BackArrow onPress={() => goBack(facilityHref)} label="Back to facility" />
+      <BackArrow onPress={() => goBack(facilityHref)} label={t('back.facility')} />
       <View style={styles.heading}>
-        <Text style={venueText.title} accessibilityRole="header">Add report</Text>
-        <Text style={venueText.caption}>{facility ? `Share what you found at ${facility.name} to help the next visitor` : 'Share what you found to help the next visitor'}</Text>
+        <Text style={venueText.title} accessibilityRole="header">{t('form.title')}</Text>
+        <Text style={venueText.caption}>{facility ? t('form.subtitleAt', { facility: facility.name }) : t('form.subtitle')}</Text>
       </View>
 
       <TextField
-        label="Report title"
-        placeholder="What should people know?"
+        label={t('form.titleLabel')}
+        placeholder={t('form.titlePlaceholder')}
         value={draft.title}
         onChangeText={title => update({ title })}
         maxLength={REPORT_TITLE_MAX + 20}
@@ -80,28 +82,28 @@ export function ReportForm() {
         returnKeyType="next"
       />
       <TextField
-        label="Your report"
-        placeholder="Enter text"
+        label={t('form.bodyLabel')}
+        placeholder={t('form.bodyPlaceholder')}
         value={draft.body}
         onChangeText={body => update({ body })}
         multiline
         error={errors.body}
-        hint="Optional. What happened, where, and when?"
+        hint={t('form.bodyHint')}
       />
 
       <MediaActions
-        onAddPicture={() => setSoon('Adding pictures is coming soon.')}
-        onSpeak={() => setSoon('Voice reports are coming soon. Type your report for now.')}
+        onAddPicture={() => setSoon(t('form.pictureSoon'))}
+        onSpeak={() => setSoon(t('form.speakSoon'))}
       />
       {soon ? <InlineNote>{soon}</InlineNote> : null}
 
       <View style={styles.topic}>
-        <Text style={Type.label}>Topic</Text>
-        <ChipGroup options={REPORT_TOPICS} value={draft.topic} onChange={topic => update({ topic })} accessibilityLabel="Topic" />
+        <Text style={Type.label}>{t('form.topic')}</Text>
+        <ChipGroup options={reportTopicOptions(t)} value={draft.topic} onChange={topic => update({ topic })} accessibilityLabel={t('form.topic')} />
         {errors.topic ? <Text style={styles.error} accessibilityLiveRegion="polite">{errors.topic}</Text> : null}
       </View>
 
-      <Button label="Submit Report" size="lg" onPress={submit} loading={saving} style={styles.submit} />
+      <Button label={t('form.submit')} size="lg" onPress={submit} loading={saving} style={styles.submit} />
     </SheetScroll>
   );
 }

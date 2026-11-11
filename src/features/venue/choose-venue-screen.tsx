@@ -1,4 +1,7 @@
-/** "Choose Your Venue": search LA28 venues, ask for a volunteer, or open a venue's map. */
+/**
+ * "Choose Your Venue": search LA28 venues, ask for a volunteer, or open a venue's map.
+ * The language pill sets the app language (the profile's appLanguage), offering only translated languages.
+ */
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -8,20 +11,48 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { isolatedLanguageName } from '@/features/profile/options';
+import { isolatedLanguageName, LANGUAGES } from '@/features/profile/options';
+import { PRIVACY_VERSION } from '@/features/profile/privacy';
 import { useProfile } from '@/features/profile/profile-context';
+import { draftFromProfile } from '@/features/profile/types';
+import { isUiLanguage, useLayoutRtl, useT } from '@/i18n';
+import { choosePendingLanguage } from '@/i18n/pending-language';
+import { friendlyError } from '@/lib/errors';
 
 import { StadiumCard } from './cards';
 import { searchVenues } from './mock';
 import { InlineNote, SearchField, venueText } from './ui';
 
+/** Languages without string tables would show English, so the picker leaves them out. */
+const UNTRANSLATED = LANGUAGES.filter(l => !isUiLanguage(l.code)).map(l => l.code);
+
 export function ChooseVenueScreen() {
-  const { profile } = useProfile();
+  const t = useT('venue');
+  const rtl = useLayoutRtl();
+  const { profile, save } = useProfile();
   const [query, setQuery] = useState('');
-  const [language, setLanguage] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
-  const venues = searchVenues(query);
-  const appLanguage = profile?.appLanguage || 'en';
+  const [saving, setSaving] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const venues = searchVenues(query, undefined, t);
+  const language = saving ?? (profile?.appLanguage || 'en');
+
+  async function pickLanguage(code: string) {
+    setPicking(false);
+    setNote(null);
+    if (!profile) return void choosePendingLanguage(code);
+    if (code === profile.appLanguage) return;
+    // Saving stamps privacy consent again when the policy changed since they agreed; that needs Profile.
+    if (profile.privacyVersion !== PRIVACY_VERSION) return setNote(t('choose.languageConsent'));
+    setSaving(code);
+    try {
+      await save({ ...draftFromProfile(profile), appLanguage: code }, null);
+    } catch (e) {
+      setNote(friendlyError(e));
+    } finally {
+      setSaving(null);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -31,34 +62,36 @@ export function ChooseVenueScreen() {
             onPress={() => setPicking(true)}
             style={({ pressed }) => [styles.langButton, pressed && styles.pressed]}
             accessibilityRole="button"
-            accessibilityLabel={`Venue info language: ${isolatedLanguageName(language ?? appLanguage)}`}
-            accessibilityHint="Choose a language">
+            accessibilityLabel={t('choose.languageLabel', { language: isolatedLanguageName(language) })}
+            accessibilityHint={t('choose.languageHint')}
+            accessibilityState={{ busy: !!saving }}
+            disabled={!!saving}>
             <FigmaIcon name="icon-c513eb" size={20} color={Colors.ink} />
-            <Text style={styles.langText}>{isolatedLanguageName(language ?? appLanguage)}</Text>
+            <Text style={styles.langText}>{isolatedLanguageName(language)}</Text>
           </Pressable>
         </View>
-        {language && language !== appLanguage ? (
-          <InlineNote>{`Venue info in ${isolatedLanguageName(language)} is coming soon. Volunteers can help in your language now.`}</InlineNote>
-        ) : null}
+        {note ? <InlineNote>{note}</InlineNote> : null}
 
         <View style={styles.titles}>
-          <Text style={venueText.title} accessibilityRole="header">Choose Your Venue</Text>
-          <Text style={venueText.caption}>Pick where you want to see map and facilities</Text>
+          <Text style={venueText.title} accessibilityRole="header">{t('choose.title')}</Text>
+          <Text style={venueText.caption}>{t('choose.subtitle')}</Text>
         </View>
 
-        <SearchField value={query} onChangeText={setQuery} placeholder="Search" accessibilityLabel="Search venues" />
+        <SearchField value={query} onChangeText={setQuery} accessibilityLabel={t('choose.searchLabel')} />
 
         <Pressable
           onPress={() => router.replace('/volunteer')}
           style={({ pressed }) => [styles.assist, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel="Need Assistance? Connect with a volunteer">
+          accessibilityLabel={t('choose.assistLabel')}>
           <FigmaIcon name="volunteer" size={50} color={Colors.primary} />
           <View style={styles.assistText}>
-            <Text style={venueText.label}>Need Assistance?</Text>
-            <Text style={venueText.caption}>Connect with a volunteer</Text>
+            <Text style={venueText.label}>{t('choose.assistTitle')}</Text>
+            <Text style={venueText.caption}>{t('choose.assistBody')}</Text>
           </View>
-          <FigmaIcon name="group-2-7ecb6b" size={34} color={Colors.primary} />
+          <View style={rtl && styles.flip}>
+            <FigmaIcon name="group-2-7ecb6b" size={34} color={Colors.primary} />
+          </View>
         </Pressable>
 
         <View style={styles.list}>
@@ -69,13 +102,15 @@ export function ChooseVenueScreen() {
               onPress={() => router.push({ pathname: '/venue/[venueId]', params: { venueId: v.id } })}
             />
           ))}
-          {!venues.length ? <Text style={styles.empty}>{`No venue matches “${query.trim()}”. Try a city, like Inglewood.`}</Text> : null}
+          {!venues.length ? <Text style={styles.empty}>{t('choose.empty', { query: query.trim() })}</Text> : null}
         </View>
       </ScrollView>
 
       <LanguageSearchModal
         visible={picking}
-        onSelect={code => { setLanguage(code); setPicking(false); }}
+        title={t('choose.languageTitle')}
+        exclude={UNTRANSLATED}
+        onSelect={pickLanguage}
         onClose={() => setPicking(false)}
       />
     </SafeAreaView>
@@ -106,13 +141,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.lg,
     minHeight: 73,
-    paddingLeft: Spacing.xl,
-    paddingRight: Spacing.md,
+    paddingStart: Spacing.xl,
+    paddingEnd: Spacing.md,
     borderRadius: Radius.md,
     backgroundColor: Colors.primarySoft,
     marginBottom: Spacing.md,
   },
   assistText: { flex: 1, gap: 2 },
+  flip: { transform: [{ scaleX: -1 }] },
   list: { gap: 24 },
   empty: { ...venueText.caption, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.lg },
 });

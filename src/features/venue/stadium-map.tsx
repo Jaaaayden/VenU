@@ -3,10 +3,11 @@
  * arena drawn in a 400×400 space, with a tappable pin per facility laid over it.
  * Picking a category fills its pins blue and fades the rest; the open facility's pin turns dark.
  */
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Colors, Fonts, Shadow } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
 import { matchesCategory } from './mock';
@@ -78,8 +79,9 @@ function Arena() {
   );
 }
 
-/** The drawing alone, no pins: also the tile on the "Choose Your Venue" cards. */
+/** The drawing alone, no pins (always north-up, never mirrored for RTL): also the tile on the "Choose Your Venue" cards. */
 export function VenueDrawing({ shape, width, height }: { shape: VenueShape; width: number; height: number }) {
+  const t = useT('venue');
   return (
     <Svg width={width} height={height} viewBox={`0 0 ${MAP_SIZE} ${MAP_SIZE}`} preserveAspectRatio="xMidYMid meet" aria-hidden>
       {/* Plazas and walkways out from the four gates */}
@@ -89,7 +91,7 @@ export function VenueDrawing({ shape, width, height }: { shape: VenueShape; widt
       {shape === 'bowl' ? <Bowl /> : <Arena />}
       <G>
         <Path d="M26 16 L32 30 L26 26 L20 30 Z" fill={Colors.textMuted} />
-        <SvgText x={26} y={44} fontSize={11} fontFamily={Fonts.textBold} fill={Colors.textMuted} textAnchor="middle">N</SvgText>
+        <SvgText x={26} y={44} fontSize={11} fontFamily={Fonts.textBold} fill={Colors.textMuted} textAnchor="middle">{t('map.north')}</SvgText>
       </G>
     </Svg>
   );
@@ -105,17 +107,23 @@ interface StadiumMapProps {
   onPinPress: (facility: Facility) => void;
 }
 
+// Not in a StyleSheet: react-native-web rejects the `direction` style.
+const NATIVE_LTR = Platform.OS === 'web' ? null : ({ direction: 'ltr' } as const);
+
 const PIN = 34;
 const PIN_SELECTED = 42;
 
 export function StadiumMap({ shape, facilities, width, height, category, selectedId, onPinPress }: StadiumMapProps) {
+  const t = useT('venue');
   const scale = Math.min(width / MAP_SIZE, height / MAP_SIZE);
   const ox = (width - MAP_SIZE * scale) / 2;
   const oy = (height - MAP_SIZE * scale) / 2;
   const selected = facilities.find(f => f.id === selectedId);
 
   return (
-    <View style={{ width, height }}>
+    // The map is geographic: east stays on the right in right-to-left languages. Web keeps `left`
+    // physical already; native swaps left/right in RTL unless this subtree is laid out LTR.
+    <View style={[NATIVE_LTR, { width, height }]}>
       <VenueDrawing shape={shape} width={width} height={height} />
       {facilities.map(f => {
         const isSelected = f.id === selectedId;
@@ -127,7 +135,7 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
             key={f.id}
             onPress={() => onPinPress(f)}
             accessibilityRole="button"
-            accessibilityLabel={`${f.name} on the map`}
+            accessibilityLabel={t('map.pin', { name: f.name })}
             accessibilityState={{ selected: isSelected }}
             style={[styles.target, { left: ox + f.x * scale - 22, top: oy + f.y * scale - 22 }, isSelected && styles.onTop]}>
             <View
