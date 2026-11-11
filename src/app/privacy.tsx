@@ -6,7 +6,7 @@ import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { PRIVACY_SECTIONS, PRIVACY_SUMMARY, PRIVACY_VERSION } from '@/features/profile/privacy';
 import { goBack } from '@/lib/navigation';
 
-/** The privacy policy; Create Account's "Terms & Conditions" link opens it too (no separate terms yet). */
+/** The privacy policy, from Profile → Privacy & data, profile setup's agreement and the terms page. */
 export default function PrivacyScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
