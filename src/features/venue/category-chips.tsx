@@ -8,8 +8,10 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Chip } from '@/components/chip';
 import { Colors, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 import { CATEGORIES } from './categories';
+import { categoryLabel } from './labels';
 import type { FacilityCategory } from './types';
 
 const FADE = 36;
@@ -36,6 +38,7 @@ export function CategoryChips({ value, onChange }: {
   value: FacilityCategory | null;
   onChange: (c: FacilityCategory | null) => void;
 }) {
+  const t = useT('venue');
   const size = useRef({ view: 0, content: 0, x: 0 });
   const [edges, setEdges] = useState({ start: false, end: false });
 
@@ -61,10 +64,10 @@ export function CategoryChips({ value, onChange }: {
         onScroll={onScroll}
         scrollEventThrottle={32}
         accessibilityRole="radiogroup"
-        accessibilityLabel="Facility type">
-        <Chip label="All" role="radio" selected={value === null} onPress={() => onChange(null)} />
+        accessibilityLabel={t('category.groupLabel')}>
+        <Chip label={t('category.all')} role="radio" selected={value === null} onPress={() => onChange(null)} />
         {CATEGORIES.map(c => (
-          <Chip key={c.value} label={c.label} role="radio" selected={value === c.value} onPress={() => onChange(value === c.value ? null : c.value)} />
+          <Chip key={c} label={categoryLabel(c, t)} role="radio" selected={value === c} onPress={() => onChange(value === c ? null : c)} />
         ))}
       </ScrollView>
       {edges.start ? <EdgeFade side="start" /> : null}

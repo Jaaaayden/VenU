@@ -15,20 +15,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
 import type { Option } from '@/features/profile/options';
+import i18n from '@/i18n';
+
+import { venueT, type VenueT } from './labels';
 
 export type ReportTopic = 'accessibility' | 'directions' | 'facility_condition' | 'security' | 'crowds' | 'other';
 
-export const REPORT_TOPICS: Option<ReportTopic>[] = [
-  { value: 'accessibility', label: 'Accessibility' },
-  { value: 'directions', label: 'Directions' },
-  { value: 'facility_condition', label: 'Facility condition' },
-  { value: 'security', label: 'Security' },
-  { value: 'crowds', label: 'Crowds' },
-  { value: 'other', label: 'Other' },
-];
+/** Topic chip order; labels come from venue:topic.<value>. */
+export const REPORT_TOPICS: ReportTopic[] = ['accessibility', 'directions', 'facility_condition', 'security', 'crowds', 'other'];
 
-export function topicLabel(topic: ReportTopic): string {
-  return REPORT_TOPICS.find(t => t.value === topic)?.label ?? 'Other';
+/** "Accessibility", "Facility condition"... Components pass their useT('venue') `t`. */
+export function topicLabel(topic: ReportTopic, t: VenueT = venueT()): string {
+  return t(`topic.${topic}`);
+}
+
+/** The topic chips, labelled in `t`'s language. */
+export function reportTopicOptions(t: VenueT = venueT()): Option<ReportTopic>[] {
+  return REPORT_TOPICS.map(value => ({ value, label: topicLabel(value, t) }));
 }
 
 export interface FacilityReport {
@@ -62,10 +65,10 @@ export type ReportErrors = Partial<Record<keyof ReportDraft, string>>;
 export function validateReport(d: ReportDraft): ReportErrors {
   const errors: ReportErrors = {};
   const title = d.title.trim();
-  if (!title) errors.title = 'Add a title, e.g. "Gate 2 ramp is cracked".';
-  else if (title.length > REPORT_TITLE_MAX) errors.title = `Keep the title under ${REPORT_TITLE_MAX} characters.`;
-  if (!d.topic) errors.topic = 'Pick the topic that fits best.';
-  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = `Keep the report under ${REPORT_BODY_MAX} characters.`;
+  if (!title) errors.title = i18n.t('venue:form.titleRequired');
+  else if (title.length > REPORT_TITLE_MAX) errors.title = i18n.t('venue:form.titleTooLong', { max: REPORT_TITLE_MAX });
+  if (!d.topic) errors.topic = i18n.t('venue:form.topicRequired');
+  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = i18n.t('venue:form.bodyTooLong', { max: REPORT_BODY_MAX });
   return errors;
 }
 
@@ -90,14 +93,6 @@ export class ReportValidationError extends Error {
     super('Report is incomplete');
     this.errors = errors;
   }
-}
-
-/** "10/24/2026", as on the report screen. */
-export function formatReportDate(iso: string): string {
-  const d = new Date(iso);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${mm}/${dd}/${d.getFullYear()}`;
 }
 
 /** Store backed by an array; `now` and `makeId` are injectable for tests. */

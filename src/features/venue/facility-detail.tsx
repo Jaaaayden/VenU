@@ -6,14 +6,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Radius, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
-import { facilityMeta, Notification, ReportCard } from './cards';
+import { Notification, ReportCard } from './cards';
+import { facilityDescription, facilityLocation, facilityMeta, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, TagRow, venueText } from './ui';
 
 export function FacilityDetail() {
+  const t = useT('venue');
   const { venue, facilities, snap, setSnap, freshReport, setFreshReport } = useVenueScreen();
   const { facilityId, submitted } = useLocalSearchParams<{ facilityId: string; submitted?: string }>();
   const facility = facilities.find(f => f.id === facilityId);
@@ -44,11 +47,13 @@ export function FacilityDetail() {
   if (!facility) {
     return (
       <SheetScroll contentContainerStyle={styles.content}>
-        <BackArrow onPress={back} label="Back to facilities" />
-        <Text style={venueText.title}>Facility not found</Text>
+        <BackArrow onPress={back} label={t('back.facilities')} />
+        <Text style={venueText.title}>{t('facility.notFound')}</Text>
       </SheetScroll>
     );
   }
+
+  const location = facilityLocation(facility, t);
 
   const addReport = () => {
     setSnap('up');
@@ -59,9 +64,9 @@ export function FacilityDetail() {
     <View style={styles.flex}>
       <SheetScroll contentContainerStyle={styles.content}>
         <View style={styles.topRow}>
-          <BackArrow onPress={back} label="Back to facilities" />
+          <BackArrow onPress={back} label={t('back.facilities')} />
           {facility.accessible ? (
-            <View style={styles.accessBadge} accessibilityRole="image" accessibilityLabel="Wheelchair accessible">
+            <View style={styles.accessBadge} accessibilityRole="image" accessibilityLabel={t('facility.wheelchair')}>
               <FigmaIcon name="wheelchair-6dc801" size={38} color={Colors.onPrimary} />
             </View>
           ) : null}
@@ -69,30 +74,30 @@ export function FacilityDetail() {
 
         <View style={styles.heading}>
           <Text style={venueText.title} accessibilityRole="header">{facility.name}</Text>
-          <Text style={venueText.caption}>{facility.description}</Text>
+          <Text style={venueText.caption}>{facilityDescription(facility, t)}</Text>
           <View style={styles.meta}>
             <FigmaIcon name="clock" size={16} color={Colors.textMuted} />
-            <Text style={styles.metaText}>{`${facilityMeta(facility)} · ${facility.location}`}</Text>
+            <Text style={styles.metaText}>{`${facilityMeta(facility, t)} · ${location}`}</Text>
           </View>
         </View>
 
-        <TagRow tags={facility.tags} />
+        <TagRow tags={facility.tags.map(tag => ({ label: tagLabel(tag, t), tone: tag.tone }))} />
 
         <View style={styles.directions}>
           <Button
-            label="Directions"
+            label={t('facility.directions')}
             variant="dark"
             size="lg"
             icon={<FigmaIcon name="icon-28465a" size={24} color={Colors.onPrimary} />}
             onPress={() => setDirections(true)}
             style={styles.directionsButton}
           />
-          {directions ? <InlineNote>{`Step-by-step directions are coming soon. ${facility.name}: ${facility.location}.`}</InlineNote> : null}
+          {directions ? <InlineNote>{t('facility.directionsSoon', { name: facility.name, location })}</InlineNote> : null}
         </View>
 
         <View style={styles.reportsHead}>
-          <Text style={venueText.title} accessibilityRole="header">Reports</Text>
-          <Text style={venueText.caption}>{reports ? `${reports.length} ${reports.length === 1 ? 'result' : 'results'}` : ''}</Text>
+          <Text style={venueText.title} accessibilityRole="header">{t('facility.reports')}</Text>
+          <Text style={venueText.caption}>{reports ? t('facility.results', { count: reports.length }) : ''}</Text>
         </View>
         <View style={styles.reports}>
           {reports?.map(r => (
@@ -106,9 +111,9 @@ export function FacilityDetail() {
               }}
             />
           ))}
-          {reports && !reports.length ? <Text style={styles.empty}>No reports yet. Be the first to share what you found.</Text> : null}
+          {reports && !reports.length ? <Text style={styles.empty}>{t('facility.noReports')}</Text> : null}
           <Button
-            label="Add Your Own Report"
+            label={t('facility.addReport')}
             variant="neutral"
             icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
             onPress={addReport}
@@ -120,9 +125,9 @@ export function FacilityDetail() {
       {submitted ? (
         <View style={styles.toastWrap} pointerEvents="box-none">
           <Notification
-            title="Report Submitted"
-            body="Thank you for submitting a facility report."
-            actionLabel="Submit another report"
+            title={t('submitted.title')}
+            body={t('submitted.body')}
+            actionLabel={t('submitted.again')}
             onAction={addReport}
             onClose={() => router.setParams({ submitted: undefined })}
           />

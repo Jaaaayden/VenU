@@ -5,13 +5,16 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
+import { formatDate } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
-import { formatReportDate, topicLabel, useReport } from './reports';
+import { topicLabel, useReport } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
 export function ReportDetail() {
+  const t = useT('venue');
   const { venue, setSnap } = useVenueScreen();
   const { facilityId, reportId } = useLocalSearchParams<{ facilityId: string; reportId: string }>();
   const report = useReport(reportId);
@@ -22,24 +25,24 @@ export function ReportDetail() {
 
   return (
     <SheetScroll contentContainerStyle={styles.content}>
-      <BackArrow onPress={back} label="Back to facility" />
+      <BackArrow onPress={back} label={t('back.facility')} />
       {report === undefined ? null : report === null ? (
-        <Text style={venueText.title}>Report not found</Text>
+        <Text style={venueText.title}>{t('report.notFound')}</Text>
       ) : (
         <>
           <View style={styles.heading}>
             <Text style={venueText.title} accessibilityRole="header">{report.title}</Text>
-            <Text style={styles.kind}>Report</Text>
+            <Text style={styles.kind}>{t('report.kind')}</Text>
           </View>
-          <TagRow tags={[{ label: topicLabel(report.topic), tone: report.topic === 'accessibility' ? 'good' : 'note' }]} />
+          <TagRow tags={[{ label: topicLabel(report.topic, t), tone: report.topic === 'accessibility' ? 'good' : 'note' }]} />
           <View style={styles.author}>
             <Avatar name={report.authorName} uri={null} size={44} />
             <View style={styles.authorText}>
               <Text style={venueText.label}>{report.authorName}</Text>
-              <Text style={venueText.caption}>{`Submitted ${formatReportDate(report.createdAt)}`}</Text>
+              <Text style={venueText.caption}>{t('report.submitted', { date: formatDate(report.createdAt) })}</Text>
             </View>
           </View>
-          {report.body ? <Text style={styles.body}>{report.body}</Text> : <Text style={styles.noBody}>No details added.</Text>}
+          {report.body ? <Text style={styles.body}>{report.body}</Text> : <Text style={styles.noBody}>{t('report.noBody')}</Text>}
         </>
       )}
     </SheetScroll>

@@ -4,8 +4,13 @@ import Svg, { Circle, Line } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
-import type { FacilityTag } from './types';
+/** A tag as shown: its translated label and tone (green good news, orange heads-up). */
+export interface TagView {
+  label: string;
+  tone: 'good' | 'note';
+}
 
 export function SearchGlyph({ size = 18, color = Colors.ink }: { size?: number; color?: string }) {
   return (
@@ -17,19 +22,20 @@ export function SearchGlyph({ size = 18, color = Colors.ink }: { size?: number; 
 }
 
 /** Figma "Search Field": a white pill with a magnifier; × clears it. */
-export function SearchField({ value, onChangeText, placeholder = 'Search', accessibilityLabel }: {
+export function SearchField({ value, onChangeText, placeholder, accessibilityLabel }: {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
   accessibilityLabel: string;
 }) {
+  const t = useT('venue');
   return (
     <View style={styles.search}>
       <SearchGlyph />
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('search.placeholder')}
         placeholderTextColor={Colors.textFaint}
         accessibilityLabel={accessibilityLabel}
         autoCorrect={false}
@@ -37,7 +43,7 @@ export function SearchField({ value, onChangeText, placeholder = 'Search', acces
         style={styles.searchInput}
       />
       {value ? (
-        <Pressable onPress={() => onChangeText('')} style={styles.clear} accessibilityRole="button" accessibilityLabel="Clear search">
+        <Pressable onPress={() => onChangeText('')} style={styles.clear} accessibilityRole="button" accessibilityLabel={t('search.clear')}>
           <FigmaIcon name="icon-button-c1cfb2" size={28} color={Colors.textMuted} />
         </Pressable>
       ) : null}
@@ -46,7 +52,7 @@ export function SearchField({ value, onChangeText, placeholder = 'Search', acces
 }
 
 /** Solid tag from the facility popup: green for good news ("Accessible"), orange for a heads-up. */
-export function TagPill({ tag }: { tag: FacilityTag }) {
+export function TagPill({ tag }: { tag: TagView }) {
   const good = tag.tone === 'good';
   return (
     <View style={[styles.tag, good ? styles.tagGood : styles.tagNote]}>
@@ -55,13 +61,14 @@ export function TagPill({ tag }: { tag: FacilityTag }) {
   );
 }
 
-export function TagRow({ tags }: { tags: FacilityTag[] }) {
+export function TagRow({ tags }: { tags: TagView[] }) {
+  const t = useT('venue');
   if (!tags.length) return null;
   return (
     <View style={styles.tagBlock}>
-      <Text style={styles.tagsLabel}>Tags:</Text>
+      <Text style={styles.tagsLabel}>{t('tags.label')}</Text>
       <View style={styles.tagRow}>
-        {tags.map(t => <TagPill key={t.label} tag={t} />)}
+        {tags.map(tag => <TagPill key={tag.label} tag={tag} />)}
       </View>
     </View>
   );

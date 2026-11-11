@@ -1,10 +1,12 @@
-import { describe, expect, it, jest } from '@jest/globals';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
+
+import i18n from '@/i18n';
+import { formatDate } from '@/i18n/format';
 
 import { facilitiesFor, matchesCategory, searchFacilities, searchVenues } from '../mock';
 import {
   createMemoryReportStore,
   createPersistentReportStore,
-  formatReportDate,
   REPORTS_STORAGE_KEY,
   ReportValidationError,
   SEED_REPORTS,
@@ -66,9 +68,29 @@ describe('memory report store', () => {
   });
 });
 
-describe('formatReportDate', () => {
-  it('formats as MM/DD/YYYY', () => {
-    expect(formatReportDate('2026-10-24T12:00:00.000Z')).toBe('10/24/2026');
+describe('submitted line', () => {
+  afterEach(async () => { await i18n.changeLanguage('en'); });
+
+  // report-detail.tsx: t('report.submitted', { date: formatDate(report.createdAt) })
+  const line = () => i18n.t('venue:report.submitted', { date: formatDate('2026-10-24T12:00:00.000Z') });
+
+  it('is one sentence with the date in each language’s format', async () => {
+    expect(line()).toBe('Submitted 10/24/2026');
+    await i18n.changeLanguage('es');
+    expect(line()).toBe('Enviado el 24/10/2026');
+    await i18n.changeLanguage('ja');
+    expect(line()).toBe('2026/10/24 に送信');
+  });
+});
+
+describe('validation messages', () => {
+  afterEach(async () => { await i18n.changeLanguage('en'); });
+
+  it('follow the app language', async () => {
+    expect(validateReport({ title: '', topic: null, body: '' }).topic).toBe('Pick the topic that fits best.');
+    await i18n.changeLanguage('es');
+    const errors = validateReport({ ...good, title: 'x'.repeat(81) });
+    expect(errors.title).toBe('El título debe tener menos de 80 caracteres.');
   });
 });
 

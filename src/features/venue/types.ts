@@ -10,6 +10,8 @@ export type FacilityCategory =
   | 'accessible'
   | 'parking';
 
+export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'football' | 'gymnastics' | 'basketball';
+
 /** How the venue is drawn on the map: an open-air bowl or an indoor arena. */
 export type VenueShape = 'bowl' | 'arena';
 
@@ -17,14 +19,30 @@ export interface Venue {
   id: string;
   name: string;
   address: string;
-  /** What LA28 holds there, e.g. "Athletics". */
-  events: string;
+  /** What LA28 holds there; shown translated (venue:events.<id>). */
+  events: VenueEvent[];
   shape: VenueShape;
 }
 
-/** Green "Accessible"-style tag, or an orange heads-up ("Busy before kickoff"). */
+/** Tag ids; each shows translated (venue:tags.<id>). */
+export type FacilityTagId =
+  | 'accessible'
+  | 'stairs'
+  | 'busy_before_events'
+  | 'ramp'
+  | 'bag_check'
+  | 'rideshare'
+  | 'escalators'
+  | 'sensory_kits'
+  | 'quiet_room'
+  | 'family_room'
+  | 'long_lines_halftime'
+  | 'wheelchair_loans'
+  | 'permit_needed';
+
+/** Green "Accessible"-style tag, or an orange heads-up ("Busy before events"). */
 export interface FacilityTag {
-  label: string;
+  id: FacilityTagId;
   tone: 'good' | 'note';
 }
 
@@ -36,8 +54,9 @@ export interface Facility {
   venueId: string;
   name: string;
   category: FacilityCategory;
+  /** English; screens show the translation in venue:facilityText.<id> when there is one. */
   description: string;
-  /** Where to find it, e.g. "East entrance, by Lot C". */
+  /** Where to find it, e.g. "East entrance, by Lot C". Translated like `description`. */
   location: string;
   walkMinutes: number;
   wait: WaitLevel;

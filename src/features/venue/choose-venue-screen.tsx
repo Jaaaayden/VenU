@@ -8,6 +8,7 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 import { isolatedLanguageName } from '@/features/profile/options';
 import { useProfile } from '@/features/profile/profile-context';
 
@@ -16,11 +17,12 @@ import { searchVenues } from './mock';
 import { InlineNote, SearchField, venueText } from './ui';
 
 export function ChooseVenueScreen() {
+  const t = useT('venue');
   const { profile } = useProfile();
   const [query, setQuery] = useState('');
   const [language, setLanguage] = useState<string | null>(null);
   const [picking, setPicking] = useState(false);
-  const venues = searchVenues(query);
+  const venues = searchVenues(query, undefined, t);
   const appLanguage = profile?.appLanguage || 'en';
 
   return (
@@ -31,32 +33,32 @@ export function ChooseVenueScreen() {
             onPress={() => setPicking(true)}
             style={({ pressed }) => [styles.langButton, pressed && styles.pressed]}
             accessibilityRole="button"
-            accessibilityLabel={`Venue info language: ${isolatedLanguageName(language ?? appLanguage)}`}
-            accessibilityHint="Choose a language">
+            accessibilityLabel={t('choose.languageLabel', { language: isolatedLanguageName(language ?? appLanguage) })}
+            accessibilityHint={t('choose.languageHint')}>
             <FigmaIcon name="icon-c513eb" size={20} color={Colors.ink} />
             <Text style={styles.langText}>{isolatedLanguageName(language ?? appLanguage)}</Text>
           </Pressable>
         </View>
         {language && language !== appLanguage ? (
-          <InlineNote>{`Venue info in ${isolatedLanguageName(language)} is coming soon. Volunteers can help in your language now.`}</InlineNote>
+          <InlineNote>{t('choose.languageSoon', { language: isolatedLanguageName(language) })}</InlineNote>
         ) : null}
 
         <View style={styles.titles}>
-          <Text style={venueText.title} accessibilityRole="header">Choose Your Venue</Text>
-          <Text style={venueText.caption}>Pick where you want to see map and facilities</Text>
+          <Text style={venueText.title} accessibilityRole="header">{t('choose.title')}</Text>
+          <Text style={venueText.caption}>{t('choose.subtitle')}</Text>
         </View>
 
-        <SearchField value={query} onChangeText={setQuery} placeholder="Search" accessibilityLabel="Search venues" />
+        <SearchField value={query} onChangeText={setQuery} accessibilityLabel={t('choose.searchLabel')} />
 
         <Pressable
           onPress={() => router.replace('/volunteer')}
           style={({ pressed }) => [styles.assist, pressed && styles.pressed]}
           accessibilityRole="button"
-          accessibilityLabel="Need Assistance? Connect with a volunteer">
+          accessibilityLabel={t('choose.assistLabel')}>
           <FigmaIcon name="volunteer" size={50} color={Colors.primary} />
           <View style={styles.assistText}>
-            <Text style={venueText.label}>Need Assistance?</Text>
-            <Text style={venueText.caption}>Connect with a volunteer</Text>
+            <Text style={venueText.label}>{t('choose.assistTitle')}</Text>
+            <Text style={venueText.caption}>{t('choose.assistBody')}</Text>
           </View>
           <FigmaIcon name="group-2-7ecb6b" size={34} color={Colors.primary} />
         </Pressable>
@@ -69,7 +71,7 @@ export function ChooseVenueScreen() {
               onPress={() => router.push({ pathname: '/venue/[venueId]', params: { venueId: v.id } })}
             />
           ))}
-          {!venues.length ? <Text style={styles.empty}>{`No venue matches “${query.trim()}”. Try a city, like Inglewood.`}</Text> : null}
+          {!venues.length ? <Text style={styles.empty}>{t('choose.empty', { query: query.trim() })}</Text> : null}
         </View>
       </ScrollView>
 

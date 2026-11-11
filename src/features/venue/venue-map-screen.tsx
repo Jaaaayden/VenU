@@ -13,6 +13,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Shadow, Spacing } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 import { CategoryChips } from './category-chips';
 import { facilitiesFor } from './mock';
@@ -70,7 +71,6 @@ const UP_GAP = 48;
 const PEEK = 132;
 const NEXT: Record<SheetSnap, SheetSnap> = { down: 'mid', mid: 'up', up: 'down' };
 const SNAP_NAMES: SheetSnap[] = ['up', 'mid', 'down'];
-const SNAP_LABEL: Record<SheetSnap, string> = { down: 'lowered', mid: 'half open', up: 'raised' };
 const SPRING = { damping: 26, stiffness: 260, mass: 0.9 };
 
 /** Sheet tops for each snap, in the map area's coordinates, for a map area `h` tall. */
@@ -80,6 +80,7 @@ function snapPositions(h: number, tabClearance: number): Record<SheetSnap, numbe
 }
 
 export function VenueMapScreen({ venue }: { venue: Venue }) {
+  const t = useT('venue');
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
   const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
@@ -183,7 +184,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
       <VenueScreenContext value={ctx}>
         <SafeAreaView edges={['top']} style={styles.header}>
           <View style={styles.titleRow}>
-            <BackArrow onPress={() => router.navigate('/venue')} label="Back to venues" />
+            <BackArrow onPress={() => router.navigate('/venue')} label={t('back.venues')} />
             <View style={styles.titleText}>
               <Text style={venueText.title} accessibilityRole="header" numberOfLines={2}>{venue.name}</Text>
               <Text style={venueText.caption} numberOfLines={1}>{venue.address}</Text>
@@ -214,8 +215,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
                       onPress={tapHandle}
                       style={styles.handleTarget}
                       accessibilityRole="adjustable"
-                      accessibilityLabel={`Facility panel, ${SNAP_LABEL[snap]}`}
-                      accessibilityHint="Tap to resize, or drag up and down"
+                      accessibilityLabel={t(`sheet.${snap}`)}
+                      accessibilityHint={t('sheet.hint')}
                       accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
                       onAccessibilityAction={e => setSnap(s => (e.nativeEvent.actionName === 'increment' ? (s === 'down' ? 'mid' : 'up') : s === 'up' ? 'mid' : 'down'))}>
                       <View style={styles.handle} />
