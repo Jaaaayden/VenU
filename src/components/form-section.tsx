@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Spacing, Type } from '@/constants/theme';
+import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 
 interface FormSectionProps {
   title: string;
@@ -31,12 +31,12 @@ export function FormSection({ title, hint, optional, error, children }: FormSect
   );
 }
 
-/** "STEP 1 OF 2" overline + title + subtitle, as in the mockups' setup screens. */
+/** Optional "STEP 1 OF 2" overline + title + subtitle, as in the Figma "Set up your profile" header. */
 export function StepHeader({ step, total, title, subtitle }: { step?: number; total?: number; title: string; subtitle?: string }) {
   return (
     <View style={styles.header}>
       {step != null && total != null && <Text style={styles.step}>{`Step ${step} of ${total}`}</Text>}
-      <Text style={Type.title} accessibilityRole="header">
+      <Text style={styles.headerTitle} accessibilityRole="header">
         {title}
       </Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
@@ -45,14 +45,16 @@ export function StepHeader({ step, total, title, subtitle }: { step?: number; to
 }
 
 const styles = StyleSheet.create({
-  section: { gap: Spacing.xs, marginBottom: Spacing.xl },
-  title: { ...Type.bodyStrong, fontWeight: '700' },
-  optional: { fontWeight: '400', color: Colors.textMuted },
+  // Figma: Alexandria 13 section titles with wide gaps between sections; 16 here (see theme.ts).
+  section: { gap: Spacing.xs, marginBottom: Spacing.xxl },
+  title: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text },
+  optional: { fontFamily: Fonts.text, fontSize: 14, color: Colors.textMuted },
   hint: Type.caption,
-  body: { marginTop: Spacing.sm },
+  body: { marginTop: Spacing.md },
   error: { ...Type.caption, color: Colors.danger, marginTop: Spacing.xs },
 
-  header: { gap: Spacing.xs, marginBottom: Spacing.xl },
+  header: { gap: Spacing.sm, marginBottom: Spacing.xxl },
   step: { ...Type.overline, color: Colors.accent },
-  subtitle: { ...Type.body, color: Colors.textMuted },
+  headerTitle: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 34, color: Colors.text },
+  subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 19, color: Colors.text },
 });
