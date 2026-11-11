@@ -1,13 +1,13 @@
 /** Sheet content: "Add report" for a facility. Title and topic required; errors show inline. */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { ChipGroup } from '@/components/chip-group';
-import { FigmaIcon } from '@/components/icons/figma-icon';
+import { MediaActions } from '@/components/media-actions';
 import { TextField } from '@/components/text-field';
-import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { goBack } from '@/lib/navigation';
 
@@ -89,16 +89,10 @@ export function ReportForm() {
         hint="Optional. What happened, where, and when?"
       />
 
-      <View style={styles.mediaRow}>
-        <Pressable onPress={() => setSoon('Adding pictures is coming soon.')} style={({ pressed }) => [styles.media, styles.mediaPicture, pressed && styles.pressed]} accessibilityRole="button">
-          <FigmaIcon name="add-circle" size={24} color={Colors.ink} />
-          <Text style={styles.mediaText}>Add picture</Text>
-        </Pressable>
-        <Pressable onPress={() => setSoon('Voice reports are coming soon. Type your report for now.')} style={({ pressed }) => [styles.media, styles.mediaSpeak, pressed && styles.pressed]} accessibilityRole="button">
-          <FigmaIcon name="icon-c230e9" size={14} color={Colors.primary} />
-          <Text style={[styles.mediaText, styles.mediaSpeakText]}>Or hold to speak</Text>
-        </Pressable>
-      </View>
+      <MediaActions
+        onAddPicture={() => setSoon('Adding pictures is coming soon.')}
+        onSpeak={() => setSoon('Voice reports are coming soon. Type your report for now.')}
+      />
       {soon ? <InlineNote>{soon}</InlineNote> : null}
 
       <View style={styles.topic}>
@@ -115,13 +109,6 @@ export function ReportForm() {
 const styles = StyleSheet.create({
   content: { gap: 20 },
   heading: { gap: 8, marginTop: Spacing.sm },
-  pressed: { opacity: 0.75 },
-  mediaRow: { flexDirection: 'row', gap: Spacing.md },
-  media: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.md, minHeight: 44, borderRadius: Radius.md },
-  mediaPicture: { backgroundColor: Colors.surfaceAlt, borderWidth: 1, borderColor: Colors.controlBorder },
-  mediaSpeak: { backgroundColor: Colors.surface, borderWidth: 2, borderColor: Colors.primary },
-  mediaText: { fontFamily: Fonts.display, fontSize: 15, color: Colors.ink },
-  mediaSpeakText: { color: Colors.primary },
   topic: { gap: 10 },
   error: { ...Type.caption, color: Colors.danger },
   submit: { marginTop: Spacing.xs },

@@ -11,6 +11,11 @@ export interface VolunteerBackend {
   sendMessage(requestId: string, text: string): Promise<void>;
   /** Volunteer messages for a request, as they arrive. Returns an unsubscribe function. */
   onMessage(requestId: string, listener: (message: ChatMessage) => void): () => void;
+  /**
+   * Whether the volunteer is typing, called with the current value on subscribing and on each
+   * change. Optional: a service without typing events just never shows the line.
+   */
+  onTyping?(requestId: string, listener: (typing: boolean) => void): () => void;
   endHelp(requestId: string): Promise<void>;
   submitFeedback(feedback: Feedback): Promise<void>;
   reportProblem(report: ProblemReport): Promise<void>;
@@ -37,10 +42,13 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
   const listeners = new Map<string, Set<(m: ChatMessage) => void>>();
   const replyIndex = new Map<string, number>();
   const timers = new Map<string, ReturnType<typeof setTimeout>[]>();
+  const typingListeners = new Map<string, Set<(typing: boolean) => void>>();
+  /** Replies scheduled but not sent yet, per request: the volunteer is "typing" while any are. */
+  const pending = new Map<string, number>();
 
-  function later(requestId: string, ms: number, fn: () => void) {
-    const t = setTimeout(fn, ms);
-    timers.set(requestId, [...(timers.get(requestId) ?? []), t]);
+  function notifyTyping(requestId: string) {
+    const typing = (pending.get(requestId) ?? 0) > 0;
+    typingListeners.get(requestId)?.forEach(l => l(typing));
   }
 
   function emit(requestId: string, text: string) {
@@ -48,10 +56,25 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
     listeners.get(requestId)?.forEach(l => l(message));
   }
 
+  /** The volunteer types for `ms`, then sends `text`. */
+  function replyLater(requestId: string, ms: number, text: string) {
+    pending.set(requestId, (pending.get(requestId) ?? 0) + 1);
+    notifyTyping(requestId);
+    const t = setTimeout(() => {
+      pending.set(requestId, (pending.get(requestId) ?? 1) - 1);
+      emit(requestId, text);
+      notifyTyping(requestId);
+    }, ms);
+    timers.set(requestId, [...(timers.get(requestId) ?? []), t]);
+  }
+
   function stop(requestId: string) {
     timers.get(requestId)?.forEach(clearTimeout);
     timers.delete(requestId);
     replyIndex.delete(requestId);
+    pending.delete(requestId);
+    notifyTyping(requestId);
+    typingListeners.delete(requestId);
   }
 
   return {
@@ -61,7 +84,7 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
         const t = setTimeout(() => {
           const volunteer = MOCK_VOLUNTEERS.find(v => v.languages.includes(request.language)) ?? MOCK_VOLUNTEERS[0]!;
           // Like a real volunteer, say hello once matched.
-          later(request.id, timing.greeting, () => emit(request.id, greetingFrom(volunteer, request.visitorName, request.location.spot)));
+          replyLater(request.id, timing.greeting, greetingFrom(volunteer, request.visitorName, request.location.spot));
           resolve({ volunteer, etaMinutes: 2, distanceFeet: 180 });
         }, timing.search);
         signal.addEventListener('abort', () => { clearTimeout(t); reject(abortError()); }, { once: true });
@@ -75,12 +98,19 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
       const i = replyIndex.get(requestId) ?? 0;
       replyIndex.set(requestId, i + 1);
       const text = MOCK_REPLIES[Math.min(i, MOCK_REPLIES.length - 1)]!;
-      later(requestId, timing.reply, () => emit(requestId, text));
+      replyLater(requestId, timing.reply, text);
     },
     onMessage(requestId, listener) {
       const set = listeners.get(requestId) ?? new Set();
       set.add(listener);
       listeners.set(requestId, set);
+      return () => { set.delete(listener); };
+    },
+    onTyping(requestId, listener) {
+      const set = typingListeners.get(requestId) ?? new Set();
+      set.add(listener);
+      typingListeners.set(requestId, set);
+      listener((pending.get(requestId) ?? 0) > 0);
       return () => { set.delete(listener); };
     },
     async endHelp(requestId) {

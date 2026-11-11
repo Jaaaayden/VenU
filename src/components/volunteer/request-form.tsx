@@ -9,8 +9,8 @@ import { LanguageSearchModal } from '@/components/language-picker';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
 import { languageName } from '@/features/profile/options';
 import { HELP_TYPES, MOCK_LOCATION } from '@/features/volunteer/mock';
-import type { HelpTypeId, RequestState } from '@/features/volunteer/types';
-import { volunteerRequests } from '@/features/volunteer/request-store';
+import { EMPTY_DRAFT, volunteerRequests } from '@/features/volunteer/request-store';
+import type { HelpTypeId, RequestDraft, RequestState } from '@/features/volunteer/types';
 
 import { EmergencyCard } from './emergency-card';
 import { HelpCard } from './help-card';
@@ -18,25 +18,32 @@ import { Hint, useHint } from './hint';
 import { NoteBanner } from './note-banner';
 import { NoteBox } from './note-box';
 
-export function RequestForm({ visitorName, defaultLanguage, notice }: { visitorName: string; defaultLanguage: string; notice: RequestState['notice'] }) {
-  const [helpTypes, setHelpTypes] = useState<HelpTypeId[]>([]);
-  const [note, setNote] = useState('');
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [language, setLanguage] = useState(defaultLanguage);
+interface RequestFormProps {
+  visitorName: string;
+  defaultLanguage: string;
+  notice: RequestState['notice'];
+  /** The fields as last filled in (kept in the store, so a failed search or a cancel keeps them). */
+  draft: RequestDraft | null;
+}
+
+export function RequestForm({ visitorName, defaultLanguage, notice, draft }: RequestFormProps) {
+  const { helpTypes, note, photoUri } = draft ?? EMPTY_DRAFT;
+  const language = draft?.language ?? defaultLanguage;
+  const edit = volunteerRequests.editDraft;
   const [pickingLanguage, setPickingLanguage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { hint, show } = useHint();
 
   function toggle(id: HelpTypeId) {
     setError(null);
-    setHelpTypes(t => (t.includes(id) ? t.filter(x => x !== id) : [...t, id]));
+    edit({ helpTypes: helpTypes.includes(id) ? helpTypes.filter(x => x !== id) : [...helpTypes, id] });
   }
 
   async function addPicture() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) return show('Photo access is off. Turn it on in Settings.');
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.6 });
-    if (!result.canceled && result.assets[0]) setPhotoUri(result.assets[0].uri);
+    if (!result.canceled && result.assets[0]) edit({ photoUri: result.assets[0].uri });
   }
 
   function send() {
@@ -90,11 +97,11 @@ export function RequestForm({ visitorName, defaultLanguage, notice }: { visitorN
 
       <NoteBox
         value={note}
-        onChangeText={setNote}
+        onChangeText={text => edit({ note: text })}
         placeholder="e.g. I'm stuck near ramp 2"
         photoUri={photoUri}
         onAddPicture={addPicture}
-        onRemovePicture={() => setPhotoUri(null)}
+        onRemovePicture={() => edit({ photoUri: null })}
         onSpeak={() => show('Voice notes are coming soon. Type a note for now.')}
       />
       <Hint text={hint} />
@@ -107,7 +114,7 @@ export function RequestForm({ visitorName, defaultLanguage, notice }: { visitorN
 
       <LanguageSearchModal
         visible={pickingLanguage}
-        onSelect={code => { setLanguage(code); setPickingLanguage(false); }}
+        onSelect={code => { edit({ language: code }); setPickingLanguage(false); }}
         onClose={() => setPickingLanguage(false)}
       />
     </View>

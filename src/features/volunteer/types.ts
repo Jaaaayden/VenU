@@ -76,6 +76,15 @@ export interface ProblemReport {
   note: string;
 }
 
+/** What the visitor has filled in on the request form, kept while they search or cancel. */
+export interface RequestDraft {
+  helpTypes: HelpTypeId[];
+  note: string;
+  photoUri: string | null;
+  /** null: the profile's main language. */
+  language: string | null;
+}
+
 /**
  * idle: the request form. searching: waiting for a match. matched: a volunteer is on the way.
  * done: the help ended; the visitor is asked for feedback.
@@ -91,6 +100,10 @@ export interface RequestState {
   unread: number;
   /** One-off note for the home screen, e.g. "Thanks for your feedback" or "Couldn't find anyone". */
   notice: { tone: 'success' | 'error'; text: string } | null;
+  /** The form's contents; survives a failed search or a cancel, cleared once the help ends. */
+  draft: RequestDraft | null;
+  /** The volunteer is writing a reply ("Daniel is typing…"). */
+  typing: boolean;
 }
 
 /** An open request as a volunteer sees it (volunteer role's placeholder list). */

@@ -3,7 +3,7 @@
  * Full screen without the tab bar; the bottom bar rides above the keyboard.
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -13,12 +13,14 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
-import { useVolunteerRequest, volunteerRequests } from '@/features/volunteer/request-store';
+import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
+import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
 import { goBack } from '@/lib/navigation';
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { status, request, match, messages, unread } = useVolunteerRequest();
+  const { status, request, match, messages, unread, typing } = useVolunteerRequest();
+  const restored = useVolunteerRestored();
   const [text, setText] = useState('');
   const { hint, show } = useHint();
   const insets = useSafeAreaInsets();
@@ -30,8 +32,9 @@ export default function ChatScreen() {
     if (active && unread) volunteerRequests.markRead();
   }, [active, unread]);
 
-  // The request ended or was cancelled (or this is a stale link after a reload).
-  if (!active) return <Redirect href="/volunteer" />;
+  // The request ended or was cancelled (or this is a stale link). After a reload, wait for the
+  // saved request to come back before deciding.
+  if (!active) return restored ? <Redirect href="/volunteer" /> : null;
   const v = match.volunteer;
 
   function send() {
@@ -72,10 +75,19 @@ export default function ChatScreen() {
           {messages.length === 0 ? (
             <Text style={styles.empty}>Say hello to {v.firstName}. They can see where you are.</Text>
           ) : (
-            messages.map(m => (
-              <ChatBubble key={m.id} message={m} onListen={() => show('Read aloud is coming soon.')} />
+            messages.map((m, i) => (
+              <Fragment key={m.id}>
+                {/* A day/time line only where the conversation paused for more than 10 minutes. */}
+                {i > 0 && needsSeparator(messages[i - 1]!.sentAt, m.sentAt) ? (
+                  <Text style={styles.separator}>{formatDayTime(m.sentAt)}</Text>
+                ) : null}
+                <ChatBubble message={m} onListen={() => show('Read aloud is coming soon.')} />
+              </Fragment>
             ))
           )}
+          {typing ? (
+            <Text style={styles.typing} accessibilityLiveRegion="polite">{v.firstName} is typing…</Text>
+          ) : null}
         </ScrollView>
 
         <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 6) }]}>
@@ -130,6 +142,9 @@ const styles = StyleSheet.create({
   messages: { flex: 1, backgroundColor: Colors.surfaceAlt },
   messagesContent: { gap: Spacing.xl, paddingHorizontal: Spacing.gutter - 6, paddingVertical: Spacing.lg },
   empty: { fontFamily: Fonts.text, fontSize: 14, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.xl },
+  separator: { fontFamily: Fonts.textSemiBold, fontSize: 13, lineHeight: 16, color: Colors.textMuted, textAlign: 'center' },
+  // Sits under the last bubble, lined up with the incoming bubbles' text.
+  typing: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, marginTop: -Spacing.sm, paddingLeft: Spacing.lg },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',

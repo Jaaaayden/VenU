@@ -13,20 +13,22 @@ interface ChipProps {
   /** Extra action on the right, e.g. remove (×). */
   onRemove?: () => void;
   removeLabel?: string;
+  /** Fill the parent's width with the label centred (and wrapping), for a grid of chips. */
+  fill?: boolean;
 }
 
-export function Chip({ label, selected = false, onPress, role = 'checkbox', dashed, onRemove, removeLabel }: ChipProps) {
+export function Chip({ label, selected = false, onPress, role = 'checkbox', dashed, onRemove, removeLabel, fill }: ChipProps) {
   return (
-    <View style={[styles.chip, selected && styles.chipSelected, dashed && styles.chipDashed]}>
+    <View style={[styles.chip, fill && styles.chipFill, selected && styles.chipSelected, dashed && styles.chipDashed]}>
       <Pressable
         onPress={onPress}
         disabled={!onPress}
         hitSlop={6}
-        style={styles.main}
+        style={[styles.main, fill && styles.mainFill]}
         accessibilityRole={role}
         accessibilityState={role === 'button' ? undefined : { checked: selected }}
         accessibilityLabel={label}>
-        <Text style={[styles.label, (selected || dashed) && styles.labelSelected]}>
+        <Text style={[styles.label, fill && styles.labelFill, (selected || dashed) && styles.labelSelected]}>
           {selected ? '✓ ' : ''}
           {label}
         </Text>
@@ -56,6 +58,10 @@ const styles = StyleSheet.create({
   chipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primarySoft },
   chipDashed: { borderStyle: 'dashed', borderColor: Colors.primary },
   main: { paddingVertical: 6 },
+  // Two lines of label fit, so a grid row keeps one height whether or not a label wraps.
+  chipFill: { flex: 1, minHeight: 54, paddingHorizontal: 0 },
+  mainFill: { flex: 1, alignSelf: 'stretch', justifyContent: 'center', paddingHorizontal: Spacing.sm },
+  labelFill: { textAlign: 'center' },
   // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
   label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text, writingDirection: 'ltr' },
   labelSelected: { color: Colors.primary },
