@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   rowText: { flex: 1, gap: 2 },
   label: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text },
   hint: { ...Type.caption },
-  divider: { height: 1, backgroundColor: Colors.divider, marginLeft: Spacing.lg },
+  divider: { height: 1, backgroundColor: Colors.divider, marginStart: Spacing.lg },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm, marginTop: Spacing.lg, padding: Spacing.md, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
   noteText: { ...Type.caption, flex: 1, paddingTop: 1 },
 });

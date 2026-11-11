@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   pressed: { backgroundColor: Colors.surfaceAlt },
   qText: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flex: 1 },
   a: { fontFamily: Fonts.text, fontSize: 15, lineHeight: 21, color: Colors.textMuted, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.lg },
-  divider: { height: 1, backgroundColor: Colors.divider, marginLeft: Spacing.lg },
+  divider: { height: 1, backgroundColor: Colors.divider, marginStart: Spacing.lg },
   flip: { transform: [{ rotate: '180deg' }] },
 
   form: { gap: Spacing.md },

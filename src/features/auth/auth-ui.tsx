@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   checkWrap: { gap: Spacing.xs },
   checkRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   // 44pt target around the 24pt box (the box is drawn at 30 so its 18pt glyph reads at 24).
-  checkTarget: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -7 },
+  checkTarget: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginStart: -7 },
   box: { width: 22, height: 22, borderRadius: 3, backgroundColor: Colors.ink, alignItems: 'center', justifyContent: 'center' },
   boxError: { backgroundColor: Colors.danger },
   tick: { color: Colors.onPrimary, fontFamily: Fonts.textBold, fontSize: 15, lineHeight: 18 },

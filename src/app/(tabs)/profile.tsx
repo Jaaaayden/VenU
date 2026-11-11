@@ -2,6 +2,7 @@ import { router, type Href } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
@@ -10,7 +11,7 @@ import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { SummaryTags } from '@/features/profile/summary-tags';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
 // Section and row labels: profile:tab.<key>.
@@ -37,6 +38,16 @@ const MENU_SECTIONS: { key: 'account' | 'support'; items: MenuItem[] }[] = [
     ],
   },
 ];
+
+/** Row chevron; points the other way in a mirrored (RTL) layout. */
+function Chevron() {
+  const rtl = useLayoutRtl();
+  return (
+    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" style={rtl ? styles.flip : undefined}>
+      <Path d="M9 6l6 6-6 6" stroke={Colors.textFaint} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
 
 export default function ProfileScreen() {
   const { profile, avatarUrl, signOut, deleteAll } = useProfile();
@@ -123,7 +134,7 @@ export default function ProfileScreen() {
                       <FigmaIcon name={item.icon} size={20} color={Colors.ink} />
                     </View>
                     <Text style={styles.menuLabel}>{t(`tab.${item.key}`)}</Text>
-                    <Text style={styles.menuChevron}>›</Text>
+                    <Chevron />
                   </Pressable>
                   {idx < section.items.length - 1 && <View style={styles.divider} />}
                 </View>
@@ -189,8 +200,8 @@ const styles = StyleSheet.create({
   menuRowPressed: { backgroundColor: Colors.surfaceAlt },
   menuIconBox: { width: 36, height: 36, borderRadius: Radius.sm, backgroundColor: Colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
   menuLabel: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flex: 1 },
-  menuChevron: { fontSize: 22, color: Colors.textFaint },
-  divider: { height: 1, backgroundColor: Colors.divider, marginLeft: 64 },
+  flip: { transform: [{ scaleX: -1 }] },
+  divider: { height: 1, backgroundColor: Colors.divider, marginStart: 64 },
 
   deleteBox: { marginTop: Spacing.md, gap: Spacing.sm, alignItems: 'stretch' },
   deleteRow: { flexDirection: 'row', gap: Spacing.md },

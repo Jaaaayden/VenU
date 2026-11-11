@@ -58,10 +58,11 @@ const styles = StyleSheet.create({
   chipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primarySoft },
   chipDashed: { borderStyle: 'dashed', borderColor: Colors.primary },
   main: { paddingVertical: 6 },
-  // LTR paragraph so "العربية · main" doesn't flip to "main · العربية".
-  label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text, writingDirection: 'ltr' },
+  // Follows the UI direction (an Arabic label reads right to left, ✓ first); wrap a name from the
+  // other direction in isolatedLanguageName() so it doesn't reorder the label.
+  label: { fontFamily: Fonts.textSemiBold, fontSize: 14, lineHeight: 20, color: Colors.text },
   labelSelected: { color: Colors.primary },
-  // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's right padding.
-  removeTarget: { minWidth: 28, minHeight: 28, marginRight: -8, alignItems: 'center', justifyContent: 'center' },
+  // 28px box (WCAG 2.2 asks >= 24) that tucks into the chip's end padding (right, or left in RTL).
+  removeTarget: { minWidth: 28, minHeight: 28, marginEnd: -8, alignItems: 'center', justifyContent: 'center' },
   remove: { fontSize: 18, lineHeight: 20, color: Colors.textMuted },
 });
