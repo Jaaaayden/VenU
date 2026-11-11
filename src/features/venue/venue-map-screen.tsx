@@ -11,11 +11,10 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { Chip } from '@/components/chip';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Shadow, Spacing } from '@/constants/theme';
 
-import { CATEGORIES } from './categories';
+import { CategoryChips } from './category-chips';
 import { facilitiesFor } from './mock';
 import { MAP_BACKGROUND, SHEET_HANDLE, StadiumMap } from './stadium-map';
 import type { Facility, FacilityCategory, Venue } from './types';
@@ -161,12 +160,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
               <Text style={venueText.caption} numberOfLines={1}>{venue.address}</Text>
             </View>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} accessibilityRole="radiogroup" accessibilityLabel="Facility type">
-            <Chip label="All" role="radio" selected={category === null} onPress={() => pickCategory(null)} />
-            {CATEGORIES.map(c => (
-              <Chip key={c.value} label={c.label} role="radio" selected={category === c.value} onPress={() => pickCategory(category === c.value ? null : c.value)} />
-            ))}
-          </ScrollView>
+          <CategoryChips value={category} onChange={pickCategory} />
         </SafeAreaView>
 
         <View style={styles.area} onLayout={(e: LayoutChangeEvent) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
@@ -214,9 +208,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.bg },
   header: { backgroundColor: Colors.bg, zIndex: 2 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, paddingHorizontal: Spacing.lg, paddingTop: Spacing.md },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, paddingHorizontal: Spacing.gutter, paddingTop: Spacing.md },
   titleText: { flex: 1, gap: 4 },
-  chips: { gap: Spacing.sm, paddingHorizontal: Spacing.gutter, paddingVertical: Spacing.sm },
   area: { flex: 1, overflow: 'hidden', backgroundColor: MAP_BACKGROUND, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
   map: { position: 'absolute', left: 0, right: 0, top: 0 },
   sheet: {

@@ -67,7 +67,7 @@ export function TagRow({ tags }: { tags: FacilityTag[] }) {
   );
 }
 
-/** The 40pt Figma "Arrow left", in a 44pt target. */
+/** The 40pt Figma "Arrow left", in a 44pt target, pulled left so the arrow itself sits on the gutter. */
 export function BackArrow({ onPress, label }: { onPress: () => void; label: string }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.back, pressed && styles.pressed]} accessibilityRole="button" accessibilityLabel={label}>
@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
   tagText: { fontFamily: Fonts.textMedium, fontSize: 13, lineHeight: 17, color: Colors.ink },
   tagTextGood: { fontFamily: Fonts.textBold, color: Colors.onPrimary },
 
-  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -4 },
+  // The 34pt glyph starts 5.6pt into its box, which is centred in the 44pt target: 5 + 5.6 ≈ 11.
+  back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginLeft: -11 },
   pressed: { opacity: 0.6 },
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 18, color: Colors.textMuted, textAlign: 'center' },
 });
