@@ -59,10 +59,12 @@ Only the language pills set the app language (`choosePendingLanguage(code)`); th
 spoken languages never do. They stay in step (`accountLanguageStep` in `languages.ts`):
 - Pick Español on welcome, then sign in → Español is saved to the account (only `app_language`, so
   privacy consent isn't re-stamped).
-- Switch to 한국어 on the venue page → shown at once, saved to the account; offline, it stays on
-  screen and the next screen retries.
+- Switch to 한국어 on the venue page → shown at once, saved to that account only; offline, it stays
+  on screen and the next screen retries. If someone else signs in first, the unsaved pick is dropped.
 - Sign out → welcome stays in the language the account was shown in (Hindi account → English).
-- Profile setup: the welcome pick, else a translated primary language, else what's on screen.
+- Profile setup starts Primary at the welcome pick, else the language on screen (never the last
+  account's remembered language), and saves the welcome pick, else a translated primary, as the app language.
+- A profile save (Edit profile) never writes the app language.
 - Both pills list only translated languages (`UNTRANSLATED` is left out) and name the language on screen.
 
 Arabic and Persian mirror the layout. Web flips at once (`<html dir="rtl">`). iOS and Android flip
