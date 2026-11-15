@@ -149,8 +149,8 @@ describe('volunteer request store', () => {
 
     await store.submitFeedback(5, ['patient', 'helpful'], ' Thank you ');
     expect(store.getState().status).toBe('idle');
-    expect(store.getState().notice).toMatchObject({ tone: 'success' });
-    expect(store.getState().notice?.text).toContain('Daniel');
+    // Kept as a key + values, so the banner words it in whatever language is on screen when it shows.
+    expect(store.getState().notice).toEqual({ tone: 'success', key: 'thanks', params: { name: 'Daniel' } });
 
     store.dismissNotice();
     expect(store.getState().notice).toBeNull();
@@ -162,7 +162,7 @@ describe('volunteer request store', () => {
     const store = createRequestStore(backend);
     await store.sendRequest(rosaNeedsHelp);
     expect(store.getState().status).toBe('idle');
-    expect(store.getState().notice?.tone).toBe('error');
+    expect(store.getState().notice).toEqual({ tone: 'error', key: 'searchFailed' });
   });
 
   it('keeps the form draft through a failed search and a cancel, and clears it once help ends', async () => {

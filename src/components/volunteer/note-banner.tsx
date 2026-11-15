@@ -18,7 +18,7 @@ export function NoteBanner({ notice, onDismiss }: { notice: NonNullable<RequestS
 
   return (
     <View style={[styles.box, ok ? styles.ok : styles.bad]} accessibilityLiveRegion="polite" role="status">
-      <Text style={[styles.text, { color: ok ? Colors.success : Colors.danger }]}>{notice.text}</Text>
+      <Text style={[styles.text, { color: ok ? Colors.success : Colors.danger }]}>{t(`notice.${notice.key}`, { name: notice.params?.name ?? '' })}</Text>
       <Pressable onPress={onDismiss} accessibilityRole="button" accessibilityLabel={t('dismiss')} style={styles.close}>
         <Text style={styles.closeText}>×</Text>
       </Pressable>
