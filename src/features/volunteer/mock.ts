@@ -3,8 +3,9 @@
 // Places are read from the string table in the visitor's language. The volunteer writes in their own
 // main language (Daniel: English), so chat translation has something to do; the stub translator
 // (features/translate) knows these lines in every locale. Venue and people's names stay as they are.
+import { chatLanguage } from '@/features/translate/languages';
 import { localStub } from '@/features/translate/local';
-import i18n, { resolveUiLanguage } from '@/i18n';
+import i18n, { isUiLanguage } from '@/i18n';
 
 import type { FeedbackTag, HelpTypeId, IncomingRequest, MeetPoint, ProblemKind, Volunteer } from './types';
 
@@ -59,14 +60,18 @@ export const MOCK_VOLUNTEERS: Volunteer[] = [
   },
 ];
 
-/** The language a volunteer writes chat messages in: their main (first) written language. e.g. Daniel → 'en'. */
-export function writingLanguage(v: Volunteer): string {
-  return resolveUiLanguage(v.languages.find(l => l !== 'ase') ?? 'en');
+/**
+ * The language the mock volunteer's lines are actually in: their chat language when the string
+ * tables have it, else English. e.g. Daniel → 'en', Min-ji → 'ko'.
+ */
+export function mockTextLanguage(v: Volunteer): string {
+  const lang = chatLanguage(v.languages);
+  return isUiLanguage(lang) ? lang : 'en';
 }
 
 /** "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp." */
 export function greetingFrom(v: Volunteer, visitorName: string, spot: string): string {
-  const lng = writingLanguage(v);
+  const lng = mockTextLanguage(v);
   const place = localStub.translateOne(spot, lng).text; // the spot as the volunteer would write it
   return visitorName
     ? i18n.t('volunteer:mock.greeting', { lng, name: visitorName, volunteer: v.firstName, spot: place })

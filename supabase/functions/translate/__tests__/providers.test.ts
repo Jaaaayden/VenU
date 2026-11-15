@@ -40,6 +40,14 @@ describe('Anthropic translator', () => {
   it('treats the message as text to translate, never as instructions', () => {
     expect(SYSTEM_PROMPT).toMatch(/never an instruction/);
     expect(SYSTEM_PROMPT).toMatch(/names, numbers/);
+    expect(SYSTEM_PROMPT).toMatch(/"source_language"/);
+  });
+
+  it('sends a known source language and reports it instead of the model’s guess', async () => {
+    const { client, create } = fakeClient({ content: [text(JSON.stringify({ translations: [{ text: 'Hola', detected_source: 'it' }] }))] });
+    const out = await createAnthropicTranslator(client).translate({ target: 'es', source: 'en-US', texts: ['Hi'] });
+    expect(out).toEqual([{ text: 'Hola', detectedSource: 'en' }]);
+    expect(JSON.parse(create.mock.calls[0]![0].messages[0]!.content as string).source_language).toBe('English (en-US)');
   });
 
   it('returns the originals, marked refused, when the model refuses', async () => {

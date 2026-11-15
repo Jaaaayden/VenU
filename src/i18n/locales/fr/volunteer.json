@@ -112,6 +112,7 @@
   "translation": {
     "translatedFrom": "Traduit (original : {{language}})",
     "translated": "Traduit",
+    "partial": "Début traduit (original : {{language}})",
     "originalIn": "Original en {{language}}",
     "original": "Original",
     "showOriginal": "Voir l’original",
@@ -120,9 +121,12 @@
     "showTranslationLabel": "Voir le message traduit",
     "translating": "Traduction…",
     "failed": "Traduction impossible",
+    "tryAgain": "Réessayer",
+    "tryAgainLabel": "Réessayer de traduire ce message",
     "unsupported": "Traduction en {{language}} pas encore disponible",
-    "localMode": "Traduction indisponible en mode local",
-    "readsIn": "{{name}} le lit en {{language}}"
+    "notSetUp": "La traduction n’est pas encore configurée",
+    "willSeeIn": "{{name}} le verra traduit en {{language}}",
+    "readsLanguage": "{{name}} lit en {{language}}"
   },
   "bubble": {
     "mine": "Vous, {{time}} : {{text}}",

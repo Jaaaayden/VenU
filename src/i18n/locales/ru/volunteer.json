@@ -113,6 +113,7 @@
   "translation": {
     "translatedFrom": "Переведено (оригинал: {{language}})",
     "translated": "Переведено",
+    "partial": "Переведено только начало (оригинал: {{language}})",
     "originalIn": "Оригинал: {{language}}",
     "original": "Оригинал",
     "showOriginal": "Показать оригинал",
@@ -121,9 +122,12 @@
     "showTranslationLabel": "Показать переведённое сообщение",
     "translating": "Перевод…",
     "failed": "Не удалось перевести",
+    "tryAgain": "Повторить",
+    "tryAgainLabel": "Попробовать перевести сообщение ещё раз",
     "unsupported": "Перевод на {{language}} пока недоступен",
-    "localMode": "Перевод недоступен в локальном режиме",
-    "readsIn": "{{name}} прочтёт это в переводе на {{language}}"
+    "notSetUp": "Перевод ещё не настроен",
+    "willSeeIn": "{{name}} увидит это в переводе на {{language}}",
+    "readsLanguage": "{{name}} читает на языке: {{language}}"
   },
   "bubble": {
     "mine": "Вы, {{time}}: {{text}}",

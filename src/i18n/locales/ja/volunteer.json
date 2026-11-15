@@ -110,6 +110,7 @@
   "translation": {
     "translatedFrom": "{{language}}から翻訳",
     "translated": "翻訳済み",
+    "partial": "冒頭のみ{{language}}から翻訳",
     "originalIn": "原文（{{language}}）",
     "original": "原文",
     "showOriginal": "原文を表示",
@@ -118,9 +119,12 @@
     "showTranslationLabel": "翻訳されたメッセージを表示",
     "translating": "翻訳中…",
     "failed": "翻訳できませんでした",
+    "tryAgain": "再試行",
+    "tryAgainLabel": "このメッセージをもう一度翻訳",
     "unsupported": "{{language}}への翻訳はまだ利用できません",
-    "localMode": "ローカルモードでは翻訳できません",
-    "readsIn": "{{name}} さんは{{language}}で読みます"
+    "notSetUp": "翻訳はまだ設定されていません",
+    "willSeeIn": "{{name}} さんには{{language}}に翻訳されて表示されます",
+    "readsLanguage": "{{name}} さんは{{language}}を読みます"
   },
   "bubble": {
     "mine": "あなた、{{time}}：{{text}}",

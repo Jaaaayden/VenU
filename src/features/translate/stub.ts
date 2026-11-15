@@ -2,11 +2,11 @@
 // tables. It recognizes the mock volunteer's canned chat lines (volunteer `mock.*` in every locale)
 // and answers with the same line from the target locale, names and places filled in. Anything else
 // comes back unchanged with `unavailable: true` ("translation unavailable in local mode").
-// No imports, so scripts/mock-supabase.mjs loads this same file in Node.
+// Imports only core.ts (with its .ts extension), so scripts/mock-supabase.mjs loads this same file in Node.
 //
 // e.g. createStub(catalog).translateOne('Got it, thanks! I'll be there in a couple of minutes.', 'es')
 //      → { text: '¡Entendido, gracias! Llego en un par de minutos.', detectedSource: 'en' }
-import type { TranslateBatch, TranslateResult, Translator } from '../../../supabase/functions/translate/core';
+import { baseLanguage, type TranslateBatch, type TranslateResult, type Translator } from '../../../supabase/functions/translate/core.ts';
 
 /** Per language, flat key → template, e.g. { en: { reply1: 'Got it…', 'spots.gate2Ramp': 'Near Gate 2 Ramp' } }. */
 export type StubCatalog = Record<string, Record<string, string>>;
@@ -52,8 +52,6 @@ function compile(catalog: StubCatalog): Compiled[] {
   return out;
 }
 
-const base = (code: string) => code.split(/[-_]/)[0]!.toLowerCase();
-
 export function createStub(catalog: StubCatalog) {
   const compiled = compile(catalog);
 
@@ -72,9 +70,9 @@ export function createStub(catalog: StubCatalog) {
   }
 
   function translateOne(text: string, targetCode: string, source?: string): TranslateResult {
-    const target = base(targetCode);
+    const target = baseLanguage(targetCode);
     const hit = find(text.trim());
-    if (!hit) return { text, detectedSource: source ? base(source) : null, unavailable: true };
+    if (!hit) return { text, detectedSource: source ? baseLanguage(source) : null, unavailable: true };
     if (hit.lang === target) return { text, detectedSource: target };
     const template = catalog[target]?.[hit.key];
     if (template === undefined) return { text, detectedSource: hit.lang, unavailable: true };

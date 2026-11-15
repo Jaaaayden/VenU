@@ -110,6 +110,7 @@
   "translation": {
     "translatedFrom": "译自{{language}}",
     "translated": "已翻译",
+    "partial": "前半部分译自{{language}}",
     "originalIn": "原文（{{language}}）",
     "original": "原文",
     "showOriginal": "查看原文",
@@ -118,9 +119,12 @@
     "showTranslationLabel": "查看翻译后的消息",
     "translating": "正在翻译…",
     "failed": "无法翻译",
+    "tryAgain": "重试",
+    "tryAgainLabel": "重新翻译这条消息",
     "unsupported": "暂不支持翻译成{{language}}",
-    "localMode": "本地模式下无法翻译",
-    "readsIn": "{{name}} 将以{{language}}阅读"
+    "notSetUp": "翻译功能尚未设置",
+    "willSeeIn": "{{name}} 将看到译成{{language}}的版本",
+    "readsLanguage": "{{name}} 使用{{language}}"
   },
   "bubble": {
     "mine": "你，{{time}}：{{text}}",

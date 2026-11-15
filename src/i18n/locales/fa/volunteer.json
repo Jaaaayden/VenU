@@ -111,6 +111,7 @@
   "translation": {
     "translatedFrom": "ترجمه از {{language}}",
     "translated": "ترجمه‌شده",
+    "partial": "فقط بخش اول از {{language}} ترجمه شد",
     "originalIn": "متن اصلی به {{language}}",
     "original": "متن اصلی",
     "showOriginal": "نمایش متن اصلی",
@@ -119,9 +120,12 @@
     "showTranslationLabel": "نمایش پیام ترجمه‌شده",
     "translating": "در حال ترجمه…",
     "failed": "ترجمه نشد",
+    "tryAgain": "تلاش دوباره",
+    "tryAgainLabel": "ترجمهٔ دوبارهٔ این پیام",
     "unsupported": "ترجمه به {{language}} هنوز در دسترس نیست",
-    "localMode": "ترجمه در حالت محلی در دسترس نیست",
-    "readsIn": "{{name}} این را به {{language}} می‌خواند"
+    "notSetUp": "ترجمه هنوز راه‌اندازی نشده است",
+    "willSeeIn": "{{name}} این را ترجمه‌شده به {{language}} می‌بیند",
+    "readsLanguage": "{{name}} به {{language}} می‌خواند"
   },
   "bubble": {
     "mine": "شما، {{time}}: {{text}}",

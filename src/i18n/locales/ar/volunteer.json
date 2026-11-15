@@ -115,6 +115,7 @@
   "translation": {
     "translatedFrom": "مترجمة من {{language}}",
     "translated": "مترجمة",
+    "partial": "تُرجم الجزء الأول فقط من {{language}}",
     "originalIn": "الأصل باللغة {{language}}",
     "original": "الأصل",
     "showOriginal": "عرض الأصل",
@@ -123,9 +124,12 @@
     "showTranslationLabel": "عرض الرسالة المترجمة",
     "translating": "جارٍ الترجمة…",
     "failed": "تعذّرت الترجمة",
+    "tryAgain": "أعد المحاولة",
+    "tryAgainLabel": "أعد محاولة ترجمة هذه الرسالة",
     "unsupported": "الترجمة إلى {{language}} غير متاحة بعد",
-    "localMode": "الترجمة غير متاحة في الوضع المحلي",
-    "readsIn": "يقرأ {{name}} هذه الرسالة باللغة {{language}}"
+    "notSetUp": "لم يتم إعداد الترجمة بعد",
+    "willSeeIn": "سيرى {{name}} هذه الرسالة مترجمة إلى {{language}}",
+    "readsLanguage": "يقرأ {{name}} باللغة {{language}}"
   },
   "bubble": {
     "mine": "أنت، {{time}}: {{text}}",

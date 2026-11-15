@@ -6,8 +6,9 @@
  *
  * Translation: an incoming message in another language shows in the reader's language, with
  * "Translated from English · Show original" under it (a button that flips between the two). While it
- * translates, or if it can't, the original shows with a short note. Yours show what you typed, and
- * the last one can carry a hint such as "Daniel reads this in English".
+ * translates, or if it can't, the original shows with a short note ("Couldn't translate · Try again").
+ * Yours show what you typed; the last one can name who reads it: "Daniel will see this translated
+ * into English" once a real translator has answered, else just "Daniel reads English".
  */
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
@@ -16,7 +17,7 @@ import Svg, { Path } from 'react-native-svg';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
-import { useMessageTranslation, type MessageTranslation } from '@/features/translate';
+import { isRealProvider, useMessageTranslation, useReaderLanguage, useTranslationProvider, type MessageTranslation } from '@/features/translate';
 import { formatClock } from '@/features/volunteer/format';
 import type { ChatMessage } from '@/features/volunteer/types';
 import { useLayoutRtl, useT } from '@/i18n';
@@ -49,14 +50,12 @@ function bubblePath(w: number, h: number, mirror: boolean): string {
 
 interface Props {
   message: ChatMessage;
-  /** Language the reader reads, e.g. 'es'; incoming messages in another language are translated into it. */
-  reader: string;
-  /** Under one of yours, e.g. "Daniel reads this in English". */
-  hint?: string | null;
+  /** Who reads your message, for the line under it, e.g. { name: 'Daniel', language: 'en' }. */
+  recipient?: { name: string; language: string } | null;
   onListen?: () => void;
 }
 
-export function ChatBubble({ message, reader, hint, onListen }: Props) {
+export function ChatBubble({ message, recipient, onListen }: Props) {
   const mine = message.from === 'me';
   const t = useT('volunteer');
   const rtl = useLayoutRtl();
@@ -66,10 +65,18 @@ export function ChatBubble({ message, reader, hint, onListen }: Props) {
     setSize({ w: Math.round(width), h: Math.round(height) });
   };
   const time = formatClock(message.sentAt);
-  const translation = useMessageTranslation(message, reader);
+  const reader = useReaderLanguage();
+  const { view: translation, retry } = useMessageTranslation(message, reader);
+  const provider = useTranslationProvider();
   const [original, setOriginal] = useState(false);
   const translated = translation.kind === 'translated' && !original ? translation : null;
-  const text = translated ? translated.text : message.text;
+  const text = translated ? (translated.partial ? `${translated.text}…` : translated.text) : message.text;
+  const recipientLanguage = recipient && recipient.language !== reader ? uiLanguageName(recipient.language) : null;
+  const hint = !mine || !recipient || !recipientLanguage
+    ? null
+    : isRealProvider(provider)
+      ? t('translation.willSeeIn', { name: recipient.name, language: recipientLanguage })
+      : t('translation.readsLanguage', { name: recipient.name, language: recipientLanguage });
   const source = translated?.source ? uiLanguageName(translated.source) : null;
   // Screen readers get the text on screen, then where it was translated from.
   const label = mine
@@ -103,10 +110,10 @@ export function ChatBubble({ message, reader, hint, onListen }: Props) {
           </View>
         </View>
       </View>
-      {mine && hint ? <Text style={styles.hint}>{hint}</Text> : null}
+      {hint ? <Text style={styles.hint}>{hint}</Text> : null}
       {!mine ? (
         <View style={styles.footer}>
-          <TranslationNote translation={translation} reader={reader} original={original} onToggle={() => setOriginal(o => !o)} />
+          <TranslationNote translation={translation} reader={reader} original={original} onToggle={() => setOriginal(o => !o)} onRetry={retry} />
           {onListen ? (
             <Pressable onPress={onListen} accessibilityRole="button" accessibilityLabel={t('bubble.listenLabel')} style={styles.listen}>
               <FigmaIcon name="volume" size={16} color={Colors.primary} />
@@ -120,7 +127,13 @@ export function ChatBubble({ message, reader, hint, onListen }: Props) {
 }
 
 /** The line under an incoming bubble: the translation toggle, or why the original is showing. */
-function TranslationNote({ translation, reader, original, onToggle }: { translation: MessageTranslation; reader: string; original: boolean; onToggle: () => void }) {
+function TranslationNote({ translation, reader, original, onToggle, onRetry }: {
+  translation: MessageTranslation;
+  reader: string;
+  original: boolean;
+  onToggle: () => void;
+  onRetry: () => void;
+}) {
   const t = useT('volunteer');
   switch (translation.kind) {
     case 'original':
@@ -128,16 +141,32 @@ function TranslationNote({ translation, reader, original, onToggle }: { translat
     case 'loading':
       return <Text style={styles.note}>{t('translation.translating')}</Text>;
     case 'failed':
-      return <Text style={styles.note}>{t('translation.failed')}</Text>;
+      return (
+        <Pressable
+          onPress={onRetry}
+          accessibilityRole="button"
+          accessibilityLabel={t('translation.tryAgainLabel')}
+          hitSlop={6}
+          style={({ pressed }) => [styles.toggle, pressed && styles.pressed]}>
+          <Text style={styles.note}>
+            {t('translation.failed')}
+            {' · '}
+            <Text style={styles.noteLink}>{t('translation.tryAgain')}</Text>
+          </Text>
+        </Pressable>
+      );
     case 'unsupported':
       return <Text style={styles.note}>{t('translation.unsupported', { language: uiLanguageName(reader) })}</Text>;
     case 'unavailable':
-      return <Text style={styles.note}>{t('translation.localMode')}</Text>;
+      return <Text style={styles.note}>{t('translation.notSetUp')}</Text>;
     case 'translated': {
       const language = translation.source ? uiLanguageName(translation.source) : null;
+      const translatedNote = language
+        ? translation.partial ? t('translation.partial', { language }) : t('translation.translatedFrom', { language })
+        : t('translation.translated');
       const status = original
         ? language ? t('translation.originalIn', { language }) : t('translation.original')
-        : language ? t('translation.translatedFrom', { language }) : t('translation.translated');
+        : translatedNote;
       return (
         <Pressable
           onPress={onToggle}

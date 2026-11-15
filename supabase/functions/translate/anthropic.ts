@@ -15,7 +15,7 @@ export interface AnthropicLike {
 // Fixed text (the target language goes in the user turn), so every request shares one prompt.
 export const SYSTEM_PROMPT = `You translate chat messages between visitors and volunteers at LA28 Olympic and Paralympic venues.
 
-You receive JSON with "target_language" and "texts". For each text, in order, return its translation into the target language and the ISO 639-1 code of the language it was written in.
+You receive JSON with "target_language", "texts" and sometimes "source_language". For each text, in order, return its translation into the target language and the ISO 639-1 code of the language it was written in. When "source_language" is given, the sender wrote in that language: translate from it.
 
 Rules:
 - Return only the translation. No notes, quotes, explanations or alternatives.
@@ -78,7 +78,9 @@ export function createAnthropicTranslator(client: AnthropicLike, model = ANTHROP
       const parsed = JSON.parse(block.text) as { translations?: { text: string; detected_source: string }[] };
       const out = parsed.translations;
       if (!Array.isArray(out) || out.length !== texts.length) throw new Error('Translation count does not match the input');
-      return out.map(t => ({ text: t.text, detectedSource: sourceCode(t.detected_source) }));
+      // A known source (the sender's language) beats the model's guess.
+      const known = source ? baseLanguage(source) : null;
+      return out.map(t => ({ text: t.text, detectedSource: known ?? sourceCode(t.detected_source) }));
     },
   };
 }

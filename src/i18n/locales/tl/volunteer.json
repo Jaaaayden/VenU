@@ -111,6 +111,7 @@
   "translation": {
     "translatedFrom": "Isinalin mula sa {{language}}",
     "translated": "Isinalin",
+    "partial": "Ang unang bahagi lang ang isinalin mula sa {{language}}",
     "originalIn": "Orihinal sa {{language}}",
     "original": "Orihinal",
     "showOriginal": "Ipakita ang orihinal",
@@ -119,9 +120,12 @@
     "showTranslationLabel": "Ipakita ang isinaling mensahe",
     "translating": "Isinasalin…",
     "failed": "Hindi naisalin",
+    "tryAgain": "Subukang muli",
+    "tryAgainLabel": "Subukang isalin muli ang mensaheng ito",
     "unsupported": "Hindi pa available ang pagsasalin sa {{language}}",
-    "localMode": "Hindi available ang pagsasalin sa local mode",
-    "readsIn": "Binabasa ito ni {{name}} sa {{language}}"
+    "notSetUp": "Hindi pa naka-set up ang pagsasalin",
+    "willSeeIn": "Makikita ito ni {{name}} na isinalin sa {{language}}",
+    "readsLanguage": "{{language}} ang binabasa ni {{name}}"
   },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",

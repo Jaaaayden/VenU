@@ -13,8 +13,6 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
-import { uiLanguageName } from '@/features/profile/summary';
-import { readingLanguage, useReaderLanguage } from '@/features/translate';
 import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
 import { useLayoutRtl, useT } from '@/i18n';
 import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
@@ -31,7 +29,6 @@ export default function ChatScreen() {
   const t = useT('volunteer');
   const tc = useT('common');
   const rtl = useLayoutRtl();
-  const reader = useReaderLanguage();
   const active = status === 'matched' && request?.id === id && !!match;
 
   // Reading the chat clears the dot on "Volunteer found", including for messages that arrive while open.
@@ -43,10 +40,6 @@ export default function ChatScreen() {
   // saved request to come back before deciding.
   if (!active) return restored ? <Redirect href="/volunteer" /> : null;
   const v = match.volunteer;
-  // The volunteer reads your messages in their main language; say so under your latest one when it isn't yours.
-  const theirLanguage = readingLanguage(v.languages[0] ?? reader);
-  const readsIn = theirLanguage !== reader ? t('translation.readsIn', { name: v.firstName, language: uiLanguageName(theirLanguage) }) : null;
-  const lastMine = messages.findLastIndex(m => m.from === 'me');
 
   function send() {
     if (!text.trim()) return;
@@ -88,7 +81,7 @@ export default function ChatScreen() {
           {messages.length === 0 ? (
             <Text style={styles.empty}>{t('chat.empty', { name: v.firstName })}</Text>
           ) : (
-            messages.map((m, i) => (
+            messages.map((m, i, all) => (
               <Fragment key={m.id}>
                 {/* A day/time line only where the conversation paused for more than 10 minutes. */}
                 {i > 0 && needsSeparator(messages[i - 1]!.sentAt, m.sentAt) ? (
@@ -96,8 +89,8 @@ export default function ChatScreen() {
                 ) : null}
                 <ChatBubble
                   message={m}
-                  reader={reader}
-                  hint={i === lastMine ? readsIn : null}
+                  // Under your latest message: who reads it, and in which language.
+                  recipient={m.from === 'me' && !all.slice(i + 1).some(n => n.from === 'me') ? { name: v.firstName, language: match.language } : null}
                   onListen={() => show(t('chat.listenSoon'))}
                 />
               </Fragment>

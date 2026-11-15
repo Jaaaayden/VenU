@@ -112,6 +112,7 @@
   "translation": {
     "translatedFrom": "Traduzido do {{language}}",
     "translated": "Traduzido",
+    "partial": "Primeira parte traduzida do {{language}}",
     "originalIn": "Original em {{language}}",
     "original": "Original",
     "showOriginal": "Ver original",
@@ -120,9 +121,12 @@
     "showTranslationLabel": "Ver a mensagem traduzida",
     "translating": "Traduzindo…",
     "failed": "Não foi possível traduzir",
+    "tryAgain": "Tentar de novo",
+    "tryAgainLabel": "Tentar traduzir esta mensagem de novo",
     "unsupported": "A tradução para {{language}} ainda não está disponível",
-    "localMode": "A tradução não está disponível no modo local",
-    "readsIn": "{{name}} lê isto em {{language}}"
+    "notSetUp": "A tradução ainda não está configurada",
+    "willSeeIn": "{{name}} verá isto traduzido para o {{language}}",
+    "readsLanguage": "{{name}} lê em {{language}}"
   },
   "bubble": {
     "mine": "Você, {{time}}: {{text}}",

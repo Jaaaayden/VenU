@@ -110,6 +110,7 @@
   "translation": {
     "translatedFrom": "Dịch từ {{language}}",
     "translated": "Đã dịch",
+    "partial": "Đã dịch phần đầu từ {{language}}",
     "originalIn": "Bản gốc bằng {{language}}",
     "original": "Bản gốc",
     "showOriginal": "Xem bản gốc",
@@ -118,9 +119,12 @@
     "showTranslationLabel": "Xem tin nhắn đã dịch",
     "translating": "Đang dịch…",
     "failed": "Không dịch được",
+    "tryAgain": "Thử lại",
+    "tryAgainLabel": "Thử dịch lại tin nhắn này",
     "unsupported": "Chưa hỗ trợ dịch sang {{language}}",
-    "localMode": "Không thể dịch ở chế độ cục bộ",
-    "readsIn": "{{name}} đọc tin này bằng {{language}}"
+    "notSetUp": "Chưa thiết lập tính năng dịch",
+    "willSeeIn": "{{name}} sẽ thấy tin này được dịch sang {{language}}",
+    "readsLanguage": "{{name}} đọc {{language}}"
   },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",
