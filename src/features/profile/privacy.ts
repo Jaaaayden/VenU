@@ -4,7 +4,7 @@
 // The points stay English in every language (legal text wants a reviewed translation); the summary
 // and section headings are translated: profile:privacy.summary and profile:privacy.sections.<key>.
 
-export const PRIVACY_VERSION = '2026-11-draft-3';
+export const PRIVACY_VERSION = '2026-11-draft-4';
 
 export type PrivacySectionKey = 'collect' | 'why' | 'who' | 'where' | 'keep' | 'choices';
 
@@ -27,6 +27,7 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
     points: [
       'Your first name and, if you add one, a profile photo.',
       'Languages you speak and how you like to communicate.',
+      'The language you use the app in, so it opens in that language when you sign in on another phone.',
       'Access needs you choose to share, e.g. "Wheelchair user".',
       'Helper preferences (visitors), or training, gender and age range (volunteers).',
       'Your email, only to sign you in.',
@@ -48,6 +49,9 @@ export const PRIVACY_SECTIONS: PrivacySection[] = [
       'Your helper sees your first name, photo, languages and the access needs you shared, and only while helping you.',
       'Visitors see a volunteer\'s first name, photo, languages and training.',
       'Your email, gender and age range are never shown to other people.',
+      'Chat messages go to a translation service so each person reads them in their own language. It gets only the message text and the two languages, never your name or profile.',
+      "Voice typing uses your phone's or browser's speech recognition. If it can't run on the device, Apple, Google or your browser's maker turns the audio into text. VenU never keeps recordings.",
+      "Venue maps are the venue's own map pages (e.g. SoFi Stadium, Crypto.com Arena) shown inside the app; those sites may set their own cookies.",
     ],
   },
   {
