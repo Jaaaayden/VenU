@@ -81,6 +81,28 @@
     "pin": "{{name}} no mapa",
     "north": "N"
   },
+  "officialMap": {
+    "attribution": "Mapa: {{source}}",
+    "open": "Abrir no navegador",
+    "openLabel": "Abrir o mapa oficial de {{source}} no navegador",
+    "frameLabel": "Mapa oficial de {{source}}. Com um leitor de tela, use a lista Serviços perto de você abaixo.",
+    "loading": "Carregando o mapa de {{source}}…",
+    "error": "Não foi possível carregar o mapa. Abra-o no navegador.",
+    "retry": "Tentar de novo",
+    "viewsLabel": "Vista do mapa",
+    "views": {
+      "exterior": "Exterior",
+      "east_garage": "Garagem leste",
+      "west_garage": "Garagem oeste"
+    },
+    "imageLabel": "Mapa de {{source}}: {{view}}",
+    "imageLabelZoom": "Mapa de {{source}}: {{view}}. Faça o movimento de pinça ou use os botões de zoom.",
+    "enlarge": "Toque para ampliar",
+    "enlargeHint": "Abre o mapa em tela cheia para ampliar",
+    "close": "Fechar mapa",
+    "zoomIn": "Ampliar",
+    "zoomOut": "Reduzir"
+  },
   "walk_one": "{{count}} min a pé",
   "walk_many": "{{count}} min a pé",
   "walk_other": "{{count}} min a pé",

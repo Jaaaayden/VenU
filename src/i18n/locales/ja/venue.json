@@ -81,6 +81,28 @@
     "pin": "地図上の{{name}}",
     "north": "北"
   },
+  "officialMap": {
+    "attribution": "地図：{{source}}",
+    "open": "ブラウザで開く",
+    "openLabel": "{{source}}の公式マップをブラウザで開く",
+    "frameLabel": "{{source}}の公式マップ。スクリーンリーダーをお使いの場合は、下の「近くの施設」リストをご利用ください。",
+    "loading": "{{source}}のマップを読み込み中…",
+    "error": "マップを読み込めませんでした。ブラウザで開いてください。",
+    "retry": "再試行",
+    "viewsLabel": "マップの表示",
+    "views": {
+      "exterior": "外観",
+      "east_garage": "東ガレージ",
+      "west_garage": "西ガレージ"
+    },
+    "imageLabel": "{{source}}のマップ：{{view}}",
+    "imageLabelZoom": "{{source}}のマップ：{{view}}。ピンチ操作かズームボタンで拡大できます。",
+    "enlarge": "タップして拡大",
+    "enlargeHint": "マップを全画面で開いて拡大します",
+    "close": "マップを閉じる",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小"
+  },
   "walk_other": "徒歩{{count}}分",
   "wait": {
     "none": "待ち時間なし",

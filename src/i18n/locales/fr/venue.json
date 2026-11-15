@@ -81,6 +81,28 @@
     "pin": "{{name}} sur le plan",
     "north": "N"
   },
+  "officialMap": {
+    "attribution": "Plan : {{source}}",
+    "open": "Ouvrir dans le navigateur",
+    "openLabel": "Ouvrir le plan officiel de {{source}} dans votre navigateur",
+    "frameLabel": "Plan officiel de {{source}}. Avec un lecteur d’écran, utilisez plutôt la liste Services à proximité ci-dessous.",
+    "loading": "Chargement du plan de {{source}}…",
+    "error": "Impossible de charger le plan. Ouvrez-le dans votre navigateur.",
+    "retry": "Réessayer",
+    "viewsLabel": "Vue du plan",
+    "views": {
+      "exterior": "Extérieur",
+      "east_garage": "Parking est",
+      "west_garage": "Parking ouest"
+    },
+    "imageLabel": "Plan de {{source}} : {{view}}",
+    "imageLabelZoom": "Plan de {{source}} : {{view}}. Pincez ou utilisez les boutons pour zoomer.",
+    "enlarge": "Touchez pour agrandir",
+    "enlargeHint": "Ouvre le plan en plein écran pour zoomer",
+    "close": "Fermer le plan",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière"
+  },
   "walk_one": "{{count}} min à pied",
   "walk_many": "{{count}} min à pied",
   "walk_other": "{{count}} min à pied",
