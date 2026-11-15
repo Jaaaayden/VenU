@@ -14,7 +14,7 @@ export type DictationError =
 
 export interface DictationState {
   status: DictationStatus;
-  /** The field's text when dictation started; dictated words are appended to it. */
+  /** The field's text when dictation started (or was last edited); dictated words go after it. */
   base: string;
   /** Final segments heard so far this session. */
   committed: string;
@@ -23,6 +23,11 @@ export interface DictationState {
   error: DictationError | null;
   /** Listening in English because the wanted language isn't supported here. */
   fellBack: boolean;
+  /**
+   * Words an edit already moved into `base`. iOS repeats the whole sentence in every result until
+   * the final one, so these are cut from the front of later results instead of being added twice.
+   */
+  consumed: string;
 }
 
 export type DictationAction =
@@ -31,9 +36,11 @@ export type DictationAction =
   | { type: 'result'; transcript: string; isFinal: boolean }
   | { type: 'stop' }
   | { type: 'end' }
-  | { type: 'error'; error: DictationError };
+  | { type: 'error'; error: DictationError }
+  /** The user typed in the field while listening; `text` is the field's new value. */
+  | { type: 'edit'; text: string };
 
-export const IDLE: DictationState = { status: 'idle', base: '', committed: '', interim: '', error: null, fellBack: false };
+export const IDLE: DictationState = { status: 'idle', base: '', committed: '', interim: '', error: null, fellBack: false, consumed: '' };
 
 export function dictationReducer(state: DictationState, action: DictationAction): DictationState {
   switch (action.type) {
@@ -45,17 +52,28 @@ export function dictationReducer(state: DictationState, action: DictationAction)
     case 'result': {
       // A final result after stop() still counts; anything after the session ended doesn't.
       if (state.status === 'idle') return state;
+      const words = dropConsumed(action.transcript, state.consumed);
       return action.isFinal
-        ? { ...state, committed: joinSpeech(state.committed, action.transcript), interim: '' }
-        : { ...state, interim: action.transcript.trim() };
+        ? { ...state, committed: joinSpeech(state.committed, words), interim: '', consumed: '' }
+        : { ...state, interim: words };
     }
     case 'stop':
       return state.status === 'idle' ? state : { ...state, status: 'stopping' };
     case 'end':
+      if (state.status === 'idle') return state;
       // Words still interim when the recogniser stops are what the user saw; keep them.
       return { ...state, status: 'idle', committed: joinSpeech(state.committed, state.interim), interim: '' };
     case 'error':
+      if (state.status === 'idle') return state;
       return { ...state, status: 'idle', committed: joinSpeech(state.committed, state.interim), interim: '', error: action.error };
+    case 'edit': {
+      if (state.status === 'idle' || action.text === composedText(state)) return state;
+      const heard = dictatedText(state);
+      // Typed before the dictated words (still at the end): keep them and move the base.
+      if (heard && action.text.endsWith(heard)) return { ...state, base: action.text.slice(0, action.text.length - heard.length) };
+      // Typed into or after them: the field as it is becomes the base.
+      return { ...state, base: action.text, committed: '', interim: '', consumed: joinSpeech(state.consumed, heard) };
+    }
   }
 }
 
@@ -71,11 +89,11 @@ export function composedText(s: DictationState): string {
   return appendDictation(s.base, dictatedText(s));
 }
 
-// Han, kana and full-width punctuation are written without spaces between words.
-const NO_SPACE = /[　-ヿ㐀-䶿一-鿿＀-￯]/;
+// Han, kana, full-width punctuation, Thai and Khmer are written without spaces between words.
+const NO_SPACE = /[฀-๿ក-៿　-ヿ㐀-䶿一-鿿＀-￯]/;
 
 /**
- * Appends dictated words to typed text with one space between, none for Chinese or Japanese.
+ * Appends dictated words to typed text with one space between, none for Chinese, Japanese, Thai, Khmer.
  * e.g. appendDictation('Stuck near ramp 2.', 'I use a wheelchair') → 'Stuck near ramp 2. I use a wheelchair'
  *      appendDictation('', '  hello ') → 'hello';  appendDictation('2号门', '附近') → '2号门附近'
  */
@@ -85,6 +103,12 @@ export function appendDictation(base: string, dictated: string): string {
   if (!base.trim()) return words;
   const joined = /\s$/.test(base) || (NO_SPACE.test(base.slice(-1)) && NO_SPACE.test(words[0]!)) ? '' : ' ';
   return base + joined + words;
+}
+
+/** Cuts words already in the field from the front of a result: ('I need a ramp', 'I need') → 'a ramp'. */
+function dropConsumed(transcript: string, consumed: string): string {
+  const words = transcript.trim();
+  return consumed && words.startsWith(consumed) ? words.slice(consumed.length).trim() : words;
 }
 
 function joinSpeech(a: string, b: string): string {

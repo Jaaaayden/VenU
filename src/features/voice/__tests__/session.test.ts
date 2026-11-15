@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, jest } from '@jest/globals';
 
 import type { DictationError, DictationState } from '../dictation-state';
 import { setSpeechEngineForTests, speechEngine, type SpeechEngine } from '../engine';
-import { DictationSession } from '../session';
+import { DictationSession, STOP_TIMEOUT_MS } from '../session';
 
 // Like Expo Go: the library's import throws because the native module isn't in the binary.
 jest.mock('expo-speech-recognition', () => {
@@ -40,11 +40,12 @@ function setup(fake: ReturnType<typeof fakeEngine> | null, platform = 'ios') {
   const states: DictationState[] = [];
   const onListening = jest.fn<(fellBack: boolean) => void>();
   const onEnd = jest.fn<(heard: boolean) => void>();
+  const commits: string[] = [];
   const session = new DictationSession(
-    { onState: s => states.push(s), onText: t => texts.push(t), onError: e => errors.push(e), onListening, onEnd },
+    { onState: s => states.push(s), onText: t => texts.push(t), onCommit: t => commits.push(t), onError: e => errors.push(e), onListening, onEnd },
     { platform, engine: () => fake?.asEngine ?? null },
   );
-  return { session, texts, errors, states, onListening, onEnd };
+  return { session, texts, commits, errors, states, onListening, onEnd };
 }
 
 const result = (transcript: string, isFinal: boolean) => ({ isFinal, results: [{ transcript, confidence: 0.9, segments: [] }] });
@@ -169,6 +170,99 @@ describe('a dictation session', () => {
     await starting;
     expect(fake.engine.start).not.toHaveBeenCalled();
     expect(session.snapshot.status).toBe('idle');
+  });
+
+  it('cancels during the locale check, and a quick re-tap starts the recogniser only once', async () => {
+    const fake = fakeEngine();
+    let answer!: (v: { locales: string[]; installedLocales: string[] }) => void;
+    fake.engine.getSupportedLocales.mockImplementationOnce(() => new Promise(r => { answer = r; }));
+    const { session } = setup(fake);
+    const first = session.start('', 'en-US');
+    await Promise.resolve(); // past the permission prompt, now awaiting the locale list
+    await Promise.resolve();
+    expect(session.preparing).toBe(true);
+    session.stop();
+    expect(session.snapshot.status).toBe('idle');
+    expect(session.preparing).toBe(false);
+    const second = session.start('', 'en-US');
+    answer({ locales: [], installedLocales: [] });
+    await Promise.all([first, second]);
+    expect(fake.engine.start).toHaveBeenCalledTimes(1);
+    expect(fake.engine.stop).not.toHaveBeenCalled();
+  });
+
+  it('keeps what the user types while listening', async () => {
+    const fake = fakeEngine();
+    const { session, texts } = setup(fake);
+    await session.start('Near ramp 2.', 'en-US');
+    fake.emit('start');
+    fake.emit('result', result('I use a', false));
+    session.edit('Near ramp 2, gate B. I use a'); // typed before the dictated words
+    fake.emit('result', result('I use a wheelchair', false));
+    expect(texts.at(-1)).toBe('Near ramp 2, gate B. I use a wheelchair');
+    session.edit('Near ramp 2, gate B. I use a wheelchair, thanks'); // typed after them
+    fake.emit('result', result('I use a wheelchair and', false));
+    expect(texts.at(-1)).toBe('Near ramp 2, gate B. I use a wheelchair, thanks and');
+  });
+
+  it('saves only settled text: on a final result and at the end, never on interim words', async () => {
+    const fake = fakeEngine();
+    const { session, commits } = setup(fake, 'android');
+    await session.start('Hi', 'en-US');
+    fake.emit('start');
+    fake.emit('result', result('I am', false));
+    fake.emit('result', result('I am at', false));
+    expect(commits).toEqual([]);
+    fake.emit('result', result('I am at gate 2', true));
+    expect(commits).toEqual(['Hi I am at gate 2']);
+    fake.emit('result', result('by the', false));
+    session.stop();
+    fake.emit('end');
+    expect(commits).toEqual(['Hi I am at gate 2', 'Hi I am at gate 2 by the']);
+  });
+
+  it('complete() waits for the final words, then nothing refills the field', async () => {
+    const fake = fakeEngine();
+    const { session, texts } = setup(fake);
+    await session.start('', 'en-US');
+    fake.emit('start');
+    fake.emit('result', result('on my', false));
+    const done = session.complete();
+    expect(fake.engine.stop).toHaveBeenCalled();
+    fake.emit('result', result('on my way', true));
+    fake.emit('end');
+    await expect(done).resolves.toBe('on my way');
+    fake.emit('result', result('on my way now', true));
+    expect(texts).toEqual(['on my', 'on my way']);
+    await expect(session.complete()).resolves.toBeNull(); // nothing running
+  });
+
+  it('complete() gives up after the stop timeout and sends what was heard', async () => {
+    jest.useFakeTimers();
+    try {
+      const fake = fakeEngine();
+      const { session } = setup(fake);
+      await session.start('Gate 2.', 'en-US');
+      fake.emit('start');
+      fake.emit('result', result('wheelchair', false));
+      const done = session.complete();
+      jest.advanceTimersByTime(STOP_TIMEOUT_MS);
+      await expect(done).resolves.toBe('Gate 2. wheelchair');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('goes quiet when disposed (screen closed): no state, text or end callbacks', async () => {
+    const fake = fakeEngine();
+    const { session, states, onEnd } = setup(fake);
+    await session.start('', 'en-US');
+    fake.emit('start');
+    const seen = states.length;
+    session.dispose();
+    expect(fake.engine.abort).toHaveBeenCalled();
+    expect(states).toHaveLength(seen);
+    expect(onEnd).not.toHaveBeenCalled();
   });
 
   it('gives up waiting for "end" a few seconds after stop()', async () => {

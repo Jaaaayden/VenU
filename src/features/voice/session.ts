@@ -2,7 +2,7 @@
 // locale plan, listens, and reports state and text through callbacks. useDictation wraps it; tests
 // drive it with a fake engine.
 // e.g. const s = new DictationSession({ onState, onText }, { platform: 'ios', engine: speechEngine });
-//      await s.start('Near gate 2', 'es-US'); … s.stop();
+//      await s.start('Near gate 2', 'es-US'); … const text = await s.complete(); // stop, wait for the final words
 
 import { dictatedText, composedText, dictationReducer, errorFromCode, IDLE, isActive, type DictationAction, type DictationError, type DictationState } from './dictation-state';
 import { isEngineAvailable, type SpeechEngine } from './engine';
@@ -10,8 +10,10 @@ import { startPlans, type LocaleSupport, type StartPlan } from './languages';
 
 export interface SessionCallbacks {
   onState: (state: DictationState) => void;
-  /** The field's new text: what was typed plus what was heard. Called only when the words change. */
-  onText: (text: string) => void;
+  /** The field's new text (typed plus heard), on every change including interim words. */
+  onText?: (text: string) => void;
+  /** The same text, only when it settles: on a final result and when the session ends. For saving. */
+  onCommit?: (text: string) => void;
   /** The recogniser is listening; `fellBack` when it's listening in English instead. */
   onListening?: (fellBack: boolean) => void;
   onError?: (error: DictationError) => void;
@@ -25,23 +27,33 @@ export interface SessionEnv {
 }
 
 /** If the recogniser never says it ended after stop(), give up waiting after this long. */
-const STOP_TIMEOUT_MS = 3000;
+export const STOP_TIMEOUT_MS = 3000;
 type Subscription = ReturnType<SpeechEngine['addListener']>;
 const NO_SUPPORT: LocaleSupport = { locales: [], installed: [] };
+const SILENT: SessionCallbacks = { onState: () => {} };
+
+/**
+ * idle: nothing running. preparing: awaiting the permission prompt or the locale list; the
+ * recogniser hasn't been started, so stopping just cancels. running: the recogniser was started.
+ */
+type Phase = 'idle' | 'preparing' | 'running';
 
 /** The recogniser is shared by the whole app; starting one session cancels another. */
 let current: DictationSession | null = null;
 
 export class DictationSession {
   private state: DictationState = IDLE;
+  private phase: Phase = 'idle';
   private engine: SpeechEngine | null = null;
   private subs: Subscription[] = [];
   private plans: StartPlan[] = [];
   private plan = 0;
   private retrying = false;
   private listened = false;
+  private lastCommit = '';
+  private waiters: ((text: string) => void)[] = [];
   private stopTimer: ReturnType<typeof setTimeout> | null = null;
-  /** Bumped when a session ends, so a start still awaiting permission knows it was cancelled. */
+  /** Bumped when a session ends, so a start still preparing knows it was cancelled. */
   private generation = 0;
 
   constructor(private cb: SessionCallbacks, private env: SessionEnv) {}
@@ -50,15 +62,22 @@ export class DictationSession {
     return this.state;
   }
 
+  /** True while the permission prompt or locale check is pending (the app may go inactive then). */
+  get preparing(): boolean {
+    return this.phase === 'preparing';
+  }
+
   async start(base: string, locale: string): Promise<void> {
-    if (isActive(this.state)) return;
+    if (this.phase !== 'idle') return;
     const engine = this.env.engine();
+    this.lastCommit = base;
     this.apply({ type: 'start', base });
     if (!engine || !isEngineAvailable(engine)) return this.finish({ type: 'error', error: 'unsupported' });
     if (current && current !== this) current.abort();
     current = this;
     this.engine = engine;
     this.listened = false;
+    this.phase = 'preparing';
     const gen = ++this.generation;
 
     // The web module has no permission API (the browser asks on start) and warns if called.
@@ -75,14 +94,15 @@ export class DictationSession {
     if (gen !== this.generation) return;
     this.plans = startPlans(locale, support);
     this.plan = 0;
+    this.phase = 'running';
     this.subscribe(engine);
     this.launch();
   }
 
   /** Stop listening and keep what was heard (a final result may still arrive). */
   stop(): void {
-    if (!isActive(this.state)) return;
-    if (!this.subs.length) return this.abort(); // still waiting on the permission prompt
+    if (this.phase === 'idle') return;
+    if (this.phase === 'preparing') return this.finish({ type: 'end' }); // nothing started; just cancel
     this.apply({ type: 'stop' });
     try {
       this.engine?.stop();
@@ -90,13 +110,40 @@ export class DictationSession {
     this.stopTimer ??= setTimeout(() => this.finish({ type: 'end' }), STOP_TIMEOUT_MS);
   }
 
-  /** Stop now and ignore anything still being recognised (on send, or when the screen closes). */
+  /** Stop now and ignore anything still being recognised. */
   abort(): void {
-    if (!isActive(this.state)) return;
-    try {
-      if (this.subs.length) this.engine?.abort();
-    } catch {}
+    if (this.phase === 'idle') return;
+    if (this.phase === 'running') {
+      try {
+        this.engine?.abort();
+      } catch {}
+    }
     this.finish({ type: 'end' });
+  }
+
+  /**
+   * Stop, wait for the final words (at most STOP_TIMEOUT_MS), and resolve with the field's text.
+   * Resolves null when nothing was running. For send: nothing arrives after it resolves.
+   */
+  complete(): Promise<string | null> {
+    if (this.phase === 'idle') return Promise.resolve(null);
+    return new Promise(resolve => {
+      this.waiters.push(resolve);
+      this.stop();
+    });
+  }
+
+  /** The user typed while listening: later words go after their text instead of replacing it. */
+  edit(text: string): void {
+    if (this.phase === 'idle') return;
+    this.lastCommit = text; // the field already holds (and saved) it
+    this.apply({ type: 'edit', text });
+  }
+
+  /** The screen is going away: no more callbacks, then abort. */
+  dispose(): void {
+    this.cb = SILENT;
+    this.abort();
   }
 
   private async localeSupport(engine: SpeechEngine): Promise<LocaleSupport> {
@@ -165,8 +212,15 @@ export class DictationSession {
     const next = dictationReducer(prev, action);
     if (next === prev) return;
     this.state = next;
+    const text = composedText(next);
+    // Save only settled text: a final result, or the session ending (interim words kept).
+    const settled = (action.type === 'result' && action.isFinal) || (isActive(prev) && !isActive(next));
+    if (settled && text !== this.lastCommit) {
+      this.lastCommit = text;
+      this.cb.onCommit?.(text);
+    }
     this.cb.onState(next);
-    if (dictatedText(next) !== dictatedText(prev)) this.cb.onText(composedText(next));
+    if (action.type !== 'edit' && dictatedText(next) !== dictatedText(prev)) this.cb.onText?.(text);
     if (action.type === 'error') this.cb.onError?.(action.error);
   }
 
@@ -179,7 +233,10 @@ export class DictationSession {
     if (this.stopTimer) clearTimeout(this.stopTimer);
     this.stopTimer = null;
     this.generation += 1;
+    this.phase = 'idle';
     if (current === this) current = null;
+    const text = composedText(this.state);
+    for (const resolve of this.waiters.splice(0)) resolve(text);
     if (wasActive) this.cb.onEnd?.(this.listened);
   }
 }

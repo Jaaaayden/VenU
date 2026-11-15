@@ -52,6 +52,37 @@ describe('dictation state', () => {
     expect(run([{ type: 'start', base: '' }, { type: 'error', error: 'unsupported' }])).toMatchObject({ status: 'idle', error: 'unsupported' });
   });
 
+  it('leaves an idle state alone on a late end or error', () => {
+    const done = run([{ type: 'start', base: 'x' }, { type: 'error', error: 'no-speech' }]);
+    expect(run([{ type: 'end' }], done)).toBe(done);
+    expect(run([{ type: 'error', error: 'failed' }], done)).toBe(done);
+    expect(run([{ type: 'end' }])).toBe(IDLE);
+  });
+
+  it('keeps text typed before the dictated words', () => {
+    let s = run([{ type: 'start', base: 'Near ramp 2.' }, { type: 'started', fellBack: false }, { type: 'result', transcript: 'I use a', isFinal: false }]);
+    s = run([{ type: 'edit', text: 'Near ramp 2, gate B. I use a' }], s);
+    expect(s.base).toBe('Near ramp 2, gate B. ');
+    s = run([{ type: 'result', transcript: 'I use a wheelchair', isFinal: true }, { type: 'end' }], s);
+    expect(composedText(s)).toBe('Near ramp 2, gate B. I use a wheelchair');
+  });
+
+  it('keeps text typed after the dictated words without repeating them (iOS repeats the sentence)', () => {
+    let s = run([{ type: 'start', base: '' }, { type: 'started', fellBack: false }, { type: 'result', transcript: 'I need', isFinal: false }]);
+    s = run([{ type: 'edit', text: 'I need, urgently,' }], s);
+    expect(composedText(s)).toBe('I need, urgently,');
+    s = run([{ type: 'result', transcript: 'I need a ramp', isFinal: false }], s);
+    expect(composedText(s)).toBe('I need, urgently, a ramp');
+    s = run([{ type: 'result', transcript: 'I need a ramp', isFinal: true }, { type: 'end' }], s);
+    expect(composedText(s)).toBe('I need, urgently, a ramp');
+  });
+
+  it('ignores an edit that matches the field, and edits when idle', () => {
+    const s = run([{ type: 'start', base: 'Hi' }, { type: 'started', fellBack: false }, { type: 'result', transcript: 'there', isFinal: false }]);
+    expect(run([{ type: 'edit', text: 'Hi there' }], s)).toBe(s);
+    expect(run([{ type: 'edit', text: 'typed' }])).toBe(IDLE);
+  });
+
   it('notes a retry in English as a fallback', () => {
     const s = run([{ type: 'start', base: '' }, { type: 'started', fellBack: false }, { type: 'started', fellBack: true }]);
     expect(s).toMatchObject({ status: 'listening', fellBack: true });
@@ -65,6 +96,12 @@ describe('appending dictation', () => {
     expect(appendDictation('', '  hello ')).toBe('hello');
     expect(appendDictation('  ', 'hello')).toBe('hello');
     expect(appendDictation('Typed', '   ')).toBe('Typed');
+  });
+
+  it("doesn't add spaces inside Thai or Khmer", () => {
+    expect(appendDictation('ใกล้ประตู', 'สอง')).toBe('ใกล้ประตูสอง');
+    expect(appendDictation('នៅជិត', 'ច្រកទ្វារ')).toBe('នៅជិតច្រកទ្វារ');
+    expect(appendDictation('Gate 2', 'ใกล้')).toBe('Gate 2 ใกล้');
   });
 
   it("doesn't add spaces inside Chinese or Japanese", () => {

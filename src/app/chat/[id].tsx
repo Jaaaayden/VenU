@@ -36,6 +36,7 @@ export default function ChatScreen() {
   const rtl = useLayoutRtl();
   // The mic dictates into the input for review; voice messages are sent as text.
   const dictation = useDictation({ onText: next => setText(next.slice(0, MESSAGE_MAX)), onNote: show });
+  const [finishing, setFinishing] = useState(false);
   const active = status === 'matched' && request?.id === id && !!match;
 
   // Reading the chat clears the dot on "Volunteer found", including for messages that arrive while open.
@@ -48,10 +49,17 @@ export default function ChatScreen() {
   if (!active) return restored ? <Redirect href="/volunteer" /> : null;
   const v = match.volunteer;
 
-  function send() {
-    if (!text.trim()) return;
-    dictation.abort(); // late words mustn't refill the cleared input
-    volunteerRequests.sendMessage(text);
+  async function send() {
+    if (finishing) return;
+    let message = text;
+    if (dictation.listening) {
+      // Wait (briefly) for the last words; once complete() resolves nothing can refill the input.
+      setFinishing(true);
+      message = ((await dictation.complete()) ?? text).slice(0, MESSAGE_MAX);
+      setFinishing(false);
+    }
+    if (!message.trim()) return;
+    volunteerRequests.sendMessage(message);
     setText('');
   }
 
@@ -112,11 +120,11 @@ export default function ChatScreen() {
           <View style={[styles.input, dictation.listening && styles.inputListening]}>
             <TextInput
               value={text}
-              onChangeText={setText}
+              onChangeText={next => { setText(next); dictation.edit(next); }}
               placeholder={dictation.listening ? tc('media.listening') : t('chat.placeholder')}
               placeholderTextColor={Colors.textFaint}
               style={styles.inputText}
-              onSubmitEditing={send}
+              onSubmitEditing={() => void send()}
               submitBehavior="submit"
               returnKeyType="send"
               accessibilityLabel={t('chat.messageTo', { name: v.firstName })}
@@ -136,7 +144,7 @@ export default function ChatScreen() {
               <View style={styles.stop} />
             </Pressable>
           ) : text.trim() ? (
-            <Pressable onPress={send} accessibilityRole="button" accessibilityLabel={tc('actions.send')} style={[styles.barButton, styles.sendButton]}>
+            <Pressable onPress={() => void send()} accessibilityRole="button" accessibilityLabel={tc('actions.send')} style={[styles.barButton, styles.sendButton]}>
               <Svg width={20} height={20} viewBox="0 0 24 24" aria-hidden>
                 <Path d="M12 19V5M5 12l7-7 7 7" stroke={Colors.onPrimary} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </Svg>

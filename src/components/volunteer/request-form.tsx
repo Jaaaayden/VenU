@@ -41,8 +41,10 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   const t = useT('volunteer');
   const tc = useT('common');
   const location = mockLocation();
-  // Tap to dictate into the note (added after what's typed); tap again to stop.
-  const dictation = useDictation({ onText: text => edit({ note: text.slice(0, NOTE_MAX) }), onNote: show });
+  // Tap to dictate into the note (added after what's typed); tap again to stop. Interim words show
+  // from liveText; the saved draft only changes when they settle.
+  const dictation = useDictation({ onCommit: text => edit({ note: text.slice(0, NOTE_MAX) }), onNote: show });
+  const [finishing, setFinishing] = useState(false);
 
   function toggle(id: HelpTypeId) {
     setError(null);
@@ -56,13 +58,20 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
     if (!result.canceled && result.assets[0]) edit({ photoUri: result.assets[0].uri });
   }
 
-  function send() {
+  async function send() {
     if (!helpTypes.length) return setError(t('form.pickOne'));
-    dictation.abort();
+    if (finishing) return;
+    let text = note;
+    if (dictation.listening) {
+      // Let the recogniser finish the last words (a few seconds at most) so they're sent too.
+      setFinishing(true);
+      text = ((await dictation.complete()) ?? note).slice(0, NOTE_MAX);
+      setFinishing(false);
+    }
     volunteerRequests.dismissNotice();
     // Ordered as on screen, so the volunteer sees the same list.
     const ordered = HELP_TYPES.filter(id => helpTypes.includes(id));
-    void volunteerRequests.sendRequest({ visitorName, helpTypes: ordered, note: note.trim(), photoUri, language, location });
+    void volunteerRequests.sendRequest({ visitorName, helpTypes: ordered, note: text.trim(), photoUri, language, location });
   }
 
   return (
@@ -107,8 +116,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
       </View>
 
       <NoteBox
-        value={note}
-        onChangeText={text => edit({ note: text })}
+        value={dictation.liveText?.slice(0, NOTE_MAX) ?? note}
+        onChangeText={text => { edit({ note: text }); dictation.edit(text); }}
         placeholder={t('form.notePlaceholder')}
         photoUri={photoUri}
         onAddPicture={addPicture}
@@ -121,7 +130,7 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 
       <View style={styles.actions}>
         {error ? <Text style={styles.error} accessibilityLiveRegion="polite">{error}</Text> : null}
-        <Button label={t('form.send')} size="lg" onPress={send} style={styles.send} />
+        <Button label={t('form.send')} size="lg" onPress={() => void send()} loading={finishing} style={styles.send} />
         <EmergencyCard />
       </View>
 
