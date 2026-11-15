@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { PHOTO_MAX_BYTES, PHOTO_TOO_BIG, PHOTO_TYPES, PHOTO_WRONG_TYPE } from '@/constants/photo';
+import { codedError } from '@/lib/errors';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from './mapping';
 import { PRIVACY_VERSION } from './privacy';
@@ -112,7 +113,7 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
         await storage.setItem(localKey(userId), JSON.stringify(row));
       } catch (e) {
         // Web localStorage caps at ~5 MB; a base64 photo is the only thing big enough to hit it.
-        if (row.avatar_path?.startsWith('data:')) throw new Error('That photo is too big to keep in local dev mode. Try a smaller one.');
+        if (row.avatar_path?.startsWith('data:')) throw codedError('photoTooBigLocal');
         throw e;
       }
       return rowToProfile(row);
@@ -172,9 +173,7 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         if (current.error) throw current.error;
         if (current.data.role !== write.role) {
           // A coded error counts as a definite rejection, so saveWithAvatar cleans up the new upload.
-          throw Object.assign(new Error(`This account is already set up as a ${current.data.role}. Reload the app to continue.`), {
-            code: 'VENU_ROLE_MISMATCH',
-          });
+          throw codedError('roleMismatch', { role: current.data.role });
         }
         result = await update();
       } else if (existing && result.error?.code === 'PGRST116') {
@@ -197,7 +196,13 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       const path = `${userId}/avatar-${Date.now()}`;
       // Prefer the picker's base64 (requested on native): fetch() on a local file:// URI isn't
       // reliable in React Native. Web blob: URIs fetch fine.
-      const body = image.base64 ? base64ToArrayBuffer(image.base64) : await (await fetch(image.uri)).arrayBuffer();
+      let body: ArrayBuffer;
+      try {
+        body = image.base64 ? base64ToArrayBuffer(image.base64) : await (await fetch(image.uri)).arrayBuffer();
+      } catch {
+        // A local file, so not a network problem: e.g. a web blob: URL that died with a reload.
+        throw codedError('photoUnreadable');
+      }
       // No upsert: paths are never reused, so storage never needs to overwrite (and no UPDATE policy).
       const { error } = await client.storage.from(bucket).upload(path, body, { contentType });
       if (error) throw error;

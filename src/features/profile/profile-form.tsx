@@ -12,7 +12,7 @@ import { TextField } from '@/components/text-field';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { Checkbox } from '@/features/auth/auth-ui';
 import { useT } from '@/i18n';
-import { friendlyError } from '@/lib/errors';
+import { ERROR_CODES, errorText } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, labeled, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
@@ -35,8 +35,10 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
   const [avatar, setAvatar] = useState<AvatarChange>(null);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  // The error itself, worded at render so a language switch re-words it.
+  const [saveError, setSaveError] = useState<unknown>(null);
   const t = useT('profile');
+  const tc = useT('common');
 
   const visitor = d.role === 'visitor';
   const errors = submitted ? validateDraft(d) : {};
@@ -60,7 +62,9 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
     try {
       await onSubmit(d, avatar);
     } catch (e) {
-      setSaveError(friendlyError(e));
+      // The picked photo can't be read any more (e.g. after a web reload): drop it; the rest can be saved again.
+      if ((e as { code?: unknown } | null)?.code === ERROR_CODES.photoUnreadable) setAvatar(null);
+      setSaveError(e ?? new Error('save failed'));
     } finally {
       inFlight.current = false;
       setSaving(false);
@@ -163,7 +167,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
         {Object.keys(errors).some(k => k !== 'privacyAccepted') && (
           <Text style={styles.error} accessibilityLiveRegion="polite">{t('form.fixAbove')}</Text>
         )}
-        {saveError && <Text style={styles.error}>{saveError}</Text>}
+        {saveError ? <Text style={styles.error}>{errorText(saveError, tc)}</Text> : null}
         <Button label={submitLabel} size="lg" onPress={submit} loading={saving} style={styles.submit} />
       </ScrollView>
     </KeyboardAvoidingView>

@@ -33,11 +33,17 @@
     "wrongLogin": "Mali ang email o password.",
     "confirmEmail": "Kumpirmahin muna ang iyong email. Hanapin ang link sa iyong inbox.",
     "alreadyRegistered": "May account na ang email na iyan. Subukang mag-sign in.",
+    "weakPassword": "Masyadong madaling hulaan ang password na iyan. Subukan ang mas mahaba.",
+    "invalidEmail": "Mukhang mali ang email address na iyan. Suriin ito at subukang muli.",
     "rateLimit": "Napakaraming pagsubok. Maghintay ng isang minuto at subukan muli.",
     "sessionExpired": "Nag-expire ang iyong session. Mag-sign in muli.",
     "cantSave": "Hindi ma-save ng VenU ang pagbabagong iyan. Kung patuloy itong mangyari, mag-sign out at mag-sign in muli.",
+    "roleMismatchVisitor": "Naka-set up na bilang bisita ang account na ito. I-reload ang app para magpatuloy.",
+    "roleMismatchVolunteer": "Naka-set up na bilang boluntaryo ang account na ito. I-reload ang app para magpatuloy.",
     "photoTooBig": "Lampas sa {{size}} MB ang larawang iyan. Pumili ng mas maliit.",
+    "photoTooBigLocal": "Masyadong malaki ang larawang iyan para itago sa device na ito. Subukan ang mas maliit.",
     "photoWrongType": "Gumamit ng larawang JPG, PNG, WebP o HEIC.",
+    "photoUnreadable": "Hindi mabasa ang larawang iyan. Piliin itong muli.",
     "generic": "May nangyaring mali. Subukan muli."
   },
   "direction": {

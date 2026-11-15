@@ -9,7 +9,7 @@ import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 import i18n from '@/i18n';
-import { friendlyError } from '@/lib/errors';
+import { codedError, friendlyError } from '@/lib/errors';
 
 const rosa: ProfileDraft = {
   ...emptyDraft('visitor', 'es'),
@@ -206,7 +206,9 @@ describe('review fixes', () => {
   it('turns a storage quota error on a photo into a readable message', async () => {
     const full: KeyValueStorage = { ...memoryStorage(), setItem: async () => { throw new Error('QuotaExceededError'); } };
     const store = createLocalStore(full);
-    await expect(store.save('u1', { ...rosa, avatarPath: 'data:image/png;base64,AAA' }, null)).rejects.toThrow('too big');
+    const tooBig = store.save('u1', { ...rosa, avatarPath: 'data:image/png;base64,AAA' }, null);
+    await expect(tooBig).rejects.toMatchObject({ code: 'VENU_PHOTO_TOO_BIG_LOCAL' });
+    await tooBig.catch(e => expect(friendlyError(e)).toBe('That photo is too big to keep on this device. Try a smaller one.'));
     await expect(store.save('u1', rosa, null)).rejects.toThrow('QuotaExceededError');
   });
 });
@@ -250,6 +252,21 @@ describe('supabase store', () => {
       const { client, calls } = fakeClient(opts);
       await expect(createSupabaseStore(client, 'avatars').deleteAll('u1')).rejects.toThrow('failed');
       expect(calls).not.toContain('delete row u1');
+    }
+  });
+
+  it('a picked photo that can no longer be read is its own error, not "offline"', async () => {
+    const { client, calls } = fakeClient();
+    const realFetch = globalThis.fetch;
+    // What a web blob: URL does after a reload.
+    globalThis.fetch = (async () => { throw new TypeError('Failed to fetch'); }) as unknown as typeof fetch;
+    try {
+      const upload = createSupabaseStore(client, 'avatars').uploadAvatar('u1', { uri: 'blob:http://localhost/dead', mimeType: 'image/png' });
+      await expect(upload).rejects.toMatchObject({ code: 'VENU_PHOTO_UNREADABLE' });
+      await upload.catch(e => expect(friendlyError(e)).toBe("Couldn't read that photo. Pick it again."));
+      expect(calls).toEqual([]); // nothing uploaded
+    } finally {
+      globalThis.fetch = realFetch;
     }
   });
 
@@ -364,8 +381,8 @@ describe('friendlyError', () => {
     expect(friendlyError({ message: 'mime type image/gif is not supported' })).toBe('Use a JPG, PNG, WebP or HEIC photo.');
   });
 
-  it('keeps unknown messages and falls back when there is none', () => {
-    expect(friendlyError(new Error('That photo is too big'))).toBe('That photo is too big');
+  it('never shows an unrecognised raw message, and falls back when there is none', () => {
+    expect(friendlyError(new Error('Some English message from a library'))).toBe('Something went wrong. Try again.');
     expect(friendlyError(undefined)).toBe('Something went wrong. Try again.');
     expect(friendlyError({}, 'Custom fallback')).toBe('Custom fallback');
   });
@@ -417,7 +434,7 @@ describe('supabase store save', () => {
 
   it('duplicate key with a different role stops instead of merging two roles', async () => {
     const { client, calls } = tableClient({ insert: duplicate, storedRole: 'volunteer' });
-    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toThrow('already set up as a volunteer');
+    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: 'VENU_ROLE_MISMATCH', role: 'volunteer' });
     expect(calls).toEqual(['insert role=visitor', 'read role']); // no update
   });
 
@@ -560,13 +577,18 @@ describe('round six details', () => {
     const generic = 'Something went wrong. Try again.';
     expect(friendlyError({ code: '23514', message: 'new row violates check constraint "main_language_listed" for relation "profiles"', details: null, hint: null })).toBe(generic);
     expect(friendlyError(Object.assign(new Error('The resource already exists'), { name: 'StorageApiError' }))).toBe(generic);
-    // Our own coded error and Supabase auth messages are written for people.
-    expect(friendlyError(Object.assign(new Error('This account is already set up as a volunteer. Reload the app to continue.'), { code: 'VENU_ROLE_MISMATCH' }))).toBe(
-      'This account is already set up as a volunteer. Reload the app to continue.',
-    );
+    // Our own coded errors and known Supabase Auth errors get a sentence from the string table.
+    expect(friendlyError(codedError('roleMismatch', { role: 'volunteer' }))).toBe('This account is already set up as a volunteer. Reload the app to continue.');
+    expect(friendlyError(codedError('roleMismatch', { role: 'visitor' }))).toBe('This account is already set up as a visitor. Reload the app to continue.');
+    expect(friendlyError(codedError('photoTooBigLocal'))).toBe('That photo is too big to keep on this device. Try a smaller one.');
     expect(friendlyError(Object.assign(new Error('Password should be at least 6 characters.'), { name: 'AuthApiError', code: 'weak_password' }))).toBe(
-      'Password should be at least 6 characters.',
+      'That password is too easy to guess. Try a longer one.',
     );
+    // Same messages without a code (older servers), and an unknown auth message.
+    expect(friendlyError(Object.assign(new Error('Password should contain at least one character of each: abc'), { name: 'AuthApiError' }))).toBe('That password is too easy to guess. Try a longer one.');
+    expect(friendlyError({ name: 'AuthApiError', message: 'For security purposes, you can only request this after 42 seconds.' })).toBe('Too many tries. Wait a minute and try again.');
+    expect(friendlyError({ name: 'AuthApiError', code: 'email_address_invalid', message: 'Email address "x@y" is invalid' })).toBe("That email address doesn't look right. Check it and try again.");
+    expect(friendlyError({ name: 'AuthApiError', message: 'Signups not allowed for this instance' })).toBe(generic);
   });
 
   it('decodes picker base64 into the bytes that get uploaded', () => {

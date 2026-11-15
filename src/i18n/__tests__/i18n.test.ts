@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { friendlyError, OFFLINE } from '@/lib/errors';
+import { errorText, friendlyError, isOfflineError } from '@/lib/errors';
 
 import { formatDate, formatNumber, formatTime } from '../format';
 import i18n from '../index';
@@ -76,13 +76,15 @@ describe('switching language', () => {
     expect(friendlyError(new TypeError('Failed to fetch'))).toBe("Can't reach VenU. Check your connection and try again.");
   });
 
-  it('keeps OFFLINE equal to the offline message in the current language', async () => {
-    // A named import is a live binding, as in app/index.tsx's `loadError === OFFLINE`.
-    await i18n.changeLanguage('ko');
-    expect(OFFLINE).toBe(friendlyError(new TypeError('Failed to fetch')));
-    expect(OFFLINE).toMatch(/^VenU에/);
-    await i18n.changeLanguage('en');
-    expect(OFFLINE).toBe("Can't reach VenU. Check your connection and try again.");
+  it('keeps a load error as the error, so the gate words it in the language applied later', async () => {
+    // The startup load can fail before LanguageSync applies the language (English at that moment).
+    const loadError = new TypeError('Failed to fetch');
+    expect(isOfflineError(loadError)).toBe(true);
+    expect(isOfflineError({ name: 'AuthRetryableFetchError', message: '{}' })).toBe(true);
+    expect(isOfflineError(new Error('JWT expired'))).toBe(false);
+    await i18n.changeLanguage('fa');
+    expect(errorText(new Error('JWT expired'), i18n.getFixedT('fa', 'common'))).toBe(i18n.getFixedT('fa', 'common')('errors.sessionExpired'));
+    expect(errorText(loadError, i18n.getFixedT('ko', 'common'))).toMatch(/^VenU에/);
   });
 });
 

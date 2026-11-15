@@ -33,11 +33,17 @@
     "wrongLogin": "Wrong email or password.",
     "confirmEmail": "Confirm your email first. Check your inbox for the link.",
     "alreadyRegistered": "That email already has an account. Try signing in.",
+    "weakPassword": "That password is too easy to guess. Try a longer one.",
+    "invalidEmail": "That email address doesn't look right. Check it and try again.",
     "rateLimit": "Too many tries. Wait a minute and try again.",
     "sessionExpired": "Your session expired. Please sign in again.",
     "cantSave": "VenU couldn't save that change. If it keeps happening, sign out and back in.",
+    "roleMismatchVisitor": "This account is already set up as a visitor. Reload the app to continue.",
+    "roleMismatchVolunteer": "This account is already set up as a volunteer. Reload the app to continue.",
     "photoTooBig": "That photo is over {{size}} MB. Pick a smaller one.",
+    "photoTooBigLocal": "That photo is too big to keep on this device. Try a smaller one.",
     "photoWrongType": "Use a JPG, PNG, WebP or HEIC photo.",
+    "photoUnreadable": "Couldn't read that photo. Pick it again.",
     "generic": "Something went wrong. Try again."
   },
   "direction": {

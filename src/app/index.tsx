@@ -9,7 +9,7 @@ import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { homeFor } from '@/features/profile/types';
 import { useT } from '@/i18n';
-import { OFFLINE } from '@/lib/errors';
+import { errorText, isOfflineError } from '@/lib/errors';
 
 /** Entry gate: signed out → landing (/welcome), signed in without a profile → onboarding, else the role's home tab. */
 export default function Index() {
@@ -21,7 +21,8 @@ export default function Index() {
   if (status === 'loading') return null;
   if (status === 'signedOut') return <Redirect href="/welcome" />;
   if (status === 'error') {
-    const offline = loadError === OFFLINE;
+    // Worded here, at render, so it follows the language once LanguageSync applies it.
+    const offline = isOfflineError(loadError);
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
@@ -30,7 +31,7 @@ export default function Index() {
             {offline ? t('gate.offlineTitle') : t('gate.errorTitle')}
           </Text>
           <Text style={styles.body} accessibilityLiveRegion="polite">
-            {offline ? t('gate.offlineBody') : loadError}
+            {offline ? t('gate.offlineBody') : errorText(loadError, tc)}
           </Text>
           <View style={styles.actions}>
             <Button

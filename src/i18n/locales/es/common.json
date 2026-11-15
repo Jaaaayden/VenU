@@ -33,11 +33,17 @@
     "wrongLogin": "Correo o contraseña incorrectos.",
     "confirmEmail": "Primero confirma tu correo. Busca el enlace en tu bandeja de entrada.",
     "alreadyRegistered": "Ese correo ya tiene una cuenta. Prueba a iniciar sesión.",
+    "weakPassword": "Esa contraseña es muy fácil de adivinar. Prueba una más larga.",
+    "invalidEmail": "Ese correo electrónico no parece correcto. Revísalo e inténtalo de nuevo.",
     "rateLimit": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
     "sessionExpired": "Tu sesión caducó. Vuelve a iniciar sesión.",
     "cantSave": "VenU no pudo guardar ese cambio. Si sigue pasando, cierra sesión y vuelve a entrar.",
+    "roleMismatchVisitor": "Esta cuenta ya está configurada como visitante. Recarga la app para continuar.",
+    "roleMismatchVolunteer": "Esta cuenta ya está configurada como voluntario. Recarga la app para continuar.",
     "photoTooBig": "Esa foto pesa más de {{size}} MB. Elige una más pequeña.",
+    "photoTooBigLocal": "Esa foto es demasiado grande para guardarla en este dispositivo. Prueba con una más pequeña.",
     "photoWrongType": "Usa una foto JPG, PNG, WebP o HEIC.",
+    "photoUnreadable": "No se pudo leer esa foto. Vuelve a elegirla.",
     "generic": "Algo salió mal. Inténtalo de nuevo."
   },
   "direction": {

@@ -3,7 +3,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { AppState } from 'react-native';
 
 import * as auth from '@/lib/auth';
-import { friendlyError } from '@/lib/errors';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
 import {
@@ -28,8 +27,8 @@ export type { AvatarChange };
 
 interface ProfileContextValue {
   status: Status;
-  /** Why loading failed, as one plain sentence (set while status is 'error'). */
-  loadError: string | null;
+  /** Why loading failed (set while status is 'error'). The error itself: screens word it at render (errorText). */
+  loadError: unknown;
   userId: string | null;
   profile: Profile | null;
   avatarUrl: string | null;
@@ -66,7 +65,7 @@ async function loadSession(): Promise<Session> {
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<Status>('loading');
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<unknown>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -120,7 +119,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         return s.profile;
       } catch (e) {
         if (!quiet && mine === generation.current) {
-          setLoadError(friendlyError(e));
+          setLoadError(e);
           setStatus('error');
         }
         throw e;
