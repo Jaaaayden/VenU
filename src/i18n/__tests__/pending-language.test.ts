@@ -61,6 +61,33 @@ describe('this device language', () => {
     expect(readSnapshot().saveError).toBeNull();
   });
 
+  it('keeps which account a venue-pill pick belongs to, and clears it with the pick', async () => {
+    await choosePendingLanguage('es', 'rosa');
+    expect(readSnapshot()).toMatchObject({ language: 'es', picked: true, pickedBy: 'rosa' });
+    expect(await readPendingSetup()).toEqual({ language: 'es', languagePicked: true, languagePickedBy: 'rosa' });
+    await refreshPendingLanguage();
+    expect(readSnapshot().pickedBy).toBe('rosa'); // read back after a reload
+    await forgetLanguagePick();
+    expect(await readPendingSetup()).toEqual({ language: 'es' });
+    await choosePendingLanguage('fr'); // welcome pill: nobody's
+    expect(readSnapshot().pickedBy).toBeUndefined();
+  });
+
+  it("doesn't let a refresh that raced a pick put the old language back", async () => {
+    await rememberAccountLanguage('ko');
+    // A route change refreshes while the welcome pill pick is still being written.
+    const refresh = refreshPendingLanguage();
+    const pick = choosePendingLanguage('es');
+    await Promise.all([refresh, pick]);
+    expect(readSnapshot()).toMatchObject({ language: 'es', picked: true });
+    // And a refresh started right after a pick reads it, not the storage from before.
+    await rememberAccountLanguage('ko');
+    const pick2 = choosePendingLanguage('ja');
+    await refreshPendingLanguage();
+    await pick2;
+    expect(readSnapshot()).toMatchObject({ language: 'ja', picked: true });
+  });
+
   it('leaves a newer pick alone when an older save finishes or fails', async () => {
     await choosePendingLanguage('es');
     await choosePendingLanguage('fr'); // picked again while 'es' was saving

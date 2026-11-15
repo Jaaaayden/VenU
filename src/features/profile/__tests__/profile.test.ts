@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
+import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, setAppLanguageIfCurrent, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials, uiLanguageName } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
@@ -292,6 +292,18 @@ describe('supabase store', () => {
     } finally {
       globalThis.fetch = realFetch;
     }
+  });
+});
+
+describe('setAppLanguageIfCurrent', () => {
+  it('reports a save that finished after another account signed in as stale (null)', async () => {
+    let current: string | null = 'rosa';
+    const store = createLocalStore(memoryStorage());
+    await store.save('rosa', rosa, null);
+    const wrapped: ProfileStore = { ...store, setAppLanguage: async (u, c) => { current = 'daniel'; return store.setAppLanguage(u, c); } };
+    expect(await setAppLanguageIfCurrent(wrapped, 'rosa', 'ko', () => current)).toBeNull();
+    current = 'rosa';
+    expect((await setAppLanguageIfCurrent(store, 'rosa', 'ja', () => current))?.appLanguage).toBe('ja');
   });
 });
 

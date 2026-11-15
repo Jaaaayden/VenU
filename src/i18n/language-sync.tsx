@@ -14,7 +14,7 @@ import { useProfile } from '@/features/profile/profile-context';
 
 import { applyDirection } from './direction';
 import i18n from './index';
-import { accountLanguageStep, pickUiLanguage } from './languages';
+import { accountLanguageStep, pickFor, pickUiLanguage } from './languages';
 import {
   forgetLanguagePick,
   languageSaveFailed,
@@ -25,7 +25,7 @@ import {
 } from './pending-language';
 
 export function LanguageSync() {
-  const { status, profile, saveAppLanguage } = useProfile();
+  const { status, userId, profile, saveAppLanguage } = useProfile();
   const pending = usePendingLanguage();
   const device = useLocales()[0]?.languageCode; // re-renders when the OS language changes
   const pathname = usePathname();
@@ -50,15 +50,17 @@ export function LanguageSync() {
   const saving = useRef(false);
   const [saves, setSaves] = useState(0); // bumped after each save, so a pick made meanwhile gets its turn
   useEffect(() => {
-    if (status !== 'ready' || !profile || !pending.loaded || pending.saveError || saving.current) return;
-    const step = accountLanguageStep(profile.appLanguage, pending);
+    if (status !== 'ready' || !profile || !pending.loaded || saving.current) return;
+    const step = accountLanguageStep({ id: profile.id, language: profile.appLanguage }, pending);
     if (!step) return;
     if ('remember' in step) return void rememberAccountLanguage(step.remember);
     if ('forgetPick' in step) return void forgetLanguagePick();
+    if (pending.saveError) return; // failed: wait for a retry (next screen, app resume, picking again)
     saving.current = true;
     const code = step.save;
     saveAppLanguage(code)
-      .then(() => forgetLanguagePick(code)) // a newer pick made meanwhile stays, for the next run
+      // null: another account signed in meanwhile; keep the pick, and the next run decides for that account.
+      .then(saved => (saved ? forgetLanguagePick(code) : undefined)) // a newer pick made meanwhile stays, for the next run
       .catch(e => languageSaveFailed(code, e)) // offline: the pick stays on screen; the next screen or app resume retries
       .finally(() => {
         saving.current = false;
@@ -68,10 +70,12 @@ export function LanguageSync() {
 
   // Wait for the profile and stored pick, so a device language never flashes in (or asks for an RTL restart) first.
   const settled = status !== 'loading' && pending.loaded;
+  // A pill pick for this account wins while it's being saved, so the old language doesn't flash in.
+  // Another account's unsaved pick doesn't (it's dropped as soon as the step above runs).
+  const ownPick = status === 'ready' && profile ? pickFor(pending, userId) : null;
   const language = pickUiLanguage({
-    // A fresh pill pick wins while it's being saved to the account, so the old language doesn't flash in.
-    profile: status === 'ready' && !pending.picked ? profile?.appLanguage : null,
-    pending: pending.language,
+    profile: status === 'ready' && !ownPick ? profile?.appLanguage : null,
+    pending: ownPick ?? pending.language,
     device,
   });
 

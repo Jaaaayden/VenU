@@ -10,6 +10,7 @@ import {
   createLocalStore,
   createSupabaseStore,
   saveWithAvatar,
+  setAppLanguageIfCurrent,
   type AvatarChange,
   type PendingUpload,
   type ProfileStore,
@@ -35,8 +36,11 @@ interface ProfileContextValue {
   /** Re-reads the session and profile; returns the profile (null if none yet). */
   refresh(): Promise<Profile | null>;
   save(draft: ProfileDraft, avatar: AvatarChange): Promise<Profile>;
-  /** Saves only the app language (the language pills); consent and the rest of the profile stay as they are. */
-  saveAppLanguage(code: string): Promise<Profile>;
+  /**
+   * Saves only the app language (the language pills); consent and the rest of the profile stay as
+   * they are. Resolves null when another account signed in while it saved (that session wins).
+   */
+  saveAppLanguage(code: string): Promise<Profile | null>;
   /** Deletes the profile and photos, then signs out (one step, so no screen sees "signed in, no profile"). */
   deleteAll(): Promise<void>;
   signOut(): Promise<void>;
@@ -199,8 +203,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const saveAppLanguage = useCallback(
     async (code: string) => {
       if (!userId) throw new Error('Not signed in');
-      const saved = await store.setAppLanguage(userId, code);
-      if (userIdRef.current !== userId) return saved; // another account signed in meanwhile
+      const saved = await setAppLanguageIfCurrent(store, userId, code, () => userIdRef.current);
+      if (!saved) return null;
       generation.current += 1;
       setProfile(saved);
       return saved;

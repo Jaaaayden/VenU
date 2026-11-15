@@ -4,7 +4,9 @@ import { errorText, friendlyError, isOfflineError } from '@/lib/errors';
 
 import { formatDate, formatNumber, formatTime } from '../format';
 import i18n from '../index';
-import { accountLanguageStep, isRtl, isUiLanguage, pickUiLanguage, resolveUiLanguage, setupAppLanguage, UNTRANSLATED } from '../languages';
+import { accountLanguageStep, isRtl, isUiLanguage, pickFor, pickUiLanguage, resolveUiLanguage, setupAppLanguage, setupPrimaryLanguage, UNTRANSLATED } from '../languages';
+
+const rosa = (language: string) => ({ id: 'rosa', language });
 
 describe('picking the UI language', () => {
   it('prefers the profile, then the welcome pick, then the device', () => {
@@ -24,21 +26,43 @@ describe('picking the UI language', () => {
 
   it('keeps the welcome pill and the account on one language', () => {
     // Picked on welcome since signing out: the account takes it on.
-    expect(accountLanguageStep('en', { language: 'es', picked: true })).toEqual({ save: 'es' });
-    expect(accountLanguageStep('es', { language: 'es', picked: true })).toEqual({ forgetPick: true });
-    expect(accountLanguageStep('en', { language: 'de', picked: true })).toEqual({ forgetPick: true }); // untranslated pick from an older build
+    expect(accountLanguageStep(rosa('en'), { language: 'es', picked: true })).toEqual({ save: 'es' });
+    expect(accountLanguageStep(rosa('es'), { language: 'es', picked: true })).toEqual({ forgetPick: true });
+    expect(accountLanguageStep(rosa('en'), { language: 'de', picked: true })).toEqual({ forgetPick: true }); // untranslated pick from an older build
     // No pick: the device remembers the account's language for the welcome page.
-    expect(accountLanguageStep('ko', { language: 'es', picked: false })).toEqual({ remember: 'ko' });
-    expect(accountLanguageStep('ko', { language: undefined, picked: false })).toEqual({ remember: 'ko' });
-    expect(accountLanguageStep('ko', { language: 'ko', picked: false })).toBeNull();
+    expect(accountLanguageStep(rosa('ko'), { language: 'es', picked: false })).toEqual({ remember: 'ko' });
+    expect(accountLanguageStep(rosa('ko'), { language: undefined, picked: false })).toEqual({ remember: 'ko' });
+    expect(accountLanguageStep(rosa('ko'), { language: 'ko', picked: false })).toBeNull();
     // Picked the account's own language while an unsaved pick showed (venue pill back to 한국어): just drop the pick.
-    expect(accountLanguageStep('ko', { language: 'ko', picked: true })).toEqual({ forgetPick: true });
+    expect(accountLanguageStep(rosa('ko'), { language: 'ko', picked: true })).toEqual({ forgetPick: true });
   });
 
   it('remembers the language an untranslated account is shown in, so sign-out/in agree', () => {
     // Account Hindi is shown in English: the welcome page shows English too, not the old pick.
-    expect(accountLanguageStep('hi', { language: 'ar', picked: false })).toEqual({ remember: 'en' });
-    expect(accountLanguageStep('hi', { language: 'en', picked: false })).toBeNull();
+    expect(accountLanguageStep(rosa('hi'), { language: 'ar', picked: false })).toEqual({ remember: 'en' });
+    expect(accountLanguageStep(rosa('hi'), { language: 'en', picked: false })).toBeNull();
+  });
+
+  it("never saves another account's unsaved venue-pill pick to the next account", () => {
+    // Rosa picked Español on the venue pill, the save failed, she signed out; Daniel signs in.
+    const rosasPick = { language: 'es', picked: true, pickedBy: 'rosa' };
+    expect(accountLanguageStep({ id: 'daniel', language: 'ko' }, rosasPick)).toEqual({ forgetPick: true });
+    expect(pickFor(rosasPick, 'daniel')).toBeNull();
+    expect(pickFor(rosasPick, null)).toBeNull(); // signed out: not a welcome pick either
+    // Rosa herself signs back in: hers is saved.
+    expect(accountLanguageStep({ id: 'rosa', language: 'ko' }, rosasPick)).toEqual({ save: 'es' });
+    // A welcome pick made signed out goes to whoever signs in.
+    expect(accountLanguageStep({ id: 'daniel', language: 'ko' }, { language: 'es', picked: true })).toEqual({ save: 'es' });
+    expect(pickFor({ language: 'es', picked: true }, 'daniel')).toBe('es');
+  });
+
+  it("seeds a new profile from a welcome pick or the screen, never the last account's remembered language", () => {
+    // Shared device: the last account was Korean, remembered (not picked); the screen shows Español.
+    const remembered = { language: 'ko', picked: false };
+    expect(setupPrimaryLanguage(pickFor(remembered, 'daniel'), 'es')).toBe('es');
+    expect(setupAppLanguage('es', pickFor(remembered, 'daniel'), 'es')).toBe('es');
+    expect(setupPrimaryLanguage(pickFor({ language: 'ar', picked: true }, 'daniel'), 'ar')).toBe('ar');
+    expect(setupPrimaryLanguage('de', 'en')).toBe('en'); // untranslated pick from an older build
   });
 
   it('starts a new profile in the welcome pick, else a translated primary, else what is on screen', () => {

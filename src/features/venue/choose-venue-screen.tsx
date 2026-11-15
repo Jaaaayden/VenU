@@ -13,6 +13,7 @@ import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { isolatedLanguageName } from '@/features/profile/options';
+import { useProfile } from '@/features/profile/profile-context';
 import { UNTRANSLATED, useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage, usePendingLanguage } from '@/i18n/pending-language';
 import { errorText } from '@/lib/errors';
@@ -29,6 +30,7 @@ export function ChooseVenueScreen() {
   // English), and an unsaved pick shows over the profile's.
   const { language } = useUiLanguage();
   const pending = usePendingLanguage();
+  const { userId } = useProfile();
   const [query, setQuery] = useState('');
   const [picking, setPicking] = useState(false);
   const venues = searchVenues(query, undefined, t);
@@ -39,7 +41,8 @@ export function ChooseVenueScreen() {
     setPicking(false);
     // Same language again: nothing to switch, but a failed save gets another try.
     // Back to the account's own language: LanguageSync drops the unsaved pick instead of saving.
-    if (code !== language || pending.saveError) choosePendingLanguage(code);
+    // Signed in, the pick belongs to this account: it's never saved to whoever signs in next.
+    if (code !== language || pending.saveError) choosePendingLanguage(code, userId ?? undefined);
   }
 
   return (

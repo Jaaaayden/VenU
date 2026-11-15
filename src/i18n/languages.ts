@@ -47,18 +47,39 @@ export function pickUiLanguage(sources: { profile?: string | null; pending?: str
 /** What keeps the welcome pill and a signed-in account on the same language (see accountLanguageStep). */
 export type AccountLanguageStep = { save: UiLanguage } | { forgetPick: true } | { remember: UiLanguage } | null;
 
+/** This device's language as pending-language.ts keeps it. */
+export interface DeviceLanguage {
+  language?: string;
+  /** Picked on a pill and not saved to an account yet. */
+  picked: boolean;
+  /** The account a venue-pill pick was made for; undefined for a welcome pick made while signed out. */
+  pickedBy?: string;
+}
+
 /**
- * Run once an account's profile is loaded. A language picked on a pill since the account's
- * language was last saved is saved to the account; otherwise this device remembers the language
+ * The pick that applies to `userId`: a welcome pick (made signed out), or that user's own unsaved
+ * venue-pill pick. Another account's unsaved pick never carries over, e.g.
+ * pickFor({ language: 'es', picked: true, pickedBy: 'rosa' }, 'daniel') → null.
+ */
+export function pickFor(device: DeviceLanguage, userId: string | null): string | null {
+  if (!device.picked || !device.language) return null;
+  return device.pickedBy === undefined || device.pickedBy === userId ? device.language : null;
+}
+
+/**
+ * Run once an account's profile is loaded. A pick that applies to this account (pickFor) is saved
+ * to it; another account's unsaved pick is dropped; otherwise this device remembers the language
  * the account is shown in, so the welcome page keeps it after sign-out.
- * e.g. picked 'es', account 'en'          → { save: 'es' }
- *      picked 'en', account 'en'          → { forgetPick: true }
- *      no pick, device has 'es', account 'ko' → { remember: 'ko' }
+ * e.g. welcome pick 'es', account 'en'          → { save: 'es' }
+ *      picked 'en', account 'en'                → { forgetPick: true }
+ *      Rosa's unsaved venue pick, Daniel signs in → { forgetPick: true }
+ *      no pick, device has 'es', account 'ko'   → { remember: 'ko' }
  *      no pick, account 'hi' (shown in English) → { remember: 'en' }
  */
-export function accountLanguageStep(accountLanguage: string, device: { language?: string; picked: boolean }): AccountLanguageStep {
+export function accountLanguageStep(account: { id: string; language: string }, device: DeviceLanguage): AccountLanguageStep {
+  const accountLanguage = account.language;
   if (device.picked) {
-    const code = device.language;
+    const code = pickFor(device, account.id);
     return isUiLanguage(code) && code !== accountLanguage ? { save: code } : { forgetPick: true };
   }
   const shown = resolveUiLanguage(accountLanguage);
@@ -76,4 +97,13 @@ export function accountLanguageStep(accountLanguage: string, device: { language?
 export function setupAppLanguage(mainLanguage: string, picked: string | null | undefined, onScreen: UiLanguage): UiLanguage {
   if (isUiLanguage(picked)) return picked;
   return isUiLanguage(mainLanguage) ? mainLanguage : onScreen;
+}
+
+/**
+ * The primary language profile setup starts with: the welcome pick, else the language on screen.
+ * Never the last account's remembered language as such: that belongs to someone else.
+ * e.g. welcome pick 'ar' → 'ar'; no pick, screen in 'es' → 'es'
+ */
+export function setupPrimaryLanguage(pick: string | null, onScreen: UiLanguage): string {
+  return isUiLanguage(pick) ? pick : onScreen;
 }

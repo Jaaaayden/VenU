@@ -240,6 +240,16 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
   };
 }
 
+/**
+ * Saves `userId`'s app language, then checks that they're still the one signed in. null means
+ * another account signed in while it saved, so the caller mustn't treat it as done for the current
+ * account (e.g. LanguageSync keeps the pick and decides again for the new account).
+ */
+export async function setAppLanguageIfCurrent(store: ProfileStore, userId: string, code: string, current: () => string | null): Promise<Profile | null> {
+  const saved = await store.setAppLanguage(userId, code);
+  return current() === userId ? saved : null;
+}
+
 /** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */
 export type AvatarChange = PickedImage | 'remove' | null;
 
