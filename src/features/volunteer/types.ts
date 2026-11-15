@@ -54,6 +54,8 @@ export interface ChatMessage {
   from: 'me' | 'volunteer';
   text: string;
   sentAt: number;
+  /** Language the sender wrote in, when known (e.g. 'en'). Lets the reader skip translating their own language. */
+  lang?: string;
 }
 
 export type FeedbackTag = 'language' | 'venue' | 'patient' | 'fast' | 'helpful' | 'other';

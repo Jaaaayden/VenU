@@ -108,9 +108,25 @@
     "record": "Mag-record ng voice message",
     "voiceSoon": "Malapit nang dumating ang voice message."
   },
+  "translation": {
+    "translatedFrom": "Isinalin mula sa {{language}}",
+    "translated": "Isinalin",
+    "originalIn": "Orihinal sa {{language}}",
+    "original": "Orihinal",
+    "showOriginal": "Ipakita ang orihinal",
+    "showOriginalLabel": "Ipakita ang orihinal na mensahe",
+    "showTranslation": "Ipakita ang salin",
+    "showTranslationLabel": "Ipakita ang isinaling mensahe",
+    "translating": "Isinasalin…",
+    "failed": "Hindi naisalin",
+    "unsupported": "Hindi pa available ang pagsasalin sa {{language}}",
+    "localMode": "Hindi available ang pagsasalin sa local mode",
+    "readsIn": "Binabasa ito ni {{name}} sa {{language}}"
+  },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",
     "theirs": "Volunteer, {{time}}: {{text}}",
+    "theirsTranslated": "Volunteer, {{time}}: {{text}} (isinalin mula sa {{language}})",
     "listen": "pakinggan",
     "listenLabel": "Pakinggan ang mensaheng ito"
   },

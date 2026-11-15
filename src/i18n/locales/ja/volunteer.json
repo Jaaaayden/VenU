@@ -107,9 +107,25 @@
     "record": "ボイスメッセージを録音",
     "voiceSoon": "ボイスメッセージは近日対応予定です。"
   },
+  "translation": {
+    "translatedFrom": "{{language}}から翻訳",
+    "translated": "翻訳済み",
+    "originalIn": "原文（{{language}}）",
+    "original": "原文",
+    "showOriginal": "原文を表示",
+    "showOriginalLabel": "元のメッセージを表示",
+    "showTranslation": "翻訳を表示",
+    "showTranslationLabel": "翻訳されたメッセージを表示",
+    "translating": "翻訳中…",
+    "failed": "翻訳できませんでした",
+    "unsupported": "{{language}}への翻訳はまだ利用できません",
+    "localMode": "ローカルモードでは翻訳できません",
+    "readsIn": "{{name}} さんは{{language}}で読みます"
+  },
   "bubble": {
     "mine": "あなた、{{time}}：{{text}}",
     "theirs": "ボランティア、{{time}}：{{text}}",
+    "theirsTranslated": "ボランティア、{{time}}：{{text}}（{{language}}から翻訳）",
     "listen": "聞く",
     "listenLabel": "このメッセージを聞く"
   },

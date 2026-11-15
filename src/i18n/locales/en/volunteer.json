@@ -108,9 +108,25 @@
     "record": "Record a voice message",
     "voiceSoon": "Voice messages are coming soon."
   },
+  "translation": {
+    "translatedFrom": "Translated from {{language}}",
+    "translated": "Translated",
+    "originalIn": "Original in {{language}}",
+    "original": "Original",
+    "showOriginal": "Show original",
+    "showOriginalLabel": "Show the original message",
+    "showTranslation": "Show translation",
+    "showTranslationLabel": "Show the translated message",
+    "translating": "Translating…",
+    "failed": "Couldn't translate",
+    "unsupported": "Translation isn't available for {{language}} yet",
+    "localMode": "Translation isn't available in local mode",
+    "readsIn": "{{name}} reads this in {{language}}"
+  },
   "bubble": {
     "mine": "You, {{time}}: {{text}}",
     "theirs": "Volunteer, {{time}}: {{text}}",
+    "theirsTranslated": "Volunteer, {{time}}: {{text}} (translated from {{language}})",
     "listen": "listen",
     "listenLabel": "Listen to this message"
   },

@@ -1,8 +1,10 @@
 // Mock data for the volunteer flow. The real matching backend (owned by Krisha) replaces
 // mockBackend in backend.ts; these lists stay as the UI's fixed options.
-// Places and the volunteer's chat lines are read from the string table when used, so the demo reads
-// naturally in the visitor's language; venue and people's names stay as they are.
-import i18n from '@/i18n';
+// Places are read from the string table in the visitor's language. The volunteer writes in their own
+// main language (Daniel: English), so chat translation has something to do; the stub translator
+// (features/translate) knows these lines in every locale. Venue and people's names stay as they are.
+import { localStub } from '@/features/translate/local';
+import i18n, { resolveUiLanguage } from '@/i18n';
 
 import type { FeedbackTag, HelpTypeId, IncomingRequest, MeetPoint, ProblemKind, Volunteer } from './types';
 
@@ -57,18 +59,25 @@ export const MOCK_VOLUNTEERS: Volunteer[] = [
   },
 ];
 
-/** "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp." */
-export function greetingFrom(v: Volunteer, visitorName: string, spot: string): string {
-  return visitorName
-    ? i18n.t('volunteer:mock.greeting', { name: visitorName, volunteer: v.firstName, spot })
-    : i18n.t('volunteer:mock.greetingNoName', { volunteer: v.firstName, spot });
+/** The language a volunteer writes chat messages in: their main (first) written language. e.g. Daniel → 'en'. */
+export function writingLanguage(v: Volunteer): string {
+  return resolveUiLanguage(v.languages.find(l => l !== 'ase') ?? 'en');
 }
 
-/** The mock volunteer's replies, in order (then the last one repeats). */
-export function mockReply(index: number): string {
-  if (index <= 0) return i18n.t('volunteer:mock.reply1');
-  if (index === 1) return i18n.t('volunteer:mock.reply2');
-  return i18n.t('volunteer:mock.reply3');
+/** "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp." */
+export function greetingFrom(v: Volunteer, visitorName: string, spot: string): string {
+  const lng = writingLanguage(v);
+  const place = localStub.translateOne(spot, lng).text; // the spot as the volunteer would write it
+  return visitorName
+    ? i18n.t('volunteer:mock.greeting', { lng, name: visitorName, volunteer: v.firstName, spot: place })
+    : i18n.t('volunteer:mock.greetingNoName', { lng, volunteer: v.firstName, spot: place });
+}
+
+/** The mock volunteer's replies in `lng`, in order (then the last one repeats). */
+export function mockReply(index: number, lng = i18n.language): string {
+  if (index <= 0) return i18n.t('volunteer:mock.reply1', { lng });
+  if (index === 1) return i18n.t('volunteer:mock.reply2', { lng });
+  return i18n.t('volunteer:mock.reply3', { lng });
 }
 
 /** "What went well?" chips (labels: volunteer `feedback.tags.<value>`). */

@@ -108,9 +108,25 @@
     "record": "ضبط پیام صوتی",
     "voiceSoon": "پیام صوتی به‌زودی."
   },
+  "translation": {
+    "translatedFrom": "ترجمه از {{language}}",
+    "translated": "ترجمه‌شده",
+    "originalIn": "متن اصلی به {{language}}",
+    "original": "متن اصلی",
+    "showOriginal": "نمایش متن اصلی",
+    "showOriginalLabel": "نمایش پیام اصلی",
+    "showTranslation": "نمایش ترجمه",
+    "showTranslationLabel": "نمایش پیام ترجمه‌شده",
+    "translating": "در حال ترجمه…",
+    "failed": "ترجمه نشد",
+    "unsupported": "ترجمه به {{language}} هنوز در دسترس نیست",
+    "localMode": "ترجمه در حالت محلی در دسترس نیست",
+    "readsIn": "{{name}} این را به {{language}} می‌خواند"
+  },
   "bubble": {
     "mine": "شما، {{time}}: {{text}}",
     "theirs": "داوطلب، {{time}}: {{text}}",
+    "theirsTranslated": "داوطلب، {{time}}: {{text}} (ترجمه از {{language}})",
     "listen": "گوش دادن",
     "listenLabel": "گوش دادن به این پیام"
   },

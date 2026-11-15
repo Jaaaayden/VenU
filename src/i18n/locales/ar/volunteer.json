@@ -112,9 +112,25 @@
     "record": "تسجيل رسالة صوتية",
     "voiceSoon": "الرسائل الصوتية قريبًا."
   },
+  "translation": {
+    "translatedFrom": "مترجمة من {{language}}",
+    "translated": "مترجمة",
+    "originalIn": "الأصل باللغة {{language}}",
+    "original": "الأصل",
+    "showOriginal": "عرض الأصل",
+    "showOriginalLabel": "عرض الرسالة الأصلية",
+    "showTranslation": "عرض الترجمة",
+    "showTranslationLabel": "عرض الرسالة المترجمة",
+    "translating": "جارٍ الترجمة…",
+    "failed": "تعذّرت الترجمة",
+    "unsupported": "الترجمة إلى {{language}} غير متاحة بعد",
+    "localMode": "الترجمة غير متاحة في الوضع المحلي",
+    "readsIn": "يقرأ {{name}} هذه الرسالة باللغة {{language}}"
+  },
   "bubble": {
     "mine": "أنت، {{time}}: {{text}}",
     "theirs": "المتطوع، {{time}}: {{text}}",
+    "theirsTranslated": "المتطوع، {{time}}: {{text}} (مترجمة من {{language}})",
     "listen": "استمع",
     "listenLabel": "استمع إلى هذه الرسالة"
   },

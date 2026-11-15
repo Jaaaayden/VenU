@@ -109,9 +109,25 @@
     "record": "Enregistrer un message vocal",
     "voiceSoon": "Les messages vocaux arrivent bientôt."
   },
+  "translation": {
+    "translatedFrom": "Traduit (original : {{language}})",
+    "translated": "Traduit",
+    "originalIn": "Original en {{language}}",
+    "original": "Original",
+    "showOriginal": "Voir l’original",
+    "showOriginalLabel": "Voir le message original",
+    "showTranslation": "Voir la traduction",
+    "showTranslationLabel": "Voir le message traduit",
+    "translating": "Traduction…",
+    "failed": "Traduction impossible",
+    "unsupported": "Traduction en {{language}} pas encore disponible",
+    "localMode": "Traduction indisponible en mode local",
+    "readsIn": "{{name}} le lit en {{language}}"
+  },
   "bubble": {
     "mine": "Vous, {{time}} : {{text}}",
     "theirs": "Bénévole, {{time}} : {{text}}",
+    "theirsTranslated": "Bénévole, {{time}} : {{text}} (traduit, original : {{language}})",
     "listen": "écouter",
     "listenLabel": "Écouter ce message"
   },

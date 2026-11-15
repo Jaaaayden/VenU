@@ -108,9 +108,25 @@
     "record": "Ձայնագրել հաղորդագրություն",
     "voiceSoon": "Ձայնային հաղորդագրությունները շուտով։"
   },
+  "translation": {
+    "translatedFrom": "Թարգմանված է (բնագիրը՝ {{language}})",
+    "translated": "Թարգմանված է",
+    "originalIn": "Բնագիրը՝ {{language}}",
+    "original": "Բնագիր",
+    "showOriginal": "Ցույց տալ բնագիրը",
+    "showOriginalLabel": "Ցույց տալ բնօրինակ հաղորդագրությունը",
+    "showTranslation": "Ցույց տալ թարգմանությունը",
+    "showTranslationLabel": "Ցույց տալ թարգմանված հաղորդագրությունը",
+    "translating": "Թարգմանվում է…",
+    "failed": "Չհաջողվեց թարգմանել",
+    "unsupported": "Թարգմանությունը ({{language}}) դեռ հասանելի չէ",
+    "localMode": "Թարգմանությունը հասանելի չէ տեղային ռեժիմում",
+    "readsIn": "{{name}}-ը սա կկարդա թարգմանությամբ՝ {{language}}"
+  },
   "bubble": {
     "mine": "Դուք, {{time}}՝ {{text}}",
     "theirs": "Կամավոր, {{time}}՝ {{text}}",
+    "theirsTranslated": "Կամավոր, {{time}}՝ {{text}} (թարգմանված է, բնագիրը՝ {{language}})",
     "listen": "լսել",
     "listenLabel": "Լսել այս հաղորդագրությունը"
   },

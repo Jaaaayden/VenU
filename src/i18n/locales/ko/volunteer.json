@@ -107,9 +107,25 @@
     "record": "음성 메시지 녹음",
     "voiceSoon": "음성 메시지는 곧 지원돼요."
   },
+  "translation": {
+    "translatedFrom": "{{language}}에서 번역됨",
+    "translated": "번역됨",
+    "originalIn": "원문({{language}})",
+    "original": "원문",
+    "showOriginal": "원문 보기",
+    "showOriginalLabel": "원래 메시지 보기",
+    "showTranslation": "번역 보기",
+    "showTranslationLabel": "번역된 메시지 보기",
+    "translating": "번역 중…",
+    "failed": "번역하지 못했어요",
+    "unsupported": "{{language}} 번역은 아직 지원되지 않아요",
+    "localMode": "로컬 모드에서는 번역할 수 없어요",
+    "readsIn": "{{name}} 님은 {{language}}로 읽어요"
+  },
   "bubble": {
     "mine": "나, {{time}}: {{text}}",
     "theirs": "자원봉사자, {{time}}: {{text}}",
+    "theirsTranslated": "자원봉사자, {{time}}: {{text}} ({{language}}에서 번역됨)",
     "listen": "듣기",
     "listenLabel": "이 메시지 듣기"
   },

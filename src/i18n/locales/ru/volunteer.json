@@ -110,9 +110,25 @@
     "record": "Записать голосовое сообщение",
     "voiceSoon": "Голосовые сообщения скоро появятся."
   },
+  "translation": {
+    "translatedFrom": "Переведено (оригинал: {{language}})",
+    "translated": "Переведено",
+    "originalIn": "Оригинал: {{language}}",
+    "original": "Оригинал",
+    "showOriginal": "Показать оригинал",
+    "showOriginalLabel": "Показать исходное сообщение",
+    "showTranslation": "Показать перевод",
+    "showTranslationLabel": "Показать переведённое сообщение",
+    "translating": "Перевод…",
+    "failed": "Не удалось перевести",
+    "unsupported": "Перевод на {{language}} пока недоступен",
+    "localMode": "Перевод недоступен в локальном режиме",
+    "readsIn": "{{name}} прочтёт это в переводе на {{language}}"
+  },
   "bubble": {
     "mine": "Вы, {{time}}: {{text}}",
     "theirs": "Волонтёр, {{time}}: {{text}}",
+    "theirsTranslated": "Волонтёр, {{time}}: {{text}} (переведено, оригинал: {{language}})",
     "listen": "слушать",
     "listenLabel": "Прослушать сообщение"
   },

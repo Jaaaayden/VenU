@@ -326,17 +326,31 @@ describe('the mock volunteer in another language', () => {
     await i18n.changeLanguage('en');
   });
 
-  it('greets and replies in the UI language', async () => {
+  // The chat translates for the reader; the volunteer writes as they would, in their main language.
+  it('greets and replies in the volunteer’s own language, tagged with it', async () => {
     await i18n.changeLanguage('es');
     const store = setup();
-    void store.sendRequest({ ...rosaNeedsHelp, location: mockLocation() });
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es', location: mockLocation() });
     await advance(TIMING.search + TIMING.greeting);
-    expect(store.getState().messages[0]!.text).toBe(
-      '¡Hola, Rosa! Soy Daniel, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: Cerca de la rampa de la Puerta 2.',
-    );
+    expect(store.getState().match?.volunteer.firstName).toBe('Daniel');
+    expect(store.getState().messages[0]).toMatchObject({
+      text: "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+      lang: 'en',
+    });
     store.sendMessage('Gracias');
     await advance(TIMING.reply);
-    expect(store.getState().messages.at(-1)!.text).toBe('¡Entendido, gracias! Llego en un par de minutos.');
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+  });
+
+  it('has a Korean-speaking volunteer write in Korean', async () => {
+    await i18n.changeLanguage('ko');
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'ko', location: mockLocation() });
+    await advance(TIMING.search + TIMING.greeting);
+    expect(store.getState().match?.volunteer.firstName).toBe('Min-ji');
+    store.sendMessage('감사합니다');
+    await advance(TIMING.reply);
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: '알겠어요, 감사합니다! 몇 분 안에 도착해요.', lang: 'ko' });
   });
 });
 

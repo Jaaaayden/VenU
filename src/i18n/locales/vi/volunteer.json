@@ -107,9 +107,25 @@
     "record": "Ghi âm tin nhắn thoại",
     "voiceSoon": "Tin nhắn thoại sắp ra mắt."
   },
+  "translation": {
+    "translatedFrom": "Dịch từ {{language}}",
+    "translated": "Đã dịch",
+    "originalIn": "Bản gốc bằng {{language}}",
+    "original": "Bản gốc",
+    "showOriginal": "Xem bản gốc",
+    "showOriginalLabel": "Xem tin nhắn gốc",
+    "showTranslation": "Xem bản dịch",
+    "showTranslationLabel": "Xem tin nhắn đã dịch",
+    "translating": "Đang dịch…",
+    "failed": "Không dịch được",
+    "unsupported": "Chưa hỗ trợ dịch sang {{language}}",
+    "localMode": "Không thể dịch ở chế độ cục bộ",
+    "readsIn": "{{name}} đọc tin này bằng {{language}}"
+  },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",
     "theirs": "Tình nguyện viên, {{time}}: {{text}}",
+    "theirsTranslated": "Tình nguyện viên, {{time}}: {{text}} (dịch từ {{language}})",
     "listen": "nghe",
     "listenLabel": "Nghe tin nhắn này"
   },

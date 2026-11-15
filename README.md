@@ -29,6 +29,51 @@ Pick one when you start the app. Each runs on its own port, so their accounts an
 - For `dev:supabase`: `cp .env.example .env.local`, then fill in the URL and the **publishable** key (Supabase → Project Settings → API Keys). Never the secret key: it bypasses row-level security.
 - The schema lives in `supabase/migrations/`. Apply it in order with `supabase db push` or the SQL editor.
 
+## Chat translation
+
+Each reader sees incoming chat messages in their profile's main language, with "Translated from English · Show original" under them. The app calls the `translate` Edge Function (`supabase/functions/translate/`), which holds the provider key; the app never does. Local mode uses an offline stub that only knows the mock volunteer's lines.
+
+The provider is one secret, so switching is a one-line change: `TRANSLATE_PROVIDER=anthropic` (Claude Haiku 5.5) or `TRANSLATE_PROVIDER=deepl`.
+
+### Try a real provider on your machine
+
+Create `.env.server.local` in the repo root (git-ignored; only the mock backend reads it, never the app bundle):
+
+```bash
+TRANSLATE_PROVIDER=anthropic
+ANTHROPIC_API_KEY=sk-ant-...
+# or
+TRANSLATE_PROVIDER=deepl
+DEEPL_API_KEY=...:fx
+```
+
+Then `npm run dev:mock -- --web`. The terminal says which provider it uses (`Translate: anthropic`); without the file it says `offline stub`. Restart after changing the file. Needs Node 22.18+ (it loads the function's `.ts` files directly).
+
+Test hooks on the mock backend: `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow).
+
+### Deploy (Supabase project owner)
+
+```bash
+supabase login
+supabase link --project-ref <project-ref>
+supabase secrets set TRANSLATE_PROVIDER=anthropic ANTHROPIC_API_KEY=sk-ant-...
+#   or: supabase secrets set TRANSLATE_PROVIDER=deepl DEEPL_API_KEY=...
+supabase functions deploy translate
+```
+
+- Only signed-in users can call it (the function checks the token; the anon key and anonymous sign-ins get 401). If calls fail at the gateway with the new signing keys, redeploy with `--no-verify-jwt`: the function verifies the token itself.
+- Limits: 2,000 characters per message, 16 messages and 8,000 characters per request.
+- Switch providers later with `supabase secrets set TRANSLATE_PROVIDER=deepl DEEPL_API_KEY=...`; no redeploy or app update needed.
+
+### Rough costs
+
+| Provider | Price | A 40-character chat message |
+| --- | --- | --- |
+| Claude Haiku 5.5 | $0.10 / M input tokens, $0.50 / M output tokens | about 300 tokens in, 30 out: roughly $0.00005, or 20,000 messages per $1 |
+| DeepL API Free | 500,000 characters / month free | about 12,000 messages / month |
+
+DeepL can't translate into Tagalog, Vietnamese, Armenian or Persian (and some other app languages); those messages show the original with "Translation isn't available for Tagalog yet". Claude covers all of them.
+
 ## Scripts
 
 | Command | What it does |
@@ -38,7 +83,7 @@ Pick one when you start the app. Each runs on its own port, so their accounts an
 | `npm run stop` | End every VenU dev server |
 | `npm run lint` | ESLint, fails on any warning |
 | `npm run typecheck` | Generate typed routes, then `tsc --noEmit` |
-| `npm test` | Jest unit tests (`src/**/__tests__`) |
+| `npm test` | Jest unit tests (`src/**/__tests__`, `supabase/functions/**/__tests__`) |
 | `npm run check` | Lint, typecheck, tests and `expo-doctor`; run before opening a PR (CI runs the same) |
 
 ## Adding packages
@@ -58,10 +103,11 @@ src/app/            routes (Expo Router): every file is a screen
   (tabs)/           venue, volunteer, profile + floating nav bar
   edit-profile.tsx, privacy.tsx, sign-in.tsx
 src/features/profile/  profile types, options, validation, store (Supabase or local), context, form
+src/features/translate/  chat translation client, cache, bubble hook, offline stub
 src/lib/            supabase client, auth
 src/components/     shared UI (chips, buttons, avatar, language picker, nav bar)
 src/constants/      design tokens (Colors, Spacing, Radius, Type)
-supabase/           SQL migrations
+supabase/           SQL migrations; functions/translate (Edge Function, providers)
 scripts/            dev.mjs (backend modes, stop), mock-supabase.mjs (fake backend)
 assets/             app icon, splash, favicon
 .kiro/figma/        Figma export the first screens were built from
