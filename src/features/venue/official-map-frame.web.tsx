@@ -9,11 +9,11 @@ import type { OfficialMapFrameProps } from './official-map-frame';
 
 const SANDBOX = 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox';
 
-export function OfficialMapFrame({ url, label, onLoad }: OfficialMapFrameProps) {
+export function OfficialMapFrame({ map, label, onLoad }: OfficialMapFrameProps) {
   // An iframe reports no load errors; the panel's timeout covers a page that never arrives.
   return (
     <iframe
-      src={url}
+      src={map.url}
       title={label}
       aria-label={label}
       onLoad={onLoad}

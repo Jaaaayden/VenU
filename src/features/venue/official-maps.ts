@@ -32,6 +32,11 @@ export interface EmbeddedOfficialMap extends OfficialMapBase {
   kind: 'embed';
   /** The page to frame. */
   url: string;
+  /**
+   * Hosts a tap inside the frame may open in place: an exact host, or `*.example.com` for the
+   * domain and every subdomain. Any other site opens in the browser.
+   */
+  frameHosts: string[];
 }
 
 export interface ImageOfficialMap extends OfficialMapBase {
@@ -42,23 +47,28 @@ export interface ImageOfficialMap extends OfficialMapBase {
 
 export type OfficialMap = EmbeddedOfficialMap | ImageOfficialMap;
 
+/** An embed's page is the framed page unless it says otherwise. */
+type OfficialMapEntry = (Omit<EmbeddedOfficialMap, 'pageUrl'> & { pageUrl?: string }) | ImageOfficialMap;
+
+// Intuit Dome's own site loads these from its Adobe publish host; intuitdome.com/content/dam/…
+// answers with an HTML page, not the image.
 const INTUIT_DOME_IMAGES = 'https://publish-p111705-e1087822.adobeaemcloud.com/content/dam/intuit-dome/en/web/content/venue-map';
 
-const OFFICIAL_MAPS: Readonly<Record<string, OfficialMap>> = {
+const OFFICIAL_MAPS: Readonly<Record<string, OfficialMapEntry>> = {
   // Mappedin Web on SoFi's site. Loads slowly (often 15 s or more before the map draws) and opens
-  // with SoFi's cookie banner, which the visitor answers inside the frame.
+  // with SoFi's Ketch cookie banner, which the visitor answers inside the frame.
   sofi: {
     kind: 'embed',
     source: 'SoFi Stadium',
     url: 'https://www.sofistadium.com/plan-your-visit/maps',
-    pageUrl: 'https://www.sofistadium.com/plan-your-visit/maps',
+    frameHosts: ['sofistadium.com', 'www.sofistadium.com', '*.mappedin.com', '*.ketchcdn.com'],
   },
   // Wayfyndr, with its own level switcher and Food / Drink / Merchandise / Parking filters.
   'crypto-arena': {
     kind: 'embed',
     source: 'Crypto.com Arena',
     url: 'https://visit.cryptoarena.com/map',
-    pageUrl: 'https://visit.cryptoarena.com/map',
+    frameHosts: ['visit.cryptoarena.com', 'cryptoarena.com', 'www.cryptoarena.com', '*.wayfyndr.com', '*.ketchcdn.com'],
   },
   // Only static images are published. They label the garages, the plaza and the streets but no
   // gates or services, so VenU draws no pins on them.
@@ -74,8 +84,17 @@ const OFFICIAL_MAPS: Readonly<Record<string, OfficialMap>> = {
   },
 };
 
+const resolved = new Map<string, OfficialMap>();
+
 export function officialMapFor(venueId: string): OfficialMap | undefined {
-  return Object.prototype.hasOwnProperty.call(OFFICIAL_MAPS, venueId) ? OFFICIAL_MAPS[venueId] : undefined;
+  if (!Object.prototype.hasOwnProperty.call(OFFICIAL_MAPS, venueId)) return undefined;
+  let map = resolved.get(venueId);
+  if (!map) {
+    const entry = OFFICIAL_MAPS[venueId];
+    map = entry.kind === 'embed' ? { ...entry, pageUrl: entry.pageUrl ?? entry.url } : entry;
+    resolved.set(venueId, map); // same object every time, so it can sit in hook deps
+  }
+  return map;
 }
 
 /** Venue ids that show an official map, for tests and checks. */
@@ -83,24 +102,54 @@ export function venuesWithOfficialMaps(): string[] {
   return Object.keys(OFFICIAL_MAPS);
 }
 
-/**
- * Whether a navigation inside the framed page may stay in the frame: same site as the map (any
- * subdomain), or not a top-level page load. Anything else opens in the browser instead.
- * e.g. ('https://visit.cryptoarena.com/map', 'https://www.cryptoarena.com/events') → true
- *      ('https://www.sofistadium.com/…', 'https://www.ticketmaster.com/…') → false
- */
-export function staysInFrame(mapUrl: string, nextUrl: string): boolean {
-  if (nextUrl === 'about:blank' || nextUrl.startsWith('about:srcdoc') || nextUrl.startsWith('data:') || nextUrl.startsWith('blob:')) return true;
-  try {
-    const next = new URL(nextUrl);
-    if (next.protocol !== 'https:' && next.protocol !== 'http:') return false;
-    return siteOf(new URL(mapUrl).hostname) === siteOf(next.hostname);
-  } catch {
-    return false;
-  }
+/** e.g. hostAllowed(['*.mappedin.com'], 'cdn.mappedin.com') → true; (['visit.cryptoarena.com'], 'cryptoarena.com') → false */
+export function hostAllowed(patterns: string[], host: string): boolean {
+  const h = host.toLowerCase();
+  return patterns.some(p => (p.startsWith('*.') ? h === p.slice(2) || h.endsWith(p.slice(1)) : h === p));
 }
 
-/** Last two labels of a host name: visit.cryptoarena.com → cryptoarena.com. */
-function siteOf(host: string): string {
-  return host.split('.').slice(-2).join('.');
+export interface FrameNavigation {
+  url: string;
+  /** false for a subframe (ads, consent iframes); undefined where the platform doesn't say. */
+  isTopFrame?: boolean;
+  /** iOS only: 'click' for a tapped link; 'other', 'reload', 'formsubmit', … otherwise. */
+  navigationType?: string;
+  /** Whether the framed page has finished its first load. */
+  loaded: boolean;
+  platform: 'ios' | 'android' | string;
+}
+
+/**
+ * What the native frame does with a navigation:
+ * - `allow`: load it in the frame;
+ * - `block`: don't load it (an app link the frame can't show, that the visitor didn't tap);
+ * - `browser`: open it in the in-app browser instead (a tapped link to another site);
+ * - `app`: hand it to the phone (tel:, mailto:, sms:, intent:, maps links the visitor tapped).
+ *
+ * Until the first load finishes, everything web stays in the frame, so redirects and consent hops
+ * aren't pushed out. After it, only the visitor's own top-frame taps are redirected: iOS says
+ * which navigations are taps; Android asks only about top-frame navigations.
+ * e.g. a tapped ticketmaster.com link on SoFi's map → 'browser'; a tapped tel: link → 'app'
+ */
+export function frameNavigation(map: EmbeddedOfficialMap, nav: FrameNavigation): 'allow' | 'block' | 'browser' | 'app' {
+  if (nav.isTopFrame === false) return 'allow';
+  const kind = urlKind(nav.url);
+  if (kind === 'inline') return 'allow';
+  const userTap = nav.loaded && (nav.platform !== 'ios' || nav.navigationType === 'click');
+  if (kind === 'app') return userTap ? 'app' : 'block';
+  if (!userTap) return 'allow';
+  return hostAllowed(map.frameHosts, new URL(nav.url).hostname) ? 'allow' : 'browser';
+}
+
+function urlKind(url: string): 'inline' | 'web' | 'app' {
+  if (/^(about|data|blob):/i.test(url)) return 'inline';
+  if (/^https?:\/\//i.test(url)) {
+    try {
+      new URL(url);
+      return 'web';
+    } catch {
+      return 'app';
+    }
+  }
+  return 'app';
 }

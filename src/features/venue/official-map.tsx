@@ -4,9 +4,10 @@
  * sheet still slides over the bottom, so the accessible list stays one swipe away.
  */
 import { Image } from 'expo-image';
+import * as Network from 'expo-network';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Chip } from '@/components/chip';
@@ -25,7 +26,7 @@ const SCRIM = 'rgba(0,0,0,0.6)';
 type Status = 'loading' | 'ready' | 'error';
 
 function openInBrowser(url: string) {
-  void WebBrowser.openBrowserAsync(url);
+  WebBrowser.openBrowserAsync(url).catch(() => {});
 }
 
 export function OfficialMapPanel({ map }: { map: OfficialMap }) {
@@ -57,8 +58,15 @@ function SourceBar({ map }: { map: OfficialMap }) {
 
 function EmbeddedMap({ map }: { map: EmbeddedOfficialMap }) {
   const t = useT('venue');
-  const [status, setStatus] = useState<Status>(() => (isOffline() ? 'error' : 'loading'));
+  const [status, setStatus] = useState<Status>('loading');
   const [attempt, setAttempt] = useState(0);
+
+  // Offline, say so at once rather than after the timeout.
+  useEffect(() => {
+    let live = true;
+    void isOffline().then(offline => { if (live && offline) setStatus('error'); });
+    return () => { live = false; };
+  }, [attempt]);
 
   useEffect(() => {
     if (status !== 'loading') return;
@@ -67,7 +75,7 @@ function EmbeddedMap({ map }: { map: EmbeddedOfficialMap }) {
   }, [status, attempt]);
 
   const retry = () => {
-    setStatus(isOffline() ? 'error' : 'loading');
+    setStatus('loading');
     setAttempt(a => a + 1);
   };
 
@@ -75,10 +83,10 @@ function EmbeddedMap({ map }: { map: EmbeddedOfficialMap }) {
     <View style={styles.body}>
       <OfficialMapFrame
         key={attempt}
-        url={map.url}
+        map={map}
         label={t('officialMap.frameLabel', { source: map.source })}
         // Offline, the frame still "loads": the browser's own error page.
-        onLoad={() => setStatus(isOffline() ? 'error' : 'ready')}
+        onLoad={() => { void isOffline().then(offline => setStatus(offline ? 'error' : 'ready')); }}
         onError={() => setStatus('error')}
       />
       {status === 'loading' ? (
@@ -135,36 +143,40 @@ function ImageMaps({ map }: { map: ImageOfficialMap }) {
           ))}
         </ScrollView>
       ) : null}
-      <Pressable
-        onPress={() => setEnlarged(true)}
-        style={styles.imageBox}
-        accessibilityRole="imagebutton"
-        accessibilityLabel={t('officialMap.imageLabel', { view: viewName, source: map.source })}
-        accessibilityHint={t('officialMap.enlargeHint')}>
-        <Image
-          key={`${image.id}-${attempt}`}
-          source={{ uri: image.url, width: image.width, height: image.height }}
+      {/* Covers stay inside the image box, so the view chips above remain usable. */}
+      <View style={styles.imageBox}>
+        <Pressable
+          onPress={() => setEnlarged(true)}
+          disabled={status !== 'ready'}
           style={styles.image}
-          contentFit="contain"
-          transition={150}
-          onLoad={() => setStatus('ready')}
-          onError={() => setStatus('error')}
-          accessible={false}
-        />
-        {status === 'ready' ? (
-          <View style={styles.enlargeBadge} pointerEvents="none">
-            <Text style={styles.enlargeText}>{t('officialMap.enlarge')}</Text>
-          </View>
-        ) : null}
+          accessibilityRole="imagebutton"
+          accessibilityLabel={t('officialMap.imageLabel', { view: viewName, source: map.source })}
+          accessibilityHint={t('officialMap.enlargeHint')}>
+          <Image
+            key={`${image.id}-${attempt}`}
+            source={{ uri: image.url, width: image.width, height: image.height }}
+            style={styles.image}
+            contentFit="contain"
+            transition={150}
+            onLoad={() => setStatus('ready')}
+            onError={() => setStatus('error')}
+            accessible={false}
+          />
+          {status === 'ready' ? (
+            <View style={styles.enlargeBadge} pointerEvents="none">
+              <Text style={styles.enlargeText}>{t('officialMap.enlarge')}</Text>
+            </View>
+          ) : null}
+        </Pressable>
         {status === 'loading' ? (
           <View style={[styles.cover, styles.coverDark]} pointerEvents="none">
             <ActivityIndicator size="large" color={Colors.onPrimary} />
           </View>
         ) : null}
-      </Pressable>
-      {status === 'error' ? (
-        <LoadError map={map} onRetry={() => { setStatus('loading'); setAttempt(a => a + 1); }} />
-      ) : null}
+        {status === 'error' ? (
+          <LoadError map={map} onRetry={() => { setStatus('loading'); setAttempt(a => a + 1); }} />
+        ) : null}
+      </View>
       <OfficialMapViewer
         visible={enlarged}
         onClose={() => setEnlarged(false)}
@@ -176,8 +188,14 @@ function ImageMaps({ map }: { map: ImageOfficialMap }) {
   );
 }
 
-function isOffline(): boolean {
-  return Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.onLine === false;
+/** No connection, or one that can't reach the internet. Unknown counts as online. */
+async function isOffline(): Promise<boolean> {
+  try {
+    const state = await Network.getNetworkStateAsync();
+    return state.isConnected === false || state.isInternetReachable === false;
+  } catch {
+    return false;
+  }
 }
 
 const styles = StyleSheet.create({
