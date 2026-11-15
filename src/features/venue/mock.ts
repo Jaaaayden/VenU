@@ -3,7 +3,7 @@
  * Every venue shares one facility layout (gates at the four compass points, services around the
  * concourse), named for the venue, so each map has the same clean spread of pins.
  */
-import { eventsLabel, facilityDescription, facilityLocation, venueT, type VenueT } from './labels';
+import { eventsLabel, facilityDescription, facilityLocation, facilityName, venueT, type VenueT } from './labels';
 import type { Facility, FacilityCategory, Venue } from './types';
 
 export const VENUES: Venue[] = [
@@ -131,7 +131,7 @@ export function searchFacilities(facilities: Facility[], query: string, category
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
-    const hay = `${f.name} ${f.description} ${f.location} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`.toLowerCase();
+    const hay = `${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`.toLowerCase();
     return words.every(w => hay.includes(w));
   });
 }

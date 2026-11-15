@@ -108,30 +108,37 @@
   },
   "facilityText": {
     "gate-1": {
+      "name": "Cổng 1",
       "description": "Lối vào phía bắc, gần trạm xe đưa đón Metro nhất.",
       "location": "Phía bắc, tại trạm xe đưa đón"
     },
     "gate-2": {
+      "name": "Cổng 2",
       "description": "Lối vào phía đông có lối dốc, cạnh chỗ đỗ xe hỗ trợ tiếp cận ở Bãi C.",
       "location": "Phía đông, cạnh Bãi C"
     },
     "gate-3": {
+      "name": "Cổng 3",
       "description": "Lối vào phía nam để lên xuống xe công nghệ.",
       "location": "Phía nam, tại khu xe công nghệ"
     },
     "gate-4": {
+      "name": "Cổng 4",
       "description": "Lối vào phía tây cho người có vé khu 200 đến 240.",
       "location": "Phía tây, gần quảng trường chính"
     },
     "info-desk": {
+      "name": "Quầy dịch vụ khán giả",
       "description": "Giải đáp thắc mắc, vé thất lạc, bộ dụng cụ giác quan và chụp tai chống ồn.",
       "location": "Hành lang, khu 105"
     },
     "first-aid": {
+      "name": "Trạm sơ cứu",
       "description": "Y tá và nhân viên cấp cứu trực từ khi mở cổng đến khi khán giả ra về hết.",
       "location": "Hành lang, khu 112"
     },
     "restroom-east": {
+      "name": "Nhà vệ sinh phía Đông",
       "description": "Nhà vệ sinh nam, nữ và phòng gia đình cho mọi giới tính có bàn thay tã.",
       "location": "Hành lang, khu 118"
     },
@@ -140,10 +147,12 @@
       "location": "Hành lang, khu 124"
     },
     "lost-found": {
+      "name": "Quầy đồ thất lạc",
       "description": "Gửi hoặc nhận lại đồ thất lạc. Trẻ đi lạc cũng được đưa đến đây.",
       "location": "Hành lang, khu 131"
     },
     "accessible-seating": {
+      "name": "Dịch vụ hỗ trợ tiếp cận",
       "description": "Cho mượn xe lăn, ghế cho người đi kèm và thiết bị hỗ trợ nghe.",
       "location": "Hành lang, khu 136"
     },
@@ -152,11 +161,13 @@
       "location": "Hành lang, khu 140"
     },
     "restroom-west": {
+      "name": "Nhà vệ sinh phía Tây",
       "description": "Nhà vệ sinh nam và nữ. Buồng hỗ trợ tiếp cận ở bên trái.",
       "location": "Hành lang, khu 145"
     },
     "parking-c": {
-      "description": "Bãi đỗ xe hỗ trợ tiếp cận, có lối đi ngắn và bằng phẳng đến Gate 2.",
+      "name": "Bãi đỗ xe C",
+      "description": "Bãi đỗ xe hỗ trợ tiếp cận, có lối đi ngắn và bằng phẳng đến Cổng 2.",
       "location": "Bãi phía đông nam"
     }
   },
@@ -210,7 +221,7 @@
     "topic": "Chủ đề",
     "submit": "Gửi báo cáo",
     "sendFailed": "Không gửi được báo cáo. Hãy kiểm tra kết nối và thử lại.",
-    "titleRequired": "Thêm tiêu đề, ví dụ “Lối dốc ở Gate 2 bị nứt”.",
+    "titleRequired": "Thêm tiêu đề, ví dụ “Lối dốc ở Cổng 2 bị nứt”.",
     "titleTooLong": "Tiêu đề phải dưới {{max}} ký tự.",
     "topicRequired": "Chọn chủ đề phù hợp nhất.",
     "bodyTooLong": "Báo cáo phải dưới {{max}} ký tự."

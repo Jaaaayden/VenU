@@ -22,6 +22,7 @@ import {
   type ReportDraft,
   type ReportErrors,
 } from './reports';
+import { facilityName } from './labels';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, venueText } from './ui';
 
@@ -69,7 +70,7 @@ export function ReportForm() {
       <BackArrow onPress={() => goBack(facilityHref)} label={t('back.facility')} />
       <View style={styles.heading}>
         <Text style={venueText.title} accessibilityRole="header">{t('form.title')}</Text>
-        <Text style={venueText.caption}>{facility ? t('form.subtitleAt', { facility: facility.name }) : t('form.subtitle')}</Text>
+        <Text style={venueText.caption}>{facility ? t('form.subtitleAt', { facility: facilityName(facility, t) }) : t('form.subtitle')}</Text>
       </View>
 
       <TextField

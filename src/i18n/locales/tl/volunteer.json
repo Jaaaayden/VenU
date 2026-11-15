@@ -79,8 +79,8 @@
     "yesCancel": "Oo, kanselahin"
   },
   "map": {
-    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa Gate 2.",
-    "gate": "Gate 2",
+    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa Pasukan 2.",
+    "gate": "Pasukan 2",
     "you": "Ikaw"
   },
   "messages": {
@@ -172,14 +172,14 @@
   },
   "mock": {
     "spots": {
-      "gate2Ramp": "Malapit sa Ramp ng Gate 2",
+      "gate2Ramp": "Malapit sa Rampa ng Pasukan 2",
       "section214": "Concourse ng Section 214",
       "mainPlaza": "Plaza ng pangunahing pasukan"
     },
     "greeting": "Hi {{name}}! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "greetingNoName": "Hi! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "reply1": "Sige, salamat! Nandiyan na ako sa loob ng ilang minuto.",
-    "reply2": "Nakikita ko na ang Gate 2. Naka-pink na LA28 vest ako.",
+    "reply2": "Nakikita ko na ang Pasukan 2. Naka-pink na LA28 vest ako.",
     "reply3": "Walang problema, dahan-dahan lang. Hihintayin kita."
   }
 }

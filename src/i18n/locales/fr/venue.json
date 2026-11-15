@@ -110,30 +110,37 @@
   },
   "facilityText": {
     "gate-1": {
+      "name": "Porte 1",
       "description": "Entrée nord, la plus proche de l’arrêt de la navette Metro.",
       "location": "Côté nord, à l’arrêt de la navette"
     },
     "gate-2": {
+      "name": "Porte 2",
       "description": "Entrée est avec rampe, à côté du parking accessible du parc C.",
       "location": "Côté est, près du parc C"
     },
     "gate-3": {
+      "name": "Porte 3",
       "description": "Entrée sud pour la dépose et la prise en charge en VTC.",
       "location": "Côté sud, à la zone VTC"
     },
     "gate-4": {
+      "name": "Porte 4",
       "description": "Entrée ouest pour les billets des sections 200 à 240.",
       "location": "Côté ouest, près de la place principale"
     },
     "info-desk": {
+      "name": "Accueil des spectateurs",
       "description": "Questions, billets perdus, kits sensoriels et casques anti-bruit.",
       "location": "Promenade, section 105"
     },
     "first-aid": {
+      "name": "Poste de secours",
       "description": "Infirmiers et secouristes présents de l’ouverture des portes jusqu’à l’évacuation du site.",
       "location": "Promenade, section 112"
     },
     "restroom-east": {
+      "name": "Toilettes est",
       "description": "Toilettes hommes, femmes et un espace famille mixte avec table à langer.",
       "location": "Promenade, section 118"
     },
@@ -142,10 +149,12 @@
       "location": "Promenade, section 124"
     },
     "lost-found": {
+      "name": "Objets trouvés",
       "description": "Déposez ou récupérez des objets perdus. Les enfants perdus sont aussi accompagnés ici.",
       "location": "Promenade, section 131"
     },
     "accessible-seating": {
+      "name": "Services d’accessibilité",
       "description": "Prêt de fauteuils roulants, places accompagnateur et aides à l’écoute.",
       "location": "Promenade, section 136"
     },
@@ -154,11 +163,13 @@
       "location": "Promenade, section 140"
     },
     "restroom-west": {
+      "name": "Toilettes ouest",
       "description": "Toilettes hommes et femmes. La cabine accessible est à gauche.",
       "location": "Promenade, section 145"
     },
     "parking-c": {
-      "description": "Parking accessible avec un chemin court et plat jusqu’à Gate 2.",
+      "name": "Parking C",
+      "description": "Parking accessible avec un chemin court et plat jusqu’à la Porte 2.",
       "location": "Parc sud-est"
     }
   },
@@ -214,7 +225,7 @@
     "topic": "Sujet",
     "submit": "Envoyer",
     "sendFailed": "Impossible d’envoyer le signalement. Vérifiez votre connexion et réessayez.",
-    "titleRequired": "Ajoutez un titre, par ex. « La rampe de la Gate 2 est fissurée ».",
+    "titleRequired": "Ajoutez un titre, par ex. « La rampe de la Porte 2 est fissurée ».",
     "titleTooLong": "Le titre doit faire moins de {{max}} caractères.",
     "topicRequired": "Choisissez le sujet le plus adapté.",
     "bodyTooLong": "Le signalement doit faire moins de {{max}} caractères."

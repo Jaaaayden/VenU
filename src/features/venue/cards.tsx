@@ -6,7 +6,7 @@ import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { eventsLabel, facilityMeta } from './labels';
+import { eventsLabel, facilityMeta, facilityName } from './labels';
 import type { FacilityReport } from './reports';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
 import type { Facility, Venue } from './types';
@@ -38,17 +38,18 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
   const t = useT('venue');
   const rtl = useLayoutRtl();
   const meta = facilityMeta(facility, t);
+  const name = facilityName(facility, t);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name: facility.name, meta })}
+      accessibilityLabel={t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name, meta })}
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <View style={styles.rowIcon}>
         <FacilityIcon category={facility.category} size={30} />
       </View>
       <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>{facility.name}</Text>
+        <Text style={styles.rowTitle} numberOfLines={1}>{name}</Text>
         <Text style={venueText.caption} numberOfLines={1}>{meta}</Text>
       </View>
       {facility.accessible ? <FigmaIcon name="wheelchair-6dc801" size={22} color={Colors.primary} /> : null}

@@ -10,7 +10,7 @@ import { useT } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
 import { Notification, ReportCard } from './cards';
-import { facilityDescription, facilityLocation, facilityMeta, tagLabel } from './labels';
+import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, TagRow, venueText } from './ui';
@@ -54,6 +54,7 @@ export function FacilityDetail() {
   }
 
   const location = facilityLocation(facility, t);
+  const name = facilityName(facility, t);
 
   const addReport = () => {
     setSnap('up');
@@ -73,7 +74,7 @@ export function FacilityDetail() {
         </View>
 
         <View style={styles.heading}>
-          <Text style={venueText.title} accessibilityRole="header">{facility.name}</Text>
+          <Text style={venueText.title} accessibilityRole="header">{name}</Text>
           <Text style={venueText.caption}>{facilityDescription(facility, t)}</Text>
           <View style={styles.meta}>
             <FigmaIcon name="clock" size={16} color={Colors.textMuted} />
@@ -92,7 +93,7 @@ export function FacilityDetail() {
             onPress={() => setDirections(true)}
             style={styles.directionsButton}
           />
-          {directions ? <InlineNote>{t('facility.directionsSoon', { name: facility.name, location })}</InlineNote> : null}
+          {directions ? <InlineNote>{t('facility.directionsSoon', { name, location })}</InlineNote> : null}
         </View>
 
         <View style={styles.reportsHead}>

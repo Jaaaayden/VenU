@@ -110,30 +110,37 @@
   },
   "facilityText": {
     "gate-1": {
+      "name": "Puerta 1",
       "description": "Entrada norte, la más cercana a la parada del autobús del Metro.",
       "location": "Lado norte, en la parada del autobús"
     },
     "gate-2": {
+      "name": "Puerta 2",
       "description": "Entrada este con rampa, junto al estacionamiento accesible del Lote C.",
       "location": "Lado este, junto al Lote C"
     },
     "gate-3": {
+      "name": "Puerta 3",
       "description": "Entrada sur para dejar y recoger pasajeros de viajes compartidos.",
       "location": "Lado sur, en la zona de viajes compartidos"
     },
     "gate-4": {
+      "name": "Puerta 4",
       "description": "Entrada oeste para quienes tienen boletos en las secciones 200 a 240.",
       "location": "Lado oeste, junto a la plaza principal"
     },
     "info-desk": {
+      "name": "Atención al visitante",
       "description": "Preguntas, boletos perdidos, kits sensoriales y protectores auditivos.",
       "location": "Explanada, sección 105"
     },
     "first-aid": {
+      "name": "Primeros auxilios",
       "description": "Enfermeros y paramédicos desde la apertura de puertas hasta que se vacía la sede.",
       "location": "Explanada, sección 112"
     },
     "restroom-east": {
+      "name": "Baños este",
       "description": "Baños de hombres, de mujeres y una sala familiar para todos con cambiador.",
       "location": "Explanada, sección 118"
     },
@@ -142,10 +149,12 @@
       "location": "Explanada, sección 124"
     },
     "lost-found": {
+      "name": "Objetos perdidos",
       "description": "Deja o recoge objetos perdidos. Aquí también se trae a los niños perdidos.",
       "location": "Explanada, sección 131"
     },
     "accessible-seating": {
+      "name": "Servicios de accesibilidad",
       "description": "Préstamo de sillas de ruedas, asientos para acompañantes y dispositivos de ayuda auditiva.",
       "location": "Explanada, sección 136"
     },
@@ -154,11 +163,13 @@
       "location": "Explanada, sección 140"
     },
     "restroom-west": {
+      "name": "Baños oeste",
       "description": "Baños de hombres y de mujeres. El cubículo accesible está a la izquierda.",
       "location": "Explanada, sección 145"
     },
     "parking-c": {
-      "description": "Estacionamiento accesible con un camino corto y plano hasta Gate 2.",
+      "name": "Estacionamiento Lote C",
+      "description": "Estacionamiento accesible con un camino corto y plano hasta la Puerta 2.",
       "location": "Lote sureste"
     }
   },
