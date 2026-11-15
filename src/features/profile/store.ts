@@ -40,7 +40,11 @@ function isServerRejection(e: unknown): boolean {
 /** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
 export interface ProfileStore {
   get(userId: string): Promise<Profile | null>;
-  /** Creates or updates. `existing` keeps the original consent time unless the policy version changed. */
+  /**
+   * Creates or updates. `existing` keeps the original consent time unless the policy version changed.
+   * An update never writes the app language: the language pills own it (setAppLanguage), and a form
+   * opened before a pill switch would otherwise put the old language back.
+   */
   save(userId: string, draft: ProfileDraft, existing: Profile | null): Promise<Profile>;
   /**
    * Changes only the app language of an existing profile. Leaves privacy consent alone, so a pill
@@ -102,12 +106,20 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
       return null;
     },
     async save(userId, draft, existing) {
+      // The stored app language, read now (not from `existing`, which a pill save may have outdated).
+      let storedLanguage: string | undefined;
+      if (existing) {
+        try {
+          const stored: unknown = JSON.parse((await storage.getItem(localKey(userId))) ?? 'null');
+          if (isProfileRowShape(stored)) storedLanguage = stored.app_language;
+        } catch {}
+      }
       const row: ProfileRow = {
         id: userId,
         verified: existing?.verified ?? false,
         ...draftToWrite(draft, consentTime(existing)),
         // Role is fixed once the profile exists, same as the DB rule.
-        ...(existing ? { role: existing.role } : {}),
+        ...(existing ? { role: existing.role, app_language: storedLanguage ?? existing.appLanguage } : {}),
       };
       try {
         await storage.setItem(localKey(userId), JSON.stringify(row));
@@ -160,8 +172,9 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
     },
     async save(userId, draft, existing) {
       const write = draftToWrite(draft, consentTime(existing));
-      // Role can't change after creation; the column isn't updatable for users.
-      const { role: _role, ...updatable } = write;
+      // Role can't change after creation; the column isn't updatable for users. The app language is
+      // left as stored: only setAppLanguage (the language pills) changes it.
+      const { role: _role, app_language: _appLanguage, ...updatable } = write;
       const update = () => table().update(updatable).eq('id', userId).select('*').single<ProfileRow>();
       const insert = () => table().insert({ id: userId, ...write }).select('*').single<ProfileRow>();
       let result = existing ? await update() : await insert();

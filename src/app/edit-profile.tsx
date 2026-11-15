@@ -25,8 +25,8 @@ export default function EditProfileScreen() {
         savedAvatarUrl={avatarUrl}
         submitLabel={t('edit.submit')}
         onSubmit={async (draft, avatar) => {
-          // The app language isn't on this form: keep the saved one, even if a pill changed it meanwhile.
-          await save({ ...draft, appLanguage: profile.appLanguage }, avatar);
+          // Saving never changes the app language (the store leaves it as stored; the pills own it).
+          await save(draft, avatar);
           goBack('/profile');
         }}
         header={<StepHeader title={t('edit.title')} subtitle={t('edit.subtitle')} />}

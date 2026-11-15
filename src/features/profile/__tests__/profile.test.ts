@@ -6,7 +6,7 @@ import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../optio
 import { PRIVACY_VERSION } from '../privacy';
 import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, setAppLanguageIfCurrent, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials, uiLanguageName } from '../summary';
-import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
+import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 import i18n from '@/i18n';
 import { codedError, friendlyError } from '@/lib/errors';
@@ -90,13 +90,17 @@ describe('draftToWrite / rowToProfile', () => {
   });
 });
 
-describe('editing spoken languages', () => {
-  it('never changes the app language', () => {
-    // Primary Arabic, app Korean (venue pill); Edit profile adds Spanish as the secondary language.
-    const before = { ...emptyDraft('visitor', 'ar'), appLanguage: 'ko' };
-    const after = withSpokenLanguages(before, ['ar', 'es'], 'ar');
-    expect(after).toMatchObject({ languages: ['ar', 'es'], mainLanguage: 'ar', appLanguage: 'ko' });
-    expect(withSpokenLanguages(before, ['es'], 'es').appLanguage).toBe('ko');
+describe('saving the profile form', () => {
+  it('never changes the app language of an existing profile (local store)', async () => {
+    // Edit profile opened in Arabic; the venue pill then saved 한국어; the form saves with its old draft.
+    const storage = memoryStorage();
+    const store = createLocalStore(storage);
+    const created = await store.save('u1', { ...rosa, appLanguage: 'ar' }, null);
+    expect(created.appLanguage).toBe('ar'); // a new profile takes the draft's
+    await store.setAppLanguage('u1', 'ko');
+    const edited = await store.save('u1', { ...rosa, languages: ['es', 'en', 'fr'], appLanguage: 'ar' }, created);
+    expect(edited.appLanguage).toBe('ko');
+    expect(edited.languages).toEqual(['es', 'en', 'fr']);
   });
 });
 
@@ -436,6 +440,20 @@ describe('supabase store save', () => {
     return { client: client as unknown as SupabaseClient, calls };
   }
   const duplicate: Result = { data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } };
+
+  it('an update leaves app_language out (the pills own it); an insert includes it', async () => {
+    const writes: Record<string, unknown>[] = [];
+    const client = {
+      from: () => ({
+        update: (r: Record<string, unknown>) => (writes.push(r), { eq: () => ({ select: () => ({ single: async () => ({ data: row, error: null }) }) }) }),
+        insert: (r: Record<string, unknown>) => (writes.push(r), { select: () => ({ single: async () => ({ data: row, error: null }) }) }),
+      }),
+    };
+    const store = createSupabaseStore(client as unknown as SupabaseClient, 'avatars');
+    await store.save('u1', { ...rosa, appLanguage: 'ar' }, rowToProfile(row));
+    await store.save('u1', { ...rosa, appLanguage: 'ar' }, null);
+    expect(writes.map(w => 'app_language' in w)).toEqual([false, true]);
+  });
 
   it('first save inserts with the role', async () => {
     const { client, calls } = tableClient();

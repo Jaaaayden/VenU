@@ -16,7 +16,7 @@ import { ERROR_CODES, errorText } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, labeled, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
-import { withSpokenLanguages, type ProfileDraft } from './types';
+import type { ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
 
 interface ProfileFormProps {
@@ -97,7 +97,8 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
           <LanguagePicker
             languages={d.languages}
             main={d.mainLanguage}
-            onChange={(languages, main) => setD(prev => withSpokenLanguages(prev, languages, main))}
+            // Spoken languages only: the app language belongs to the language pills (welcome, venue).
+            onChange={(languages, main) => setD(prev => ({ ...prev, languages, mainLanguage: main }))}
           />
         </FormSection>
 
