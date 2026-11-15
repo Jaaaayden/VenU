@@ -4,7 +4,7 @@
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     paddingStart: 14,
   },
   inputListening: { borderColor: Colors.primary, borderWidth: 2, paddingStart: 13 }, // the thicker border doesn't shift the text
-  inputText: { flex: 1, fontFamily: Fonts.text, fontSize: 17, color: Colors.text, paddingVertical: 8, outlineStyle: 'none' } as object,
+  // outlineStyle 'none' is web-only: native accepts only solid | dotted | dashed.
+  inputText: { flex: 1, fontFamily: Fonts.text, fontSize: 17, color: Colors.text, paddingVertical: 8, ...Platform.select({ web: { outlineStyle: 'none' } as object }) },
   sticker: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
 });
