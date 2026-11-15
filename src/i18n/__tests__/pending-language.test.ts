@@ -3,7 +3,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { readPendingSetup } from '@/features/auth/pending-setup';
 
-import { choosePendingLanguage, forgetLanguagePick, refreshPendingLanguage, rememberAccountLanguage } from '../pending-language';
+import {
+  choosePendingLanguage,
+  forgetLanguagePick,
+  languageSaveFailed,
+  refreshPendingLanguage,
+  rememberAccountLanguage,
+  retryLanguageSave,
+  usePendingLanguage,
+} from '../pending-language';
+
+// The hook only reads the shared snapshot; outside React, read it the same way.
+jest.mock('react', () => ({ ...jest.requireActual<object>('react'), useSyncExternalStore: (_s: unknown, get: () => unknown) => get() }));
+const readSnapshot = usePendingLanguage;
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -33,5 +45,29 @@ describe('this device language', () => {
     await refreshPendingLanguage();
     await forgetLanguagePick(); // only clears what the snapshot knows is a pick
     expect(await readPendingSetup()).toEqual({ language: 'ja' });
+  });
+
+  it('keeps a pick whose save failed on screen, and clears the error to retry', async () => {
+    await choosePendingLanguage('es');
+    languageSaveFailed('es', new TypeError('Failed to fetch'));
+    expect(readSnapshot()).toMatchObject({ language: 'es', picked: true, saveError: expect.any(TypeError) });
+    await refreshPendingLanguage(); // re-reading the same pick doesn't retry by itself
+    expect(readSnapshot().saveError).toBeInstanceOf(TypeError);
+    retryLanguageSave();
+    expect(readSnapshot()).toMatchObject({ language: 'es', picked: true, saveError: null });
+    // Picking again (even the same language) also retries.
+    languageSaveFailed('es', new Error('offline'));
+    await choosePendingLanguage('es');
+    expect(readSnapshot().saveError).toBeNull();
+  });
+
+  it('leaves a newer pick alone when an older save finishes or fails', async () => {
+    await choosePendingLanguage('es');
+    await choosePendingLanguage('fr'); // picked again while 'es' was saving
+    languageSaveFailed('es', new Error('offline'));
+    await forgetLanguagePick('es');
+    expect(readSnapshot()).toMatchObject({ language: 'fr', picked: true, saveError: null });
+    await forgetLanguagePick('fr');
+    expect(readSnapshot()).toMatchObject({ language: 'fr', picked: false });
   });
 });

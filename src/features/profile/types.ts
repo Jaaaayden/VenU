@@ -68,6 +68,14 @@ export function emptyDraft(role: Role, mainLanguage = 'en'): ProfileDraft {
   };
 }
 
+/**
+ * The language picker's change: spoken languages only. The app language belongs to the language
+ * pills, e.g. Primary العربية + Spanish added on Edit profile → the app stays in 한국어.
+ */
+export function withSpokenLanguages<D extends ProfileDraft>(d: D, languages: string[], mainLanguage: string): D {
+  return { ...d, languages, mainLanguage };
+}
+
 /** Consent carries over only if the policy hasn't changed since they agreed. */
 export function draftFromProfile(p: Profile): ProfileDraft {
   const { id: _id, verified: _v, privacyVersion, privacyAcceptedAt: _pa, ...rest } = p;

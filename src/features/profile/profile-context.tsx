@@ -36,6 +36,8 @@ interface ProfileContextValue {
   /** Re-reads the session and profile; returns the profile (null if none yet). */
   refresh(): Promise<Profile | null>;
   save(draft: ProfileDraft, avatar: AvatarChange): Promise<Profile>;
+  /** Saves only the app language (the language pills); consent and the rest of the profile stay as they are. */
+  saveAppLanguage(code: string): Promise<Profile>;
   /** Deletes the profile and photos, then signs out (one step, so no screen sees "signed in, no profile"). */
   deleteAll(): Promise<void>;
   signOut(): Promise<void>;
@@ -195,6 +197,18 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     [userId, profile, setSignedUrl],
   );
 
+  const saveAppLanguage = useCallback(
+    async (code: string) => {
+      if (!userId) throw new Error('Not signed in');
+      const saved = await store.setAppLanguage(userId, code);
+      if (userIdRef.current !== userId) return saved; // another account signed in meanwhile
+      generation.current += 1;
+      setProfile(saved);
+      return saved;
+    },
+    [userId],
+  );
+
   const deleteAll = useCallback(async () => {
     if (!userId) return;
     // Any kept upload is in the folder this sweeps, so it can't be reused afterwards either way.
@@ -218,8 +232,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [goSignedOut]);
 
   const value = useMemo(
-    () => ({ status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut }),
-    [status, loadError, userId, profile, avatarUrl, refresh, save, deleteAll, signOut],
+    () => ({ status, loadError, userId, profile, avatarUrl, refresh, save, saveAppLanguage, deleteAll, signOut }),
+    [status, loadError, userId, profile, avatarUrl, refresh, save, saveAppLanguage, deleteAll, signOut],
   );
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 }

@@ -6,7 +6,7 @@ import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../optio
 import { PRIVACY_VERSION } from '../privacy';
 import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials } from '../summary';
-import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
+import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 import { friendlyError } from '@/lib/errors';
 
@@ -89,6 +89,16 @@ describe('draftToWrite / rowToProfile', () => {
   });
 });
 
+describe('editing spoken languages', () => {
+  it('never changes the app language', () => {
+    // Primary Arabic, app Korean (venue pill); Edit profile adds Spanish as the secondary language.
+    const before = { ...emptyDraft('visitor', 'ar'), appLanguage: 'ko' };
+    const after = withSpokenLanguages(before, ['ar', 'es'], 'ar');
+    expect(after).toMatchObject({ languages: ['ar', 'es'], mainLanguage: 'ar', appLanguage: 'ko' });
+    expect(withSpokenLanguages(before, ['es'], 'es').appLanguage).toBe('ko');
+  });
+});
+
 describe('local store', () => {
   it('saves, reads back, keeps role and consent time on edit, and deletes', async () => {
     const storage = memoryStorage();
@@ -107,6 +117,18 @@ describe('local store', () => {
     await store.deleteAll('u1');
     expect(await store.get('u1')).toBeNull();
     expect(storage.data.size).toBe(0);
+  });
+
+  it('changes only the app language, leaving an old consent as it was', async () => {
+    const storage = memoryStorage();
+    const store = createLocalStore(storage);
+    const created = await store.save('u1', rosa, null);
+    const old = { ...JSON.parse(storage.data.get('venu.profile.u1')!), privacy_version: '2020-01', privacy_accepted_at: '2020-01-01T00:00:00.000Z' };
+    storage.data.set('venu.profile.u1', JSON.stringify(old));
+    const saved = await store.setAppLanguage('u1', 'ko');
+    expect(saved).toEqual({ ...created, appLanguage: 'ko', privacyVersion: '2020-01', privacyAcceptedAt: '2020-01-01T00:00:00.000Z' });
+    expect(await store.get('u1')).toEqual(saved);
+    await expect(store.setAppLanguage('nobody', 'ko')).rejects.toThrow();
   });
 
   it('drops unreadable saved data instead of failing every launch', async () => {
@@ -267,6 +289,7 @@ describe('saveWithAvatar', () => {
       removeAvatar: async p => { calls.push(`remove ${p}`); if (removeFails) throw new Error('remove failed'); },
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     return { store, calls };
   }
@@ -294,6 +317,7 @@ describe('saveWithAvatar', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toMatchObject({ code: '' });
     expect(calls).toEqual(['upload', 'save']);
@@ -402,6 +426,18 @@ describe('supabase store save', () => {
     expect(calls).toEqual(['update role=omitted', 'insert role=visitor']);
   });
 
+  it('a language change updates only app_language (no consent re-stamp)', async () => {
+    const writes: unknown[] = [];
+    const client = {
+      from: () => ({
+        update: (r: unknown) => (writes.push(r), { eq: () => ({ select: () => ({ single: async () => ({ data: { ...row, app_language: 'ko' }, error: null, status: 200 }) }) }) }),
+      }),
+    };
+    const saved = await createSupabaseStore(client as unknown as SupabaseClient, 'avatars').setAppLanguage('u1', 'ko');
+    expect(writes).toEqual([{ app_language: 'ko' }]);
+    expect(saved.appLanguage).toBe('ko');
+  });
+
   it('other insert errors still throw', async () => {
     const { client } = tableClient({ insert: { data: null, error: { code: '23514', message: 'violates check constraint' } } });
     await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: '23514' });
@@ -427,6 +463,7 @@ describe('saveWithAvatar retries after a network failure', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     return { store, calls };
   }
@@ -485,6 +522,7 @@ describe('saveWithAvatar retries after a network failure', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
@@ -554,6 +592,7 @@ describe('what counts as a definite rejection', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toBe(error);

@@ -41,6 +41,11 @@ export interface ProfileStore {
   get(userId: string): Promise<Profile | null>;
   /** Creates or updates. `existing` keeps the original consent time unless the policy version changed. */
   save(userId: string, draft: ProfileDraft, existing: Profile | null): Promise<Profile>;
+  /**
+   * Changes only the app language of an existing profile. Leaves privacy consent alone, so a pill
+   * pick never records agreement to a newer policy, e.g. setAppLanguage('u1', 'ko').
+   */
+  setAppLanguage(userId: string, code: string): Promise<Profile>;
   /** Stores the picked image and returns the value to keep in `avatarPath`. */
   uploadAvatar(userId: string, image: PickedImage): Promise<string>;
   removeAvatar(path: string): Promise<void>;
@@ -112,6 +117,17 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
       }
       return rowToProfile(row);
     },
+    async setAppLanguage(userId, code) {
+      const raw = await storage.getItem(localKey(userId));
+      let row: unknown = null;
+      try {
+        row = raw ? JSON.parse(raw) : null;
+      } catch {}
+      if (!isProfileRowShape(row)) throw new Error('No profile to update');
+      const next: ProfileRow = { ...row, app_language: code };
+      await storage.setItem(localKey(userId), JSON.stringify(next));
+      return rowToProfile(next);
+    },
     async uploadAvatar(_userId, image) {
       // Native keeps the picker's cache URI, which the OS may clear. Fine for this dev-only fallback.
       return image.base64 ? `data:${image.mimeType ?? 'image/jpeg'};base64,${image.base64}` : image.uri;
@@ -168,6 +184,11 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       // Keep the HTTP status: a 4xx is a definite "no" even when the body has no PostgREST code.
       if (result.error) throw Object.assign(result.error, { status: result.status });
       return rowToProfile(result.data);
+    },
+    async setAppLanguage(userId, code) {
+      const { data, error, status } = await table().update({ app_language: code }).eq('id', userId).select('*').single<ProfileRow>();
+      if (error) throw Object.assign(error, { status });
+      return rowToProfile(data);
     },
     async uploadAvatar(userId, image) {
       const contentType = image.mimeType ?? 'image/jpeg';

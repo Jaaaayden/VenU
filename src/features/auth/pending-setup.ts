@@ -35,14 +35,23 @@ export async function readPendingSetup(): Promise<PendingSetup> {
   }
 }
 
+// Writes run one at a time: each reads what's stored and merges into it, so two at once (e.g.
+// forgetting a pick while remembering the account's language) would otherwise drop one.
+let writes: Promise<void> = Promise.resolve();
+function queued(write: () => Promise<void>): Promise<void> {
+  const run = writes.then(write).catch(() => {
+    // Storage full or blocked (private browsing): setup just starts blank.
+  });
+  writes = run;
+  return run;
+}
+
 /** Merges into what's stored: keys left out are kept, a key set to `undefined` is cleared. */
-export async function writePendingSetup(patch: PendingSetup): Promise<void> {
-  try {
+export function writePendingSetup(patch: PendingSetup): Promise<void> {
+  return queued(async () => {
     const next = { ...(await readPendingSetup()), ...patch };
     await AsyncStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    // Storage full or blocked (private browsing): setup just starts blank.
-  }
+  });
 }
 
 const normalEmail = (email: string) => email.trim().toLowerCase();
@@ -64,9 +73,9 @@ export async function forgetPendingNameUnlessFor(email: string): Promise<void> {
 }
 
 /** After setup saves: the name now lives in the profile. The language stays as this device's choice. */
-export async function clearPendingName(): Promise<void> {
-  const { language } = await readPendingSetup();
-  try {
-    await AsyncStorage.setItem(KEY, JSON.stringify({ language }));
-  } catch {}
+export function clearPendingName(): Promise<void> {
+  return queued(async () => {
+    const { language, languagePicked } = await readPendingSetup();
+    await AsyncStorage.setItem(KEY, JSON.stringify({ language, languagePicked }));
+  });
 }

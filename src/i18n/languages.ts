@@ -48,17 +48,32 @@ export function pickUiLanguage(sources: { profile?: string | null; pending?: str
 export type AccountLanguageStep = { save: UiLanguage } | { forgetPick: true } | { remember: UiLanguage } | null;
 
 /**
- * Run once an account's profile is loaded. A language picked on the welcome pill since signing out
- * is saved to the account; otherwise this device remembers the account's language, so the welcome
- * page keeps it after sign-out.
- * e.g. picked 'es' on welcome, account 'en'  → { save: 'es' }
- *      picked 'en' on welcome, account 'en'  → { forgetPick: true }
+ * Run once an account's profile is loaded. A language picked on a pill since the account's
+ * language was last saved is saved to the account; otherwise this device remembers the language
+ * the account is shown in, so the welcome page keeps it after sign-out.
+ * e.g. picked 'es', account 'en'          → { save: 'es' }
+ *      picked 'en', account 'en'          → { forgetPick: true }
  *      no pick, device has 'es', account 'ko' → { remember: 'ko' }
+ *      no pick, account 'hi' (shown in English) → { remember: 'en' }
  */
 export function accountLanguageStep(accountLanguage: string, device: { language?: string; picked: boolean }): AccountLanguageStep {
   if (device.picked) {
     const code = device.language;
     return isUiLanguage(code) && code !== accountLanguage ? { save: code } : { forgetPick: true };
   }
-  return isUiLanguage(accountLanguage) && device.language !== accountLanguage ? { remember: accountLanguage } : null;
+  const shown = resolveUiLanguage(accountLanguage);
+  return device.language !== shown ? { remember: shown } : null;
+}
+
+/**
+ * The app language a new profile starts with. The primary language is only a starting point for
+ * the app when nothing was picked on the welcome pill and it has translated screens; otherwise the
+ * app stays in the language on screen.
+ * e.g. picked 'ar', primary 'hi'      → 'ar'
+ *      no pick, primary 'ko', shown 'es' → 'ko'
+ *      no pick, primary 'hi', shown 'es' → 'es'
+ */
+export function setupAppLanguage(mainLanguage: string, picked: string | null | undefined, onScreen: UiLanguage): UiLanguage {
+  if (isUiLanguage(picked)) return picked;
+  return isUiLanguage(mainLanguage) ? mainLanguage : onScreen;
 }

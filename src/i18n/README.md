@@ -49,13 +49,18 @@ a placeholder. Dates, times and numbers go through `format.ts` (`formatDate`, `f
 
 ## Which language shows
 
-`<LanguageSync />` (mounted in `app/_layout.tsx`) picks: signed-in profile's `appLanguage` → the
-language picked on the welcome screen (`choosePendingLanguage(code)` from `pending-language.ts`)
-→ the device language → English. Changing any of them re-renders the app without a restart.
+`<LanguageSync />` (mounted in `app/_layout.tsx`) picks: a pill pick not saved yet → signed-in
+profile's `appLanguage` → this device's language (`pending-language.ts`) → the device language →
+English. Changing any of them re-renders the app without a restart.
 
-The welcome pill and the venue pill stay in step (`accountLanguageStep` in `languages.ts`):
-- Pick Español on welcome, then sign in → Español is saved to the account.
-- Switch to 한국어 on the venue page, then sign out → welcome stays in Korean.
+Only the language pills set the app language (`choosePendingLanguage(code)`); the profile's
+spoken languages never do. They stay in step (`accountLanguageStep` in `languages.ts`):
+- Pick Español on welcome, then sign in → Español is saved to the account (only `app_language`, so
+  privacy consent isn't re-stamped).
+- Switch to 한국어 on the venue page → shown at once, saved to the account; offline, it stays on
+  screen and the next screen retries.
+- Sign out → welcome stays in the language the account was shown in (Hindi account → English).
+- Profile setup: the welcome pick, else a translated primary language, else what's on screen.
 - Both pills list only translated languages (`UNTRANSLATED` is left out) and name the language on screen.
 
 Arabic and Persian mirror the layout. Web flips at once (`<html dir="rtl">`). iOS and Android flip

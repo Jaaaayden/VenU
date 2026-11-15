@@ -15,7 +15,6 @@
     "languageLabel": "App language: {{language}}",
     "languageHint": "Changes the language of the whole app",
     "languageTitle": "App language",
-    "languageConsent": "Review the updated privacy policy in Profile first, then change the language.",
     "assistTitle": "Need Assistance?",
     "assistBody": "Connect with a volunteer",
     "assistLabel": "Need assistance? Connect with a volunteer",

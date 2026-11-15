@@ -4,7 +4,7 @@ import { friendlyError, OFFLINE } from '@/lib/errors';
 
 import { formatDate, formatNumber, formatTime } from '../format';
 import i18n from '../index';
-import { accountLanguageStep, isRtl, isUiLanguage, pickUiLanguage, resolveUiLanguage, UNTRANSLATED } from '../languages';
+import { accountLanguageStep, isRtl, isUiLanguage, pickUiLanguage, resolveUiLanguage, setupAppLanguage, UNTRANSLATED } from '../languages';
 
 describe('picking the UI language', () => {
   it('prefers the profile, then the welcome pick, then the device', () => {
@@ -31,7 +31,22 @@ describe('picking the UI language', () => {
     expect(accountLanguageStep('ko', { language: 'es', picked: false })).toEqual({ remember: 'ko' });
     expect(accountLanguageStep('ko', { language: undefined, picked: false })).toEqual({ remember: 'ko' });
     expect(accountLanguageStep('ko', { language: 'ko', picked: false })).toBeNull();
-    expect(accountLanguageStep('de', { language: 'es', picked: false })).toBeNull(); // shown in English; keep the device's pick
+    // Picked the account's own language while an unsaved pick showed (venue pill back to 한국어): just drop the pick.
+    expect(accountLanguageStep('ko', { language: 'ko', picked: true })).toEqual({ forgetPick: true });
+  });
+
+  it('remembers the language an untranslated account is shown in, so sign-out/in agree', () => {
+    // Account Hindi is shown in English: the welcome page shows English too, not the old pick.
+    expect(accountLanguageStep('hi', { language: 'ar', picked: false })).toEqual({ remember: 'en' });
+    expect(accountLanguageStep('hi', { language: 'en', picked: false })).toBeNull();
+  });
+
+  it('starts a new profile in the welcome pick, else a translated primary, else what is on screen', () => {
+    expect(setupAppLanguage('hi', 'ar', 'ar')).toBe('ar'); // untranslated primary keeps the pick
+    expect(setupAppLanguage('ko', 'ar', 'ar')).toBe('ar'); // a pick wins over a translated primary too
+    expect(setupAppLanguage('ko', null, 'es')).toBe('ko');
+    expect(setupAppLanguage('hi', null, 'es')).toBe('es');
+    expect(setupAppLanguage('hi', 'de', 'en')).toBe('en'); // untranslated pick from an older build
   });
 
   it('lists every untranslated language for the pills to leave out', () => {
