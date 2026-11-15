@@ -11,6 +11,7 @@ import { useProfile } from '@/features/profile/profile-context';
 import { ProfileForm } from '@/features/profile/profile-form';
 import { emptyDraft, type Role } from '@/features/profile/types';
 import { useT } from '@/i18n';
+import { forgetLanguagePick } from '@/i18n/pending-language';
 
 /** Figma onboarding__profile-setup ("Set up your profile"); volunteers get their own questions. */
 export default function ProfileStep() {
@@ -40,6 +41,8 @@ export default function ProfileStep() {
         submitLabel={t('setup.submit')}
         // No navigation here: once the profile exists, the onboarding layout redirects to the home tab.
         onSubmit={async (draft, avatar) => {
+          // The welcome pick became this form's primary (and app) language; don't apply it again over what was chosen here.
+          await forgetLanguagePick();
           await save(draft, avatar);
           await clearPendingName();
         }}

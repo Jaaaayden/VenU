@@ -13,6 +13,9 @@ export type UiLanguage = (typeof TRANSLATED)[number];
 /** The LANGUAGES entries the UI is translated into, in LANGUAGES order. */
 export const UI_LANGUAGES: Language[] = LANGUAGES.filter(l => (TRANSLATED as readonly string[]).includes(l.code));
 
+/** LANGUAGES codes with no string tables. Language pills leave them out: picking one would still show English. */
+export const UNTRANSLATED: string[] = LANGUAGES.filter(l => !(TRANSLATED as readonly string[]).includes(l.code)).map(l => l.code);
+
 const RTL = new Set(['ar', 'fa', 'he', 'ur', 'ps', 'yi']);
 
 export function isRtl(code: string): boolean {
@@ -39,4 +42,23 @@ export function resolveUiLanguage(code: string | null | undefined): UiLanguage {
  */
 export function pickUiLanguage(sources: { profile?: string | null; pending?: string | null; device?: string | null }): UiLanguage {
   return resolveUiLanguage(sources.profile || sources.pending || sources.device);
+}
+
+/** What keeps the welcome pill and a signed-in account on the same language (see accountLanguageStep). */
+export type AccountLanguageStep = { save: UiLanguage } | { forgetPick: true } | { remember: UiLanguage } | null;
+
+/**
+ * Run once an account's profile is loaded. A language picked on the welcome pill since signing out
+ * is saved to the account; otherwise this device remembers the account's language, so the welcome
+ * page keeps it after sign-out.
+ * e.g. picked 'es' on welcome, account 'en'  → { save: 'es' }
+ *      picked 'en' on welcome, account 'en'  → { forgetPick: true }
+ *      no pick, device has 'es', account 'ko' → { remember: 'ko' }
+ */
+export function accountLanguageStep(accountLanguage: string, device: { language?: string; picked: boolean }): AccountLanguageStep {
+  if (device.picked) {
+    const code = device.language;
+    return isUiLanguage(code) && code !== accountLanguage ? { save: code } : { forgetPick: true };
+  }
+  return isUiLanguage(accountLanguage) && device.language !== accountLanguage ? { remember: accountLanguage } : null;
 }

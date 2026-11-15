@@ -11,11 +11,11 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { isolatedLanguageName, LANGUAGES } from '@/features/profile/options';
+import { isolatedLanguageName } from '@/features/profile/options';
 import { PRIVACY_VERSION } from '@/features/profile/privacy';
 import { useProfile } from '@/features/profile/profile-context';
 import { draftFromProfile } from '@/features/profile/types';
-import { isUiLanguage, useLayoutRtl, useT } from '@/i18n';
+import { UNTRANSLATED, useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage } from '@/i18n/pending-language';
 import { friendlyError } from '@/lib/errors';
 
@@ -23,19 +23,18 @@ import { StadiumCard } from './cards';
 import { searchVenues } from './mock';
 import { InlineNote, SearchField, venueText } from './ui';
 
-/** Languages without string tables would show English, so the picker leaves them out. */
-const UNTRANSLATED = LANGUAGES.filter(l => !isUiLanguage(l.code)).map(l => l.code);
-
 export function ChooseVenueScreen() {
   const t = useT('venue');
   const rtl = useLayoutRtl();
+  const { language: onScreen } = useUiLanguage();
   const { profile, save } = useProfile();
   const [query, setQuery] = useState('');
   const [picking, setPicking] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const venues = searchVenues(query, undefined, t);
-  const language = saving ?? (profile?.appLanguage || 'en');
+  // The language on screen, not the stored one: a profile can hold an untranslated language (shown in English).
+  const language = saving ?? onScreen;
 
   async function pickLanguage(code: string) {
     setPicking(false);

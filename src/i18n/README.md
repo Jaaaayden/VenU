@@ -53,6 +53,11 @@ a placeholder. Dates, times and numbers go through `format.ts` (`formatDate`, `f
 language picked on the welcome screen (`choosePendingLanguage(code)` from `pending-language.ts`)
 → the device language → English. Changing any of them re-renders the app without a restart.
 
+The welcome pill and the venue pill stay in step (`accountLanguageStep` in `languages.ts`):
+- Pick Español on welcome, then sign in → Español is saved to the account.
+- Switch to 한국어 on the venue page, then sign out → welcome stays in Korean.
+- Both pills list only translated languages (`UNTRANSLATED` is left out) and name the language on screen.
+
 Arabic and Persian mirror the layout. Web flips at once (`<html dir="rtl">`). iOS and Android flip
 after a restart (the app asks); Expo Go can't flip. Use `marginStart`/`paddingEnd`/`start`/`end`
 instead of left/right, and flip directional icons with `useLayoutRtl()`.

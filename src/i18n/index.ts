@@ -10,7 +10,7 @@ import { DEFAULT_LANGUAGE, isRtl, resolveUiLanguage, type UiLanguage } from './l
 import { NAMESPACES, resources, type Namespace } from './locales';
 
 export { NAMESPACES, type Namespace } from './locales';
-export { DEFAULT_LANGUAGE, UI_LANGUAGES, isRtl, isUiLanguage, resolveUiLanguage, type UiLanguage } from './languages';
+export { DEFAULT_LANGUAGE, UI_LANGUAGES, UNTRANSLATED, isRtl, isUiLanguage, resolveUiLanguage, type UiLanguage } from './languages';
 
 const i18n = createInstance();
 

@@ -4,7 +4,7 @@ import { friendlyError, OFFLINE } from '@/lib/errors';
 
 import { formatDate, formatNumber, formatTime } from '../format';
 import i18n from '../index';
-import { isRtl, pickUiLanguage, resolveUiLanguage } from '../languages';
+import { accountLanguageStep, isRtl, isUiLanguage, pickUiLanguage, resolveUiLanguage, UNTRANSLATED } from '../languages';
 
 describe('picking the UI language', () => {
   it('prefers the profile, then the welcome pick, then the device', () => {
@@ -20,6 +20,24 @@ describe('picking the UI language', () => {
     expect(resolveUiLanguage('fil')).toBe('tl');
     expect(resolveUiLanguage('de')).toBe('en'); // listed in LANGUAGES, not translated yet
     expect(resolveUiLanguage('ase')).toBe('en');
+  });
+
+  it('keeps the welcome pill and the account on one language', () => {
+    // Picked on welcome since signing out: the account takes it on.
+    expect(accountLanguageStep('en', { language: 'es', picked: true })).toEqual({ save: 'es' });
+    expect(accountLanguageStep('es', { language: 'es', picked: true })).toEqual({ forgetPick: true });
+    expect(accountLanguageStep('en', { language: 'de', picked: true })).toEqual({ forgetPick: true }); // untranslated pick from an older build
+    // No pick: the device remembers the account's language for the welcome page.
+    expect(accountLanguageStep('ko', { language: 'es', picked: false })).toEqual({ remember: 'ko' });
+    expect(accountLanguageStep('ko', { language: undefined, picked: false })).toEqual({ remember: 'ko' });
+    expect(accountLanguageStep('ko', { language: 'ko', picked: false })).toBeNull();
+    expect(accountLanguageStep('de', { language: 'es', picked: false })).toBeNull(); // shown in English; keep the device's pick
+  });
+
+  it('lists every untranslated language for the pills to leave out', () => {
+    expect(UNTRANSLATED).toEqual(expect.arrayContaining(['de', 'it', 'hi', 'th', 'he', 'ase']));
+    expect(UNTRANSLATED).not.toEqual(expect.arrayContaining(['en']));
+    expect(UNTRANSLATED.some(isUiLanguage)).toBe(false);
   });
 
   it('knows which languages are right-to-left', () => {

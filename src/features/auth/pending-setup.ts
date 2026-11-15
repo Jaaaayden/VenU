@@ -11,7 +11,10 @@ import { isKnownLanguage } from '@/features/profile/options';
 const KEY = 'venu.setup.pending';
 
 export interface PendingSetup {
+  /** This device's app language while signed out: the welcome pill's pick, or the last account's. */
   language?: string;
+  /** True when `language` was picked on the welcome pill and no account has taken it yet. */
+  languagePicked?: boolean;
   firstName?: string;
   /** The account `firstName` was typed for (trimmed, lower case). */
   email?: string;
@@ -23,6 +26,7 @@ export async function readPendingSetup(): Promise<PendingSetup> {
     const v = raw ? (JSON.parse(raw) as PendingSetup) : {};
     return {
       language: isKnownLanguage(v.language) ? v.language : undefined,
+      languagePicked: v.languagePicked === true ? true : undefined,
       firstName: typeof v.firstName === 'string' ? v.firstName : undefined,
       email: typeof v.email === 'string' ? v.email : undefined,
     };

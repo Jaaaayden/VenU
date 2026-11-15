@@ -1,5 +1,5 @@
 import { Redirect, router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,30 +8,19 @@ import { LanguageSearchModal } from '@/components/language-picker';
 import { LogoMark } from '@/components/wordmark';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { LanguagePill, SocialButtons } from '@/features/auth/auth-ui';
-import { readPendingSetup } from '@/features/auth/pending-setup';
 import { useSignedInHref } from '@/features/auth/use-auth-form';
 import { languageName } from '@/features/profile/options';
-import { useT } from '@/i18n';
+import { UNTRANSLATED, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage } from '@/i18n/pending-language';
 
 /** Landing page for signed-out users (Figma onboarding__landing). */
 export default function WelcomeScreen() {
   const signedInHref = useSignedInHref();
   const t = useT('onboarding');
-  const [language, setLanguage] = useState('en');
+  // The pill names the language on screen (an earlier pick, the last account's, or the device's).
+  const { language } = useUiLanguage();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [socialNote, setSocialNote] = useState(false);
-  // Set once the user picks a language, so the slower read below can't overwrite their choice.
-  const picked = useRef(false);
-
-  // The language picked here on an earlier visit.
-  useEffect(() => {
-    let live = true;
-    readPendingSetup().then(p => {
-      if (live && !picked.current && p.language) setLanguage(p.language);
-    });
-    return () => { live = false; };
-  }, []);
 
   // Opening /welcome while signed in (a bookmark, another tab): move on.
   if (signedInHref) return <Redirect href={signedInHref} />;
@@ -68,11 +57,10 @@ export default function WelcomeScreen() {
       <LanguageSearchModal
         visible={pickerOpen}
         title={t('welcome.languageTitle')}
+        exclude={UNTRANSLATED}
         onSelect={code => {
-          picked.current = true;
-          setLanguage(code);
           setPickerOpen(false);
-          // Switches the app to this language now; profile setup also starts with it as the primary language.
+          // Switches the app now; signing in saves it to the account, and profile setup starts with it as the primary language.
           choosePendingLanguage(code);
         }}
         onClose={() => setPickerOpen(false)}
