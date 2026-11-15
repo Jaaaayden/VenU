@@ -49,6 +49,7 @@
     "dialogBody": "Em caso de perigo, ferimento ou emergência médica, ligue primeiro para o 911.",
     "call911": "Ligar para o 911",
     "callStaff": "Ligar para a equipe do local",
+    "textStaff": "Enviar mensagem para a equipe do local",
     "notEmergency": "não é uma emergência",
     "close": "Fechar"
   },

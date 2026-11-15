@@ -49,6 +49,7 @@
     "dialogBody": "En cas de danger, de blessure ou d’urgence médicale, appelez d’abord le 911.",
     "call911": "Appeler le 911",
     "callStaff": "Appeler le personnel du site",
+    "textStaff": "Envoyer un SMS au personnel du site",
     "notEmergency": "ce n’est pas une urgence",
     "close": "Fermer"
   },

@@ -8,7 +8,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
-import { dial, venueContact } from '@/features/venue/contacts';
+import { dial, textMessage, venueContact } from '@/features/venue/contacts';
 import { useWhereAmI } from '@/features/venue/current';
 import { announce } from '@/features/voice/announce';
 import { volunteerRequests } from '@/features/volunteer/request-store';
@@ -47,6 +47,7 @@ export function NotFoundView({ request }: { request: HelpRequest }) {
 
       <View style={styles.actions}>
         <Button label={t('searching.keepSearching')} size="lg" onPress={() => void volunteerRequests.keepSearching()} />
+        {staff?.text ? <Button label={t('emergency.textStaff')} variant="outline" size="lg" onPress={() => textMessage(staff.text!)} /> : null}
         {staff ? <Button label={t('emergency.callStaff')} variant="outline" size="lg" onPress={() => dial(staff.phone)} /> : null}
         <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
       </View>

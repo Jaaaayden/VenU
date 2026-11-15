@@ -8,7 +8,7 @@ import { AccessibilityInfo, Modal, Platform, Pressable, StyleSheet, Text, View }
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
-import { dial, venueContact } from '@/features/venue/contacts';
+import { dial, textMessage, venueContact } from '@/features/venue/contacts';
 import { useWhereAmI } from '@/features/venue/current';
 import { useT } from '@/i18n';
 
@@ -53,6 +53,7 @@ export function EmergencyDialog({ visible, onClose }: EmergencyDialogProps) {
             style={({ pressed }) => [styles.call911, pressed && styles.pressed]}>
             <Text style={styles.call911Label}>{t('emergency.call911')}</Text>
           </Pressable>
+          {staff?.text ? <Button label={t('emergency.textStaff')} variant="outline" size="lg" onPress={() => textMessage(staff.text!)} /> : null}
           {staff ? <Button label={t('emergency.callStaff')} variant="outline" size="lg" onPress={() => dial(staff.phone)} /> : null}
           <Button label={t('emergency.notEmergency')} variant="link" onPress={onClose} style={styles.dismiss} />
         </View>

@@ -49,6 +49,7 @@
     "dialogBody": "如遇危险、受伤或医疗紧急情况，请先拨打 911。",
     "call911": "拨打 911",
     "callStaff": "致电场馆工作人员",
+    "textStaff": "给场馆工作人员发短信",
     "notEmergency": "不是紧急情况",
     "close": "关闭"
   },

@@ -49,6 +49,7 @@
     "dialogBody": "For danger, injury, or a medical emergency, call 911 first.",
     "call911": "Call 911",
     "callStaff": "Call venue staff",
+    "textStaff": "Text venue staff",
     "notEmergency": "not an emergency",
     "close": "Close"
   },
