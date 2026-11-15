@@ -78,14 +78,14 @@
     "yesCancel": "بله، لغو شود"
   },
   "map": {
-    "label": "نقشه: {{name}} در فاصله {{distance}} است و در دروازه 2 به سمت شما می‌آید.",
-    "gate": "دروازه 2",
+    "label": "نقشه: {{name}} در فاصله {{distance}} است و در دروازه ۲ به سمت شما می‌آید.",
+    "gate": "دروازه ۲",
     "you": "شما"
   },
   "messages": {
     "label": "پیام‌ها",
-    "unread_one": "پیام‌ها، {{count}} خوانده‌نشده",
-    "unread_other": "پیام‌ها، {{count}} خوانده‌نشده"
+    "unread_one": "پیام‌ها، {{number}} خوانده‌نشده",
+    "unread_other": "پیام‌ها، {{number}} خوانده‌نشده"
   },
   "chat": {
     "away": "{{minutes}} دقیقه فاصله",
@@ -152,8 +152,8 @@
   },
   "rating": {
     "label": "امتیاز",
-    "star_one": "{{count}} ستاره، {{word}}",
-    "star_other": "{{count}} ستاره، {{word}}",
+    "star_one": "{{number}} ستاره، {{word}}",
+    "star_other": "{{number}} ستاره، {{word}}",
     "words": {
       "poor": "ضعیف",
       "notGreat": "نه چندان خوب",
@@ -190,7 +190,7 @@
   },
   "mock": {
     "spots": {
-      "gate2Ramp": "نزدیک رمپ دروازه 2",
+      "gate2Ramp": "نزدیک رمپ دروازه ۲",
       "section214": "راهروی بخش 214",
       "mainPlaza": "میدان ورودی اصلی"
     },

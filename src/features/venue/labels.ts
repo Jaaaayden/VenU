@@ -1,6 +1,7 @@
 /**
  * Translated display text for venue records: event names, categories, tags, wait levels and the
- * mock facilities' descriptions. Names and street addresses are never translated.
+ * mock facilities' names and descriptions. Venue names, proper-noun facility names (Taco Corner)
+ * and street addresses are never translated.
  *
  * Components pass their own `t` from useT('venue'): the React Compiler memoizes calls by their
  * arguments, so a helper that read the global language would keep showing the old one.
@@ -8,8 +9,8 @@
  */
 import type { TFunction } from 'i18next';
 
-import i18n from '@/i18n';
-import { formatList } from '@/i18n/format';
+import i18n, { languageOf } from '@/i18n';
+import { formatList, formatNumber } from '@/i18n/format';
 import { en } from '@/i18n/locales';
 
 import type { Facility, FacilityCategory, FacilityTag, Venue } from './types';
@@ -38,6 +39,15 @@ const FACILITY_TEXT = en.venue.facilityText;
 type KnownFacility = keyof typeof FACILITY_TEXT;
 const isKnown = (id: string): id is KnownFacility => id in FACILITY_TEXT;
 
+/**
+ * The facility's name in `t`'s language: "Gate 2" → "Puerta 2" (es), "دروازه ۲" (fa). Proper nouns
+ * (Taco Corner, Burger Stand) and facilities without a translation keep their own name.
+ */
+export function facilityName(f: Facility, t: VenueT = venueT()): string {
+  const id = f.id;
+  return isKnown(id) && 'name' in FACILITY_TEXT[id] ? t(`facilityText.${id}.name` as never) : f.name;
+}
+
 /** The facility's description in `t`'s language; a facility without a translation keeps its own text. */
 export function facilityDescription(f: Facility, t: VenueT = venueT()): string {
   const id = f.id;
@@ -50,7 +60,8 @@ export function facilityLocation(f: Facility, t: VenueT = venueT()): string {
   return isKnown(id) ? t(`facilityText.${id}.location`) : f.location;
 }
 
-/** "3 min walk · Short wait". */
+/** "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian). */
 export function facilityMeta(f: Facility, t: VenueT = venueT()): string {
-  return `${t('walk', { count: f.walkMinutes })} · ${t(`wait.${f.wait}`)}`;
+  const number = formatNumber(f.walkMinutes, undefined, languageOf(t));
+  return `${t('walk', { count: f.walkMinutes, number })} · ${t(`wait.${f.wait}`)}`;
 }

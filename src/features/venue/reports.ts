@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import type { Option } from '@/features/profile/options';
 import i18n from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 
 import { venueT, type VenueT } from './labels';
 
@@ -41,8 +42,10 @@ export interface FacilityReport {
   title: string;
   topic: ReportTopic;
   body: string;
-  /** Display name, e.g. "Rosa W.". */
+  /** Display name, e.g. "Rosa W."; empty when the author had none (shown as report.authorFallback, see reportAuthor). */
   authorName: string;
+  /** The language the title and body were written in, e.g. 'en'. User text is shown as written, never translated. */
+  language?: string;
   /** ISO timestamp. */
   createdAt: string;
 }
@@ -66,9 +69,9 @@ export function validateReport(d: ReportDraft): ReportErrors {
   const errors: ReportErrors = {};
   const title = d.title.trim();
   if (!title) errors.title = i18n.t('venue:form.titleRequired');
-  else if (title.length > REPORT_TITLE_MAX) errors.title = i18n.t('venue:form.titleTooLong', { max: REPORT_TITLE_MAX });
+  else if (title.length > REPORT_TITLE_MAX) errors.title = i18n.t('venue:form.titleTooLong', { max: formatNumber(REPORT_TITLE_MAX) });
   if (!d.topic) errors.topic = i18n.t('venue:form.topicRequired');
-  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = i18n.t('venue:form.bodyTooLong', { max: REPORT_BODY_MAX });
+  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = i18n.t('venue:form.bodyTooLong', { max: formatNumber(REPORT_BODY_MAX) });
   return errors;
 }
 
@@ -76,7 +79,14 @@ export interface NewReport {
   venueId: string;
   facilityId: string;
   authorName: string;
+  /** The UI language while it was written, our best guess at the text's language. */
+  language?: string;
   draft: ReportDraft;
+}
+
+/** "Rosa W.", or "VenU visitor" in `t`'s language for a report without a name. */
+export function reportAuthor(r: Pick<FacilityReport, 'authorName'>, t: VenueT = venueT()): string {
+  return r.authorName.trim() || t('report.authorFallback');
 }
 
 export interface ReportStore {
@@ -110,7 +120,7 @@ export function createMemoryReportStore(
     async get(id) {
       return reports.find(r => r.id === id) ?? null;
     },
-    async add({ venueId, facilityId, authorName, draft }) {
+    async add({ venueId, facilityId, authorName, language, draft }) {
       const errors = validateReport(draft);
       if (Object.keys(errors).length) throw new ReportValidationError(errors);
       const report: FacilityReport = {
@@ -120,8 +130,9 @@ export function createMemoryReportStore(
         title: draft.title.trim(),
         topic: draft.topic!,
         body: draft.body.trim(),
-        authorName: authorName.trim() || 'VenU visitor',
+        authorName: authorName.trim(), // a missing name is worded at render (reportAuthor)
         createdAt: now().toISOString(),
+        ...(language ? { language } : {}),
       };
       reports.push(report);
       return report;
@@ -187,24 +198,25 @@ const RAMP_REPORT =
   'I arrived around 45 minutes before kickoff from the east side of the stadium. Gate 2 was a little difficult to find, and the ramp was also pretty far from the gate.\n\n' +
   'As a wheelchair user, I thought the ramp was pretty old and outdated. There were cracks which made it a bit hard to use, and I almost got stuck.';
 
+/** Sample visitor reports, written in English (each carries language: 'en', so screens can say so). */
 export const SEED_REPORTS: FacilityReport[] = [
   {
     id: 'seed-ramp', venueId: 'sofi', facilityId: 'gate-2', topic: 'accessibility',
-    title: 'Gate 2 Ramp Outdated', body: RAMP_REPORT, authorName: 'Rosa W.', createdAt: '2026-10-24T18:30:00.000Z',
+    title: 'Gate 2 Ramp Outdated', body: RAMP_REPORT, authorName: 'Rosa W.', createdAt: '2026-10-24T18:30:00.000Z', language: 'en',
   },
   {
     id: 'seed-bags', venueId: 'sofi', facilityId: 'gate-2', topic: 'crowds',
-    title: 'Bag check moves fast', authorName: 'Marcus T.', createdAt: '2026-10-20T17:05:00.000Z',
+    title: 'Bag check moves fast', authorName: 'Marcus T.', createdAt: '2026-10-20T17:05:00.000Z', language: 'en',
     body: 'The clear-bag lane at Gate 2 took about five minutes an hour before the event. Staff waved wheelchair users to the front.',
   },
   {
     id: 'seed-restroom', venueId: 'sofi', facilityId: 'restroom-east', topic: 'facility_condition',
-    title: 'Family room was clean', authorName: 'Ana P.', createdAt: '2026-10-18T20:12:00.000Z',
+    title: 'Family room was clean', authorName: 'Ana P.', createdAt: '2026-10-18T20:12:00.000Z', language: 'en',
     body: 'The family room has a changing table and enough space to turn a wheelchair. Soap dispenser was empty by the second half.',
   },
   {
     id: 'seed-tacos', venueId: 'coliseum', facilityId: 'food-south', topic: 'crowds',
-    title: 'Go before halftime', authorName: 'Kenji S.', createdAt: '2026-10-11T02:40:00.000Z',
+    title: 'Go before halftime', authorName: 'Kenji S.', createdAt: '2026-10-11T02:40:00.000Z', language: 'en',
     body: 'The line was 25 minutes at halftime and under 5 minutes in the first quarter.',
   },
 ];

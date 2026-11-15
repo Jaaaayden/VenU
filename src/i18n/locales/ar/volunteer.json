@@ -84,12 +84,12 @@
   },
   "messages": {
     "label": "الرسائل",
-    "unread_zero": "الرسائل، {{count}} غير مقروءة",
-    "unread_one": "الرسائل، {{count}} غير مقروءة",
-    "unread_two": "الرسائل، {{count}} غير مقروءة",
-    "unread_few": "الرسائل، {{count}} غير مقروءة",
-    "unread_many": "الرسائل، {{count}} غير مقروءة",
-    "unread_other": "الرسائل، {{count}} غير مقروءة"
+    "unread_zero": "الرسائل، {{number}} غير مقروءة",
+    "unread_one": "الرسائل، {{number}} غير مقروءة",
+    "unread_two": "الرسائل، {{number}} غير مقروءة",
+    "unread_few": "الرسائل، {{number}} غير مقروءة",
+    "unread_many": "الرسائل، {{number}} غير مقروءة",
+    "unread_other": "الرسائل، {{number}} غير مقروءة"
   },
   "chat": {
     "away": "على بُعد {{minutes}} دقيقة",
@@ -156,12 +156,12 @@
   },
   "rating": {
     "label": "التقييم",
-    "star_zero": "{{count}} نجوم، {{word}}",
-    "star_one": "{{count}} نجمة، {{word}}",
-    "star_two": "{{count}} نجمتان، {{word}}",
-    "star_few": "{{count}} نجوم، {{word}}",
-    "star_many": "{{count}} نجمة، {{word}}",
-    "star_other": "{{count}} نجمة، {{word}}",
+    "star_zero": "{{number}} نجوم، {{word}}",
+    "star_one": "{{number}} نجمة، {{word}}",
+    "star_two": "{{number}} نجمتان، {{word}}",
+    "star_few": "{{number}} نجوم، {{word}}",
+    "star_many": "{{number}} نجمة، {{word}}",
+    "star_other": "{{number}} نجمة، {{word}}",
     "words": {
       "poor": "ضعيفة",
       "notGreat": "ليست جيدة",

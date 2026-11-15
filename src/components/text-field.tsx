@@ -6,7 +6,7 @@ import { useState, type ComponentRef, type Ref } from 'react';
 import { Platform, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
-import { Colors, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Radius, Spacing, Type, webNoOutline } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
 interface TextFieldProps extends Omit<TextInputProps, 'style' | 'secureTextEntry'> {
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   multiline: { minHeight: 96, alignItems: 'flex-start', paddingVertical: Spacing.md },
   focused: { borderColor: Colors.primary },
   invalid: { borderColor: Colors.danger },
-  input: { ...Type.input, flex: 1, paddingVertical: 12, outlineStyle: 'none' } as object,
+  input: { ...Type.input, flex: 1, paddingVertical: 12, ...webNoOutline },
   inputMultiline: { paddingVertical: 0, textAlignVertical: 'top', minHeight: 70 },
   eye: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center', marginEnd: -6 },
   error: { ...Type.caption, color: Colors.danger },

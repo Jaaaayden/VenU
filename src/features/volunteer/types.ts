@@ -95,6 +95,15 @@ export interface RequestDraft {
  */
 export type RequestStatus = 'idle' | 'searching' | 'matched' | 'done';
 
+/** volunteer:notice.<key>. */
+export type NoticeKey = 'thanks' | 'searchFailed';
+
+export interface Notice {
+  tone: 'success' | 'error';
+  key: NoticeKey;
+  params?: { name?: string };
+}
+
 export interface RequestState {
   status: RequestStatus;
   request: HelpRequest | null;
@@ -102,8 +111,11 @@ export interface RequestState {
   messages: ChatMessage[];
   /** Volunteer messages the visitor hasn't seen (drives the dot on the message icon). */
   unread: number;
-  /** One-off note for the home screen, e.g. "Thanks for your feedback" or "Couldn't find anyone". */
-  notice: { tone: 'success' | 'error'; text: string } | null;
+  /**
+   * One-off note for the home screen, as a string key and its values so the banner words it in the
+   * language on screen when it shows, e.g. { tone: 'success', key: 'thanks', params: { name: 'Daniel' } }.
+   */
+  notice: Notice | null;
   /** The form's contents; survives a failed search or a cancel, cleared once the help ends. */
   draft: RequestDraft | null;
   /** The volunteer is writing a reply ("Daniel is typing…"). */

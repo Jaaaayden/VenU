@@ -14,12 +14,12 @@
     "directions": "Direksyon",
     "language": "Tulong sa Wika",
     "quiet": "Tahimik na Lugar",
-    "lost": "Lost & Found",
+    "lost": "Mga Nawawala",
     "other": "Iba Pa"
   },
   "skills": {
     "wheelchair": "Sanay sa wheelchair",
-    "first_aid": "First aid",
+    "first_aid": "Pangunang lunas",
     "asl": "ASL"
   },
   "form": {
@@ -41,7 +41,7 @@
     "remove": "Alisin ang larawan"
   },
   "emergency": {
-    "title": "Emergency?",
+    "title": "May emerhensiya?",
     "call": "Tumawag sa 911 ngayon",
     "label": "Emergency? Tumawag sa 911 ngayon",
     "hint": "Bubuksan ang telepono para tumawag sa 911"
@@ -78,14 +78,14 @@
     "yesCancel": "Oo, kanselahin"
   },
   "map": {
-    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa Gate 2.",
-    "gate": "Gate 2",
+    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa Pasukan 2.",
+    "gate": "Pasukan 2",
     "you": "Ikaw"
   },
   "messages": {
     "label": "Mga mensahe",
-    "unread_one": "Mga mensahe, {{count}} hindi pa nababasa",
-    "unread_other": "Mga mensahe, {{count}} hindi pa nababasa"
+    "unread_one": "Mga mensahe, {{number}} hindi pa nababasa",
+    "unread_other": "Mga mensahe, {{number}} hindi pa nababasa"
   },
   "chat": {
     "away": "{{minutes}} min ang layo",
@@ -102,7 +102,7 @@
     "attachSoon": "Malapit nang dumating ang pagpapadala ng larawan.",
     "placeholder": "Mensahe",
     "messageTo": "Mensahe kay {{name}}",
-    "stickers": "Stickers",
+    "stickers": "Mga sticker",
     "stickersSoon": "Malapit nang dumating ang stickers.",
     "record": "Magsalita ng mensahe"
   },
@@ -127,8 +127,8 @@
   },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",
-    "theirs": "Volunteer, {{time}}: {{text}}",
-    "theirsTranslated": "Volunteer, {{time}}: {{text}} (isinalin mula sa {{language}})",
+    "theirs": "Boluntaryo, {{time}}: {{text}}",
+    "theirsTranslated": "Boluntaryo, {{time}}: {{text}} (isinalin mula sa {{language}})",
     "listen": "pakinggan",
     "listenLabel": "Pakinggan ang mensaheng ito"
   },
@@ -151,9 +151,9 @@
     "submit": "Ipadala"
   },
   "rating": {
-    "label": "Rating",
-    "star_one": "{{count}} bituin, {{word}}",
-    "star_other": "{{count}} bituin, {{word}}",
+    "label": "Marka",
+    "star_one": "{{number}} bituin, {{word}}",
+    "star_other": "{{number}} bituin, {{word}}",
     "words": {
       "poor": "Mahina",
       "notGreat": "Hindi masyado",
@@ -190,14 +190,14 @@
   },
   "mock": {
     "spots": {
-      "gate2Ramp": "Malapit sa Ramp ng Gate 2",
+      "gate2Ramp": "Malapit sa Rampa ng Pasukan 2",
       "section214": "Concourse ng Section 214",
       "mainPlaza": "Plaza ng pangunahing pasukan"
     },
     "greeting": "Hi {{name}}! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "greetingNoName": "Hi! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "reply1": "Sige, salamat! Nandiyan na ako sa loob ng ilang minuto.",
-    "reply2": "Nakikita ko na ang Gate 2. Naka-pink na LA28 vest ako.",
+    "reply2": "Nakikita ko na ang Pasukan 2. Naka-pink na LA28 vest ako.",
     "reply3": "Walang problema, dahan-dahan lang. Hihintayin kita."
   }
 }

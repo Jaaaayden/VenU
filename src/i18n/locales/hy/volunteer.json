@@ -84,8 +84,8 @@
   },
   "messages": {
     "label": "Հաղորդագրություններ",
-    "unread_one": "Հաղորդագրություններ, {{count}} չկարդացված",
-    "unread_other": "Հաղորդագրություններ, {{count}} չկարդացված"
+    "unread_one": "Հաղորդագրություններ, {{number}} չկարդացված",
+    "unread_other": "Հաղորդագրություններ, {{number}} չկարդացված"
   },
   "chat": {
     "away": "{{minutes}} րոպե հեռու",
@@ -152,8 +152,8 @@
   },
   "rating": {
     "label": "Գնահատական",
-    "star_one": "{{count}} աստղ, {{word}}",
-    "star_other": "{{count}} աստղ, {{word}}",
+    "star_one": "{{number}} աստղ, {{word}}",
+    "star_other": "{{number}} աստղ, {{word}}",
     "words": {
       "poor": "Վատ",
       "notGreat": "Այնքան էլ լավ չէ",

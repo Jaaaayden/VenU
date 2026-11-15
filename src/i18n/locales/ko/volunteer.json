@@ -84,7 +84,7 @@
   },
   "messages": {
     "label": "메시지",
-    "unread_other": "메시지, 읽지 않음 {{count}}개"
+    "unread_other": "메시지, 읽지 않음 {{number}}개"
   },
   "chat": {
     "away": "{{minutes}}분 거리",
@@ -151,7 +151,7 @@
   },
   "rating": {
     "label": "평점",
-    "star_other": "별 {{count}}개, {{word}}",
+    "star_other": "별 {{number}}개, {{word}}",
     "words": {
       "poor": "나쁨",
       "notGreat": "별로",

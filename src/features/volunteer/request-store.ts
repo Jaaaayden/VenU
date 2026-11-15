@@ -7,7 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
 import { chatLanguage } from '@/features/translate/languages';
-import i18n from '@/i18n';
 
 import { createMockBackend, newId, type VolunteerBackend } from './backend';
 import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestDraft, RequestState } from './types';
@@ -28,7 +27,7 @@ export const EMPTY_DRAFT: RequestDraft = { helpTypes: [], note: '', photoUri: nu
 export type RequestAction =
   | { type: 'search'; request: HelpRequest }
   | { type: 'matched'; requestId: string; match: Match }
-  | { type: 'searchFailed'; requestId: string; text: string }
+  | { type: 'searchFailed'; requestId: string }
   | { type: 'cancel' }
   | { type: 'send'; message: ChatMessage }
   | { type: 'receive'; requestId: string; message: ChatMessage }
@@ -52,7 +51,7 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
         : state;
     case 'searchFailed':
       return state.status === 'searching' && state.request?.id === action.requestId
-        ? { ...INITIAL_STATE, draft: state.draft, notice: { tone: 'error', text: action.text } }
+        ? { ...INITIAL_STATE, draft: state.draft, notice: { tone: 'error', key: 'searchFailed' } }
         : state;
     case 'cancel':
       return state.status === 'searching' || state.status === 'matched' ? { ...INITIAL_STATE, draft: state.draft } : state;
@@ -205,7 +204,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     } catch {
       if (search !== ctl) return; // cancelled: cancel() already reset the state
       search = null;
-      dispatch({ type: 'searchFailed', requestId: request.id, text: i18n.t('volunteer:notice.searchFailed') });
+      dispatch({ type: 'searchFailed', requestId: request.id });
     }
   }
 
@@ -306,7 +305,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const { request, match } = state;
       if (state.status !== 'done' || !request || !match) return;
       await backend.submitFeedback({ requestId: request.id, volunteerId: match.volunteer.id, stars, tags, note: note.trim() });
-      dispatch({ type: 'finish', notice: { tone: 'success', text: i18n.t('volunteer:notice.thanks', { name: match.volunteer.firstName }) } });
+      dispatch({ type: 'finish', notice: { tone: 'success', key: 'thanks', params: { name: match.volunteer.firstName } } });
     },
 
     async reportProblem(kind: ProblemKind, note: string) {

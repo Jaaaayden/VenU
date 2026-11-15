@@ -15,7 +15,6 @@
     "languageLabel": "Idioma do app: {{language}}",
     "languageHint": "Muda o idioma de todo o app",
     "languageTitle": "Idioma do app",
-    "languageConsent": "Primeiro revise a política de privacidade atualizada em Perfil e depois mude o idioma.",
     "assistTitle": "Precisa de ajuda?",
     "assistBody": "Fale com um voluntário",
     "assistLabel": "Precisa de ajuda? Fale com um voluntário",
@@ -26,7 +25,7 @@
     "opening_ceremony": "Cerimônia de abertura",
     "swimming": "Natação",
     "athletics": "Atletismo",
-    "football": "Futebol americano",
+    "soccer": "Futebol",
     "gymnastics": "Ginástica",
     "basketball": "Basquete"
   },
@@ -103,9 +102,9 @@
     "zoomIn": "Ampliar",
     "zoomOut": "Reduzir"
   },
-  "walk_one": "{{count}} min a pé",
-  "walk_many": "{{count}} min a pé",
-  "walk_other": "{{count}} min a pé",
+  "walk_one": "{{number}} min a pé",
+  "walk_many": "{{number}} min a pé",
+  "walk_other": "{{number}} min a pé",
   "wait": {
     "none": "Sem fila",
     "short": "Fila curta",
@@ -133,30 +132,37 @@
   },
   "facilityText": {
     "gate-1": {
+      "name": "Portão 1",
       "description": "Entrada norte, a mais próxima do ponto do ônibus do Metro.",
       "location": "Lado norte, no ponto do ônibus"
     },
     "gate-2": {
+      "name": "Portão 2",
       "description": "Entrada leste com rampa, ao lado do estacionamento acessível do Lote C.",
       "location": "Lado leste, perto do Lote C"
     },
     "gate-3": {
+      "name": "Portão 3",
       "description": "Entrada sul para embarque e desembarque de carros por app.",
       "location": "Lado sul, na área de carros por app"
     },
     "gate-4": {
+      "name": "Portão 4",
       "description": "Entrada oeste para ingressos dos setores 200 a 240.",
       "location": "Lado oeste, junto à praça principal"
     },
     "info-desk": {
+      "name": "Atendimento ao público",
       "description": "Dúvidas, ingressos perdidos, kits sensoriais e protetores auriculares.",
       "location": "Corredor, setor 105"
     },
     "first-aid": {
+      "name": "Primeiros socorros",
       "description": "Enfermeiros e socorristas de plantão da abertura dos portões até o local esvaziar.",
       "location": "Corredor, setor 112"
     },
     "restroom-east": {
+      "name": "Banheiros leste",
       "description": "Banheiros masculino, feminino e uma sala família para todos com trocador.",
       "location": "Corredor, setor 118"
     },
@@ -165,10 +171,12 @@
       "location": "Corredor, setor 124"
     },
     "lost-found": {
+      "name": "Achados e perdidos",
       "description": "Deixe ou retire objetos perdidos. Crianças perdidas também são trazidas aqui.",
       "location": "Corredor, setor 131"
     },
     "accessible-seating": {
+      "name": "Serviços de acessibilidade",
       "description": "Empréstimo de cadeiras de rodas, assentos para acompanhantes e aparelhos de escuta assistida.",
       "location": "Corredor, setor 136"
     },
@@ -177,11 +185,13 @@
       "location": "Corredor, setor 140"
     },
     "restroom-west": {
+      "name": "Banheiros oeste",
       "description": "Banheiros masculino e feminino. A cabine acessível fica à esquerda.",
       "location": "Corredor, setor 145"
     },
     "parking-c": {
-      "description": "Estacionamento acessível com um caminho curto e plano até o Gate 2.",
+      "name": "Estacionamento C",
+      "description": "Estacionamento acessível com um caminho curto e plano até o Portão 2.",
       "location": "Lote sudeste"
     }
   },
@@ -191,9 +201,9 @@
     "directions": "Como chegar",
     "directionsSoon": "As rotas passo a passo chegam em breve. {{name}}: {{location}}.",
     "reports": "Relatos",
-    "results_one": "{{count}} resultado",
-    "results_many": "{{count}} de resultados",
-    "results_other": "{{count}} resultados",
+    "results_one": "{{number}} resultado",
+    "results_many": "{{number}} de resultados",
+    "results_other": "{{number}} resultados",
     "noReports": "Ainda não há relatos. Seja o primeiro a contar o que encontrou.",
     "addReport": "Adicione seu relato"
   },
@@ -220,7 +230,9 @@
   "report": {
     "notFound": "Relato não encontrado",
     "kind": "Relato",
+    "authorFallback": "Visitante do VenU",
     "submitted": "Enviado em {{date}}",
+    "originalLanguage": "Idioma original: {{language}}",
     "noBody": "Sem detalhes."
   },
   "form": {
@@ -236,7 +248,7 @@
     "topic": "Assunto",
     "submit": "Enviar relato",
     "sendFailed": "Não foi possível enviar o relato. Verifique sua conexão e tente de novo.",
-    "titleRequired": "Adicione um título, ex.: “A rampa do Gate 2 está rachada”.",
+    "titleRequired": "Adicione um título, ex.: “A rampa do Portão 2 está rachada”.",
     "titleTooLong": "O título deve ter menos de {{max}} caracteres.",
     "topicRequired": "Escolha o assunto que melhor se encaixa.",
     "bodyTooLong": "O relato deve ter menos de {{max}} caracteres."

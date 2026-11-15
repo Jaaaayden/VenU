@@ -58,6 +58,7 @@ interface Props {
 export function ChatBubble({ message, recipient, onListen }: Props) {
   const mine = message.from === 'me';
   const t = useT('volunteer');
+  const tp = useT('profile'); // language names in the UI language
   const rtl = useLayoutRtl();
   const [size, setSize] = useState({ w: 0, h: 0 });
   const onLayout = (e: LayoutChangeEvent) => {
@@ -71,13 +72,13 @@ export function ChatBubble({ message, recipient, onListen }: Props) {
   const [original, setOriginal] = useState(false);
   const translated = translation.kind === 'translated' && !original ? translation : null;
   const text = translated ? (translated.partial ? `${translated.text}…` : translated.text) : message.text;
-  const recipientLanguage = recipient && recipient.language !== reader ? uiLanguageName(recipient.language) : null;
+  const recipientLanguage = recipient && recipient.language !== reader ? uiLanguageName(recipient.language, tp) : null;
   const hint = !mine || !recipient || !recipientLanguage
     ? null
     : isRealProvider(provider)
       ? t('translation.willSeeIn', { name: recipient.name, language: recipientLanguage })
       : t('translation.readsLanguage', { name: recipient.name, language: recipientLanguage });
-  const source = translated?.source ? uiLanguageName(translated.source) : null;
+  const source = translated?.source ? uiLanguageName(translated.source, tp) : null;
   // Screen readers get the text on screen, then where it was translated from.
   const label = mine
     ? t('bubble.mine', { time, text })
@@ -135,6 +136,7 @@ function TranslationNote({ translation, reader, original, onToggle, onRetry }: {
   onRetry: () => void;
 }) {
   const t = useT('volunteer');
+  const tp = useT('profile'); // language names in the UI language
   switch (translation.kind) {
     case 'original':
       return null;
@@ -156,11 +158,11 @@ function TranslationNote({ translation, reader, original, onToggle, onRetry }: {
         </Pressable>
       );
     case 'unsupported':
-      return <Text style={styles.note}>{t('translation.unsupported', { language: uiLanguageName(reader) })}</Text>;
+      return <Text style={styles.note}>{t('translation.unsupported', { language: uiLanguageName(reader, tp) })}</Text>;
     case 'unavailable':
       return <Text style={styles.note}>{t('translation.notSetUp')}</Text>;
     case 'translated': {
-      const language = translation.source ? uiLanguageName(translation.source) : null;
+      const language = translation.source ? uiLanguageName(translation.source, tp) : null;
       const translatedNote = language
         ? translation.partial ? t('translation.partial', { language }) : t('translation.translatedFrom', { language })
         : t('translation.translated');

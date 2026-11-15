@@ -84,7 +84,7 @@
   },
   "messages": {
     "label": "消息",
-    "unread_other": "消息，{{count}} 条未读"
+    "unread_other": "消息，{{number}} 条未读"
   },
   "chat": {
     "away": "{{minutes}} 分钟路程",
@@ -151,7 +151,7 @@
   },
   "rating": {
     "label": "评分",
-    "star_other": "{{count}} 星，{{word}}",
+    "star_other": "{{number}} 星，{{word}}",
     "words": {
       "poor": "差",
       "notGreat": "不太好",

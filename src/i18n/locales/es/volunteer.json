@@ -84,9 +84,9 @@
   },
   "messages": {
     "label": "Mensajes",
-    "unread_one": "Mensajes, {{count}} sin leer",
-    "unread_many": "Mensajes, {{count}} sin leer",
-    "unread_other": "Mensajes, {{count}} sin leer"
+    "unread_one": "Mensajes, {{number}} sin leer",
+    "unread_many": "Mensajes, {{number}} sin leer",
+    "unread_other": "Mensajes, {{number}} sin leer"
   },
   "chat": {
     "away": "A {{minutes}} min",
@@ -153,9 +153,9 @@
   },
   "rating": {
     "label": "Valoración",
-    "star_one": "{{count}} estrella, {{word}}",
-    "star_many": "{{count}} de estrellas, {{word}}",
-    "star_other": "{{count}} estrellas, {{word}}",
+    "star_one": "{{number}} estrella, {{word}}",
+    "star_many": "{{number}} de estrellas, {{word}}",
+    "star_other": "{{number}} estrellas, {{word}}",
     "words": {
       "poor": "Mala",
       "notGreat": "Regular",

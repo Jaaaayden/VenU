@@ -84,9 +84,9 @@
   },
   "messages": {
     "label": "Mensagens",
-    "unread_one": "Mensagens, {{count}} não lida",
-    "unread_many": "Mensagens, {{count}} não lidas",
-    "unread_other": "Mensagens, {{count}} não lidas"
+    "unread_one": "Mensagens, {{number}} não lida",
+    "unread_many": "Mensagens, {{number}} não lidas",
+    "unread_other": "Mensagens, {{number}} não lidas"
   },
   "chat": {
     "away": "A {{minutes}} min",
@@ -153,9 +153,9 @@
   },
   "rating": {
     "label": "Avaliação",
-    "star_one": "{{count}} estrela, {{word}}",
-    "star_many": "{{count}} de estrelas, {{word}}",
-    "star_other": "{{count}} estrelas, {{word}}",
+    "star_one": "{{number}} estrela, {{word}}",
+    "star_many": "{{number}} de estrelas, {{word}}",
+    "star_other": "{{number}} estrelas, {{word}}",
     "words": {
       "poor": "Ruim",
       "notGreat": "Não muito boa",

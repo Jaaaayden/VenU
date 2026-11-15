@@ -63,8 +63,9 @@ describe('locale files', () => {
         for (const [key, text] of Object.entries(table)) {
           expect({ key, empty: !text.trim() }).toEqual({ key, empty: false });
           const source = english[key] ?? english[key.replace(PLURAL, '_other')];
-          // Plural forms may spell the number out ("شخصان" = two people), so {{count}} is optional there.
-          const needed = placeholders(source).filter(p => !(PLURAL.test(key) && p === 'count'));
+          // Plural forms may spell the number out ("شخصان" = two people), so the number ({{count}}, or
+          // {{number}}: the same number formatted for the language) is optional there.
+          const needed = placeholders(source).filter(p => !(PLURAL.test(key) && (p === 'count' || p === 'number')));
           const have = placeholders(text);
           for (const p of needed) expect({ key, placeholder: p, present: have.includes(p) }).toEqual({ key, placeholder: p, present: true });
           for (const p of have) expect({ key, placeholder: p, inEnglish: placeholders(source).includes(p) }).toEqual({ key, placeholder: p, inEnglish: true });

@@ -9,7 +9,7 @@ import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { formatDistance } from '@/features/volunteer/format';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest, Match } from '@/features/volunteer/types';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 
 import { MeetMap } from './meet-map';
@@ -25,7 +25,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
     their: t('match.onTheWay.their', { name: v.firstName }),
   }[v.possessive];
   const openChat = () => router.push({ pathname: '/chat/[id]', params: { id: request.id } });
-  const distance = formatDistance(match.distanceFeet);
+  const distance = formatDistance(match.distanceFeet, languageOf(t));
 
   return (
     <View style={styles.page}>
@@ -53,9 +53,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
             <Text style={styles.name}>{v.name}</Text>
             <Text style={styles.role}>{t('role')}</Text>
           </View>
-          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating) })}>
+          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating, undefined, languageOf(t)) })}>
             <FigmaIcon name="star" size={18} color={Colors.warning} />
-            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</Text>
+            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, languageOf(t))}</Text>
           </View>
         </View>
 
@@ -73,9 +73,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         <View style={styles.infoRow}>
           <InfoTile
             icon="clock"
-            main={t('match.etaMain', { minutes: match.etaMinutes })}
+            main={t('match.etaMain', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
             sub={t('match.etaSub')}
-            label={t('match.etaLabel', { minutes: match.etaMinutes })}
+            label={t('match.etaLabel', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
           />
           <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
         </View>

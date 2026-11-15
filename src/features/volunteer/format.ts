@@ -12,11 +12,14 @@ export function formatClock(ms: number, language: string = i18n.language): strin
   return language === 'en' ? time.replace(/[\s ]*([AP])M$/, (_, p: string) => `${p.toLowerCase()}m`) : time;
 }
 
-/** "180 ft", "0.3 mi": units stay imperial; the number and abbreviation follow the language. */
-export function formatDistance(feet: number): string {
-  if (feet < 1000) return i18n.t('volunteer:distance.feet', { value: formatNumber(Math.round(feet / 10) * 10) });
-  const miles = formatNumber(feet / 5280, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  return i18n.t('volunteer:distance.miles', { value: miles });
+/**
+ * "180 ft", "0.3 mi": units stay imperial; the number and abbreviation follow the language.
+ * Components pass languageOf(t), so the distance re-renders with the language.
+ */
+export function formatDistance(feet: number, language: string = i18n.language): string {
+  if (feet < 1000) return i18n.t('volunteer:distance.feet', { value: formatNumber(Math.round(feet / 10) * 10, undefined, language), lng: language });
+  const miles = formatNumber(feet / 5280, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, language);
+  return i18n.t('volunteer:distance.miles', { value: miles, lng: language });
 }
 
 /** Messages further apart than this get a day/time line between them. */

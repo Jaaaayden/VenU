@@ -3,11 +3,12 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { useLayoutRtl, useT } from '@/i18n';
+import { uiLanguageName } from '@/features/profile/summary';
+import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { eventsLabel, facilityMeta } from './labels';
-import type { FacilityReport } from './reports';
+import { eventsLabel, facilityMeta, facilityName } from './labels';
+import { reportAuthor, type FacilityReport } from './reports';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
 import type { Facility, Venue } from './types';
 import { inset, venueText } from './ui';
@@ -38,17 +39,18 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
   const t = useT('venue');
   const rtl = useLayoutRtl();
   const meta = facilityMeta(facility, t);
+  const name = facilityName(facility, t);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name: facility.name, meta })}
+      accessibilityLabel={t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name, meta })}
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <View style={styles.rowIcon}>
         <FacilityIcon category={facility.category} size={30} />
       </View>
       <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>{facility.name}</Text>
+        <Text style={styles.rowTitle} numberOfLines={1}>{name}</Text>
         <Text style={venueText.caption} numberOfLines={1}>{meta}</Text>
       </View>
       {facility.accessible ? <FigmaIcon name="wheelchair-6dc801" size={22} color={Colors.primary} /> : null}
@@ -62,18 +64,24 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
 /** Gray report preview: title, first lines, "see more →". */
 export function ReportCard({ report, onPress, fresh }: { report: FacilityReport; onPress: () => void; fresh?: boolean }) {
   const t = useT('venue');
+  const tp = useT('profile');
+  const { language: onScreen } = useUiLanguage();
+  const author = reportAuthor(report, t);
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t('card.label', { title: report.title, author: report.authorName })}
+      accessibilityLabel={t('card.label', { title: report.title, author })}
       accessibilityHint={t('card.hint')}
       style={({ pressed }) => [styles.report, fresh && styles.reportFresh, pressed && styles.reportPressed]}>
       <View style={styles.reportTop}>
         <Text style={[venueText.label, styles.flex]} numberOfLines={1}>{report.title}</Text>
         {fresh ? <Text style={styles.newBadge}>{t('card.new')}</Text> : null}
       </View>
-      <Text style={venueText.caption} numberOfLines={2}>{report.body || t('card.by', { author: report.authorName })}</Text>
+      <Text style={venueText.caption} numberOfLines={2}>{report.body || t('card.by', { author })}</Text>
+      {report.language && report.language !== onScreen ? (
+        <Text style={styles.original}>{t('report.originalLanguage', { language: uiLanguageName(report.language, tp) })}</Text>
+      ) : null}
       <Text style={styles.seeMore}>{t('card.seeMore')}</Text>
     </Pressable>
   );
@@ -157,6 +165,7 @@ const styles = StyleSheet.create({
   reportTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   newBadge: { fontFamily: Fonts.textBold, fontSize: 13, color: Colors.onPrimary, backgroundColor: Colors.primary, paddingHorizontal: 8, paddingVertical: 1, borderRadius: 6, overflow: 'hidden' },
   seeMore: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.text, marginTop: 12 },
+  original: { fontFamily: Fonts.text, fontSize: 12, lineHeight: 16, color: Colors.textMuted, marginTop: 4 },
 
   toast: {
     backgroundColor: Colors.surface,

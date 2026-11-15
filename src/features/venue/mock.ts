@@ -3,13 +3,13 @@
  * Every venue shares one facility layout (gates at the four compass points, services around the
  * concourse), named for the venue, so each map has the same clean spread of pins.
  */
-import { eventsLabel, facilityDescription, facilityLocation, venueT, type VenueT } from './labels';
+import { eventsLabel, facilityDescription, facilityLocation, facilityName, venueT, type VenueT } from './labels';
 import type { Facility, FacilityCategory, Venue } from './types';
 
 export const VENUES: Venue[] = [
   { id: 'sofi', name: 'SoFi Stadium', address: '1001 Stadium Dr, Inglewood, CA 90301', events: ['opening_ceremony', 'swimming'], shape: 'bowl' },
   { id: 'coliseum', name: 'LA Memorial Coliseum', address: '3911 S Figueroa St, Los Angeles, CA 90037', events: ['athletics'], shape: 'bowl' },
-  { id: 'rose-bowl', name: 'Rose Bowl Stadium', address: '1001 Rose Bowl Dr, Pasadena, CA 91103', events: ['football'], shape: 'bowl' },
+  { id: 'rose-bowl', name: 'Rose Bowl Stadium', address: '1001 Rose Bowl Dr, Pasadena, CA 91103', events: ['soccer'], shape: 'bowl' },
   { id: 'crypto-arena', name: 'Crypto.com Arena', address: '1111 S Figueroa St, Los Angeles, CA 90015', events: ['gymnastics'], shape: 'arena' },
   { id: 'intuit-dome', name: 'Intuit Dome', address: '3930 W Century Blvd, Inglewood, CA 90303', events: ['basketball'], shape: 'arena' },
 ];
@@ -131,7 +131,7 @@ export function searchFacilities(facilities: Facility[], query: string, category
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
-    const hay = `${f.name} ${f.description} ${f.location} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`.toLowerCase();
+    const hay = `${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`.toLowerCase();
     return words.every(w => hay.includes(w));
   });
 }

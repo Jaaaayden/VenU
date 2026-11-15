@@ -15,7 +15,6 @@
     "languageLabel": "应用语言：{{language}}",
     "languageHint": "更改整个应用的语言",
     "languageTitle": "应用语言",
-    "languageConsent": "请先在“个人资料”中查看更新后的隐私政策，再更改语言。",
     "assistTitle": "需要帮助？",
     "assistBody": "联系志愿者",
     "assistLabel": "需要帮助？联系志愿者",
@@ -26,7 +25,7 @@
     "opening_ceremony": "开幕式",
     "swimming": "游泳",
     "athletics": "田径",
-    "football": "美式橄榄球",
+    "soccer": "足球",
     "gymnastics": "体操",
     "basketball": "篮球"
   },
@@ -103,7 +102,7 @@
     "zoomIn": "放大",
     "zoomOut": "缩小"
   },
-  "walk_other": "步行 {{count}} 分钟",
+  "walk_other": "步行 {{number}} 分钟",
   "wait": {
     "none": "无需排队",
     "short": "排队较短",
@@ -131,30 +130,37 @@
   },
   "facilityText": {
     "gate-1": {
+      "name": "1 号门",
       "description": "北入口，离 Metro 接驳车站最近。",
       "location": "北侧，接驳车站旁"
     },
     "gate-2": {
+      "name": "2 号门",
       "description": "东入口，设有坡道，紧邻 C 停车场的无障碍车位。",
       "location": "东侧，C 停车场旁"
     },
     "gate-3": {
+      "name": "3 号门",
       "description": "南入口，供网约车上下客。",
       "location": "南侧，网约车区"
     },
     "gate-4": {
+      "name": "4 号门",
       "description": "西入口，供 200 至 240 区持票观众使用。",
       "location": "西侧，主广场旁"
     },
     "info-desk": {
+      "name": "观众服务处",
       "description": "咨询、遗失门票、感官工具包和降噪耳罩。",
       "location": "环廊，105 区"
     },
     "first-aid": {
+      "name": "急救站",
       "description": "从开门到观众全部离场，护士和急救员全程值守。",
       "location": "环廊，112 区"
     },
     "restroom-east": {
+      "name": "东侧洗手间",
       "description": "男洗手间、女洗手间，以及带尿布台的全性别家庭间。",
       "location": "环廊，118 区"
     },
@@ -163,10 +169,12 @@
       "location": "环廊，124 区"
     },
     "lost-found": {
+      "name": "失物招领处",
       "description": "交还或领取遗失物品。走失儿童也会被带到这里。",
       "location": "环廊，131 区"
     },
     "accessible-seating": {
+      "name": "无障碍服务处",
       "description": "轮椅借用、陪同座位和助听设备。",
       "location": "环廊，136 区"
     },
@@ -175,11 +183,13 @@
       "location": "环廊，140 区"
     },
     "restroom-west": {
+      "name": "西侧洗手间",
       "description": "男女洗手间。无障碍隔间在左侧。",
       "location": "环廊，145 区"
     },
     "parking-c": {
-      "description": "无障碍停车场，有一条平坦的短路通往 Gate 2。",
+      "name": "C 停车场",
+      "description": "无障碍停车场，有一条平坦的短路通往2 号门。",
       "location": "东南停车场"
     }
   },
@@ -189,7 +199,7 @@
     "directions": "路线",
     "directionsSoon": "分步导航即将推出。{{name}}：{{location}}。",
     "reports": "反馈",
-    "results_other": "{{count}} 条结果",
+    "results_other": "{{number}} 条结果",
     "noReports": "还没有反馈。来分享你的发现吧。",
     "addReport": "添加你的反馈"
   },
@@ -216,7 +226,9 @@
   "report": {
     "notFound": "未找到该反馈",
     "kind": "反馈",
+    "authorFallback": "VenU 观众",
     "submitted": "提交于 {{date}}",
+    "originalLanguage": "原文语言：{{language}}",
     "noBody": "未添加详情。"
   },
   "form": {
@@ -232,7 +244,7 @@
     "topic": "主题",
     "submit": "提交反馈",
     "sendFailed": "反馈发送失败。请检查网络后重试。",
-    "titleRequired": "请添加标题，例如“Gate 2 坡道有裂缝”。",
+    "titleRequired": "请添加标题，例如“2 号门坡道有裂缝”。",
     "titleTooLong": "标题请少于 {{max}} 个字符。",
     "topicRequired": "请选择最合适的主题。",
     "bodyTooLong": "反馈请少于 {{max}} 个字符。"

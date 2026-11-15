@@ -10,7 +10,7 @@ import { TextField } from '@/components/text-field';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { useDictation } from '@/features/voice/use-dictation';
-import { useT } from '@/i18n';
+import { useT, useUiLanguage } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
 import {
@@ -23,11 +23,13 @@ import {
   type ReportDraft,
   type ReportErrors,
 } from './reports';
+import { facilityName } from './labels';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, InlineNote, venueText } from './ui';
 
 export function ReportForm() {
   const t = useT('venue');
+  const { language } = useUiLanguage();
   const { venue, facilities, setSnap } = useVenueScreen();
   const { profile } = useProfile();
   const { facilityId } = useLocalSearchParams<{ facilityId: string }>();
@@ -52,7 +54,7 @@ export function ReportForm() {
   }
 
   async function submit() {
-    if (saving) return;
+    if (!facility || saving) return;
     let current = draft;
     if (dictation.listening) {
       // Wait (a few seconds at most) for the last dictated words so they're included.
@@ -67,7 +69,7 @@ export function ReportForm() {
     if (Object.keys(found).length) return;
     setSaving(true);
     try {
-      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', draft: current });
+      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', language, draft: current });
       router.dismissTo({ ...facilityHref, params: { ...facilityHref.params, submitted: saved.id } });
     } catch (e) {
       if (e instanceof ReportValidationError) setErrors(e.errors);
@@ -77,12 +79,22 @@ export function ReportForm() {
     }
   }
 
+  // A stale or hand-typed link (/venue/sofi/nope/reports/new): nothing to report on.
+  if (!facility) {
+    return (
+      <SheetScroll contentContainerStyle={styles.content}>
+        <BackArrow onPress={() => goBack({ pathname: '/venue/[venueId]', params: { venueId: venue.id } })} label={t('back.facilities')} />
+        <Text style={venueText.title} accessibilityRole="header">{t('facility.notFound')}</Text>
+      </SheetScroll>
+    );
+  }
+
   return (
     <SheetScroll contentContainerStyle={styles.content}>
       <BackArrow onPress={() => goBack(facilityHref)} label={t('back.facility')} />
       <View style={styles.heading}>
         <Text style={venueText.title} accessibilityRole="header">{t('form.title')}</Text>
-        <Text style={venueText.caption}>{facility ? t('form.subtitleAt', { facility: facility.name }) : t('form.subtitle')}</Text>
+        <Text style={venueText.caption}>{t('form.subtitleAt', { facility: facilityName(facility, t) })}</Text>
       </View>
 
       <TextField

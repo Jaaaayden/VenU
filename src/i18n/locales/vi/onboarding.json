@@ -14,7 +14,7 @@
     "devMode": "Chế độ phát triển: chưa có khóa Supabase nên bỏ qua đăng nhập và dữ liệu chỉ lưu trên thiết bị này.",
     "name": "Tên",
     "namePlaceholder": "Nhập tên",
-    "email": "Email",
+    "email": "Thư điện tử",
     "emailPlaceholder": "Nhập email",
     "password": "Mật khẩu",
     "passwordPlaceholder": "Nhập mật khẩu"

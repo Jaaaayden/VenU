@@ -10,7 +10,7 @@ import { DEFAULT_LANGUAGE, isRtl, resolveUiLanguage, type UiLanguage } from './l
 import { NAMESPACES, resources, type Namespace } from './locales';
 
 export { NAMESPACES, type Namespace } from './locales';
-export { DEFAULT_LANGUAGE, UI_LANGUAGES, isRtl, isUiLanguage, resolveUiLanguage, type UiLanguage } from './languages';
+export { DEFAULT_LANGUAGE, UI_LANGUAGES, UNTRANSLATED, isRtl, isUiLanguage, resolveUiLanguage, type UiLanguage } from './languages';
 
 const i18n = createInstance();
 
@@ -37,6 +37,16 @@ export default i18n;
  */
 export function useT<N extends Namespace>(ns: N) {
   return useTranslation(ns).t;
+}
+
+/**
+ * The language `t` translates into: its own if it's fixed to one (getFixedT), else the current one.
+ * Pass it on to formatNumber / formatDate next to the `t` call, so the React Compiler re-runs them
+ * when the language (and so `t`) changes:
+ *   const t = useT('venue'); t('facility.results', { count: n, number: formatNumber(n, undefined, languageOf(t)) })
+ */
+export function languageOf(t: unknown): string {
+  return (t as { lng?: string | null } | null)?.lng || i18n.language;
 }
 
 /** The current UI language and its text direction, e.g. { language: 'ar', rtl: true }. Re-renders on change. */

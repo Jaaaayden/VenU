@@ -84,10 +84,10 @@
   },
   "messages": {
     "label": "Сообщения",
-    "unread_one": "Сообщения, {{count}} непрочитанное",
-    "unread_few": "Сообщения, {{count}} непрочитанных",
-    "unread_many": "Сообщения, {{count}} непрочитанных",
-    "unread_other": "Сообщения, {{count}} непрочитанного"
+    "unread_one": "Сообщения, {{number}} непрочитанное",
+    "unread_few": "Сообщения, {{number}} непрочитанных",
+    "unread_many": "Сообщения, {{number}} непрочитанных",
+    "unread_other": "Сообщения, {{number}} непрочитанного"
   },
   "chat": {
     "away": "В {{minutes}} мин от вас",
@@ -154,10 +154,10 @@
   },
   "rating": {
     "label": "Оценка",
-    "star_one": "{{count}} звезда, {{word}}",
-    "star_few": "{{count}} звезды, {{word}}",
-    "star_many": "{{count}} звёзд, {{word}}",
-    "star_other": "{{count}} звезды, {{word}}",
+    "star_one": "{{number}} звезда, {{word}}",
+    "star_few": "{{number}} звезды, {{word}}",
+    "star_many": "{{number}} звёзд, {{word}}",
+    "star_other": "{{number}} звезды, {{word}}",
     "words": {
       "poor": "Плохо",
       "notGreat": "Так себе",
