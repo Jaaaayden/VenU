@@ -56,7 +56,19 @@ const BY_CODE: Record<string, (e: { role?: unknown }) => ErrorMessage> = {
   over_email_send_rate_limit: () => ({ key: 'rateLimit' }),
   over_sms_send_rate_limit: () => ({ key: 'rateLimit' }),
   session_expired: () => ({ key: 'sessionExpired' }),
+  session_not_found: () => ({ key: 'sessionExpired' }),
   refresh_token_not_found: () => ({ key: 'sessionExpired' }),
+  refresh_token_already_used: () => ({ key: 'sessionExpired' }),
+  bad_jwt: () => ({ key: 'sessionExpired' }),
+  reauthentication_needed: () => ({ key: 'sessionExpired' }),
+  user_not_found: () => ({ key: 'wrongLogin' }),
+  signup_disabled: () => ({ key: 'signupDisabled' }),
+  email_provider_disabled: () => ({ key: 'signupDisabled' }),
+  same_password: () => ({ key: 'samePassword' }),
+  otp_expired: () => ({ key: 'linkExpired' }),
+  flow_state_expired: () => ({ key: 'linkExpired' }),
+  flow_state_not_found: () => ({ key: 'linkExpired' }),
+  user_banned: () => ({ key: 'accountBlocked' }),
 };
 
 const KNOWN: [RegExp, ErrorMessage][] = [
@@ -67,6 +79,10 @@ const KNOWN: [RegExp, ErrorMessage][] = [
   [/password should (be at least|contain)|password is (too )?weak|pwned|known to be weak/i, { key: 'weakPassword' }],
   [/unable to validate email|invalid email|email address .* is invalid/i, { key: 'invalidEmail' }],
   [/rate limit|too many requests|you can only request this after/i, { key: 'rateLimit' }],
+  [/signups? (are |is )?(not allowed|disabled)/i, { key: 'signupDisabled' }],
+  [/should be different from the old password/i, { key: 'samePassword' }],
+  [/(link|token|otp) (is invalid or )?has expired|expired or is invalid/i, { key: 'linkExpired' }],
+  [/user is banned/i, { key: 'accountBlocked' }],
   // Shown on screens with and without a sign-out button (e.g. sign-in), so no "sign out" step.
   [/jwt expired|invalid jwt|refresh token/i, { key: 'sessionExpired' }],
   // Not a session problem: the database or storage policy refused this change.

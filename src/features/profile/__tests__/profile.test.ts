@@ -624,7 +624,25 @@ describe('round six details', () => {
     expect(friendlyError(Object.assign(new Error('Password should contain at least one character of each: abc'), { name: 'AuthApiError' }))).toBe('That password is too easy to guess. Try a longer one.');
     expect(friendlyError({ name: 'AuthApiError', message: 'For security purposes, you can only request this after 42 seconds.' })).toBe('Too many tries. Wait a minute and try again.');
     expect(friendlyError({ name: 'AuthApiError', code: 'email_address_invalid', message: 'Email address "x@y" is invalid' })).toBe("That email address doesn't look right. Check it and try again.");
-    expect(friendlyError({ name: 'AuthApiError', message: 'Signups not allowed for this instance' })).toBe(generic);
+    expect(friendlyError({ name: 'AuthApiError', message: 'Some brand new auth failure' })).toBe(generic); // only truly unknown ones
+  });
+
+  it('words the readable Supabase Auth errors instead of "Something went wrong"', () => {
+    const auth = (code: string | undefined, message: string) => friendlyError(Object.assign(new Error(message), { name: 'AuthApiError', code }));
+    const cases: [string | undefined, string, string][] = [
+      ['signup_disabled', 'Signups not allowed for this instance', "New accounts can't be created right now. Try again later."],
+      [undefined, 'Signups not allowed for this instance', "New accounts can't be created right now. Try again later."],
+      ['same_password', 'New password should be different from the old password.', 'Choose a password different from your current one.'],
+      [undefined, 'New password should be different from the old password.', 'Choose a password different from your current one.'],
+      ['otp_expired', 'Email link is invalid or has expired', 'That link has expired or was already used. Ask for a new one.'],
+      [undefined, 'Token has expired or is invalid', 'That link has expired or was already used. Ask for a new one.'],
+      ['user_banned', 'User is banned', "This account can't sign in right now. Contact LA28 support."],
+      ['over_email_send_rate_limit', 'Email rate limit exceeded', 'Too many tries. Wait a minute and try again.'],
+      ['weak_password', 'Password should be at least 6 characters.', 'That password is too easy to guess. Try a longer one.'],
+      ['email_not_confirmed', 'Email not confirmed', 'Confirm your email first. Check your inbox for the link.'],
+      ['session_not_found', 'Session from session_id claim in JWT does not exist', 'Your session expired. Please sign in again.'],
+    ];
+    for (const [code, message, expected] of cases) expect({ code, message, text: auth(code, message) }).toEqual({ code, message, text: expected });
   });
 
   it('decodes picker base64 into the bytes that get uploaded', () => {
