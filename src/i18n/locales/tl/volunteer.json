@@ -188,6 +188,32 @@
     "accept": "Tanggapin",
     "acceptSoon": "Puwede nang tumanggap ng request kapag live na ang matching."
   },
+  "home": {
+    "greeting": "Kumusta, {{name}}",
+    "languageLabel": "Wika ng app: {{language}}",
+    "languageHint": "Binabago ang wika ng buong app",
+    "languageTitle": "Wika ng app",
+    "near": "Malapit sa {{place}}",
+    "locationLabel": "Lokasyon mo: {{place}}, {{venue}}",
+    "locationHint": "Binubuksan ang mapa ng venue",
+    "statusTitle": "Iyong status",
+    "status": {
+      "free": "Bakante",
+      "busy": "Abala",
+      "off": "Pahinga"
+    },
+    "statusLine": {
+      "free": "Makakatanggap ka ng mga request sa malapit. Kapag naka-break, lumipat sa Abala o Pahinga at lalaktawan ka ng mga request.",
+      "busy": "Abala ka muna. Lalaktawan ka ng mga bagong request hanggang bumalik ka sa Bakante.",
+      "off": "Naka-pahinga ka. Lalaktawan ka ng mga request hanggang lumipat ka sa Bakante."
+    },
+    "helpTitle": "Mga maitutulong mo",
+    "editLabel": "I-edit ang mga maitutulong mo",
+    "languages": "Mga wikang matatas ka",
+    "training": "Pagsasanay",
+    "noTraining": "Wala pang naidagdag na pagsasanay",
+    "paused": "Naka-pause ang mga request habang naka-break ka. Lumipat sa Bakante para makita kung sino ang kailangan ng tulong sa malapit."
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "Malapit sa Rampa ng Pasukan 2",

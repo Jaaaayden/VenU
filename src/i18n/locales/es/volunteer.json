@@ -190,6 +190,32 @@
     "accept": "Aceptar",
     "acceptSoon": "Podrás aceptar solicitudes cuando se active el emparejamiento."
   },
+  "home": {
+    "greeting": "Hola, {{name}}",
+    "languageLabel": "Idioma de la app: {{language}}",
+    "languageHint": "Cambia el idioma de toda la app",
+    "languageTitle": "Idioma de la app",
+    "near": "Cerca de {{place}}",
+    "locationLabel": "Tu ubicación: {{place}}, {{venue}}",
+    "locationHint": "Abre el mapa de la sede",
+    "statusTitle": "Tu estado",
+    "status": {
+      "free": "Libre",
+      "busy": "Ocupado",
+      "off": "Fuera"
+    },
+    "statusLine": {
+      "free": "Recibirás solicitudes cercanas. En un descanso, cambia a Ocupado o Fuera y las solicitudes no te llegarán.",
+      "busy": "Estás ocupado por ahora. Las nuevas solicitudes no te llegarán hasta que vuelvas a Libre.",
+      "off": "Estás fuera de turno. Las solicitudes no te llegarán hasta que cambies a Libre."
+    },
+    "helpTitle": "En qué puedes ayudar",
+    "editLabel": "Editar en qué puedes ayudar",
+    "languages": "Idiomas que dominas",
+    "training": "Formación",
+    "noTraining": "Aún no has añadido formación",
+    "paused": "Las solicitudes están en pausa mientras descansas. Cambia a Libre para ver quién necesita ayuda cerca."
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "Cerca de la rampa de la Puerta 2",

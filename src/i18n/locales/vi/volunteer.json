@@ -186,6 +186,32 @@
     "accept": "Nhận",
     "acceptSoon": "Bạn có thể nhận yêu cầu khi tính năng ghép đôi hoạt động."
   },
+  "home": {
+    "greeting": "Xin chào, {{name}}",
+    "languageLabel": "Ngôn ngữ ứng dụng: {{language}}",
+    "languageHint": "Đổi ngôn ngữ của toàn bộ ứng dụng",
+    "languageTitle": "Ngôn ngữ ứng dụng",
+    "near": "Gần {{place}}",
+    "locationLabel": "Vị trí của bạn: {{place}}, {{venue}}",
+    "locationHint": "Mở bản đồ địa điểm",
+    "statusTitle": "Trạng thái của bạn",
+    "status": {
+      "free": "Rảnh",
+      "busy": "Bận",
+      "off": "Nghỉ"
+    },
+    "statusLine": {
+      "free": "Bạn sẽ nhận yêu cầu ở gần. Khi nghỉ giải lao, hãy chuyển sang Bận hoặc Nghỉ để yêu cầu bỏ qua bạn.",
+      "busy": "Bạn đang bận. Yêu cầu mới sẽ bỏ qua bạn cho đến khi bạn chuyển lại Rảnh.",
+      "off": "Bạn đang nghỉ. Yêu cầu sẽ bỏ qua bạn cho đến khi bạn chuyển sang Rảnh."
+    },
+    "helpTitle": "Việc bạn có thể giúp",
+    "editLabel": "Sửa việc bạn có thể giúp",
+    "languages": "Ngôn ngữ thông thạo",
+    "training": "Đào tạo",
+    "noTraining": "Chưa thêm khóa đào tạo nào",
+    "paused": "Yêu cầu tạm dừng khi bạn nghỉ giải lao. Chuyển sang Rảnh để xem ai ở gần đang cần giúp."
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "Gần dốc Cổng 2",

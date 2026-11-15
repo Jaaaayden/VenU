@@ -186,6 +186,32 @@
     "accept": "接受",
     "acceptSoon": "匹配功能上线后即可接受请求。"
   },
+  "home": {
+    "greeting": "你好，{{name}}",
+    "languageLabel": "应用语言：{{language}}",
+    "languageHint": "更改整个应用的语言",
+    "languageTitle": "应用语言",
+    "near": "{{place}}附近",
+    "locationLabel": "你的位置：{{place}}，{{venue}}",
+    "locationHint": "打开场馆地图",
+    "statusTitle": "你的状态",
+    "status": {
+      "free": "空闲",
+      "busy": "忙碌",
+      "off": "离线"
+    },
+    "statusLine": {
+      "free": "你会收到附近的请求。休息时切换到“忙碌”或“离线”，请求就会跳过你。",
+      "busy": "你现在正忙。切换回“空闲”之前，新请求会跳过你。",
+      "off": "你已离线。切换到“空闲”之前，请求会跳过你。"
+    },
+    "helpTitle": "你能提供的帮助",
+    "editLabel": "编辑你能提供的帮助",
+    "languages": "流利的语言",
+    "training": "培训",
+    "noTraining": "尚未添加培训",
+    "paused": "休息期间请求已暂停。切换到“空闲”即可查看附近需要帮助的人。"
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "2 号门坡道附近",

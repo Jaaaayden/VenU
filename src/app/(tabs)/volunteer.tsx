@@ -3,10 +3,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { FeedbackView } from '@/components/volunteer/feedback-view';
-import { IncomingRequests } from '@/components/volunteer/incoming-requests';
 import { MatchView } from '@/components/volunteer/match-view';
 import { RequestForm } from '@/components/volunteer/request-form';
 import { SearchingView } from '@/components/volunteer/searching-view';
+import { VolunteerHome } from '@/components/volunteer/volunteer-home';
 import { Colors, Spacing } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { useVolunteerRequest, useVolunteerRestored } from '@/features/volunteer/request-store';
@@ -14,6 +14,7 @@ import { useVolunteerRequest, useVolunteerRestored } from '@/features/volunteer/
 /**
  * The Volunteer tab follows the visitor's request: form → searching → "Volunteer found" →
  * feedback. One route, so switching tabs and coming back lands on the current step.
+ * A volunteer sees their home instead (status, what they can help with, nearby requests).
  */
 export default function VolunteerScreen() {
   const { profile } = useProfile();
@@ -26,7 +27,7 @@ export default function VolunteerScreen() {
   const { status, request, match } = state;
   const isVolunteer = profile.role === 'volunteer';
   let body: React.ReactNode;
-  if (isVolunteer) body = <IncomingRequests />;
+  if (isVolunteer) body = <VolunteerHome profile={profile} />;
   else if (status === 'searching' && request) body = <SearchingView request={request} />;
   else if (status === 'matched' && request && match) body = <MatchView request={request} match={match} unread={state.unread} />;
   else if (status === 'done' && match) body = <FeedbackView match={match} />;

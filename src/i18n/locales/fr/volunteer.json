@@ -190,6 +190,32 @@
     "accept": "Accepter",
     "acceptSoon": "Vous pourrez accepter des demandes quand la mise en relation sera active."
   },
+  "home": {
+    "greeting": "Bonjour, {{name}}",
+    "languageLabel": "Langue de l’app : {{language}}",
+    "languageHint": "Change la langue de toute l’app",
+    "languageTitle": "Langue de l’app",
+    "near": "Près de {{place}}",
+    "locationLabel": "Votre position : {{place}}, {{venue}}",
+    "locationHint": "Ouvre le plan du site",
+    "statusTitle": "Votre statut",
+    "status": {
+      "free": "Libre",
+      "busy": "Occupé",
+      "off": "Absent"
+    },
+    "statusLine": {
+      "free": "Vous recevrez les demandes à proximité. Pendant une pause, passez en Occupé ou Absent et les demandes vous éviteront.",
+      "busy": "Vous êtes occupé pour l’instant. Les nouvelles demandes vous évitent jusqu’à ce que vous repassiez en Libre.",
+      "off": "Vous n’êtes pas en service. Les demandes vous évitent jusqu’à ce que vous passiez en Libre."
+    },
+    "helpTitle": "Ce en quoi vous pouvez aider",
+    "editLabel": "Modifier ce en quoi vous pouvez aider",
+    "languages": "Langues parlées couramment",
+    "training": "Formation",
+    "noTraining": "Aucune formation ajoutée pour l’instant",
+    "paused": "Les demandes sont suspendues pendant votre pause. Passez en Libre pour voir qui a besoin d’aide à proximité."
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "Près de la rampe de la porte 2",

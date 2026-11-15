@@ -188,6 +188,32 @@
     "accept": "Accept",
     "acceptSoon": "Accepting requests opens when matching goes live."
   },
+  "home": {
+    "greeting": "Hi, {{name}}",
+    "languageLabel": "App language: {{language}}",
+    "languageHint": "Changes the language of the whole app",
+    "languageTitle": "App language",
+    "near": "Near {{place}}",
+    "locationLabel": "Your location: {{place}}, {{venue}}",
+    "locationHint": "Opens the venue map",
+    "statusTitle": "Your status",
+    "status": {
+      "free": "Free",
+      "busy": "Busy",
+      "off": "Off"
+    },
+    "statusLine": {
+      "free": "You’ll get nearby requests. Switch to Busy or Off on a break and requests will skip you.",
+      "busy": "You’re busy for now. New requests skip you until you switch back to Free.",
+      "off": "You’re off duty. Requests skip you until you switch to Free."
+    },
+    "helpTitle": "What you can help with",
+    "editLabel": "Edit what you can help with",
+    "languages": "Fluent languages",
+    "training": "Training",
+    "noTraining": "No training added yet",
+    "paused": "Requests are paused while you’re on a break. Switch to Free to see who needs help nearby."
+  },
   "mock": {
     "spots": {
       "gate2Ramp": "Near Gate 2 Ramp",
