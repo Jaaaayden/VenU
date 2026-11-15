@@ -24,10 +24,10 @@
   "events": {
     "opening_ceremony": "Seremonya ng Pagbubukas",
     "swimming": "Paglangoy",
-    "athletics": "Athletics",
+    "athletics": "Atletiks",
     "soccer": "Putbol",
-    "gymnastics": "Gymnastics",
-    "basketball": "Basketball"
+    "gymnastics": "Himnastiko",
+    "basketball": "Basketbol"
   },
   "category": {
     "all": "Lahat",
@@ -35,10 +35,10 @@
     "gate": "Mga Gate",
     "restroom": "Mga CR",
     "food": "Pagkain at Inumin",
-    "first_aid": "First Aid",
-    "lost_found": "Lost & Found",
-    "info": "Info Desk",
-    "accessible": "Accessibility",
+    "first_aid": "Pangunang Lunas",
+    "lost_found": "Mga Nawawalang Gamit",
+    "info": "Impormasyon",
+    "accessible": "Para sa May Kapansanan",
     "parking": "Paradahan"
   },
   "emptyMatch": {
@@ -89,20 +89,20 @@
   },
   "row": {
     "label": "{{name}}, {{meta}}",
-    "labelAccessible": "{{name}}, {{meta}}, accessible"
+    "labelAccessible": "{{name}}, {{meta}}, para sa may kapansanan"
   },
   "tags": {
     "label": "Mga tag:",
-    "accessible": "Accessible",
+    "accessible": "Para sa may kapansanan",
     "stairs": "May hagdan",
     "busy_before_events": "Siksikan bago ang event",
     "ramp": "Rampa",
     "bag_check": "Inspeksyon ng bag",
-    "rideshare": "Rideshare",
+    "rideshare": "Sakay-hatid",
     "escalators": "Escalator",
     "sensory_kits": "Sensory kit",
     "quiet_room": "Tahimik na kuwarto",
-    "family_room": "Family room",
+    "family_room": "Silid pampamilya",
     "long_lines_halftime": "Mahabang pila sa halftime",
     "wheelchair_loans": "Pahiram ng wheelchair",
     "permit_needed": "Kailangan ng permit"
@@ -196,7 +196,7 @@
     "seeMore": "tingnan pa →"
   },
   "topic": {
-    "accessibility": "Accessibility",
+    "accessibility": "Akses para sa may kapansanan",
     "directions": "Direksyon",
     "facility_condition": "Kondisyon ng pasilidad",
     "security": "Seguridad",

@@ -6,7 +6,7 @@
   "cancelRequest": "Hủy yêu cầu",
   "dismiss": "Đóng",
   "distance": {
-    "feet": "{{value}} ft",
+    "feet": "{{value}} bộ",
     "miles": "{{value}} dặm"
   },
   "helpTypes": {
