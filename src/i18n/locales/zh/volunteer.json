@@ -30,7 +30,6 @@
     "question": "你需要什么帮助？",
     "notePlaceholder": "例如：我在 2 号坡道附近过不去",
     "photoOff": "照片访问已关闭。请在“设置”中开启。",
-    "voiceSoon": "语音备注即将推出。请先输入文字备注。",
     "pickOne": "请至少选择一项需要的帮助。",
     "send": "发送请求"
   },
@@ -104,8 +103,7 @@
     "messageTo": "给 {{name}} 发消息",
     "stickers": "贴纸",
     "stickersSoon": "贴纸即将推出。",
-    "record": "录制语音消息",
-    "voiceSoon": "语音消息即将推出。"
+    "record": "语音输入消息"
   },
   "bubble": {
     "mine": "你，{{time}}：{{text}}",

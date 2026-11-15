@@ -1,6 +1,6 @@
 /**
  * Figma "Frame 2241" (235:26768): "Add a note (optional)", the multiline box, and (with
- * `onAddPicture` / `onSpeak`) the "Add picture" and "Or hold to speak" buttons under it.
+ * `onAddPicture` / `onSpeak`) the "Add picture" and speak buttons under it; `listening` shows dictation on.
  */
 import { Image } from 'expo-image';
 import { Trans } from 'react-i18next';
@@ -19,9 +19,11 @@ interface NoteBoxProps {
   onAddPicture?: () => void;
   onRemovePicture?: () => void;
   onSpeak?: () => void;
+  speakLabel?: string;
+  listening?: boolean;
 }
 
-export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPicture, onRemovePicture, onSpeak }: NoteBoxProps) {
+export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPicture, onRemovePicture, onSpeak, speakLabel, listening }: NoteBoxProps) {
   const t = useT('volunteer');
   return (
     <View style={styles.wrap}>
@@ -49,7 +51,7 @@ export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPictu
         </View>
       ) : null}
 
-      <MediaActions onAddPicture={onAddPicture} hasPicture={!!photoUri} onSpeak={onSpeak} />
+      <MediaActions onAddPicture={onAddPicture} hasPicture={!!photoUri} onSpeak={onSpeak} speakLabel={speakLabel} listening={listening} />
     </View>
   );
 }

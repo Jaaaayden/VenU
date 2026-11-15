@@ -30,7 +30,6 @@
     "question": "De quelle aide avez-vous besoin ?",
     "notePlaceholder": "ex. : J’ai besoin d’aide près de la rampe 2",
     "photoOff": "L’accès aux photos est désactivé. Activez-le dans Réglages.",
-    "voiceSoon": "Les notes vocales arrivent bientôt. Écrivez une note pour l’instant.",
     "pickOne": "Choisissez au moins un type d’aide.",
     "send": "Envoyer la demande"
   },
@@ -106,8 +105,7 @@
     "messageTo": "Message à {{name}}",
     "stickers": "Autocollants",
     "stickersSoon": "Les autocollants arrivent bientôt.",
-    "record": "Enregistrer un message vocal",
-    "voiceSoon": "Les messages vocaux arrivent bientôt."
+    "record": "Dicter un message"
   },
   "bubble": {
     "mine": "Vous, {{time}} : {{text}}",

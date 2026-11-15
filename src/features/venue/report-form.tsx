@@ -9,6 +9,7 @@ import { MediaActions } from '@/components/media-actions';
 import { TextField } from '@/components/text-field';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
+import { useDictation } from '@/features/voice/use-dictation';
 import { useT } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
@@ -36,6 +37,9 @@ export function ReportForm() {
   const [tried, setTried] = useState(false);
   const [saving, setSaving] = useState(false);
   const [soon, setSoon] = useState<string | null>(null);
+  const tc = useT('common');
+  // Tap to dictate into the description (after what's typed); tap again to stop.
+  const dictation = useDictation({ onCommit: body => update({ body }), onNote: setSoon });
 
   useEffect(() => { setSnap('up'); }, [setSnap]);
 
@@ -48,13 +52,22 @@ export function ReportForm() {
   }
 
   async function submit() {
+    if (saving) return;
+    let current = draft;
+    if (dictation.listening) {
+      // Wait (a few seconds at most) for the last dictated words so they're included.
+      setSaving(true);
+      const body = await dictation.complete();
+      setSaving(false);
+      if (body != null) current = { ...draft, body };
+    }
     setTried(true);
-    const found = validateReport(draft);
+    const found = validateReport(current);
     setErrors(found);
     if (Object.keys(found).length) return;
     setSaving(true);
     try {
-      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', draft });
+      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', draft: current });
       router.dismissTo({ ...facilityHref, params: { ...facilityHref.params, submitted: saved.id } });
     } catch (e) {
       if (e instanceof ReportValidationError) setErrors(e.errors);
@@ -84,8 +97,8 @@ export function ReportForm() {
       <TextField
         label={t('form.bodyLabel')}
         placeholder={t('form.bodyPlaceholder')}
-        value={draft.body}
-        onChangeText={body => update({ body })}
+        value={dictation.liveText ?? draft.body}
+        onChangeText={body => { update({ body }); dictation.edit(body); }}
         multiline
         error={errors.body}
         hint={t('form.bodyHint')}
@@ -93,7 +106,9 @@ export function ReportForm() {
 
       <MediaActions
         onAddPicture={() => setSoon(t('form.pictureSoon'))}
-        onSpeak={() => setSoon(t('form.speakSoon'))}
+        onSpeak={() => dictation.toggle(draft.body)}
+        speakLabel={tc('media.tapToSpeak')}
+        listening={dictation.listening}
       />
       {soon ? <InlineNote>{soon}</InlineNote> : null}
 

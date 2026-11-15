@@ -30,7 +30,6 @@
     "question": "Bạn cần giúp gì?",
     "notePlaceholder": "VD: Tôi bị kẹt gần dốc số 2",
     "photoOff": "Quyền truy cập ảnh đang tắt. Hãy bật trong Cài đặt.",
-    "voiceSoon": "Ghi chú giọng nói sắp ra mắt. Tạm thời hãy nhập ghi chú.",
     "pickOne": "Hãy chọn ít nhất một việc bạn cần giúp.",
     "send": "Gửi yêu cầu"
   },
@@ -104,8 +103,7 @@
     "messageTo": "Nhắn cho {{name}}",
     "stickers": "Nhãn dán",
     "stickersSoon": "Nhãn dán sắp ra mắt.",
-    "record": "Ghi âm tin nhắn thoại",
-    "voiceSoon": "Tin nhắn thoại sắp ra mắt."
+    "record": "Nói tin nhắn"
   },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",

@@ -53,7 +53,18 @@
   "media": {
     "addPicture": "写真を追加",
     "changePicture": "写真を変更",
-    "holdToSpeak": "または長押しで話す"
+    "holdToSpeak": "または長押しで話す",
+    "tapToSpeak": "またはタップして話す",
+    "listening": "聞き取り中… タップで停止",
+    "voiceStarted": "聞き取り中です。話してください。",
+    "voiceStopped": "聞き取りを停止しました。",
+    "voiceEnglish": "ここでは{{language}}の音声入力を使えないため、英語で聞き取ります。",
+    "voiceUnavailable": "ここでは音声入力を使えません。文字で入力してください。",
+    "voiceDeniedIos": "マイクがオフです。設定 > VenU で「マイク」と「音声認識」をオンにしてください。",
+    "voiceDeniedAndroid": "マイクがオフです。設定 > アプリ > VenU > 権限 でオンにしてください。",
+    "voiceDeniedWeb": "マイクがブロックされています。ブラウザのサイト設定で許可してから、もう一度お試しください。",
+    "voiceNoSpeech": "聞き取れませんでした。タップしてもう一度話してください。",
+    "voiceFailed": "音声入力が停止しました。もう一度試すか、文字で入力してください。"
   },
   "form": {
     "optionalTitle": "{{title}} <muted>（任意）</muted>",

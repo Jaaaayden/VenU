@@ -54,7 +54,18 @@
   "media": {
     "addPicture": "Magdagdag ng larawan",
     "changePicture": "Palitan ang larawan",
-    "holdToSpeak": "Pindutin at magsalita"
+    "holdToSpeak": "Pindutin at magsalita",
+    "tapToSpeak": "O i-tap para magsalita",
+    "listening": "Nakikinig… i-tap para huminto",
+    "voiceStarted": "Nakikinig. Magsalita na.",
+    "voiceStopped": "Huminto na sa pakikinig.",
+    "voiceEnglish": "Hindi available dito ang voice input sa {{language}}. Nakikinig sa English.",
+    "voiceUnavailable": "Hindi available dito ang voice input. Mag-type na lang.",
+    "voiceDeniedIos": "Naka-off ang mikropono. I-on ang Microphone at Speech Recognition sa Settings > VenU.",
+    "voiceDeniedAndroid": "Naka-off ang mikropono. I-on ito sa Settings > Apps > VenU > Permissions.",
+    "voiceDeniedWeb": "Naka-block ang mikropono. Payagan ito sa site settings ng browser mo, saka subukan ulit.",
+    "voiceNoSpeech": "Hindi ko narinig. I-tap at magsalita ulit.",
+    "voiceFailed": "Huminto ang voice input. Subukan ulit, o mag-type na lang."
   },
   "form": {
     "optionalTitle": "{{title}} <muted>(opsyonal)</muted>",

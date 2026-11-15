@@ -30,7 +30,6 @@
     "question": "What do you need help with?",
     "notePlaceholder": "e.g. I'm stuck near ramp 2",
     "photoOff": "Photo access is off. Turn it on in Settings.",
-    "voiceSoon": "Voice notes are coming soon. Type a note for now.",
     "pickOne": "Pick at least one thing you need help with.",
     "send": "Send Request"
   },
@@ -105,8 +104,7 @@
     "messageTo": "Message {{name}}",
     "stickers": "Stickers",
     "stickersSoon": "Stickers are coming soon.",
-    "record": "Record a voice message",
-    "voiceSoon": "Voice messages are coming soon."
+    "record": "Speak a message"
   },
   "bubble": {
     "mine": "You, {{time}}: {{text}}",
