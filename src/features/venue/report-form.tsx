@@ -50,6 +50,7 @@ export function ReportForm() {
   }
 
   async function submit() {
+    if (!facility) return;
     setTried(true);
     const found = validateReport(draft);
     setErrors(found);
@@ -66,12 +67,22 @@ export function ReportForm() {
     }
   }
 
+  // A stale or hand-typed link (/venue/sofi/nope/reports/new): nothing to report on.
+  if (!facility) {
+    return (
+      <SheetScroll contentContainerStyle={styles.content}>
+        <BackArrow onPress={() => goBack({ pathname: '/venue/[venueId]', params: { venueId: venue.id } })} label={t('back.facilities')} />
+        <Text style={venueText.title} accessibilityRole="header">{t('facility.notFound')}</Text>
+      </SheetScroll>
+    );
+  }
+
   return (
     <SheetScroll contentContainerStyle={styles.content}>
       <BackArrow onPress={() => goBack(facilityHref)} label={t('back.facility')} />
       <View style={styles.heading}>
         <Text style={venueText.title} accessibilityRole="header">{t('form.title')}</Text>
-        <Text style={venueText.caption}>{facility ? t('form.subtitleAt', { facility: facilityName(facility, t) }) : t('form.subtitle')}</Text>
+        <Text style={venueText.caption}>{t('form.subtitleAt', { facility: facilityName(facility, t) })}</Text>
       </View>
 
       <TextField
