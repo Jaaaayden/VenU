@@ -44,7 +44,13 @@
     "title": "May emerhensiya?",
     "call": "Tumawag sa 911 ngayon",
     "label": "Emergency? Tumawag sa 911 ngayon",
-    "hint": "Bubuksan ang telepono para tumawag sa 911"
+    "hint": "Itatanong kung tatawag sa 911 o sa staff ng venue",
+    "dialogTitle": "Kailangan mo ba ng tulong pang-emerhensiya?",
+    "dialogBody": "Kung may panganib, pinsala, o medikal na emerhensiya, tumawag muna sa 911.",
+    "call911": "Tumawag sa 911",
+    "callStaff": "Tawagan ang staff ng venue",
+    "notEmergency": "hindi ito emerhensiya",
+    "close": "Isara"
   },
   "notice": {
     "searchFailed": "Hindi makakonekta sa volunteer. Tingnan ang koneksyon mo at subukan ulit.",
@@ -53,7 +59,10 @@
   "searching": {
     "title": "Naghahanap ng volunteer",
     "subtitle": "Karaniwang wala pang isang minuto · Manatili ka lang diyan",
-    "askedFor": "Hiniling mo"
+    "askedFor": "Hiniling mo",
+    "notFoundTitle": "Walang bakanteng volunteer ngayon",
+    "notFoundBody": "Naka-save ang request mo. Patuloy na maghanap, o tawagan ang staff ng venue para sa tulong.",
+    "keepSearching": "Patuloy na maghanap"
   },
   "match": {
     "title": "May nahanap na volunteer",

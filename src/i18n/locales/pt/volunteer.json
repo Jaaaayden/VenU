@@ -44,7 +44,13 @@
     "title": "Emergência?",
     "call": "Ligue para o 911 agora",
     "label": "Emergência? Ligue para o 911 agora",
-    "hint": "Abre o telefone para ligar para o 911"
+    "hint": "Pergunta se você quer ligar para o 911 ou para a equipe do local",
+    "dialogTitle": "Precisa de ajuda de emergência?",
+    "dialogBody": "Em caso de perigo, ferimento ou emergência médica, ligue primeiro para o 911.",
+    "call911": "Ligar para o 911",
+    "callStaff": "Ligar para a equipe do local",
+    "notEmergency": "não é uma emergência",
+    "close": "Fechar"
   },
   "notice": {
     "searchFailed": "Não conseguimos falar com um voluntário. Verifique sua conexão e tente de novo.",
@@ -53,7 +59,10 @@
   "searching": {
     "title": "Procurando um voluntário",
     "subtitle": "Geralmente menos de um minuto · Fique onde está",
-    "askedFor": "Você pediu"
+    "askedFor": "Você pediu",
+    "notFoundTitle": "Nenhum voluntário está livre agora",
+    "notFoundBody": "Seu pedido foi guardado. Continue procurando ou ligue para a equipe do local para pedir ajuda.",
+    "keepSearching": "Continuar procurando"
   },
   "match": {
     "title": "Voluntário encontrado",

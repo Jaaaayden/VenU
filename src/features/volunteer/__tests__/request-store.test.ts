@@ -2,9 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 
 import i18n from '@/i18n';
 
-import { createMockBackend } from '../backend';
+import { createMockBackend, mockVolunteerFor } from '../backend';
 import { mockLocation } from '../mock';
-import { createRequestStore, INITIAL_STATE, parseSaved, reduce, type KeyValueStorage, type NewRequest } from '../request-store';
+import { createRequestStore, INITIAL_STATE, parseSaved, reduce, SEARCH_TIMEOUT_MS, type KeyValueStorage, type NewRequest } from '../request-store';
+import type { HelpRequest, RequestState } from '../types';
 import { formatClock, formatDayTime, formatDistance, needsSeparator } from '../format';
 
 // The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
@@ -350,6 +351,145 @@ describe('volunteer request store', () => {
     expect(reduce(INITIAL_STATE, { type: 'end' })).toBe(INITIAL_STATE);
     expect(reduce(INITIAL_STATE, { type: 'cancel' })).toBe(INITIAL_STATE);
     expect(reduce(INITIAL_STATE, { type: 'send', message: { id: 'm', from: 'me', text: 'hi', sentAt: 0 } })).toBe(INITIAL_STATE);
+  });
+});
+
+describe('no volunteer free in time', () => {
+  beforeEach(() => { jest.useFakeTimers(); });
+  afterEach(() => { jest.useRealTimers(); });
+
+  // German: no mock volunteer speaks it and chat translation doesn't cover it, so nobody matches.
+  const nobodySpeaks: NewRequest = { ...rosaNeedsHelp, language: 'de' };
+  const request: HelpRequest = { ...rosaNeedsHelp, id: 'req-1', createdAt: 0 };
+  const draft = { helpTypes: ['physical' as const], note: 'By the ramp', photoUri: null, language: 'de' };
+  const searching: RequestState = { ...INITIAL_STATE, status: 'searching', request, draft };
+
+  it('moves searching → notFound → searching, and cancels back to the form with the draft', () => {
+    const notFound = reduce(searching, { type: 'searchTimedOut', requestId: 'req-1' });
+    expect(notFound).toEqual({ ...searching, status: 'notFound' });
+    expect(reduce(searching, { type: 'searchTimedOut', requestId: 'req-other' })).toBe(searching);
+    expect(reduce(INITIAL_STATE, { type: 'searchTimedOut', requestId: 'req-1' })).toBe(INITIAL_STATE);
+
+    expect(reduce(notFound, { type: 'keepSearching' })).toEqual(searching);
+    expect(reduce(searching, { type: 'keepSearching' })).toBe(searching);
+    expect(reduce(notFound, { type: 'matched', requestId: 'req-1', match: {} as never })).toBe(notFound);
+
+    expect(reduce(notFound, { type: 'cancel' })).toEqual({ ...INITIAL_STATE, draft });
+  });
+
+  it('the mock matches nobody only for a language no one speaks and the app can’t translate', () => {
+    expect(mockVolunteerFor('de')).toBeNull();
+    expect(mockVolunteerFor('ko')?.firstName).toBe('Min-ji');
+    expect(mockVolunteerFor('ja')?.firstName).toBe('Daniel'); // through chat translation, as before
+  });
+
+  it('gives up after SEARCH_TIMEOUT_MS, keeping the request and draft, and withdraws it', async () => {
+    const backend = createMockBackend(TIMING);
+    const cancelRequest = jest.spyOn(backend, 'cancelRequest');
+    const store = createRequestStore(backend);
+    store.editDraft(draft);
+    let settled = false;
+    void store.sendRequest(nobodySpeaks).then(() => { settled = true; });
+
+    await advance(SEARCH_TIMEOUT_MS - 1);
+    expect(store.getState().status).toBe('searching');
+    expect(settled).toBe(false);
+
+    await advance(1);
+    const state = store.getState();
+    expect(state.status).toBe('notFound');
+    expect(state.request?.language).toBe('de');
+    expect(state.draft).toEqual(draft);
+    expect(settled).toBe(true);
+    expect(cancelRequest).toHaveBeenCalledWith(state.request!.id);
+  });
+
+  it('a match before the timeout stays matched', async () => {
+    const store = setup();
+    void store.sendRequest(rosaNeedsHelp);
+    await advance(SEARCH_TIMEOUT_MS * 2);
+    expect(store.getState().status).toBe('matched');
+  });
+
+  it('keep searching sends the same request and waits the full time again', async () => {
+    const store = setup();
+    void store.sendRequest(nobodySpeaks);
+    await advance(SEARCH_TIMEOUT_MS);
+    const id = store.getState().request?.id;
+    expect(store.getState().status).toBe('notFound');
+
+    void store.keepSearching();
+    expect(store.getState().status).toBe('searching');
+    expect(store.getState().request?.id).toBe(id);
+    await advance(SEARCH_TIMEOUT_MS - 1);
+    expect(store.getState().status).toBe('searching');
+    await advance(1);
+    expect(store.getState().status).toBe('notFound');
+  });
+
+  it('cancel from notFound goes back to the form with the draft', async () => {
+    const store = setup();
+    store.editDraft(draft);
+    void store.sendRequest(nobodySpeaks);
+    await advance(SEARCH_TIMEOUT_MS);
+    store.cancel();
+    expect(store.getState()).toEqual({ ...INITIAL_STATE, draft });
+  });
+
+  describe('after a restart', () => {
+    function saved(state: RequestState, extra: object = {}) {
+      return JSON.stringify({ v: 1, owner: 'rosa', state, ...extra });
+    }
+
+    async function restart(raw: string) {
+      const storage = memoryStorage();
+      storage.data.set(KEY, raw);
+      const store = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await store.setUser('rosa');
+      return store;
+    }
+
+    it('shows notFound again for a saved notFound request, without searching', async () => {
+      const store = await restart(saved({ ...searching, status: 'notFound', request: { ...request, createdAt: Date.now() } }));
+      expect(store.getState().status).toBe('notFound');
+      expect(store.getState().draft).toEqual(draft);
+      await advance(SEARCH_TIMEOUT_MS * 2);
+      expect(store.getState().status).toBe('notFound');
+    });
+
+    it('shows notFound for an old-shape save (no since) whose wait already ran out', async () => {
+      const store = await restart(saved({ ...searching, request: { ...request, createdAt: Date.now() - SEARCH_TIMEOUT_MS - 1000 } }));
+      expect(store.getState().status).toBe('notFound');
+    });
+
+    it('resumes an old-shape save that still has time, and matches as before', async () => {
+      const store = await restart(saved({ ...searching, request: { ...request, language: 'en', createdAt: Date.now() } }));
+      expect(store.getState().status).toBe('searching');
+      await advance(TIMING.search);
+      expect(store.getState().status).toBe('matched');
+    });
+
+    it('saves when the wait began and gives up on time after a restart', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const started = Date.now();
+      void before.sendRequest(nobodySpeaks);
+      await advance(0);
+      expect(JSON.parse(storage.data.get(KEY)!).since).toBe(started);
+
+      await advance(SEARCH_TIMEOUT_MS / 2);
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await after.setUser('rosa');
+      expect(after.getState().status).toBe('searching');
+      await advance(SEARCH_TIMEOUT_MS / 2);
+      expect(after.getState().status).toBe('notFound');
+    });
+
+    it('parses a saved notFound request', () => {
+      expect(parseSaved(saved({ ...searching, status: 'notFound' }), 'rosa')?.status).toBe('notFound');
+      expect(parseSaved(saved({ ...searching, status: 'notFound', request: null }), 'rosa')).toBeNull();
+    });
   });
 });
 

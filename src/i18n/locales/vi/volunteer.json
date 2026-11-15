@@ -44,7 +44,13 @@
     "title": "Khẩn cấp?",
     "call": "Gọi 911 ngay",
     "label": "Khẩn cấp? Gọi 911 ngay",
-    "hint": "Mở điện thoại để gọi 911"
+    "hint": "Hỏi bạn muốn gọi 911 hay nhân viên địa điểm",
+    "dialogTitle": "Bạn cần trợ giúp khẩn cấp?",
+    "dialogBody": "Khi gặp nguy hiểm, bị thương hoặc cấp cứu y tế, hãy gọi 911 trước.",
+    "call911": "Gọi 911",
+    "callStaff": "Gọi nhân viên địa điểm",
+    "notEmergency": "không phải khẩn cấp",
+    "close": "Đóng"
   },
   "notice": {
     "searchFailed": "Không liên lạc được với tình nguyện viên. Hãy kiểm tra kết nối và thử lại.",
@@ -53,7 +59,10 @@
   "searching": {
     "title": "Đang tìm tình nguyện viên",
     "subtitle": "Thường dưới một phút · Hãy ở yên tại chỗ",
-    "askedFor": "Bạn đã yêu cầu"
+    "askedFor": "Bạn đã yêu cầu",
+    "notFoundTitle": "Hiện chưa có tình nguyện viên nào rảnh",
+    "notFoundBody": "Yêu cầu của bạn đã được lưu. Hãy tiếp tục tìm hoặc gọi nhân viên địa điểm để được giúp.",
+    "keepSearching": "Tiếp tục tìm"
   },
   "match": {
     "title": "Đã tìm thấy tình nguyện viên",

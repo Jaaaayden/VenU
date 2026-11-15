@@ -27,8 +27,6 @@ export function SearchingView({ request }: { request: HelpRequest }) {
     return () => loop.stop();
   }, [pulse]);
 
-  const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
-
   return (
     <View style={styles.page}>
       <View style={styles.titles}>
@@ -51,6 +49,19 @@ export function SearchingView({ request }: { request: HelpRequest }) {
         </View>
       </View>
 
+      <RequestSummary request={request} />
+
+      <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
+    </View>
+  );
+}
+
+/** Where they are and what they asked for; also under "No volunteer is free right now". */
+export function RequestSummary({ request }: { request: HelpRequest }) {
+  const t = useT('volunteer');
+  const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
+  return (
+    <>
       <Text style={styles.where}>{t('place', { spot: request.location.spot, venue: request.location.venue })}</Text>
 
       <View style={styles.summary}>
@@ -64,9 +75,7 @@ export function SearchingView({ request }: { request: HelpRequest }) {
         <Text style={styles.meta}>{t('helpIn', { language: isolatedLanguageName(request.language) })}</Text>
         {request.note ? <Text style={styles.note}>{t('quoted', { text: request.note })}</Text> : null}
       </View>
-
-      <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
-    </View>
+    </>
   );
 }
 

@@ -90,10 +90,11 @@ export interface RequestDraft {
 }
 
 /**
- * idle: the request form. searching: waiting for a match. matched: a volunteer is on the way.
+ * idle: the request form. searching: waiting for a match. notFound: the wait ran out with nobody
+ * free; the request is kept so they can search again. matched: a volunteer is on the way.
  * done: the help ended; the visitor is asked for feedback.
  */
-export type RequestStatus = 'idle' | 'searching' | 'matched' | 'done';
+export type RequestStatus = 'idle' | 'searching' | 'notFound' | 'matched' | 'done';
 
 /** volunteer:notice.<key>. */
 export type NoticeKey = 'thanks' | 'searchFailed';

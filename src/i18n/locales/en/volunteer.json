@@ -44,7 +44,13 @@
     "title": "Emergency?",
     "call": "Call 911 now",
     "label": "Emergency? Call 911 now",
-    "hint": "Opens your phone to call 911"
+    "hint": "Asks whether to call 911 or venue staff",
+    "dialogTitle": "Need emergency help?",
+    "dialogBody": "For danger, injury, or a medical emergency, call 911 first.",
+    "call911": "Call 911",
+    "callStaff": "Call venue staff",
+    "notEmergency": "not an emergency",
+    "close": "Close"
   },
   "notice": {
     "searchFailed": "Couldn't reach a volunteer. Check your connection and try again.",
@@ -53,7 +59,10 @@
   "searching": {
     "title": "Finding a volunteer",
     "subtitle": "Usually under a minute · Stay where you are",
-    "askedFor": "You asked for"
+    "askedFor": "You asked for",
+    "notFoundTitle": "No volunteer is free right now",
+    "notFoundBody": "Your request is saved. Keep searching, or call venue staff for help.",
+    "keepSearching": "Keep searching"
   },
   "match": {
     "title": "Volunteer found",

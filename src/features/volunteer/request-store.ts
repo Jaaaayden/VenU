@@ -1,4 +1,5 @@
-// The visitor's current help request: idle → searching → matched → done → idle.
+// The visitor's current help request: idle → searching → matched → done → idle (searching can
+// time out to notFound, then search again).
 // One store shared by the Volunteer tab and the chat screen (they're in different navigators, so a
 // context provider would have to wrap the root layout). The backend and storage are injected, so
 // tests and the app use the same store. The request is saved under one storage key, so a reload or
@@ -24,10 +25,15 @@ export const INITIAL_STATE: RequestState = {
 
 export const EMPTY_DRAFT: RequestDraft = { helpTypes: [], note: '', photoUri: null, language: null };
 
+/** How long to wait for a volunteer before showing "No volunteer is free right now", e.g. 2 min. */
+export const SEARCH_TIMEOUT_MS = 2 * 60 * 1000;
+
 export type RequestAction =
   | { type: 'search'; request: HelpRequest }
   | { type: 'matched'; requestId: string; match: Match }
   | { type: 'searchFailed'; requestId: string }
+  | { type: 'searchTimedOut'; requestId: string }
+  | { type: 'keepSearching' }
   | { type: 'cancel' }
   | { type: 'send'; message: ChatMessage }
   | { type: 'receive'; requestId: string; message: ChatMessage }
@@ -53,8 +59,15 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
       return state.status === 'searching' && state.request?.id === action.requestId
         ? { ...INITIAL_STATE, draft: state.draft, notice: { tone: 'error', key: 'searchFailed' } }
         : state;
+    case 'searchTimedOut':
+      // Nobody free in time: keep the request (and draft) so "Keep searching" sends it again.
+      return state.status === 'searching' && state.request?.id === action.requestId ? { ...state, status: 'notFound' } : state;
+    case 'keepSearching':
+      return state.status === 'notFound' ? { ...state, status: 'searching' } : state;
     case 'cancel':
-      return state.status === 'searching' || state.status === 'matched' ? { ...INITIAL_STATE, draft: state.draft } : state;
+      return state.status === 'searching' || state.status === 'notFound' || state.status === 'matched'
+        ? { ...INITIAL_STATE, draft: state.draft }
+        : state;
     case 'send':
       return state.status === 'matched' ? { ...state, messages: [...state.messages, action.message] } : state;
     case 'receive':
@@ -100,9 +113,22 @@ interface Saved {
   v: 1;
   owner: string;
   state: RequestState;
+  /** While searching: when the wait began (ms). Older saves lack it and use request.createdAt. */
+  since?: number;
 }
 
-const STATUSES: RequestState['status'][] = ['idle', 'searching', 'matched', 'done'];
+const STATUSES: RequestState['status'][] = ['idle', 'searching', 'notFound', 'matched', 'done'];
+
+/** When a saved search's wait began, e.g. 1763200000000; null if the save doesn't say. */
+function savedSince(raw: string | null): number | null {
+  try {
+    const saved = raw ? (JSON.parse(raw) as Partial<Saved>) : null;
+    const since = saved?.since ?? saved?.state?.request?.createdAt;
+    return typeof since === 'number' ? since : null;
+  } catch {
+    return null;
+  }
+}
 
 /** A web photo is a blob: URL that dies with the page; drop it rather than show a broken image. */
 function livePhoto(uri: string | null | undefined): string | null {
@@ -148,6 +174,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
   let senderLanguage: string | null = null;
   /** Storage writes, chained so they land in order. */
   let writes: Promise<unknown> = Promise.resolve();
+  /** When the current wait for a volunteer began; SEARCH_TIMEOUT_MS counts from it, across restarts too. */
+  let searchSince = 0;
 
   function emit() {
     listeners.forEach(l => l());
@@ -164,7 +192,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     const snapshot = state;
     // Nothing worth keeping (e.g. the help ended): no key at all.
     if (snapshot.status === 'idle' && !snapshot.draft) return queueWrite((s, k) => s.removeItem(k));
-    const saved: Saved = { v: 1, owner: who, state: { ...snapshot, notice: null, typing: false } };
+    const since = snapshot.status === 'searching' ? { since: searchSince } : {};
+    const saved: Saved = { v: 1, owner: who, state: { ...snapshot, notice: null, typing: false }, ...since };
     queueWrite((s, k) => s.setItem(k, JSON.stringify(saved)));
   }
 
@@ -191,10 +220,18 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     };
   }
 
-  /** Waits for a volunteer for a request that is already in the 'searching' state. */
+  /** Waits for a volunteer for a request that is already in the 'searching' state, until the wait runs out. */
   async function runSearch(request: HelpRequest): Promise<void> {
     const ctl = new AbortController();
     search = ctl;
+    const timer = setTimeout(() => {
+      if (search !== ctl) return;
+      search = null;
+      ctl.abort();
+      dispatch({ type: 'searchTimedOut', requestId: request.id });
+      // Withdraw it, so no volunteer turns up after we said nobody was free.
+      backend.cancelRequest(request.id).catch(() => {});
+    }, Math.min(SEARCH_TIMEOUT_MS, Math.max(0, searchSince + SEARCH_TIMEOUT_MS - Date.now()))); // a clock change never stretches it
     try {
       const match = await backend.findVolunteer(request, ctl.signal);
       if (search !== ctl) return;
@@ -202,9 +239,11 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       dispatch({ type: 'matched', requestId: request.id, match });
       listen(request.id); // after "matched", so the typing state it reports right away applies
     } catch {
-      if (search !== ctl) return; // cancelled: cancel() already reset the state
+      if (search !== ctl) return; // cancelled or timed out: the state already moved on
       search = null;
       dispatch({ type: 'searchFailed', requestId: request.id });
+    } finally {
+      clearTimeout(timer);
     }
   }
 
@@ -220,12 +259,17 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     const mine = generation;
     try {
       await writes;
-      const saved = parseSaved(await persist.storage.getItem(persist.key), userId);
+      const raw = await persist.storage.getItem(persist.key);
+      const saved = parseSaved(raw, userId);
       const untouched = state.status === 'idle' && !state.draft;
       if (!saved || mine !== generation || owner !== userId || !untouched) return;
-      dispatch({ type: 'restore', state: saved });
+      if (saved.status === 'searching') searchSince = savedSince(raw) ?? Date.now();
+      // The wait ran out while the app was closed: say nobody was free rather than silently start over.
+      const expired = saved.status === 'searching' && Date.now() - searchSince >= SEARCH_TIMEOUT_MS;
+      dispatch({ type: 'restore', state: expired ? { ...saved, status: 'notFound' } : saved });
       // Pick up where it left off: keep waiting for a volunteer, or keep listening to the chat.
-      if (saved.status === 'searching' && saved.request) void runSearch(saved.request);
+      if (expired && saved.request) backend.cancelRequest(saved.request.id).catch(() => {});
+      else if (saved.status === 'searching' && saved.request) void runSearch(saved.request);
       else if (saved.status === 'matched' && saved.request && saved.match) {
         backend.resume?.(saved.request.id, saved.match);
         listen(saved.request.id);
@@ -261,15 +305,25 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       return () => { listeners.delete(listener); };
     },
 
-    /** Starts searching; resolves once matched, failed or cancelled. */
+    /** Starts searching; resolves once matched, failed, timed out or cancelled. */
     async sendRequest(input: NewRequest): Promise<void> {
       if (state.status !== 'idle') return;
       const request: HelpRequest = { ...input, id: newId('req'), createdAt: Date.now() };
+      searchSince = request.createdAt;
       dispatch({ type: 'search', request });
       await runSearch(request);
     },
 
-    /** Stops searching or calls off the matched volunteer, back to the request form. */
+    /** Nobody was free: send the same request again and wait another SEARCH_TIMEOUT_MS. */
+    async keepSearching(): Promise<void> {
+      const { request } = state;
+      if (state.status !== 'notFound' || !request) return;
+      searchSince = Date.now();
+      dispatch({ type: 'keepSearching' });
+      await runSearch(request);
+    },
+
+    /** Stops searching (or gives up after nobody was free) or calls off the matched volunteer, back to the request form. */
     cancel() {
       const id = state.request?.id;
       search?.abort();

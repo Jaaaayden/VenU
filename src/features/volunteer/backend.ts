@@ -2,9 +2,10 @@
 // `VolunteerBackend`; `createMockBackend()` fakes it on the device. A Supabase version (matching owned
 // by Krisha) implements the same interface and is swapped in where the store is created.
 import { chatLanguage } from '@/features/translate/languages';
+import { isUiLanguage } from '@/i18n';
 
 import { greetingFrom, mockReply, MOCK_VOLUNTEERS, mockTextLanguage } from './mock';
-import type { ChatMessage, Feedback, HelpRequest, Match, ProblemReport } from './types';
+import type { ChatMessage, Feedback, HelpRequest, Match, ProblemReport, Volunteer } from './types';
 
 export interface VolunteerBackend {
   /** Resolves when a volunteer accepts; rejects with an AbortError when `signal` aborts. */
@@ -42,8 +43,17 @@ function abortError(): Error {
 export const MOCK_TIMING = { search: 2500, greeting: 1200, reply: 1500 };
 
 /**
- * On-device stand-in: "finds" the first volunteer who speaks the request's language (else the
- * first on shift) after a short wait, and has them answer each message with a canned reply.
+ * The mock volunteer for a request: the first who speaks its language, else (chat translation
+ * covers the app's languages) the first on shift. Nobody for a language no one speaks and the app
+ * can't translate, so "No volunteer is free" can be tried: e.g. 'es' → Daniel, 'ja' → Daniel, 'de' → null.
+ */
+export function mockVolunteerFor(language: string): Volunteer | null {
+  return MOCK_VOLUNTEERS.find(v => v.languages.includes(language)) ?? (isUiLanguage(language) ? MOCK_VOLUNTEERS[0]! : null);
+}
+
+/**
+ * On-device stand-in: "finds" mockVolunteerFor the request after a short wait (or never, leaving
+ * the store's timeout to give up), and has them answer each message with a canned reply.
  */
 export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
   const listeners = new Map<string, Set<(m: ChatMessage) => void>>();
@@ -91,8 +101,9 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
     findVolunteer(request, signal) {
       return new Promise((resolve, reject) => {
         if (signal.aborted) return reject(abortError());
+        const volunteer = mockVolunteerFor(request.language);
         const t = setTimeout(() => {
-          const volunteer = MOCK_VOLUNTEERS.find(v => v.languages.includes(request.language)) ?? MOCK_VOLUNTEERS[0]!;
+          if (!volunteer) return; // nobody free: wait until the caller gives up
           langs.set(request.id, mockTextLanguage(volunteer));
           // Like a real volunteer, say hello once matched.
           replyLater(request.id, timing.greeting, greetingFrom(volunteer, request.visitorName, request.location.spot));

@@ -44,7 +44,13 @@
     "title": "紧急情况？",
     "call": "立即拨打 911",
     "label": "紧急情况？立即拨打 911",
-    "hint": "打开电话拨打 911"
+    "hint": "询问你要拨打 911 还是联系场馆工作人员",
+    "dialogTitle": "需要紧急帮助吗？",
+    "dialogBody": "如遇危险、受伤或医疗紧急情况，请先拨打 911。",
+    "call911": "拨打 911",
+    "callStaff": "致电场馆工作人员",
+    "notEmergency": "不是紧急情况",
+    "close": "关闭"
   },
   "notice": {
     "searchFailed": "无法联系到志愿者。请检查网络连接后重试。",
@@ -53,7 +59,10 @@
   "searching": {
     "title": "正在寻找志愿者",
     "subtitle": "通常不到一分钟 · 请留在原地",
-    "askedFor": "你请求的帮助"
+    "askedFor": "你请求的帮助",
+    "notFoundTitle": "目前没有空闲的志愿者",
+    "notFoundBody": "你的请求已保存。可以继续寻找，或致电场馆工作人员寻求帮助。",
+    "keepSearching": "继续寻找"
   },
   "match": {
     "title": "已找到志愿者",
