@@ -10,7 +10,7 @@
 import type { TFunction } from 'i18next';
 
 import { PHOTO_MAX_BYTES } from '@/constants/photo';
-import i18n from '@/i18n';
+import i18n, { languageOf } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 import type { Resources } from '@/i18n/locales';
 
@@ -108,8 +108,7 @@ function formatted(params: ErrorMessage['params'], language: string): ErrorMessa
 /** The sentence for `e` in `t`'s language; pass the screen's t from useT('common'). */
 export function errorText(e: unknown, t: CommonT): string {
   const { key, params } = errorMessage(e);
-  const language = (t as unknown as { lng?: string | null }).lng || i18n.language;
-  return (t as unknown as Translate)(`errors.${key}`, formatted(params, language));
+  return (t as unknown as Translate)(`errors.${key}`, formatted(params, languageOf(t)));
 }
 
 /**

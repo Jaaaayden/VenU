@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 
 interface FormSectionProps {
@@ -44,7 +44,7 @@ export function StepHeader({ step, total, title, subtitle }: { step?: number; to
   const t = useT('common');
   return (
     <View style={styles.header}>
-      {step != null && total != null && <Text style={styles.step}>{t('form.step', { step: formatNumber(step), total: formatNumber(total) })}</Text>}
+      {step != null && total != null && <Text style={styles.step}>{t('form.step', { step: formatNumber(step, undefined, languageOf(t)), total: formatNumber(total, undefined, languageOf(t)) })}</Text>}
       <Text style={styles.headerTitle} accessibilityRole="header">
         {title}
       </Text>

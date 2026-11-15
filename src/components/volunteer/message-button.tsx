@@ -3,12 +3,12 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 
 export function MessageButton({ unread, onPress }: { unread: number; onPress: () => void }) {
   const t = useT('volunteer');
-  const label = unread ? t('messages.unread', { count: unread, number: formatNumber(unread) }) : t('messages.label');
+  const label = unread ? t('messages.unread', { count: unread, number: formatNumber(unread, undefined, languageOf(t)) }) : t('messages.label');
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.target, pressed && styles.pressed]}>
       <FigmaIcon name="message-1-6cfb1c" size={30} color={Colors.ink} />

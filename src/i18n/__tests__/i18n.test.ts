@@ -3,7 +3,9 @@ import { describe, expect, it } from '@jest/globals';
 import { errorText, friendlyError, isOfflineError } from '@/lib/errors';
 
 import { formatDate, formatNumber, formatTime } from '../format';
-import i18n from '../index';
+import { formatDistance } from '@/features/volunteer/format';
+
+import i18n, { languageOf } from '../index';
 import { accountLanguageStep, isRtl, isUiLanguage, pickFor, pickUiLanguage, resolveUiLanguage, setupAppLanguage, setupPrimaryLanguage, UNTRANSLATED } from '../languages';
 
 const rosa = (language: string) => ({ id: 'rosa', language });
@@ -111,6 +113,18 @@ describe('switching language', () => {
     expect(errorText(loadError, i18n.getFixedT('ko', 'common'))).toMatch(/^VenU에/);
     // Numbers in a message follow the language's digits.
     expect(errorText({ message: 'The object exceeded the maximum allowed size' }, i18n.getFixedT('fa', 'common'))).toContain('۵');
+  });
+});
+
+describe('formatting in the screen\'s language', () => {
+  it('reads the language from a t, so a component formats with its own t, not a stale global', async () => {
+    await i18n.changeLanguage('en');
+    expect(languageOf(i18n.getFixedT('fa', 'common'))).toBe('fa');
+    expect(languageOf(i18n.getFixedT(null as unknown as string, 'common'))).toBe('en'); // not fixed: the current one
+    expect(languageOf(undefined)).toBe('en');
+    // A distance worded for Persian while the global language is still English.
+    expect(formatDistance(180, 'fa')).toContain('۱۸۰');
+    expect(formatDistance(180, 'en')).toBe('180 ft');
   });
 });
 

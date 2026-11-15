@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Radius, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
@@ -99,7 +99,7 @@ export function FacilityDetail() {
 
         <View style={styles.reportsHead}>
           <Text style={venueText.title} accessibilityRole="header">{t('facility.reports')}</Text>
-          <Text style={venueText.caption}>{reports ? t('facility.results', { count: reports.length, number: formatNumber(reports.length) }) : ''}</Text>
+          <Text style={venueText.caption}>{reports ? t('facility.results', { count: reports.length, number: formatNumber(reports.length, undefined, languageOf(t)) }) : ''}</Text>
         </View>
         <View style={styles.reports}>
           {reports?.map(r => (

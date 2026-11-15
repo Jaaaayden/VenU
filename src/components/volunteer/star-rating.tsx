@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, Spacing, Type } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 
 const STAR = 'M16 3L20.08 10.73L28.68 12.22L22.59 18.48L23.84 27.12L16 23.27L8.16 27.12L9.41 18.48L3.32 12.22L11.92 10.73Z';
@@ -23,7 +23,7 @@ export function StarRating({ value, onChange }: { value: number; onChange: (star
               onPress={() => onChange(n)}
               accessibilityRole="radio"
               accessibilityState={{ checked: n === value }}
-              accessibilityLabel={t('rating.star', { count: n, number: formatNumber(n), word: word(n) })}
+              accessibilityLabel={t('rating.star', { count: n, number: formatNumber(n, undefined, languageOf(t)), word: word(n) })}
               style={({ pressed }) => [styles.star, pressed && styles.pressed]}>
               <Svg width={40} height={40} viewBox="0 0 32 32" aria-hidden>
                 <Path d={STAR} stroke={Colors.warning} strokeWidth={2} strokeLinejoin="round" fill={filled ? Colors.warning : 'none'} />
