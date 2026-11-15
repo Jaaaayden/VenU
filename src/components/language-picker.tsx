@@ -7,6 +7,7 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
 import { LANGUAGES, languageName, searchLanguages, type Language } from '@/features/profile/options';
+import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT } from '@/i18n';
 
 /**
@@ -18,6 +19,25 @@ function useNameDirection(): TextStyle {
   const rtl = useLayoutRtl();
   const writingDirection = rtl ? 'rtl' : 'ltr';
   return Platform.OS === 'web' ? { writingDirection } : { writingDirection, textAlign: 'left' };
+}
+
+/**
+ * A language's own name plus its name in the UI language, for list rows and search.
+ * e.g. Korean UI: es → { native: 'Español', gloss: '스페인어' }; ko → { native: '한국어', gloss: null }
+ */
+function useLanguageNames() {
+  const t = useT('profile');
+  const uiName = (code: string) => uiLanguageName(code, t);
+  const row = (l: Language) => {
+    const gloss = uiName(l.code);
+    return { native: l.native, gloss: gloss !== l.native ? gloss : null, label: gloss !== l.native ? `${l.native}, ${gloss}` : l.native };
+  };
+  return { uiName, row };
+}
+
+/** Pills that set the app language leave out ASL (no screens in it), so their examples don't offer it. */
+function searchExamples(t: ReturnType<typeof useT<'common'>>, exclude: string[]): string {
+  return exclude.includes('ase') ? t('language.searchExamplesApp') : t('language.searchExamples');
 }
 
 /** "Primary language", "Secondary language", then "Another language". */
@@ -127,11 +147,12 @@ interface LanguageMenuFieldProps {
  */
 export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear }: LanguageMenuFieldProps) {
   const t = useT('common');
+  const names = useLanguageNames();
   const nameDirection = useNameDirection();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const blurTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const results = searchLanguages(query).filter(l => !exclude.includes(l.code)).slice(0, 6);
+  const results = searchLanguages(query, names.uiName).filter(l => !exclude.includes(l.code)).slice(0, 6);
 
   useEffect(() => () => { if (blurTimer.current) clearTimeout(blurTimer.current); }, []);
 
@@ -200,17 +221,20 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
           {results.length === 0 ? (
             <Text style={styles.empty}>{t('language.noMatch')}</Text>
           ) : (
-            results.map(l => (
-              <Pressable
-                key={l.code}
-                onPress={() => pick(l.code)}
-                style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
-                accessibilityRole="menuitem"
-                accessibilityLabel={`${l.native}, ${l.english}`}>
-                <Text style={[styles.menuNative, nameDirection]}>{l.native}</Text>
-                {l.native !== l.english && <Text style={[styles.menuEnglish, nameDirection]}>{l.english}</Text>}
-              </Pressable>
-            ))
+            results.map(l => {
+              const n = names.row(l);
+              return (
+                <Pressable
+                  key={l.code}
+                  onPress={() => pick(l.code)}
+                  style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
+                  accessibilityRole="menuitem"
+                  accessibilityLabel={n.label}>
+                  <Text style={[styles.menuNative, nameDirection]}>{n.native}</Text>
+                  {n.gloss ? <Text style={[styles.menuGloss, nameDirection]}>{n.gloss}</Text> : null}
+                </Pressable>
+              );
+            })
           )}
         </View>
       )}
@@ -227,12 +251,13 @@ interface LanguageSearchModalProps {
   onClose: () => void;
 }
 
-/** Full-screen searchable list; names shown in their own script with the English name underneath. */
+/** Full-screen searchable list; names shown in their own script with the UI-language name underneath. */
 export function LanguageSearchModal({ visible, title, exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
   const t = useT('common');
+  const names = useLanguageNames();
   const nameDirection = useNameDirection();
   const [query, setQuery] = useState('');
-  const results = searchLanguages(query).filter(l => !exclude.includes(l.code));
+  const results = searchLanguages(query, names.uiName).filter(l => !exclude.includes(l.code));
 
   function close() {
     setQuery('');
@@ -253,7 +278,7 @@ export function LanguageSearchModal({ visible, title, exclude = [], onSelect, on
             <FigmaIcon name="leading-icon-de9321" size={40} color={Colors.ink} />
             <TextInput
               style={styles.searchInput}
-              placeholder={t('language.searchExamples')}
+              placeholder={searchExamples(t, exclude)}
               placeholderTextColor={Colors.textFaint}
               value={query}
               onChangeText={setQuery}
@@ -268,19 +293,22 @@ export function LanguageSearchModal({ visible, title, exclude = [], onSelect, on
             keyboardShouldPersistTaps="handled"
             ItemSeparatorComponent={() => <View style={styles.sep} />}
             ListEmptyComponent={<Text style={styles.empty}>{t('language.noMatch')}</Text>}
-            renderItem={({ item }) => (
-              <Pressable
-                style={({ pressed }) => [styles.item, pressed && styles.menuItemPressed]}
-                onPress={() => {
-                  setQuery('');
-                  onSelect(item.code);
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={`${item.native}, ${item.english}`}>
-                <Text style={[styles.menuNative, nameDirection]}>{item.native}</Text>
-                {item.native !== item.english && <Text style={[styles.menuEnglish, nameDirection]}>{item.english}</Text>}
-              </Pressable>
-            )}
+            renderItem={({ item }) => {
+              const n = names.row(item);
+              return (
+                <Pressable
+                  style={({ pressed }) => [styles.item, pressed && styles.menuItemPressed]}
+                  onPress={() => {
+                    setQuery('');
+                    onSelect(item.code);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={n.label}>
+                  <Text style={[styles.menuNative, nameDirection]}>{n.native}</Text>
+                  {n.gloss ? <Text style={[styles.menuGloss, nameDirection]}>{n.gloss}</Text> : null}
+                </Pressable>
+              );
+            }}
           />
         </View>
       </SafeAreaView>
@@ -310,7 +338,7 @@ const styles = StyleSheet.create({
   menuItem: { minHeight: 44, paddingHorizontal: Spacing.lg, paddingVertical: 6, justifyContent: 'center' },
   menuItemPressed: { backgroundColor: Colors.primarySoft },
   menuNative: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text },
-  menuEnglish: { ...Type.caption },
+  menuGloss: { ...Type.caption },
   empty: { ...Type.caption, textAlign: 'center', paddingVertical: Spacing.md },
 
   modal: { flex: 1, backgroundColor: Colors.bg, paddingHorizontal: Spacing.gutter },

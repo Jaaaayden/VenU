@@ -95,6 +95,7 @@
     "searchFor": "Buscar idiomas para {{field}}",
     "examples": "p. ej., Español, 한국어, ASL",
     "searchExamples": "Buscar, p. ej., Español, 한국어, ASL",
+    "searchExamplesApp": "Buscar, p. ej., Español, 한국어",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: ninguno",
     "openHint": "Abre la búsqueda de idiomas",

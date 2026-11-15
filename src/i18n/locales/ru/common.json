@@ -96,6 +96,7 @@
     "searchFor": "Поиск языка: {{field}}",
     "examples": "напр. Русский, Español, ASL",
     "searchExamples": "Поиск, напр. Русский, Español, ASL",
+    "searchExamplesApp": "Поиск, напр. Русский, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: не выбран",
     "openHint": "Открывает поиск языка",

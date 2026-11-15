@@ -5,7 +5,7 @@ import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
 import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
-import { helperSummary, initials } from '../summary';
+import { helperSummary, initials, uiLanguageName } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 import i18n from '@/i18n';
@@ -186,6 +186,12 @@ describe('small helpers', () => {
     expect(searchLanguages('espanol').map(l => l.code)).toEqual(['es']);
     expect(searchLanguages('KOREAN').map(l => l.code)).toEqual(['ko']);
     expect(searchLanguages('sign').map(l => l.code)).toEqual(['ase']);
+    // The name in the UI language matches too (Korean UI: 스페인어 = Spanish), without losing English.
+    const ko = i18n.getFixedT('ko', 'profile');
+    const koName = (code: string) => uiLanguageName(code, ko);
+    expect(searchLanguages('스페인어', koName).map(l => l.code)).toEqual(['es']);
+    expect(searchLanguages('스페인어').map(l => l.code)).toEqual([]);
+    expect(searchLanguages('spanish', koName).map(l => l.code)).toEqual(['es']);
   });
 });
 

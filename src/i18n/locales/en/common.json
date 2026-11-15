@@ -94,6 +94,7 @@
     "searchFor": "Search languages for {{field}}",
     "examples": "e.g. Español, Korean, ASL",
     "searchExamples": "Search, e.g. Español, Korean, ASL",
+    "searchExamplesApp": "Search, e.g. Español, Korean",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: none",
     "openHint": "Opens a language search",

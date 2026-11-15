@@ -93,6 +93,7 @@
     "searchFor": "{{field}} 검색",
     "examples": "예: 한국어, Español, ASL",
     "searchExamples": "검색, 예: 한국어, Español, ASL",
+    "searchExamplesApp": "검색, 예: 한국어, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: 없음",
     "openHint": "언어 검색을 엽니다",

@@ -93,6 +93,7 @@
     "searchFor": "Tìm ngôn ngữ cho {{field}}",
     "examples": "vd. Tiếng Việt, Español, ASL",
     "searchExamples": "Tìm, vd. Tiếng Việt, Español, ASL",
+    "searchExamplesApp": "Tìm, vd. Tiếng Việt, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: chưa chọn",
     "openHint": "Mở tìm kiếm ngôn ngữ",

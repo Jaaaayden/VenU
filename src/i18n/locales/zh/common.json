@@ -93,6 +93,7 @@
     "searchFor": "为{{field}}搜索语言",
     "examples": "例如 中文、Español、ASL",
     "searchExamples": "搜索，例如 中文、Español、ASL",
+    "searchExamplesApp": "搜索，例如 中文、Español",
     "field": "{{field}}：{{language}}",
     "fieldEmpty": "{{field}}：未选择",
     "openHint": "打开语言搜索",

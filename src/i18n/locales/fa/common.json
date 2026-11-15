@@ -94,6 +94,7 @@
     "searchFor": "جست‌وجوی زبان برای {{field}}",
     "examples": "مثلاً فارسی، Español، ASL",
     "searchExamples": "جست‌وجو، مثلاً فارسی، Español، ASL",
+    "searchExamplesApp": "جست‌وجو، مثلاً فارسی، Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: هیچ",
     "openHint": "جست‌وجوی زبان را باز می‌کند",

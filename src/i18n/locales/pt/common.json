@@ -95,6 +95,7 @@
     "searchFor": "Buscar idioma para {{field}}",
     "examples": "ex.: Português, Español, ASL",
     "searchExamples": "Buscar, ex.: Português, Español, ASL",
+    "searchExamplesApp": "Buscar, ex.: Português, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: nenhum",
     "openHint": "Abre a busca de idiomas",

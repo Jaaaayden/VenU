@@ -98,6 +98,7 @@
     "searchFor": "البحث عن لغة لـ {{field}}",
     "examples": "مثلًا العربية، Español، ASL",
     "searchExamples": "ابحث، مثلًا العربية، Español، ASL",
+    "searchExamplesApp": "ابحث، مثلًا العربية، Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: لا شيء",
     "openHint": "يفتح البحث عن اللغات",

@@ -15,7 +15,7 @@ import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { isolatedLanguageName } from '@/features/profile/options';
 import { UNTRANSLATED, useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage, usePendingLanguage } from '@/i18n/pending-language';
-import { friendlyError } from '@/lib/errors';
+import { errorText } from '@/lib/errors';
 
 import { StadiumCard } from './cards';
 import { searchVenues } from './mock';
@@ -23,6 +23,7 @@ import { InlineNote, SearchField, venueText } from './ui';
 
 export function ChooseVenueScreen() {
   const t = useT('venue');
+  const tc = useT('common');
   const rtl = useLayoutRtl();
   // The language on screen, not the stored one: a profile can hold an untranslated language (shown in
   // English), and an unsaved pick shows over the profile's.
@@ -32,7 +33,7 @@ export function ChooseVenueScreen() {
   const [picking, setPicking] = useState(false);
   const venues = searchVenues(query, undefined, t);
   // A pick that couldn't be saved yet (e.g. offline) stays on screen; LanguageSync retries it.
-  const note = pending.picked && pending.saveError ? friendlyError(pending.saveError) : null;
+  const note = pending.picked && pending.saveError ? errorText(pending.saveError, tc) : null;
 
   function pickLanguage(code: string) {
     setPicking(false);

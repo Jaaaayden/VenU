@@ -70,12 +70,15 @@ export function englishLanguageName(code: string): string {
   return BY_CODE.get(code)?.english ?? code;
 }
 
-/** Case- and accent-insensitive match on native name, English name or code. */
-export function searchLanguages(query: string): Language[] {
+/**
+ * Case- and accent-insensitive match on native name, English name, code, and (with `uiName`) the
+ * name in the UI language, e.g. searchLanguages('스페인어', code => uiLanguageName(code, t)) → [es].
+ */
+export function searchLanguages(query: string, uiName?: (code: string) => string): Language[] {
   const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const q = fold(query.trim());
   if (!q) return LANGUAGES;
-  return LANGUAGES.filter(l => [l.native, l.english, l.code].some(s => fold(s).includes(q)));
+  return LANGUAGES.filter(l => [l.native, l.english, l.code, uiName?.(l.code) ?? ''].some(s => fold(s).includes(q)));
 }
 
 /**

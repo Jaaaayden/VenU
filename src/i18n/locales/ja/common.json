@@ -93,6 +93,7 @@
     "searchFor": "{{field}}を検索",
     "examples": "例：日本語、Español、ASL",
     "searchExamples": "検索（例：日本語、Español、ASL）",
+    "searchExamplesApp": "検索（例：日本語、Español）",
     "field": "{{field}}：{{language}}",
     "fieldEmpty": "{{field}}：未選択",
     "openHint": "言語の検索を開きます",

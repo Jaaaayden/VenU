@@ -94,6 +94,7 @@
     "searchFor": "Որոնել լեզու՝ {{field}}",
     "examples": "օր.՝ Հայերեն, Español, ASL",
     "searchExamples": "Որոնել, օր.՝ Հայերեն, Español, ASL",
+    "searchExamplesApp": "Որոնել, օր.՝ Հայերեն, Español",
     "field": "{{field}}՝ {{language}}",
     "fieldEmpty": "{{field}}՝ ընտրված չէ",
     "openHint": "Բացում է լեզվի որոնումը",

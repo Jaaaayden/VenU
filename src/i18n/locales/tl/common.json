@@ -94,6 +94,7 @@
     "searchFor": "Maghanap ng wika para sa {{field}}",
     "examples": "hal. Tagalog, Español, ASL",
     "searchExamples": "Maghanap, hal. Tagalog, Español, ASL",
+    "searchExamplesApp": "Maghanap, hal. Tagalog, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: wala",
     "openHint": "Binubuksan ang paghahanap ng wika",

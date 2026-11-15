@@ -95,6 +95,7 @@
     "searchFor": "Rechercher une langue pour {{field}}",
     "examples": "p. ex. Français, Español, ASL",
     "searchExamples": "Rechercher, p. ex. Français, Español, ASL",
+    "searchExamplesApp": "Rechercher, p. ex. Français, Español",
     "field": "{{field}} : {{language}}",
     "fieldEmpty": "{{field}} : aucune",
     "openHint": "Ouvre la recherche de langue",
