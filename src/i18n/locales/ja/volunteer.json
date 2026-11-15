@@ -85,7 +85,7 @@
   },
   "messages": {
     "label": "メッセージ",
-    "unread_other": "メッセージ、未読 {{count}} 件"
+    "unread_other": "メッセージ、未読 {{number}} 件"
   },
   "chat": {
     "away": "あと {{minutes}} 分",
@@ -133,7 +133,7 @@
   },
   "rating": {
     "label": "評価",
-    "star_other": "星 {{count}} つ、{{word}}",
+    "star_other": "星 {{number}} つ、{{word}}",
     "words": {
       "poor": "悪い",
       "notGreat": "いまいち",

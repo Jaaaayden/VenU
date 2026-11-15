@@ -80,8 +80,8 @@
     "pin": "{{name}} روی نقشه",
     "north": "ش"
   },
-  "walk_one": "{{count}} دقیقه پیاده",
-  "walk_other": "{{count}} دقیقه پیاده",
+  "walk_one": "{{number}} دقیقه پیاده",
+  "walk_other": "{{number}} دقیقه پیاده",
   "wait": {
     "none": "بدون انتظار",
     "short": "انتظار کوتاه",
@@ -178,8 +178,8 @@
     "directions": "مسیریابی",
     "directionsSoon": "مسیریابی گام‌به‌گام به‌زودی می‌آید. {{name}}: {{location}}.",
     "reports": "گزارش‌ها",
-    "results_one": "{{count}} نتیجه",
-    "results_other": "{{count}} نتیجه",
+    "results_one": "{{number}} نتیجه",
+    "results_other": "{{number}} نتیجه",
     "noReports": "هنوز گزارشی نیست. اولین نفری باشید که تجربه‌اش را می‌گوید.",
     "addReport": "گزارش خود را اضافه کنید"
   },

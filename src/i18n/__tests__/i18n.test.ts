@@ -85,6 +85,8 @@ describe('switching language', () => {
     await i18n.changeLanguage('fa');
     expect(errorText(new Error('JWT expired'), i18n.getFixedT('fa', 'common'))).toBe(i18n.getFixedT('fa', 'common')('errors.sessionExpired'));
     expect(errorText(loadError, i18n.getFixedT('ko', 'common'))).toMatch(/^VenU에/);
+    // Numbers in a message follow the language's digits.
+    expect(errorText({ message: 'The object exceeded the maximum allowed size' }, i18n.getFixedT('fa', 'common'))).toContain('۵');
   });
 });
 

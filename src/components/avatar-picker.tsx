@@ -7,6 +7,7 @@ import { PHOTO_MAX_BYTES, PHOTO_TOO_BIG } from '@/constants/photo';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { checkPhoto, type PickedImage } from '@/features/profile/store';
 import { useT } from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 import { isLocalMode } from '@/lib/auth';
 
 interface AvatarPickerProps {
@@ -51,7 +52,7 @@ export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps)
     const image: PickedImage = { uri: asset.uri, mimeType: asset.mimeType ?? null, fileSize: asset.fileSize ?? null, base64: asset.base64 ?? null };
     const problem = checkPhoto(image);
     // checkPhoto answers in English (shared with the store); show the same rule in the UI language.
-    if (problem) return setError(problem === PHOTO_TOO_BIG ? t('errors.photoTooBig', { size: PHOTO_MAX_BYTES / 1024 / 1024 }) : t('errors.photoWrongType'));
+    if (problem) return setError(problem === PHOTO_TOO_BIG ? t('errors.photoTooBig', { size: formatNumber(PHOTO_MAX_BYTES / 1024 / 1024) }) : t('errors.photoWrongType'));
     onPick(image);
   }
 

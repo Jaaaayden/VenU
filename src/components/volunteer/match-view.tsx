@@ -73,9 +73,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         <View style={styles.infoRow}>
           <InfoTile
             icon="clock"
-            main={t('match.etaMain', { minutes: match.etaMinutes })}
+            main={t('match.etaMain', { minutes: formatNumber(match.etaMinutes) })}
             sub={t('match.etaSub')}
-            label={t('match.etaLabel', { minutes: match.etaMinutes })}
+            label={t('match.etaLabel', { minutes: formatNumber(match.etaMinutes) })}
           />
           <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
         </View>

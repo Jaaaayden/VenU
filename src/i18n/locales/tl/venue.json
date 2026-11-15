@@ -80,8 +80,8 @@
     "pin": "{{name}} sa mapa",
     "north": "H"
   },
-  "walk_one": "{{count}} minutong lakad",
-  "walk_other": "{{count}} minutong lakad",
+  "walk_one": "{{number}} minutong lakad",
+  "walk_other": "{{number}} minutong lakad",
   "wait": {
     "none": "Walang pila",
     "short": "Maikling pila",
@@ -178,8 +178,8 @@
     "directions": "Direksyon",
     "directionsSoon": "Malapit na ang sunud-sunod na direksyon. {{name}}: {{location}}.",
     "reports": "Mga Ulat",
-    "results_one": "{{count}} resulta",
-    "results_other": "{{count}} resulta",
+    "results_one": "{{number}} resulta",
+    "results_other": "{{number}} resulta",
     "noReports": "Wala pang ulat. Ikaw na ang unang magbahagi ng nakita mo.",
     "addReport": "Magdagdag ng Ulat"
   },

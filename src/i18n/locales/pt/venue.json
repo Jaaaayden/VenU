@@ -80,9 +80,9 @@
     "pin": "{{name}} no mapa",
     "north": "N"
   },
-  "walk_one": "{{count}} min a pé",
-  "walk_many": "{{count}} min a pé",
-  "walk_other": "{{count}} min a pé",
+  "walk_one": "{{number}} min a pé",
+  "walk_many": "{{number}} min a pé",
+  "walk_other": "{{number}} min a pé",
   "wait": {
     "none": "Sem fila",
     "short": "Fila curta",
@@ -179,9 +179,9 @@
     "directions": "Como chegar",
     "directionsSoon": "As rotas passo a passo chegam em breve. {{name}}: {{location}}.",
     "reports": "Relatos",
-    "results_one": "{{count}} resultado",
-    "results_many": "{{count}} de resultados",
-    "results_other": "{{count}} resultados",
+    "results_one": "{{number}} resultado",
+    "results_many": "{{number}} de resultados",
+    "results_other": "{{number}} resultados",
     "noReports": "Ainda não há relatos. Seja o primeiro a contar o que encontrou.",
     "addReport": "Adicione seu relato"
   },

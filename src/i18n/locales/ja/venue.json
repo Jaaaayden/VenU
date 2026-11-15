@@ -80,7 +80,7 @@
     "pin": "地図上の{{name}}",
     "north": "北"
   },
-  "walk_other": "徒歩{{count}}分",
+  "walk_other": "徒歩{{number}}分",
   "wait": {
     "none": "待ち時間なし",
     "short": "待ち時間短め",
@@ -177,7 +177,7 @@
     "directions": "経路",
     "directionsSoon": "ステップごとの経路案内はまもなく対応します。{{name}}：{{location}}。",
     "reports": "レポート",
-    "results_other": "{{count}}件",
+    "results_other": "{{number}}件",
     "noReports": "レポートはまだありません。最初に気づいたことを共有しましょう。",
     "addReport": "レポートを追加"
   },

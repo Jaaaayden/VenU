@@ -80,9 +80,9 @@
     "pin": "{{name}} sur le plan",
     "north": "N"
   },
-  "walk_one": "{{count}} min à pied",
-  "walk_many": "{{count}} min à pied",
-  "walk_other": "{{count}} min à pied",
+  "walk_one": "{{number}} min à pied",
+  "walk_many": "{{number}} min à pied",
+  "walk_other": "{{number}} min à pied",
   "wait": {
     "none": "Pas d’attente",
     "short": "Attente courte",
@@ -179,9 +179,9 @@
     "directions": "Itinéraire",
     "directionsSoon": "L’itinéraire pas à pas arrive bientôt. {{name}} : {{location}}.",
     "reports": "Signalements",
-    "results_one": "{{count}} résultat",
-    "results_many": "{{count}} de résultats",
-    "results_other": "{{count}} résultats",
+    "results_one": "{{number}} résultat",
+    "results_many": "{{number}} de résultats",
+    "results_other": "{{number}} résultats",
     "noReports": "Aucun signalement pour l’instant. Soyez le premier à partager ce que vous avez vu.",
     "addReport": "Ajouter un signalement"
   },

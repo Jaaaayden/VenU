@@ -80,7 +80,7 @@
     "pin": "{{name}} trên bản đồ",
     "north": "B"
   },
-  "walk_other": "{{count}} phút đi bộ",
+  "walk_other": "{{number}} phút đi bộ",
   "wait": {
     "none": "Không phải chờ",
     "short": "Chờ ít",
@@ -177,7 +177,7 @@
     "directions": "Chỉ đường",
     "directionsSoon": "Chỉ đường từng bước sắp ra mắt. {{name}}: {{location}}.",
     "reports": "Báo cáo",
-    "results_other": "{{count}} kết quả",
+    "results_other": "{{number}} kết quả",
     "noReports": "Chưa có báo cáo. Hãy là người đầu tiên chia sẻ điều bạn thấy.",
     "addReport": "Thêm báo cáo của bạn"
   },

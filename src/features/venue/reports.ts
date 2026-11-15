@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import type { Option } from '@/features/profile/options';
 import i18n from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 
 import { venueT, type VenueT } from './labels';
 
@@ -68,9 +69,9 @@ export function validateReport(d: ReportDraft): ReportErrors {
   const errors: ReportErrors = {};
   const title = d.title.trim();
   if (!title) errors.title = i18n.t('venue:form.titleRequired');
-  else if (title.length > REPORT_TITLE_MAX) errors.title = i18n.t('venue:form.titleTooLong', { max: REPORT_TITLE_MAX });
+  else if (title.length > REPORT_TITLE_MAX) errors.title = i18n.t('venue:form.titleTooLong', { max: formatNumber(REPORT_TITLE_MAX) });
   if (!d.topic) errors.topic = i18n.t('venue:form.topicRequired');
-  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = i18n.t('venue:form.bodyTooLong', { max: REPORT_BODY_MAX });
+  if (d.body.trim().length > REPORT_BODY_MAX) errors.body = i18n.t('venue:form.bodyTooLong', { max: formatNumber(REPORT_BODY_MAX) });
   return errors;
 }
 

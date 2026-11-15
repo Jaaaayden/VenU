@@ -85,7 +85,7 @@
   },
   "messages": {
     "label": "Tin nhắn",
-    "unread_other": "Tin nhắn, {{count}} chưa đọc"
+    "unread_other": "Tin nhắn, {{number}} chưa đọc"
   },
   "chat": {
     "away": "Cách {{minutes}} phút",
@@ -133,7 +133,7 @@
   },
   "rating": {
     "label": "Đánh giá",
-    "star_other": "{{count}} sao, {{word}}",
+    "star_other": "{{number}} sao, {{word}}",
     "words": {
       "poor": "Kém",
       "notGreat": "Chưa tốt",

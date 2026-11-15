@@ -80,7 +80,7 @@
     "pin": "地图上的{{name}}",
     "north": "北"
   },
-  "walk_other": "步行 {{count}} 分钟",
+  "walk_other": "步行 {{number}} 分钟",
   "wait": {
     "none": "无需排队",
     "short": "排队较短",
@@ -177,7 +177,7 @@
     "directions": "路线",
     "directionsSoon": "分步导航即将推出。{{name}}：{{location}}。",
     "reports": "反馈",
-    "results_other": "{{count}} 条结果",
+    "results_other": "{{number}} 条结果",
     "noReports": "还没有反馈。来分享你的发现吧。",
     "addReport": "添加你的反馈"
   },

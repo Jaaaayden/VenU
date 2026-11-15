@@ -85,8 +85,8 @@
   },
   "messages": {
     "label": "Mga mensahe",
-    "unread_one": "Mga mensahe, {{count}} hindi pa nababasa",
-    "unread_other": "Mga mensahe, {{count}} hindi pa nababasa"
+    "unread_one": "Mga mensahe, {{number}} hindi pa nababasa",
+    "unread_other": "Mga mensahe, {{number}} hindi pa nababasa"
   },
   "chat": {
     "away": "{{minutes}} min ang layo",
@@ -134,8 +134,8 @@
   },
   "rating": {
     "label": "Rating",
-    "star_one": "{{count}} bituin, {{word}}",
-    "star_other": "{{count}} bituin, {{word}}",
+    "star_one": "{{number}} bituin, {{word}}",
+    "star_other": "{{number}} bituin, {{word}}",
     "words": {
       "poor": "Mahina",
       "notGreat": "Hindi masyado",

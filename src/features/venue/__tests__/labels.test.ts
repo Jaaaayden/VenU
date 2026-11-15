@@ -37,6 +37,13 @@ describe('venue labels', () => {
     expect(facilityMeta({ ...gate2, walkMinutes: 3 })).toBe('3 دقائق سيرًا · انتظار قصير');
   });
 
+  it('writes numbers in the language\'s digits, still choosing the plural by count', () => {
+    const fa = i18n.getFixedT('fa', 'venue');
+    expect(facilityMeta(gate2, fa)).toMatch(/^۳ /); // not "3 دقیقه" next to Persian digits elsewhere
+    expect(fa('facility.results', { count: 12, number: '۱۲' })).toContain('۱۲');
+    expect(facilityMeta({ ...gate2, walkMinutes: 1 }, i18n.getFixedT('ru', 'venue'))).toMatch(/^1 /);
+  });
+
   it('calls the Rose Bowl event soccer in every language (LA28 plays soccer there)', () => {
     const roseBowl = getVenue('rose-bowl')!;
     const label = (lng: string) => eventsLabel(roseBowl, i18n.getFixedT(lng, 'venue'), lng);

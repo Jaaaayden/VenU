@@ -80,8 +80,8 @@
     "pin": "{{name}}-ը քարտեզի վրա",
     "north": "Հս"
   },
-  "walk_one": "{{count}} րոպե ոտքով",
-  "walk_other": "{{count}} րոպե ոտքով",
+  "walk_one": "{{number}} րոպե ոտքով",
+  "walk_other": "{{number}} րոպե ոտքով",
   "wait": {
     "none": "Առանց սպասելու",
     "short": "Կարճ հերթ",
@@ -178,8 +178,8 @@
     "directions": "Ուղղություններ",
     "directionsSoon": "Քայլ առ քայլ ուղղությունները շուտով կլինեն։ {{name}}՝ {{location}}։",
     "reports": "Հաշվետվություններ",
-    "results_one": "{{count}} արդյունք",
-    "results_other": "{{count}} արդյունք",
+    "results_one": "{{number}} արդյունք",
+    "results_other": "{{number}} արդյունք",
     "noReports": "Դեռ հաշվետվություններ չկան։ Առաջինը պատմեք, թե ինչ տեսաք։",
     "addReport": "Ավելացնել հաշվետվություն"
   },

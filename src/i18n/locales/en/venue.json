@@ -80,8 +80,8 @@
     "pin": "{{name}} on the map",
     "north": "N"
   },
-  "walk_one": "{{count}} min walk",
-  "walk_other": "{{count}} min walk",
+  "walk_one": "{{number}} min walk",
+  "walk_other": "{{number}} min walk",
   "wait": {
     "none": "No wait",
     "short": "Short wait",
@@ -178,8 +178,8 @@
     "directions": "Directions",
     "directionsSoon": "Step-by-step directions are coming soon. {{name}}: {{location}}.",
     "reports": "Reports",
-    "results_one": "{{count}} result",
-    "results_other": "{{count}} results",
+    "results_one": "{{number}} result",
+    "results_other": "{{number}} results",
     "noReports": "No reports yet. Be the first to share what you found.",
     "addReport": "Add Your Own Report"
   },

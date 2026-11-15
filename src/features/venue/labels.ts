@@ -10,7 +10,7 @@
 import type { TFunction } from 'i18next';
 
 import i18n from '@/i18n';
-import { formatList } from '@/i18n/format';
+import { formatList, formatNumber } from '@/i18n/format';
 import { en } from '@/i18n/locales';
 
 import type { Facility, FacilityCategory, FacilityTag, Venue } from './types';
@@ -60,7 +60,13 @@ export function facilityLocation(f: Facility, t: VenueT = venueT()): string {
   return isKnown(id) ? t(`facilityText.${id}.location`) : f.location;
 }
 
-/** "3 min walk · Short wait". */
+/** `t`'s language when it is fixed to one (getFixedT), else the current one. */
+function languageOf(t: VenueT): string {
+  return (t as unknown as { lng?: string | null }).lng || i18n.language;
+}
+
+/** "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian). */
 export function facilityMeta(f: Facility, t: VenueT = venueT()): string {
-  return `${t('walk', { count: f.walkMinutes })} · ${t(`wait.${f.wait}`)}`;
+  const number = formatNumber(f.walkMinutes, undefined, languageOf(t));
+  return `${t('walk', { count: f.walkMinutes, number })} · ${t(`wait.${f.wait}`)}`;
 }

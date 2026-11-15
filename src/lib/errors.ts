@@ -11,6 +11,7 @@ import type { TFunction } from 'i18next';
 
 import { PHOTO_MAX_BYTES } from '@/constants/photo';
 import i18n from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 import type { Resources } from '@/i18n/locales';
 
 type ErrorKey = keyof Resources['common']['errors'];
@@ -39,7 +40,6 @@ export function codedError(code: keyof typeof ERROR_CODES, extra: Record<string,
   return Object.assign(new Error(code), { code: ERROR_CODES[code], ...extra });
 }
 
-const photoSize = { size: PHOTO_MAX_BYTES / 1024 / 1024 };
 
 const BY_CODE: Record<string, (e: { role?: unknown }) => ErrorMessage> = {
   [ERROR_CODES.roleMismatch]: e => ({ key: e.role === 'volunteer' ? 'roleMismatchVolunteer' : 'roleMismatchVisitor' }),
@@ -71,7 +71,7 @@ const KNOWN: [RegExp, ErrorMessage][] = [
   [/jwt expired|invalid jwt|refresh token/i, { key: 'sessionExpired' }],
   // Not a session problem: the database or storage policy refused this change.
   [/row-level security|permission denied/i, { key: 'cantSave' }],
-  [/exceeded the maximum allowed size|payload too large/i, { key: 'photoTooBig', params: photoSize }],
+  [/exceeded the maximum allowed size|payload too large/i, { key: 'photoTooBig', params: { size: PHOTO_MAX_BYTES / 1024 / 1024 } }],
   [/mime type/i, { key: 'photoWrongType' }],
 ];
 
@@ -99,10 +99,17 @@ export function isOfflineError(e: unknown): boolean {
   return errorMessage(e).key === 'offline';
 }
 
+/** Numbers in the message's language digits (5 → "۵" in Persian). */
+function formatted(params: ErrorMessage['params'], language: string): ErrorMessage['params'] {
+  if (!params) return params;
+  return Object.fromEntries(Object.entries(params).map(([k, v]) => [k, typeof v === 'number' ? formatNumber(v, undefined, language) : v]));
+}
+
 /** The sentence for `e` in `t`'s language; pass the screen's t from useT('common'). */
 export function errorText(e: unknown, t: CommonT): string {
   const { key, params } = errorMessage(e);
-  return (t as unknown as Translate)(`errors.${key}`, params);
+  const language = (t as unknown as { lng?: string | null }).lng || i18n.language;
+  return (t as unknown as Translate)(`errors.${key}`, formatted(params, language));
 }
 
 /**
@@ -112,5 +119,5 @@ export function errorText(e: unknown, t: CommonT): string {
 export function friendlyError(e: unknown, fallback?: string): string {
   const m = errorMessage(e);
   if (m.key === 'generic' && fallback !== undefined) return fallback;
-  return (i18n.t as unknown as Translate)(`common:errors.${m.key}`, m.params);
+  return (i18n.t as unknown as Translate)(`common:errors.${m.key}`, formatted(m.params, i18n.language));
 }

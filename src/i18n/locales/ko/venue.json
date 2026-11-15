@@ -80,7 +80,7 @@
     "pin": "지도의 {{name}}",
     "north": "북"
   },
-  "walk_other": "도보 {{count}}분",
+  "walk_other": "도보 {{number}}분",
   "wait": {
     "none": "대기 없음",
     "short": "대기 짧음",
@@ -177,7 +177,7 @@
     "directions": "길찾기",
     "directionsSoon": "단계별 길찾기는 곧 제공됩니다. {{name}}: {{location}}.",
     "reports": "제보",
-    "results_other": "{{count}}건",
+    "results_other": "{{number}}건",
     "noReports": "아직 제보가 없습니다. 처음으로 발견한 내용을 공유해 주세요.",
     "addReport": "제보 추가하기"
   },

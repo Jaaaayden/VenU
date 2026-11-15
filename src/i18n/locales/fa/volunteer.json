@@ -85,8 +85,8 @@
   },
   "messages": {
     "label": "پیام‌ها",
-    "unread_one": "پیام‌ها، {{count}} خوانده‌نشده",
-    "unread_other": "پیام‌ها، {{count}} خوانده‌نشده"
+    "unread_one": "پیام‌ها، {{number}} خوانده‌نشده",
+    "unread_other": "پیام‌ها، {{number}} خوانده‌نشده"
   },
   "chat": {
     "away": "{{minutes}} دقیقه فاصله",
@@ -134,8 +134,8 @@
   },
   "rating": {
     "label": "امتیاز",
-    "star_one": "{{count}} ستاره، {{word}}",
-    "star_other": "{{count}} ستاره، {{word}}",
+    "star_one": "{{number}} ستاره، {{word}}",
+    "star_other": "{{number}} ستاره، {{word}}",
     "words": {
       "poor": "ضعیف",
       "notGreat": "نه چندان خوب",

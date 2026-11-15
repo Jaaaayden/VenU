@@ -85,8 +85,8 @@
   },
   "messages": {
     "label": "Messages",
-    "unread_one": "Messages, {{count}} unread",
-    "unread_other": "Messages, {{count}} unread"
+    "unread_one": "Messages, {{number}} unread",
+    "unread_other": "Messages, {{number}} unread"
   },
   "chat": {
     "away": "{{minutes}} min away",
@@ -134,8 +134,8 @@
   },
   "rating": {
     "label": "Rating",
-    "star_one": "{{count}} star, {{word}}",
-    "star_other": "{{count}} stars, {{word}}",
+    "star_one": "{{number}} star, {{word}}",
+    "star_other": "{{number}} stars, {{word}}",
     "words": {
       "poor": "Poor",
       "notGreat": "Not great",
