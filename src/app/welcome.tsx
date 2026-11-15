@@ -58,6 +58,7 @@ export default function WelcomeScreen() {
         visible={pickerOpen}
         title={t('welcome.languageTitle')}
         exclude={UNTRANSLATED}
+        appLanguage
         onSelect={code => {
           setPickerOpen(false);
           // Switches the app now; signing in saves it to the account, and profile setup starts with it as the primary language.

@@ -35,11 +35,6 @@ function useLanguageNames() {
   return { uiName, row };
 }
 
-/** Pills that set the app language leave out ASL (no screens in it), so their examples don't offer it. */
-function searchExamples(t: ReturnType<typeof useT<'common'>>, exclude: string[]): string {
-  return exclude.includes('ase') ? t('language.searchExamplesApp') : t('language.searchExamples');
-}
-
 /** "Primary language", "Secondary language", then "Another language". */
 function slotName(t: ReturnType<typeof useT<'common'>>, index: number): string {
   return index === 0 ? t('language.primary') : index === 1 ? t('language.secondary') : t('language.another');
@@ -247,12 +242,14 @@ interface LanguageSearchModalProps {
   /** Sheet heading; defaults to "Add a language". */
   title?: string;
   exclude?: string[];
+  /** Picks the app language (welcome and venue pills): the search hint doesn't suggest ASL, which has no screens. */
+  appLanguage?: boolean;
   onSelect: (code: string) => void;
   onClose: () => void;
 }
 
 /** Full-screen searchable list; names shown in their own script with the UI-language name underneath. */
-export function LanguageSearchModal({ visible, title, exclude = [], onSelect, onClose }: LanguageSearchModalProps) {
+export function LanguageSearchModal({ visible, title, exclude = [], appLanguage = false, onSelect, onClose }: LanguageSearchModalProps) {
   const t = useT('common');
   const names = useLanguageNames();
   const nameDirection = useNameDirection();
@@ -278,7 +275,7 @@ export function LanguageSearchModal({ visible, title, exclude = [], onSelect, on
             <FigmaIcon name="leading-icon-de9321" size={40} color={Colors.ink} />
             <TextInput
               style={styles.searchInput}
-              placeholder={searchExamples(t, exclude)}
+              placeholder={appLanguage ? t('language.searchExamplesApp') : t('language.searchExamples')}
               placeholderTextColor={Colors.textFaint}
               value={query}
               onChangeText={setQuery}
