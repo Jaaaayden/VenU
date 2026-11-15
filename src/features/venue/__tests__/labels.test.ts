@@ -37,6 +37,13 @@ describe('venue labels', () => {
     expect(facilityMeta({ ...gate2, walkMinutes: 3 })).toBe('3 دقائق سيرًا · انتظار قصير');
   });
 
+  it('calls the Rose Bowl event soccer in every language (LA28 plays soccer there)', () => {
+    const roseBowl = getVenue('rose-bowl')!;
+    const label = (lng: string) => eventsLabel(roseBowl, i18n.getFixedT(lng, 'venue'), lng);
+    expect(['en', 'es', 'ja', 'ko', 'zh', 'ar', 'pt'].map(label)).toEqual(['Soccer', 'Fútbol', 'サッカー', '축구', '足球', 'كرة القدم', 'Futebol']);
+    expect(searchVenues('soccer').map(v => v.id)).toEqual(['rose-bowl']);
+  });
+
   it('translates facility names, keeping proper nouns', () => {
     const t = (lng: string) => i18n.getFixedT(lng, 'venue');
     const byId = (id: string) => facilitiesFor('sofi').find(f => f.id === id)!;

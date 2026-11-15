@@ -10,7 +10,7 @@ export type FacilityCategory =
   | 'accessible'
   | 'parking';
 
-export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'football' | 'gymnastics' | 'basketball';
+export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'soccer' | 'gymnastics' | 'basketball';
 
 /** How the venue is drawn on the map: an open-air bowl or an indoor arena. */
 export type VenueShape = 'bowl' | 'arena';

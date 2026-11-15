@@ -9,7 +9,7 @@ import type { Facility, FacilityCategory, Venue } from './types';
 export const VENUES: Venue[] = [
   { id: 'sofi', name: 'SoFi Stadium', address: '1001 Stadium Dr, Inglewood, CA 90301', events: ['opening_ceremony', 'swimming'], shape: 'bowl' },
   { id: 'coliseum', name: 'LA Memorial Coliseum', address: '3911 S Figueroa St, Los Angeles, CA 90037', events: ['athletics'], shape: 'bowl' },
-  { id: 'rose-bowl', name: 'Rose Bowl Stadium', address: '1001 Rose Bowl Dr, Pasadena, CA 91103', events: ['football'], shape: 'bowl' },
+  { id: 'rose-bowl', name: 'Rose Bowl Stadium', address: '1001 Rose Bowl Dr, Pasadena, CA 91103', events: ['soccer'], shape: 'bowl' },
   { id: 'crypto-arena', name: 'Crypto.com Arena', address: '1111 S Figueroa St, Los Angeles, CA 90015', events: ['gymnastics'], shape: 'arena' },
   { id: 'intuit-dome', name: 'Intuit Dome', address: '3930 W Century Blvd, Inglewood, CA 90303', events: ['basketball'], shape: 'arena' },
 ];
