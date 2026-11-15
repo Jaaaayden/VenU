@@ -126,7 +126,13 @@
     "family_room": "Phòng gia đình",
     "long_lines_halftime": "Xếp hàng dài giờ nghỉ",
     "wheelchair_loans": "Cho mượn xe lăn",
-    "permit_needed": "Cần giấy phép"
+    "permit_needed": "Cần giấy phép",
+    "wheelchair_escort": "Hỗ trợ xe lăn",
+    "premium_access": "VIP và vé cao cấp",
+    "sensory_room": "Phòng giác quan",
+    "assistive_listening": "Hỗ trợ nghe",
+    "lost_items": "Đồ thất lạc",
+    "changing_table": "Bàn thay tã"
   },
   "facilityText": {
     "gate-1": {
@@ -191,6 +197,221 @@
       "name": "Bãi đỗ xe C",
       "description": "Bãi đỗ xe hỗ trợ tiếp cận, có lối đi ngắn và bằng phẳng đến Cổng 2.",
       "location": "Bãi phía đông nam"
+    },
+    "entry-3": {
+      "name": "Lối vào 3",
+      "description": "Lối vào phía bắc. Mọi lối vào đều có lối đi hỗ trợ tiếp cận và người hỗ trợ xe lăn miễn phí.",
+      "location": "Phía bắc"
+    },
+    "entry-4": {
+      "name": "Lối vào 4",
+      "description": "Lối vào phía bắc, bên trong có quầy hỗ trợ tiếp cận và ghế chờ.",
+      "location": "Phía bắc"
+    },
+    "entry-6": {
+      "name": "Lối vào 6",
+      "description": "Lối vào phía tây cho người có vé VIP và vé cao cấp.",
+      "location": "Phía tây"
+    },
+    "entry-8": {
+      "name": "Lối vào 8",
+      "description": "Lối vào phía nam, bên trong có quầy hỗ trợ tiếp cận và ghế chờ.",
+      "location": "Phía nam"
+    },
+    "entry-10": {
+      "name": "Lối vào 10",
+      "description": "Lối vào phía nam, bên trong có quầy hỗ trợ tiếp cận và ghế chờ.",
+      "location": "Phía nam"
+    },
+    "entry-11": {
+      "name": "Lối vào 11",
+      "description": "Lối vào phía đông cho người có vé VIP và vé cao cấp.",
+      "location": "Phía đông"
+    },
+    "guest-services-ne": {
+      "name": "Quầy dịch vụ Đông Bắc",
+      "description": "Giải đáp thắc mắc, đồ thất lạc, thiết bị hỗ trợ nghe, bộ dụng cụ giác quan miễn phí và phòng giác quan.",
+      "location": "Tầng 3, hành lang phía đông bắc"
+    },
+    "guest-services-sw": {
+      "name": "Quầy dịch vụ Tây Nam",
+      "description": "Bên trong Corona Beach Club. Đồ thất lạc, thiết bị hỗ trợ nghe, bộ dụng cụ giác quan miễn phí và phòng giác quan.",
+      "location": "Tầng 3, hành lang phía tây nam"
+    },
+    "first-aid-se": {
+      "name": "Trạm sơ cứu Đông Nam",
+      "description": "Có nhân viên cấp cứu tại chỗ. Mọi nhân viên hướng dẫn hay nhân viên sân đều có thể gọi giúp bạn.",
+      "location": "Tầng 1, hành lang phía đông nam"
+    },
+    "first-aid-nw": {
+      "name": "Trạm sơ cứu Tây Bắc",
+      "description": "Có nhân viên cấp cứu tại chỗ. Mọi nhân viên hướng dẫn hay nhân viên sân đều có thể gọi giúp bạn.",
+      "location": "Tầng 3, hành lang phía tây bắc"
+    },
+    "pedestrian-ramp": {
+      "name": "Lối dốc đi bộ",
+      "description": "Lối dốc đi bộ duy nhất của sân, lên được mọi tầng trừ tầng 7.",
+      "location": "Phía đông nam, phía sau khu end zone"
+    },
+    "lactation-suite": {
+      "name": "Phòng cho con bú",
+      "description": "Buồng cho con bú riêng tư Mamava. Mỗi tầng đều có nhà vệ sinh gia đình.",
+      "location": "Tầng 4, phía nam"
+    },
+    "rideshare-kareem": {
+      "name": "Điểm trả khách xe công nghệ",
+      "description": "Điểm trả khách cho Uber, Lyft và taxi. Điểm đón ở góc Kareem Court và Manchester Boulevard.",
+      "location": "Kareem Court, giữa Pincay Drive và Manchester Boulevard"
+    },
+    "accessible-drop-off": {
+      "name": "Điểm đón trả hỗ trợ tiếp cận",
+      "description": "Đón và trả khách khuyết tật. Đi Prairie Avenue hướng bắc rồi vào Arbor Vitae Street.",
+      "location": "District Drive, giữa Champions Way và Touchdown Drive"
+    },
+    "brown-zone": {
+      "name": "Khu Nâu",
+      "description": "Bãi đỗ gần Lối vào 1–5 và 12 nhất. Bãi nào cũng có chỗ đỗ ADA, ai đến trước được trước.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "Khu Xanh dương",
+      "description": "Bãi đỗ gần Lối vào 7 và 8 nhất. Bãi nào cũng có chỗ đỗ ADA, ai đến trước được trước.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "Khu Cam",
+      "description": "Bãi đỗ gần Lối vào 10, 11 và 12 nhất. Bãi nào cũng có chỗ đỗ ADA, ai đến trước được trước.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Lối vào Kobe Bryant",
+      "description": "Lối vào chính cho mọi loại vé. Vé GA sàn đấu phải vào ở đây.",
+      "location": "Góc Chick Hearn Ct. (11th St.) và Georgia St."
+    },
+    "star-plaza-entrance": {
+      "name": "Lối vào Star Plaza",
+      "description": "Lối vào chính cho mọi loại vé, giữa Phòng vé và cửa hàng Team LA.",
+      "location": "Góc Chick Hearn Ct. (11th St.) và Figueroa St."
+    },
+    "figueroa-entrance": {
+      "name": "Lối vào Figueroa",
+      "description": "Lối vào chính cho mọi loại vé. Hãy yêu cầu người hỗ trợ xe lăn miễn phí ở đây.",
+      "location": "Góc 12th St. và Figueroa St."
+    },
+    "guest-services-m12": {
+      "name": "Quầy dịch vụ M12",
+      "description": "Giải đáp thắc mắc, đồ thất lạc, thiết bị hỗ trợ nghe, túi giác quan và đệm đùi có trọng lượng (cần giấy tờ tùy thân).",
+      "location": "Hành lang chính, đối diện lối M12"
+    },
+    "guest-services-u6": {
+      "name": "Quầy dịch vụ U6",
+      "description": "Giải đáp thắc mắc, đồ thất lạc, túi giác quan và đệm đùi. Hỏi mã Buồng giác quan ở đây.",
+      "location": "Hành lang tầng trên, đối diện lối U6"
+    },
+    "first-aid-m3": {
+      "name": "Trạm sơ cứu M3",
+      "description": "Có nhân viên cấp cứu ở mọi sự kiện, bên trong có khu yên tĩnh.",
+      "location": "Hành lang chính, đối diện lối M3"
+    },
+    "first-aid-u22": {
+      "name": "Trạm sơ cứu U22",
+      "description": "Có nhân viên cấp cứu ở mọi sự kiện, bên trong có khu yên tĩnh.",
+      "location": "Hành lang tầng trên, đối diện lối U22"
+    },
+    "sensory-pod": {
+      "name": "Buồng giác quan",
+      "description": "Buồng yên tĩnh cho một hoặc hai người, mở trong mọi sự kiện. Quầy dịch vụ có mã cửa.",
+      "location": "Hành lang tầng trên, đối diện lối 3"
+    },
+    "restroom-m23": {
+      "name": "Nhà vệ sinh M23",
+      "description": "Nhà vệ sinh cho mọi giới tính, có bàn thay tã. Mọi nhà vệ sinh đều dùng được cho xe lăn.",
+      "location": "Hành lang chính, đối diện lối M23"
+    },
+    "restroom-u31": {
+      "name": "Nhà vệ sinh U31",
+      "description": "Nhà vệ sinh cho mọi giới tính, có bàn thay tã. Mọi nhà vệ sinh đều dùng được cho xe lăn.",
+      "location": "Hành lang tầng trên, đối diện lối U31"
+    },
+    "rideshare-chick-hearn": {
+      "name": "Xe công nghệ Chick Hearn",
+      "description": "Đón và trả khách xe công nghệ ở vùng trắng (hướng đông).",
+      "location": "Chick Hearn Ct., giữa L.A. Live Way và Georgia St."
+    },
+    "rideshare-figueroa": {
+      "name": "Xe công nghệ Figueroa",
+      "description": "Đón và trả khách xe công nghệ ở vùng trắng (hướng nam).",
+      "location": "Figueroa St., giữa 12th St. và Pico Blvd."
+    },
+    "west-garage-lot-w": {
+      "name": "Nhà xe phía Tây (Lot W)",
+      "description": "Nhà xe của nhà thi đấu, lối vào ở Chick Hearn Ct. và Georgia St.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "Lối vào chính",
+      "description": "Làn GameFace ID bên trái, làn Identity Pass bên phải. Hỗ trợ di chuyển miễn phí từ điểm kiểm tra an ninh đến chỗ ngồi.",
+      "location": "Trên quảng trường, gần Century Blvd. và Prairie Ave."
+    },
+    "vip-entrance": {
+      "name": "Lối vào VIP",
+      "description": "Dành cho người có vé phòng riêng, câu lạc bộ và sàn đấu.",
+      "location": "Bên trái Lối vào chính"
+    },
+    "wall-entrance": {
+      "name": "Lối vào The Wall",
+      "description": "Lối vào riêng cho The Wall.",
+      "location": "Bên trái Lối vào chính, qua Lối vào VIP"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal tầng Main",
+      "description": "Dịch vụ khán giả: đồ thất lạc, thiết bị hỗ trợ nghe miễn phí (giữ giấy tờ có ảnh) và thiết bị OneCourt.",
+      "location": "Tầng Main, gần khu Main 6"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal tầng Terrace",
+      "description": "Dịch vụ khán giả: đồ thất lạc và thiết bị hỗ trợ nghe miễn phí (giữ giấy tờ có ảnh).",
+      "location": "Tầng Terrace, gần khu Terrace 18"
+    },
+    "first-aid-main": {
+      "name": "Trạm sơ cứu tầng Main",
+      "description": "Có nhân viên cấp cứu được đào tạo ở mọi sự kiện.",
+      "location": "Hành lang tầng Main, Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "Trạm sơ cứu tầng Terrace",
+      "description": "Có nhân viên cấp cứu được đào tạo ở mọi sự kiện.",
+      "location": "Hành lang tầng Terrace, Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "Trạm sơ cứu tầng sàn",
+      "description": "Có nhân viên cấp cứu được đào tạo ở mọi sự kiện.",
+      "location": "Tầng sàn, dưới Wall 19, cạnh đường hầm phía đông"
+    },
+    "sensory-room": {
+      "name": "Phòng giác quan",
+      "description": "Phòng giác quan riêng Kaiser Permanente. Có túi giác quan khi bạn yêu cầu.",
+      "location": "Hỏi nhân viên Arena Host để được chỉ đường"
+    },
+    "infant-care-room": {
+      "name": "Phòng chăm sóc trẻ sơ sinh",
+      "description": "Phòng riêng để chăm sóc em bé. Khắp nhà thi đấu đều có nhà vệ sinh chung.",
+      "location": "Tầng Main, Main 6"
+    },
+    "mobility-hub": {
+      "name": "Trạm di chuyển",
+      "description": "Đón trả xe công nghệ và taxi, khu đón trả gia đình và xe đưa đón.",
+      "location": "Nhà xe phía Đông, tầng 1"
+    },
+    "east-garage": {
+      "name": "Nhà xe phía Đông",
+      "description": "Bãi đỗ thường; hãy mua vé đỗ xe trước. Chỗ đỗ hỗ trợ tiếp cận bán theo thứ tự đến trước.",
+      "location": "Lối vào trên 102nd St."
+    },
+    "west-garage": {
+      "name": "Nhà xe phía Tây",
+      "description": "Bãi đỗ VIP bên kia Prairie Ave.; hãy mua vé đỗ xe trước.",
+      "location": "Lối vào trên Prairie Ave."
     }
   },
   "facility": {
@@ -198,6 +419,9 @@
     "wheelchair": "Xe lăn vào được",
     "directions": "Chỉ đường",
     "directionsSoon": "Chỉ đường từng bước sắp ra mắt. {{name}}: {{location}}.",
+    "imHere": "Tôi ở đây",
+    "imHereHint": "Dùng chỗ này làm vị trí của bạn khi nhờ giúp đỡ",
+    "isHere": "Vị trí của bạn",
     "reports": "Báo cáo",
     "results_other": "{{number}} kết quả",
     "noReports": "Chưa có báo cáo. Hãy là người đầu tiên chia sẻ điều bạn thấy.",

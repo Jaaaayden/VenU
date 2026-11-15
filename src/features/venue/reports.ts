@@ -195,24 +195,32 @@ export function createPersistentReportStore(
 }
 
 const RAMP_REPORT =
-  'I arrived around 45 minutes before kickoff from the east side of the stadium. Gate 2 was a little difficult to find, and the ramp was also pretty far from the gate.\n\n' +
-  'As a wheelchair user, I thought the ramp was pretty old and outdated. There were cracks which made it a bit hard to use, and I almost got stuck.';
+  'I arrived around 45 minutes before kickoff from the east side of the stadium. The ramp was a little hard to find from Entry 11, so give yourself extra time.\n\n' +
+  'As a wheelchair user I found it long but steady. Take it slowly near the top when the crowd builds up.';
 
-/** Sample visitor reports, written in English (each carries language: 'en', so screens can say so). */
+/**
+ * Sample visitor reports, written in English (each carries language: 'en', so screens can say so).
+ * Each points at a real facility of its venue (see mock.ts), e.g. SoFi's pedestrian-ramp.
+ */
 export const SEED_REPORTS: FacilityReport[] = [
   {
-    id: 'seed-ramp', venueId: 'sofi', facilityId: 'gate-2', topic: 'accessibility',
-    title: 'Gate 2 Ramp Outdated', body: RAMP_REPORT, authorName: 'Rosa W.', createdAt: '2026-10-24T18:30:00.000Z', language: 'en',
+    id: 'seed-ramp', venueId: 'sofi', facilityId: 'pedestrian-ramp', topic: 'accessibility',
+    title: 'Ramp is a long way round', body: RAMP_REPORT, authorName: 'Rosa W.', createdAt: '2026-10-24T18:30:00.000Z', language: 'en',
   },
   {
-    id: 'seed-bags', venueId: 'sofi', facilityId: 'gate-2', topic: 'crowds',
+    id: 'seed-bags', venueId: 'sofi', facilityId: 'entry-4', topic: 'crowds',
     title: 'Bag check moves fast', authorName: 'Marcus T.', createdAt: '2026-10-20T17:05:00.000Z', language: 'en',
-    body: 'The clear-bag lane at Gate 2 took about five minutes an hour before the event. Staff waved wheelchair users to the front.',
+    body: 'The clear-bag lane at Entry 4 took about five minutes an hour before the event. Staff waved wheelchair users to the front.',
   },
   {
-    id: 'seed-restroom', venueId: 'sofi', facilityId: 'restroom-east', topic: 'facility_condition',
-    title: 'Family room was clean', authorName: 'Ana P.', createdAt: '2026-10-18T20:12:00.000Z', language: 'en',
-    body: 'The family room has a changing table and enough space to turn a wheelchair. Soap dispenser was empty by the second half.',
+    id: 'seed-restroom', venueId: 'crypto-arena', facilityId: 'restroom-m23', topic: 'facility_condition',
+    title: 'Room to turn a wheelchair', authorName: 'Ana P.', createdAt: '2026-10-18T20:12:00.000Z', language: 'en',
+    body: 'The all-gender restroom has a changing table and enough space to turn a wheelchair. Soap dispenser was empty by the second half.',
+  },
+  {
+    id: 'seed-sensory', venueId: 'intuit-dome', facilityId: 'answers-portal-main', topic: 'accessibility',
+    title: 'Listening device in two minutes', authorName: 'Leila H.', createdAt: '2026-10-15T03:20:00.000Z', language: 'en',
+    body: 'Picked up a free assisted listening device at the Answers Portal near Main 6. They held my photo ID until I brought it back.',
   },
   {
     id: 'seed-tacos', venueId: 'coliseum', facilityId: 'food-south', topic: 'crowds',

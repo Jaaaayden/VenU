@@ -126,7 +126,13 @@
     "family_room": "가족실",
     "long_lines_halftime": "하프타임에 긴 줄",
     "wheelchair_loans": "휠체어 대여",
-    "permit_needed": "허가증 필요"
+    "permit_needed": "허가증 필요",
+    "wheelchair_escort": "휠체어 동행",
+    "premium_access": "VIP·프리미엄",
+    "sensory_room": "감각실",
+    "assistive_listening": "보청 보조",
+    "lost_items": "분실물",
+    "changing_table": "기저귀 교환대"
   },
   "facilityText": {
     "gate-1": {
@@ -191,6 +197,221 @@
       "name": "C 주차장",
       "description": "2번 게이트까지 짧고 평탄한 길이 있는 장애인 주차장입니다.",
       "location": "남동쪽 주차장"
+    },
+    "entry-3": {
+      "name": "3번 입구",
+      "description": "북쪽 입구. 모든 입구에 무장애 통로가 있고 무료 휠체어 동행 서비스를 제공합니다.",
+      "location": "북쪽"
+    },
+    "entry-4": {
+      "name": "4번 입구",
+      "description": "안쪽에 접근성 안내 데스크와 대기 의자가 있는 북쪽 입구입니다.",
+      "location": "북쪽"
+    },
+    "entry-6": {
+      "name": "6번 입구",
+      "description": "VIP 및 프리미엄 티켓 소지자용 서쪽 입구입니다.",
+      "location": "서쪽"
+    },
+    "entry-8": {
+      "name": "8번 입구",
+      "description": "안쪽에 접근성 안내 데스크와 대기 의자가 있는 남쪽 입구입니다.",
+      "location": "남쪽"
+    },
+    "entry-10": {
+      "name": "10번 입구",
+      "description": "안쪽에 접근성 안내 데스크와 대기 의자가 있는 남쪽 입구입니다.",
+      "location": "남쪽"
+    },
+    "entry-11": {
+      "name": "11번 입구",
+      "description": "VIP 및 프리미엄 티켓 소지자용 동쪽 입구입니다.",
+      "location": "동쪽"
+    },
+    "guest-services-ne": {
+      "name": "관람객 서비스센터 북동",
+      "description": "문의, 분실물, 보청 보조기기, 무료 감각 키트와 감각실.",
+      "location": "3층, 북동쪽 콘코스"
+    },
+    "guest-services-sw": {
+      "name": "관람객 서비스센터 남서",
+      "description": "Corona Beach Club 안에 있습니다. 분실물, 보청 보조기기, 무료 감각 키트와 감각실.",
+      "location": "3층, 남서쪽 콘코스"
+    },
+    "first-aid-se": {
+      "name": "응급처치실 남동",
+      "description": "응급구조사가 상주합니다. 안내원이나 직원 누구에게나 요청하면 불러 드립니다.",
+      "location": "1층, 남동쪽 콘코스"
+    },
+    "first-aid-nw": {
+      "name": "응급처치실 북서",
+      "description": "응급구조사가 상주합니다. 안내원이나 직원 누구에게나 요청하면 불러 드립니다.",
+      "location": "3층, 북서쪽 콘코스"
+    },
+    "pedestrian-ramp": {
+      "name": "보행자 경사로",
+      "description": "경기장의 유일한 보행자 경사로로, 7층을 제외한 모든 층으로 이어집니다.",
+      "location": "남동쪽, 엔드존 뒤"
+    },
+    "lactation-suite": {
+      "name": "수유실",
+      "description": "Mamava 개인 수유 부스. 가족 화장실은 모든 층에 있습니다.",
+      "location": "4층, 남쪽"
+    },
+    "rideshare-kareem": {
+      "name": "차량 호출 하차장",
+      "description": "Uber, Lyft, 택시 하차장입니다. 승차는 Kareem Court와 Manchester Boulevard 교차로에서 합니다.",
+      "location": "Kareem Court, Pincay Drive와 Manchester Boulevard 사이"
+    },
+    "accessible-drop-off": {
+      "name": "장애인 승하차장",
+      "description": "장애인 승객을 내려 주고 태우는 곳입니다. Prairie Avenue 북쪽 방향에서 Arbor Vitae Street로 들어오세요.",
+      "location": "District Drive, Champions Way와 Touchdown Drive 사이"
+    },
+    "brown-zone": {
+      "name": "브라운 존",
+      "description": "1~5번, 12번 입구에서 가장 가까운 주차 구역. 모든 주차장에 ADA 주차면이 있으며 선착순입니다.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "블루 존",
+      "description": "7번, 8번 입구에서 가장 가까운 주차 구역. 모든 주차장에 ADA 주차면이 있으며 선착순입니다.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "오렌지 존",
+      "description": "10번, 11번, 12번 입구에서 가장 가까운 주차 구역. 모든 주차장에 ADA 주차면이 있으며 선착순입니다.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Kobe Bryant 입구",
+      "description": "모든 티켓 소지자용 메인 입구. GA 플로어 티켓은 이곳으로 입장해야 합니다.",
+      "location": "Chick Hearn Ct.(11th St.)와 Georgia St. 모퉁이"
+    },
+    "star-plaza-entrance": {
+      "name": "Star Plaza 입구",
+      "description": "모든 티켓 소지자용 메인 입구로, 매표소와 Team LA 스토어 사이에 있습니다.",
+      "location": "Chick Hearn Ct.(11th St.)와 Figueroa St. 모퉁이"
+    },
+    "figueroa-entrance": {
+      "name": "Figueroa 입구",
+      "description": "모든 티켓 소지자용 메인 입구. 무료 휠체어 동행을 이곳에서 요청하세요.",
+      "location": "12th St.와 Figueroa St. 모퉁이"
+    },
+    "guest-services-m12": {
+      "name": "관람객 서비스센터 M12",
+      "description": "문의, 분실물, 보청 보조기기, 감각 가방과 무게감 무릎 패드(신분증 필요).",
+      "location": "메인 콘코스, M12 통로 맞은편"
+    },
+    "guest-services-u6": {
+      "name": "관람객 서비스센터 U6",
+      "description": "문의, 분실물, 감각 가방과 무릎 패드. 감각 부스 비밀번호도 여기서 받으세요.",
+      "location": "상층 콘코스, U6 통로 맞은편"
+    },
+    "first-aid-m3": {
+      "name": "응급처치실 M3",
+      "description": "모든 행사에 응급구조사가 있으며, 안에 조용한 공간이 있습니다.",
+      "location": "메인 콘코스, M3 통로 맞은편"
+    },
+    "first-aid-u22": {
+      "name": "응급처치실 U22",
+      "description": "모든 행사에 응급구조사가 있으며, 안에 조용한 공간이 있습니다.",
+      "location": "상층 콘코스, U22 통로 맞은편"
+    },
+    "sensory-pod": {
+      "name": "감각 부스",
+      "description": "한두 명이 쓸 수 있는 조용한 부스로, 모든 행사 중에 열려 있습니다. 비밀번호는 관람객 서비스센터에서 받으세요.",
+      "location": "상층 콘코스, 3번 통로 맞은편"
+    },
+    "restroom-m23": {
+      "name": "화장실 M23",
+      "description": "기저귀 교환대가 있는 성별 무관 화장실. 모든 화장실은 휠체어로 이용할 수 있습니다.",
+      "location": "메인 콘코스, M23 통로 맞은편"
+    },
+    "restroom-u31": {
+      "name": "화장실 U31",
+      "description": "기저귀 교환대가 있는 성별 무관 화장실. 모든 화장실은 휠체어로 이용할 수 있습니다.",
+      "location": "상층 콘코스, U31 통로 맞은편"
+    },
+    "rideshare-chick-hearn": {
+      "name": "Chick Hearn 차량 호출",
+      "description": "흰색 구역에서 차량 호출 승하차(동쪽 방향).",
+      "location": "Chick Hearn Ct., L.A. Live Way와 Georgia St. 사이"
+    },
+    "rideshare-figueroa": {
+      "name": "Figueroa 차량 호출",
+      "description": "흰색 구역에서 차량 호출 승하차(남쪽 방향).",
+      "location": "Figueroa St., 12th St.와 Pico Blvd. 사이"
+    },
+    "west-garage-lot-w": {
+      "name": "서쪽 주차장(Lot W)",
+      "description": "경기장 주차 건물로, Chick Hearn Ct.와 Georgia St.에 입구가 있습니다.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "정문",
+      "description": "왼쪽은 GameFace ID 줄, 오른쪽은 Identity Pass 줄입니다. 보안 검색대부터 좌석까지 무료 이동 지원을 받을 수 있습니다.",
+      "location": "광장, Century Blvd.와 Prairie Ave. 근처"
+    },
+    "vip-entrance": {
+      "name": "VIP 입구",
+      "description": "스위트, 클럽, 플로어 티켓 소지자용.",
+      "location": "정문 왼쪽"
+    },
+    "wall-entrance": {
+      "name": "The Wall 입구",
+      "description": "The Wall 전용 입구.",
+      "location": "정문 왼쪽, VIP 입구 지나서"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal 메인",
+      "description": "관람객 서비스: 분실물, 무료 보청 보조기기(사진 신분증 보관), OneCourt 기기.",
+      "location": "Main 레벨, Main 6 구역 근처"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal 테라스",
+      "description": "관람객 서비스: 분실물, 무료 보청 보조기기(사진 신분증 보관).",
+      "location": "Terrace 레벨, Terrace 18 구역 근처"
+    },
+    "first-aid-main": {
+      "name": "응급처치실 메인",
+      "description": "모든 행사에 교육받은 응급구조사가 있습니다.",
+      "location": "Main 레벨 콘코스, Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "응급처치실 테라스",
+      "description": "모든 행사에 교육받은 응급구조사가 있습니다.",
+      "location": "Terrace 레벨 콘코스, Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "응급처치실 플로어",
+      "description": "모든 행사에 교육받은 응급구조사가 있습니다.",
+      "location": "플로어 레벨, Wall 19 아래 동쪽 터널 옆"
+    },
+    "sensory-room": {
+      "name": "감각실",
+      "description": "개인용 Kaiser Permanente 감각실. 요청하면 감각 가방도 받을 수 있습니다.",
+      "location": "아레나 호스트에게 길을 물어보세요"
+    },
+    "infant-care-room": {
+      "name": "영유아 돌봄실",
+      "description": "아기를 돌볼 수 있는 개인 공간. 경기장 곳곳에 모두를 위한 화장실이 있습니다.",
+      "location": "Main 레벨, Main 6"
+    },
+    "mobility-hub": {
+      "name": "모빌리티 허브",
+      "description": "차량 호출·택시 승하차, 가족 승하차 구역, 셔틀.",
+      "location": "동쪽 주차장 1층"
+    },
+    "east-garage": {
+      "name": "동쪽 주차장",
+      "description": "일반 주차. 주차권을 미리 구매하세요. 장애인 주차면은 선착순으로 판매합니다.",
+      "location": "102nd St. 입구"
+    },
+    "west-garage": {
+      "name": "서쪽 주차장",
+      "description": "Prairie Ave. 건너편의 VIP 주차장. 주차권을 미리 구매하세요.",
+      "location": "Prairie Ave. 입구"
     }
   },
   "facility": {
@@ -198,6 +419,9 @@
     "wheelchair": "휠체어 이용 가능",
     "directions": "길찾기",
     "directionsSoon": "단계별 길찾기는 곧 제공됩니다. {{name}}: {{location}}.",
+    "imHere": "여기 있어요",
+    "imHereHint": "도움을 요청할 때 이곳을 내 위치로 사용합니다",
+    "isHere": "내 위치",
     "reports": "제보",
     "results_other": "{{number}}건",
     "noReports": "아직 제보가 없습니다. 처음으로 발견한 내용을 공유해 주세요.",

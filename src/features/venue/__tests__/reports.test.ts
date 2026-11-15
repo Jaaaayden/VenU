@@ -43,34 +43,35 @@ describe('memory report store', () => {
   const makeId = () => `t${++n}`;
 
   it('lists a facility’s reports newest first', async () => {
-    const store = createMemoryReportStore(SEED_REPORTS, { now, makeId });
-    const list = await store.list('sofi', 'gate-2');
-    expect(list.map(r => r.title)).toEqual(['Gate 2 Ramp Outdated', 'Bag check moves fast']);
-    expect(await store.list('sofi', 'gate-4')).toEqual([]);
+    const older = { ...SEED_REPORTS[1], id: 'older', title: 'Older', createdAt: '2026-10-01T00:00:00.000Z' };
+    const store = createMemoryReportStore([older, ...SEED_REPORTS], { now, makeId });
+    const list = await store.list('sofi', 'entry-4');
+    expect(list.map(r => r.title)).toEqual(['Bag check moves fast', 'Older']);
+    expect(await store.list('sofi', 'entry-6')).toEqual([]);
   });
 
   it('adds a trimmed report at the top of that facility’s list only', async () => {
     const store = createMemoryReportStore(SEED_REPORTS, { now, makeId });
-    const saved = await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: ' Rosa ', draft: good });
+    const saved = await store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: ' Rosa ', draft: good });
     expect(saved).toMatchObject({
       title: 'Elevator out at Gate 2', body: 'Use the ramp instead.', authorName: 'Rosa', topic: 'accessibility',
       createdAt: '2026-11-11T12:00:00.000Z',
     });
-    expect((await store.list('sofi', 'gate-2'))[0].id).toBe(saved.id);
-    expect(await store.list('coliseum', 'gate-2')).toEqual([]);
+    expect((await store.list('sofi', 'entry-4')).map(r => r.id)).toEqual([saved.id, 'seed-bags']);
+    expect(await store.list('coliseum', 'entry-4')).toEqual([]);
     expect(await store.get(saved.id)).toEqual(saved);
   });
 
   it('marks the seed reports as English and keeps the language a report was written in', async () => {
     expect(SEED_REPORTS.every(r => r.language === 'en')).toBe(true);
     const store = createMemoryReportStore([], { now, makeId });
-    expect((await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', language: 'es', draft: good })).language).toBe('es');
-    expect((await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good })).language).toBeUndefined();
+    expect((await store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', language: 'es', draft: good })).language).toBe('es');
+    expect((await store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: good })).language).toBeUndefined();
   });
 
   it('stores no made-up English name; the screen words the fallback author in its language', async () => {
     const store = createMemoryReportStore([], { now, makeId });
-    const saved = await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: '  ', draft: good });
+    const saved = await store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: '  ', draft: good });
     expect(saved.authorName).toBe('');
     expect(reportAuthor(saved, i18n.getFixedT('en', 'venue'))).toBe('VenU visitor');
     expect(reportAuthor(saved, i18n.getFixedT('es', 'venue'))).toBe('Visitante de VenU');
@@ -79,9 +80,9 @@ describe('memory report store', () => {
 
   it('rejects an incomplete draft with field errors', async () => {
     const store = createMemoryReportStore([], { now, makeId });
-    await expect(store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: { title: '', topic: null, body: '' } }))
+    await expect(store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: { title: '', topic: null, body: '' } }))
       .rejects.toBeInstanceOf(ReportValidationError);
-    expect(await store.list('sofi', 'gate-2')).toEqual([]);
+    expect(await store.list('sofi', 'entry-4')).toEqual([]);
   });
 });
 
@@ -119,7 +120,7 @@ describe('venue search', () => {
   });
 
   it('filters facilities by category and words', () => {
-    const all = facilitiesFor('sofi');
+    const all = facilitiesFor('coliseum');
     expect(searchFacilities(all, '', 'gate').map(f => f.id)).toEqual(['gate-1', 'gate-2', 'gate-3', 'gate-4']);
     expect(searchFacilities(all, 'taco', null).map(f => f.id)).toEqual(['food-south']);
     // "Accessibility" also matches accessible gates, restrooms and so on.
@@ -142,7 +143,7 @@ describe('persistent report store', () => {
   it('saves only user reports, under one key, and loads them back after a reload', async () => {
     const storage = fakeStorage();
     const first = createPersistentReportStore(storage, SEED_REPORTS, { now, makeId: () => 'mine-1' });
-    await first.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
+    await first.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: good });
 
     expect([...storage.data.keys()]).toEqual([REPORTS_STORAGE_KEY]);
     const saved = JSON.parse(storage.data.get(REPORTS_STORAGE_KEY)!);
@@ -150,8 +151,8 @@ describe('persistent report store', () => {
 
     // A fresh store over the same storage = the app after a reload.
     const second = createPersistentReportStore(storage, SEED_REPORTS, { now });
-    const list = await second.list('sofi', 'gate-2');
-    expect(list.map(r => r.id)).toEqual(['mine-1', 'seed-ramp', 'seed-bags']);
+    const list = await second.list('sofi', 'entry-4');
+    expect(list.map(r => r.id)).toEqual(['mine-1', 'seed-bags']);
     expect(await second.get('mine-1')).toMatchObject({ title: 'Elevator out at Gate 2' });
   });
 
@@ -159,23 +160,23 @@ describe('persistent report store', () => {
     const storage = fakeStorage();
     let n = 0;
     const makeId = () => `mine-${++n}`;
-    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
-    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'gate-1', authorName: 'Rosa', draft: good });
+    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: good });
+    await createPersistentReportStore(storage, [], { now, makeId }).add({ venueId: 'sofi', facilityId: 'entry-3', authorName: 'Rosa', draft: good });
     expect(JSON.parse(storage.data.get(REPORTS_STORAGE_KEY)!).map((r: { id: string }) => r.id)).toEqual(['mine-1', 'mine-2']);
   });
 
   it('ignores an unreadable saved value and bad rows, and still serves the seed', async () => {
     const broken = createPersistentReportStore(fakeStorage({ [REPORTS_STORAGE_KEY]: '{not json' }), SEED_REPORTS);
-    expect((await broken.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['seed-ramp', 'seed-bags']);
+    expect((await broken.list('sofi', 'entry-4')).map(r => r.id)).toEqual(['seed-bags']);
 
-    const mixed = createPersistentReportStore(fakeStorage({ [REPORTS_STORAGE_KEY]: JSON.stringify([{ id: 'x' }, SEED_REPORTS[0]]) }), SEED_REPORTS);
-    expect((await mixed.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['seed-ramp', 'seed-bags']); // no duplicate seed
+    const mixed = createPersistentReportStore(fakeStorage({ [REPORTS_STORAGE_KEY]: JSON.stringify([{ id: 'x' }, SEED_REPORTS[1]]) }), SEED_REPORTS);
+    expect((await mixed.list('sofi', 'entry-4')).map(r => r.id)).toEqual(['seed-bags']); // no duplicate seed
   });
 
   it('keeps the report for the session when saving fails', async () => {
     const storage = { getItem: async () => null, setItem: async () => { throw new Error('quota'); } };
     const s = createPersistentReportStore(storage, [], { now, makeId: () => 'mine-1' });
-    await s.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good });
-    expect((await s.list('sofi', 'gate-2')).map(r => r.id)).toEqual(['mine-1']);
+    await s.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: good });
+    expect((await s.list('sofi', 'entry-4')).map(r => r.id)).toEqual(['mine-1']);
   });
 });

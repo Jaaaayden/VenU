@@ -8,7 +8,7 @@ import { facilitiesFor, getVenue, searchFacilities, searchVenues } from '../mock
 import type { Facility } from '../types';
 
 const sofi = getVenue('sofi')!;
-const gate2 = facilitiesFor('sofi').find(f => f.id === 'gate-2')!;
+const gate2 = facilitiesFor('coliseum').find(f => f.id === 'gate-2')!;
 
 afterEach(async () => { await i18n.changeLanguage('en'); });
 
@@ -53,7 +53,7 @@ describe('venue labels', () => {
 
   it('translates facility names, keeping proper nouns', () => {
     const t = (lng: string) => i18n.getFixedT(lng, 'venue');
-    const byId = (id: string) => facilitiesFor('sofi').find(f => f.id === id)!;
+    const byId = (id: string) => facilitiesFor('coliseum').find(f => f.id === id)!;
     expect(facilityName(gate2, t('en'))).toBe('Gate 2');
     expect(facilityName(gate2, t('es'))).toBe('Puerta 2');
     expect(facilityName(gate2, t('fa'))).toBe('دروازه ۲');
@@ -63,15 +63,15 @@ describe('venue labels', () => {
     expect(facilityName({ ...gate2, id: 'gate-99', name: 'Gate 99' }, t('es'))).toBe('Gate 99');
     // Every other mock facility reads differently from English in each language.
     for (const lng of ['es', 'zh', 'ko', 'tl', 'vi', 'hy', 'fa', 'ja', 'ru', 'ar', 'fr', 'pt']) {
-      for (const f of facilitiesFor('sofi').filter(f => !f.id.startsWith('food-'))) {
+      for (const f of facilitiesFor('coliseum').filter(f => !f.id.startsWith('food-'))) {
         expect({ lng, id: f.id, name: facilityName(f, t(lng)) }).not.toEqual({ lng, id: f.id, name: f.name });
       }
     }
   });
 
   it('finds a facility by its translated name', () => {
-    expect(searchFacilities(facilitiesFor('sofi'), 'objetos perdidos', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(['lost-found']);
-    expect(searchFacilities(facilitiesFor('sofi'), 'puerta', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(expect.arrayContaining(['gate-1', 'gate-2', 'gate-3', 'gate-4']));
+    expect(searchFacilities(facilitiesFor('coliseum'), 'objetos perdidos', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(['lost-found']);
+    expect(searchFacilities(facilitiesFor('coliseum'), 'puerta', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(expect.arrayContaining(['gate-1', 'gate-2', 'gate-3', 'gate-4']));
   });
 
   it('keeps a facility\'s own text when there is no translation for it', async () => {
@@ -87,7 +87,7 @@ describe('search in the app language', () => {
     await i18n.changeLanguage('es');
     expect(searchVenues('natación').map(v => v.id)).toEqual(['sofi']);
     expect(searchVenues('swimming').map(v => v.id)).toEqual(['sofi']);
-    const all = facilitiesFor('sofi');
+    const all = facilitiesFor('coliseum');
     expect(searchFacilities(all, 'rampa', null).map(f => f.id)).toEqual(['gate-2']);
     expect(searchFacilities(all, 'ramp', 'gate').map(f => f.id)).toEqual(['gate-2']);
   });

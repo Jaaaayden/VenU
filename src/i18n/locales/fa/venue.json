@@ -127,7 +127,13 @@
     "family_room": "اتاق خانواده",
     "long_lines_halftime": "صف طولانی در بین دو نیمه",
     "wheelchair_loans": "امانت ویلچر",
-    "permit_needed": "نیاز به مجوز"
+    "permit_needed": "نیاز به مجوز",
+    "wheelchair_escort": "همراهی با ویلچر",
+    "premium_access": "VIP و ویژه",
+    "sensory_room": "اتاق حسی",
+    "assistive_listening": "کمک‌شنوایی",
+    "lost_items": "اشیای گمشده",
+    "changing_table": "میز تعویض پوشک"
   },
   "facilityText": {
     "gate-1": {
@@ -192,6 +198,221 @@
       "name": "پارکینگ C",
       "description": "پارکینگ دسترس‌پذیر با مسیری کوتاه و هموار تا دروازه ۲.",
       "location": "محوطه جنوب شرقی"
+    },
+    "entry-3": {
+      "name": "ورودی ۳",
+      "description": "ورودی شمالی. همه ورودی‌ها مسیر دسترس‌پذیر و همراهی رایگان با ویلچر دارند.",
+      "location": "ضلع شمالی"
+    },
+    "entry-4": {
+      "name": "ورودی ۴",
+      "description": "ورودی شمالی با میز دسترس‌پذیری و صندلی‌های انتظار در داخل.",
+      "location": "ضلع شمالی"
+    },
+    "entry-6": {
+      "name": "ورودی ۶",
+      "description": "ورودی غربی برای دارندگان بلیت VIP و ویژه.",
+      "location": "ضلع غربی"
+    },
+    "entry-8": {
+      "name": "ورودی ۸",
+      "description": "ورودی جنوبی با میز دسترس‌پذیری و صندلی‌های انتظار در داخل.",
+      "location": "ضلع جنوبی"
+    },
+    "entry-10": {
+      "name": "ورودی ۱۰",
+      "description": "ورودی جنوبی با میز دسترس‌پذیری و صندلی‌های انتظار در داخل.",
+      "location": "ضلع جنوبی"
+    },
+    "entry-11": {
+      "name": "ورودی ۱۱",
+      "description": "ورودی شرقی برای دارندگان بلیت VIP و ویژه.",
+      "location": "ضلع شرقی"
+    },
+    "guest-services-ne": {
+      "name": "خدمات تماشاگران شمال شرقی",
+      "description": "پرسش‌ها، اشیای گمشده، دستگاه کمک‌شنوایی، کیت حسی رایگان و اتاق حسی.",
+      "location": "طبقه ۳، سالن شمال شرقی"
+    },
+    "guest-services-sw": {
+      "name": "خدمات تماشاگران جنوب غربی",
+      "description": "داخل Corona Beach Club. اشیای گمشده، دستگاه کمک‌شنوایی، کیت حسی رایگان و اتاق حسی.",
+      "location": "طبقه ۳، سالن جنوب غربی"
+    },
+    "first-aid-se": {
+      "name": "کمک‌های اولیه جنوب شرقی",
+      "description": "تکنسین‌های فوریت پزشکی در محل هستند. هر راهنما یا کارمندی می‌تواند آن‌ها را خبر کند.",
+      "location": "طبقه ۱، سالن جنوب شرقی"
+    },
+    "first-aid-nw": {
+      "name": "کمک‌های اولیه شمال غربی",
+      "description": "تکنسین‌های فوریت پزشکی در محل هستند. هر راهنما یا کارمندی می‌تواند آن‌ها را خبر کند.",
+      "location": "طبقه ۳، سالن شمال غربی"
+    },
+    "pedestrian-ramp": {
+      "name": "رمپ عابر پیاده",
+      "description": "تنها رمپ عابر پیاده ورزشگاه؛ به همه طبقه‌ها جز طبقه ۷ می‌رسد.",
+      "location": "ضلع جنوب شرقی، پشت منطقه انتهایی زمین"
+    },
+    "lactation-suite": {
+      "name": "اتاق شیردهی",
+      "description": "کابین خصوصی شیردهی Mamava. در هر طبقه سرویس بهداشتی خانوادگی هست.",
+      "location": "طبقه ۴، جنوب"
+    },
+    "rideshare-kareem": {
+      "name": "محل پیاده شدن تاکسی اینترنتی",
+      "description": "محل پیاده شدن از Uber، Lyft و تاکسی. محل سوار شدن در تقاطع Kareem Court و Manchester Boulevard است.",
+      "location": "Kareem Court، بین Pincay Drive و Manchester Boulevard"
+    },
+    "accessible-drop-off": {
+      "name": "محل سوار و پیاده شدن دسترس‌پذیر",
+      "description": "برای پیاده و سوار کردن مهمانان دارای معلولیت. از Prairie Avenue به سمت شمال بیایید و وارد Arbor Vitae Street شوید.",
+      "location": "District Drive، بین Champions Way و Touchdown Drive"
+    },
+    "brown-zone": {
+      "name": "منطقه قهوه‌ای",
+      "description": "نزدیک‌ترین پارکینگ به ورودی‌های ۱ تا ۵ و ۱۲. همه پارکینگ‌ها جای پارک ADA دارند؛ به ترتیب ورود.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "منطقه آبی",
+      "description": "نزدیک‌ترین پارکینگ به ورودی‌های ۷ و ۸. همه پارکینگ‌ها جای پارک ADA دارند؛ به ترتیب ورود.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "منطقه نارنجی",
+      "description": "نزدیک‌ترین پارکینگ به ورودی‌های ۱۰، ۱۱ و ۱۲. همه پارکینگ‌ها جای پارک ADA دارند؛ به ترتیب ورود.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "ورودی Kobe Bryant",
+      "description": "ورودی اصلی برای همه بلیت‌ها. دارندگان بلیت GA زمین باید از اینجا وارد شوند.",
+      "location": "تقاطع Chick Hearn Ct. (11th St.) و Georgia St."
+    },
+    "star-plaza-entrance": {
+      "name": "ورودی Star Plaza",
+      "description": "ورودی اصلی برای همه بلیت‌ها، بین گیشه و فروشگاه Team LA.",
+      "location": "تقاطع Chick Hearn Ct. (11th St.) و Figueroa St."
+    },
+    "figueroa-entrance": {
+      "name": "ورودی Figueroa",
+      "description": "ورودی اصلی برای همه بلیت‌ها. همراهی رایگان با ویلچر را اینجا درخواست کنید.",
+      "location": "تقاطع 12th St. و Figueroa St."
+    },
+    "guest-services-m12": {
+      "name": "خدمات تماشاگران M12",
+      "description": "پرسش‌ها، اشیای گمشده، دستگاه کمک‌شنوایی، کیف حسی و پد وزن‌دار پا (کارت شناسایی لازم است).",
+      "location": "سالن اصلی، روبه‌روی گذرگاه M12"
+    },
+    "guest-services-u6": {
+      "name": "خدمات تماشاگران U6",
+      "description": "پرسش‌ها، اشیای گمشده، کیف حسی و پد پا. رمز کابین حسی را اینجا بگیرید.",
+      "location": "سالن بالایی، روبه‌روی گذرگاه U6"
+    },
+    "first-aid-m3": {
+      "name": "کمک‌های اولیه M3",
+      "description": "تکنسین فوریت پزشکی در همه رویدادها، با فضای آرام در داخل.",
+      "location": "سالن اصلی، روبه‌روی گذرگاه M3"
+    },
+    "first-aid-u22": {
+      "name": "کمک‌های اولیه U22",
+      "description": "تکنسین فوریت پزشکی در همه رویدادها، با فضای آرام در داخل.",
+      "location": "سالن بالایی، روبه‌روی گذرگاه U22"
+    },
+    "sensory-pod": {
+      "name": "کابین حسی",
+      "description": "کابین آرام برای یک یا دو نفر، باز در همه رویدادها. رمز در دست خدمات تماشاگران است.",
+      "location": "سالن بالایی، روبه‌روی گذرگاه ۳"
+    },
+    "restroom-m23": {
+      "name": "سرویس بهداشتی M23",
+      "description": "سرویس بهداشتی همگانی با میز تعویض پوشک. همه سرویس‌ها با ویلچر قابل استفاده‌اند.",
+      "location": "سالن اصلی، روبه‌روی گذرگاه M23"
+    },
+    "restroom-u31": {
+      "name": "سرویس بهداشتی U31",
+      "description": "سرویس بهداشتی همگانی با میز تعویض پوشک. همه سرویس‌ها با ویلچر قابل استفاده‌اند.",
+      "location": "سالن بالایی، روبه‌روی گذرگاه U31"
+    },
+    "rideshare-chick-hearn": {
+      "name": "تاکسی اینترنتی Chick Hearn",
+      "description": "سوار و پیاده شدن تاکسی اینترنتی در منطقه سفید (به سمت شرق).",
+      "location": "Chick Hearn Ct.، بین L.A. Live Way و Georgia St."
+    },
+    "rideshare-figueroa": {
+      "name": "تاکسی اینترنتی Figueroa",
+      "description": "سوار و پیاده شدن تاکسی اینترنتی در منطقه سفید (به سمت جنوب).",
+      "location": "Figueroa St.، بین 12th St. و Pico Blvd."
+    },
+    "west-garage-lot-w": {
+      "name": "پارکینگ غربی (Lot W)",
+      "description": "پارکینگ طبقاتی سالن، با ورودی از Chick Hearn Ct. و Georgia St.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "ورودی اصلی",
+      "description": "صف GameFace ID سمت چپ و صف Identity Pass سمت راست است. کمک رایگان برای جابه‌جایی از بازرسی تا صندلی شما.",
+      "location": "در میدان، نزدیک Century Blvd. و Prairie Ave."
+    },
+    "vip-entrance": {
+      "name": "ورودی VIP",
+      "description": "برای دارندگان بلیت سوئیت، باشگاه و زمین.",
+      "location": "سمت چپ ورودی اصلی"
+    },
+    "wall-entrance": {
+      "name": "ورودی The Wall",
+      "description": "ورودی اختصاصی The Wall.",
+      "location": "سمت چپ ورودی اصلی، بعد از ورودی VIP"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal طبقه Main",
+      "description": "خدمات تماشاگران: اشیای گمشده، دستگاه کمک‌شنوایی رایگان (کارت شناسایی عکس‌دار نگه داشته می‌شود) و دستگاه‌های OneCourt.",
+      "location": "طبقه Main، نزدیک بخش Main 6"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal طبقه Terrace",
+      "description": "خدمات تماشاگران: اشیای گمشده و دستگاه کمک‌شنوایی رایگان (کارت شناسایی عکس‌دار نگه داشته می‌شود).",
+      "location": "طبقه Terrace، نزدیک بخش Terrace 18"
+    },
+    "first-aid-main": {
+      "name": "کمک‌های اولیه طبقه Main",
+      "description": "تکنسین‌های آموزش‌دیده فوریت پزشکی در همه رویدادها.",
+      "location": "سالن طبقه Main، Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "کمک‌های اولیه طبقه Terrace",
+      "description": "تکنسین‌های آموزش‌دیده فوریت پزشکی در همه رویدادها.",
+      "location": "سالن طبقه Terrace، Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "کمک‌های اولیه کف سالن",
+      "description": "تکنسین‌های آموزش‌دیده فوریت پزشکی در همه رویدادها.",
+      "location": "کف سالن، زیر Wall 19 کنار تونل شرقی"
+    },
+    "sensory-room": {
+      "name": "اتاق حسی",
+      "description": "اتاق حسی خصوصی Kaiser Permanente. کیف حسی هم در صورت درخواست هست.",
+      "location": "مسیر را از میزبانان سالن بپرسید"
+    },
+    "infant-care-room": {
+      "name": "اتاق مراقبت از نوزاد",
+      "description": "اتاقی خصوصی برای مراقبت از نوزاد. سرویس‌های بهداشتی همگانی در سراسر سالن هست.",
+      "location": "طبقه Main، Main 6"
+    },
+    "mobility-hub": {
+      "name": "مرکز حمل‌ونقل",
+      "description": "سوار و پیاده شدن تاکسی اینترنتی و تاکسی، محل پیاده کردن خانواده‌ها و شاتل‌ها.",
+      "location": "پارکینگ شرقی، طبقه ۱"
+    },
+    "east-garage": {
+      "name": "پارکینگ شرقی",
+      "description": "پارکینگ عادی؛ مجوز پارک را از قبل بخرید. جاهای پارک دسترس‌پذیر به ترتیب ورود فروخته می‌شوند.",
+      "location": "ورودی از 102nd St."
+    },
+    "west-garage": {
+      "name": "پارکینگ غربی",
+      "description": "پارکینگ VIP آن سوی Prairie Ave.؛ مجوز پارک را از قبل بخرید.",
+      "location": "ورودی از Prairie Ave."
     }
   },
   "facility": {
@@ -199,6 +420,9 @@
     "wheelchair": "مناسب ویلچر",
     "directions": "مسیریابی",
     "directionsSoon": "مسیریابی گام‌به‌گام به‌زودی می‌آید. {{name}}: {{location}}.",
+    "imHere": "من اینجا هستم",
+    "imHereHint": "هنگام درخواست کمک، اینجا مکان شما در نظر گرفته می‌شود",
+    "isHere": "مکان شما",
     "reports": "گزارش‌ها",
     "results_one": "{{number}} نتیجه",
     "results_other": "{{number}} نتیجه",

@@ -22,16 +22,16 @@ describe('where am I', () => {
 
   it('saves the venue and spot under one key', async () => {
     setCurrentVenue('crypto-arena');
-    setCurrentSpot('gate-2');
-    expect(getWhereAmI()).toEqual({ venueId: 'crypto-arena', facilityId: 'gate-2' });
+    setCurrentSpot('star-plaza-entrance');
+    expect(getWhereAmI()).toEqual({ venueId: 'crypto-arena', facilityId: 'star-plaza-entrance' });
     await Promise.resolve();
-    expect(await saved()).toEqual({ venueId: 'crypto-arena', facilityId: 'gate-2' });
+    expect(await saved()).toEqual({ venueId: 'crypto-arena', facilityId: 'star-plaza-entrance' });
   });
 
   it('opening another venue forgets the spot; reopening the same one keeps it', () => {
-    setCurrentSpot('gate-2');
+    setCurrentSpot('entry-4');
     setCurrentVenue('sofi');
-    expect(getWhereAmI().facilityId).toBe('gate-2');
+    expect(getWhereAmI().facilityId).toBe('entry-4');
     setCurrentVenue('intuit-dome');
     expect(getWhereAmI()).toEqual({ venueId: 'intuit-dome', facilityId: null });
   });
@@ -43,9 +43,9 @@ describe('where am I', () => {
   });
 
   it('reads back a saved value, dropping stale ids', async () => {
-    await AsyncStorage.setItem(WHERE_KEY, JSON.stringify({ venueId: 'intuit-dome', facilityId: 'gate-3' }));
+    await AsyncStorage.setItem(WHERE_KEY, JSON.stringify({ venueId: 'intuit-dome', facilityId: 'main-entrance' }));
     await hydrateWhereAmI();
-    expect(getWhereAmI()).toEqual({ venueId: 'intuit-dome', facilityId: 'gate-3' });
+    expect(getWhereAmI()).toEqual({ venueId: 'intuit-dome', facilityId: 'main-entrance' });
     expect(validWhere({ venueId: 'sofi', facilityId: 'gone' })).toEqual({ venueId: 'sofi', facilityId: null });
     expect(validWhere({ venueId: 'gone' })).toEqual(DEFAULT_WHERE);
     expect(validWhere('{bad')).toEqual(DEFAULT_WHERE);

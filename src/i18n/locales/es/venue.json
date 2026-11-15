@@ -128,7 +128,13 @@
     "family_room": "Sala familiar",
     "long_lines_halftime": "Filas largas en el descanso",
     "wheelchair_loans": "Préstamo de sillas de ruedas",
-    "permit_needed": "Requiere permiso"
+    "permit_needed": "Requiere permiso",
+    "wheelchair_escort": "Acompañamiento en silla de ruedas",
+    "premium_access": "VIP y premium",
+    "sensory_room": "Sala sensorial",
+    "assistive_listening": "Audición asistida",
+    "lost_items": "Objetos perdidos",
+    "changing_table": "Cambiador"
   },
   "facilityText": {
     "gate-1": {
@@ -193,6 +199,221 @@
       "name": "Estacionamiento Lote C",
       "description": "Estacionamiento accesible con un camino corto y plano hasta la Puerta 2.",
       "location": "Lote sureste"
+    },
+    "entry-3": {
+      "name": "Entrada 3",
+      "description": "Entrada norte. Todas las entradas tienen un camino accesible y acompañamiento gratuito en silla de ruedas.",
+      "location": "Lado norte"
+    },
+    "entry-4": {
+      "name": "Entrada 4",
+      "description": "Entrada norte con un punto de atención de accesibilidad y sillas de espera adentro.",
+      "location": "Lado norte"
+    },
+    "entry-6": {
+      "name": "Entrada 6",
+      "description": "Entrada oeste para boletos VIP y premium.",
+      "location": "Lado oeste"
+    },
+    "entry-8": {
+      "name": "Entrada 8",
+      "description": "Entrada sur con un punto de atención de accesibilidad y sillas de espera adentro.",
+      "location": "Lado sur"
+    },
+    "entry-10": {
+      "name": "Entrada 10",
+      "description": "Entrada sur con un punto de atención de accesibilidad y sillas de espera adentro.",
+      "location": "Lado sur"
+    },
+    "entry-11": {
+      "name": "Entrada 11",
+      "description": "Entrada este para boletos VIP y premium.",
+      "location": "Lado este"
+    },
+    "guest-services-ne": {
+      "name": "Atención al visitante NE",
+      "description": "Preguntas, objetos perdidos, audición asistida, kits sensoriales gratis y una sala sensorial.",
+      "location": "Nivel 3, explanada noreste"
+    },
+    "guest-services-sw": {
+      "name": "Atención al visitante SO",
+      "description": "Dentro del Corona Beach Club. Objetos perdidos, audición asistida, kits sensoriales gratis y una sala sensorial.",
+      "location": "Nivel 3, explanada suroeste"
+    },
+    "first-aid-se": {
+      "name": "Primeros auxilios SE",
+      "description": "Paramédicos en el estadio. Cualquier acomodador o empleado puede llamarlos.",
+      "location": "Nivel 1, explanada sureste"
+    },
+    "first-aid-nw": {
+      "name": "Primeros auxilios NO",
+      "description": "Paramédicos en el estadio. Cualquier acomodador o empleado puede llamarlos.",
+      "location": "Nivel 3, explanada noroeste"
+    },
+    "pedestrian-ramp": {
+      "name": "Rampa peatonal",
+      "description": "La única rampa peatonal del estadio. Llega a todos los niveles excepto el 7.",
+      "location": "Lado sureste, detrás de la zona de anotación"
+    },
+    "lactation-suite": {
+      "name": "Sala de lactancia",
+      "description": "Cabina privada de lactancia Mamava. Hay baños familiares en todos los niveles.",
+      "location": "Nivel 4, sur"
+    },
+    "rideshare-kareem": {
+      "name": "Descenso de viajes compartidos",
+      "description": "Para Uber, Lyft y taxis. La recogida es en Kareem Court y Manchester Boulevard.",
+      "location": "Kareem Court, entre Pincay Drive y Manchester Boulevard"
+    },
+    "accessible-drop-off": {
+      "name": "Descenso accesible",
+      "description": "Para dejar y recoger a personas con discapacidad. Entra por Prairie Avenue hacia el norte y sigue por Arbor Vitae Street.",
+      "location": "District Drive, entre Champions Way y Touchdown Drive"
+    },
+    "brown-zone": {
+      "name": "Zona Marrón",
+      "description": "Estacionamiento más cercano a las Entradas 1–5 y 12. Hay plazas ADA en todos los lotes, por orden de llegada.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "Zona Azul",
+      "description": "Estacionamiento más cercano a las Entradas 7 y 8. Hay plazas ADA en todos los lotes, por orden de llegada.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "Zona Naranja",
+      "description": "Estacionamiento más cercano a las Entradas 10, 11 y 12. Hay plazas ADA en todos los lotes, por orden de llegada.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Entrada Kobe Bryant",
+      "description": "Entrada principal para todos los boletos. Los boletos de pista general (GA FLR) entran por aquí.",
+      "location": "Chick Hearn Ct. (11th St.) esquina con Georgia St."
+    },
+    "star-plaza-entrance": {
+      "name": "Entrada Star Plaza",
+      "description": "Entrada principal para todos los boletos, entre la taquilla y la tienda Team LA.",
+      "location": "Chick Hearn Ct. (11th St.) esquina con Figueroa St."
+    },
+    "figueroa-entrance": {
+      "name": "Entrada Figueroa",
+      "description": "Entrada principal para todos los boletos. Pide aquí acompañamiento gratuito en silla de ruedas.",
+      "location": "12th St. esquina con Figueroa St."
+    },
+    "guest-services-m12": {
+      "name": "Atención al visitante M12",
+      "description": "Preguntas, objetos perdidos, audición asistida, bolsas sensoriales y cojines con peso (se pide identificación).",
+      "location": "Explanada principal, frente al pasillo M12"
+    },
+    "guest-services-u6": {
+      "name": "Atención al visitante U6",
+      "description": "Preguntas, objetos perdidos, bolsas sensoriales y cojines con peso. Aquí te dan el código de la cabina sensorial.",
+      "location": "Explanada superior, frente al pasillo U6"
+    },
+    "first-aid-m3": {
+      "name": "Primeros auxilios M3",
+      "description": "Paramédicos en cada evento, con una zona tranquila adentro.",
+      "location": "Explanada principal, frente al pasillo M3"
+    },
+    "first-aid-u22": {
+      "name": "Primeros auxilios U22",
+      "description": "Paramédicos en cada evento, con una zona tranquila adentro.",
+      "location": "Explanada superior, frente al pasillo U22"
+    },
+    "sensory-pod": {
+      "name": "Cabina sensorial",
+      "description": "Cabina tranquila para una o dos personas, abierta en todos los eventos. Atención al visitante tiene el código.",
+      "location": "Explanada superior, frente al pasillo 3"
+    },
+    "restroom-m23": {
+      "name": "Baño M23",
+      "description": "Baño para todos los géneros con cambiador. Todos los baños son accesibles en silla de ruedas.",
+      "location": "Explanada principal, frente al pasillo M23"
+    },
+    "restroom-u31": {
+      "name": "Baño U31",
+      "description": "Baño para todos los géneros con cambiador. Todos los baños son accesibles en silla de ruedas.",
+      "location": "Explanada superior, frente al pasillo U31"
+    },
+    "rideshare-chick-hearn": {
+      "name": "Viajes compartidos Chick Hearn",
+      "description": "Para subir y bajar de viajes compartidos en la zona blanca (sentido este).",
+      "location": "Chick Hearn Ct., entre L.A. Live Way y Georgia St."
+    },
+    "rideshare-figueroa": {
+      "name": "Viajes compartidos Figueroa",
+      "description": "Para subir y bajar de viajes compartidos en la zona blanca (sentido sur).",
+      "location": "Figueroa St., entre 12th St. y Pico Blvd."
+    },
+    "west-garage-lot-w": {
+      "name": "Garaje Oeste (Lote W)",
+      "description": "Garaje de la arena, con entradas por Chick Hearn Ct. y Georgia St.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "Entrada principal",
+      "description": "Carril GameFace ID a la izquierda y carril Identity Pass a la derecha. Ayuda de movilidad gratis desde el control de seguridad hasta tu asiento.",
+      "location": "En la plaza, junto a Century Blvd. y Prairie Ave."
+    },
+    "vip-entrance": {
+      "name": "Entrada VIP",
+      "description": "Para boletos de suite, club y pista.",
+      "location": "A la izquierda de la entrada principal"
+    },
+    "wall-entrance": {
+      "name": "Entrada de The Wall",
+      "description": "Entrada exclusiva para The Wall.",
+      "location": "A la izquierda de la entrada principal, pasando la entrada VIP"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal, nivel Main",
+      "description": "Atención al visitante: objetos perdidos, audición asistida gratis (se retiene una identificación con foto) y dispositivos OneCourt.",
+      "location": "Nivel Main, cerca de la sección Main 6"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal, nivel Terrace",
+      "description": "Atención al visitante: objetos perdidos y audición asistida gratis (se retiene una identificación con foto).",
+      "location": "Nivel Terrace, cerca de la sección Terrace 18"
+    },
+    "first-aid-main": {
+      "name": "Primeros auxilios, nivel Main",
+      "description": "Paramédicos capacitados en todos los eventos.",
+      "location": "Explanada del nivel Main, Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "Primeros auxilios, nivel Terrace",
+      "description": "Paramédicos capacitados en todos los eventos.",
+      "location": "Explanada del nivel Terrace, Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "Primeros auxilios, cancha",
+      "description": "Paramédicos capacitados en todos los eventos.",
+      "location": "Nivel de cancha, bajo Wall 19, junto al túnel este"
+    },
+    "sensory-room": {
+      "name": "Sala sensorial",
+      "description": "La sala sensorial privada Kaiser Permanente. Hay bolsas sensoriales a pedido.",
+      "location": "Pide indicaciones a un anfitrión de la arena"
+    },
+    "infant-care-room": {
+      "name": "Sala de cuidado infantil",
+      "description": "Sala privada para el cuidado de bebés. Hay baños universales por toda la arena.",
+      "location": "Nivel Main, Main 6"
+    },
+    "mobility-hub": {
+      "name": "Centro de movilidad",
+      "description": "Subida y bajada de viajes compartidos y taxis, zona para dejar a la familia y lanzaderas.",
+      "location": "Garaje Este, nivel 1"
+    },
+    "east-garage": {
+      "name": "Garaje Este",
+      "description": "Estacionamiento estándar; compra el pase con anticipación. Los espacios accesibles se venden por orden de llegada.",
+      "location": "Entrada por 102nd St."
+    },
+    "west-garage": {
+      "name": "Garaje Oeste",
+      "description": "Estacionamiento VIP al otro lado de Prairie Ave.; compra el pase con anticipación.",
+      "location": "Entrada por Prairie Ave."
     }
   },
   "facility": {
@@ -200,6 +421,9 @@
     "wheelchair": "Accesible en silla de ruedas",
     "directions": "Cómo llegar",
     "directionsSoon": "Las indicaciones paso a paso llegarán pronto. {{name}}: {{location}}.",
+    "imHere": "Estoy aquí",
+    "imHereHint": "Usa este lugar como tu ubicación al pedir ayuda",
+    "isHere": "Tu ubicación",
     "reports": "Reportes",
     "results_one": "{{number}} resultado",
     "results_many": "{{number}} de resultados",
