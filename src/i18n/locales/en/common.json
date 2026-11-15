@@ -54,7 +54,18 @@
   "media": {
     "addPicture": "Add picture",
     "changePicture": "Change picture",
-    "holdToSpeak": "Or hold to speak"
+    "holdToSpeak": "Or hold to speak",
+    "tapToSpeak": "Or tap to speak",
+    "listening": "Listening… tap to stop",
+    "voiceStarted": "Listening. Speak now.",
+    "voiceStopped": "Stopped listening.",
+    "voiceEnglish": "Voice input in {{language}} isn’t available here. Listening in English.",
+    "voiceUnavailable": "Voice input isn’t available here. Type instead.",
+    "voiceDeniedIos": "Microphone is off. Turn on Microphone and Speech Recognition in Settings > VenU.",
+    "voiceDeniedAndroid": "Microphone is off. Turn it on in Settings > Apps > VenU > Permissions.",
+    "voiceDeniedWeb": "Microphone is blocked. Allow it in your browser’s site settings, then try again.",
+    "voiceNoSpeech": "Didn’t catch that. Tap and speak again.",
+    "voiceFailed": "Voice input stopped. Try again, or type instead."
   },
   "form": {
     "optionalTitle": "{{title}} <muted>(optional)</muted>",

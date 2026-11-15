@@ -30,7 +30,6 @@
     "question": "Saan mo kailangan ng tulong?",
     "notePlaceholder": "hal. Naipit ako malapit sa ramp 2",
     "photoOff": "Naka-off ang access sa larawan. I-on ito sa Settings.",
-    "voiceSoon": "Malapit nang dumating ang voice note. Mag-type muna ng note.",
     "pickOne": "Pumili ng kahit isang bagay na kailangan mo ng tulong.",
     "send": "Ipadala ang Request"
   },
@@ -105,8 +104,7 @@
     "messageTo": "Mensahe kay {{name}}",
     "stickers": "Stickers",
     "stickersSoon": "Malapit nang dumating ang stickers.",
-    "record": "Mag-record ng voice message",
-    "voiceSoon": "Malapit nang dumating ang voice message."
+    "record": "Magsalita ng mensahe"
   },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",

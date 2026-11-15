@@ -55,7 +55,18 @@
   "media": {
     "addPicture": "Adicionar foto",
     "changePicture": "Trocar foto",
-    "holdToSpeak": "Segure para falar"
+    "holdToSpeak": "Segure para falar",
+    "tapToSpeak": "Ou toque para falar",
+    "listening": "Ouvindo… toque para parar",
+    "voiceStarted": "Ouvindo. Fale agora.",
+    "voiceStopped": "Parou de ouvir.",
+    "voiceEnglish": "A entrada por voz em {{language}} não está disponível aqui. Ouvindo em inglês.",
+    "voiceUnavailable": "A entrada por voz não está disponível aqui. Digite em vez disso.",
+    "voiceDeniedIos": "O microfone está desativado. Ative Microfone e Reconhecimento de Fala em Ajustes > VenU.",
+    "voiceDeniedAndroid": "O microfone está desativado. Ative em Configurações > Apps > VenU > Permissões.",
+    "voiceDeniedWeb": "O microfone está bloqueado. Permita nas configurações do site no navegador e tente de novo.",
+    "voiceNoSpeech": "Não entendi. Toque e fale de novo.",
+    "voiceFailed": "A entrada por voz parou. Tente de novo ou digite."
   },
   "form": {
     "optionalTitle": "{{title}} <muted>(opcional)</muted>",

@@ -30,7 +30,6 @@
     "question": "어떤 도움이 필요하세요?",
     "notePlaceholder": "예: 2번 경사로 근처에서 못 움직여요",
     "photoOff": "사진 접근이 꺼져 있어요. 설정에서 켜 주세요.",
-    "voiceSoon": "음성 메모는 곧 지원돼요. 지금은 메모를 입력해 주세요.",
     "pickOne": "필요한 도움을 하나 이상 선택하세요.",
     "send": "요청 보내기"
   },
@@ -104,8 +103,7 @@
     "messageTo": "{{name}} 님에게 메시지",
     "stickers": "스티커",
     "stickersSoon": "스티커는 곧 지원돼요.",
-    "record": "음성 메시지 녹음",
-    "voiceSoon": "음성 메시지는 곧 지원돼요."
+    "record": "음성으로 메시지 입력"
   },
   "bubble": {
     "mine": "나, {{time}}: {{text}}",

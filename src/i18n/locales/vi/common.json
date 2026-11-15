@@ -53,7 +53,18 @@
   "media": {
     "addPicture": "Thêm ảnh",
     "changePicture": "Đổi ảnh",
-    "holdToSpeak": "Hoặc giữ để nói"
+    "holdToSpeak": "Hoặc giữ để nói",
+    "tapToSpeak": "Hoặc chạm để nói",
+    "listening": "Đang nghe… chạm để dừng",
+    "voiceStarted": "Đang nghe. Hãy nói.",
+    "voiceStopped": "Đã dừng nghe.",
+    "voiceEnglish": "Không dùng được nhập giọng nói bằng {{language}} ở đây. Đang nghe bằng tiếng Anh.",
+    "voiceUnavailable": "Không dùng được nhập giọng nói ở đây. Hãy nhập chữ.",
+    "voiceDeniedIos": "Micrô đang tắt. Hãy bật Micrô và Nhận dạng giọng nói trong Cài đặt > VenU.",
+    "voiceDeniedAndroid": "Micrô đang tắt. Hãy bật trong Cài đặt > Ứng dụng > VenU > Quyền.",
+    "voiceDeniedWeb": "Micrô đang bị chặn. Hãy cho phép trong cài đặt trang web của trình duyệt rồi thử lại.",
+    "voiceNoSpeech": "Chưa nghe rõ. Chạm và nói lại.",
+    "voiceFailed": "Nhập giọng nói đã dừng. Hãy thử lại hoặc nhập chữ."
   },
   "form": {
     "optionalTitle": "{{title}} <muted>(không bắt buộc)</muted>",

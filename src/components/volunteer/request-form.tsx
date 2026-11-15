@@ -11,6 +11,7 @@ import { isolatedLanguageName, languageName } from '@/features/profile/options';
 import { HELP_TYPES, mockLocation } from '@/features/volunteer/mock';
 import { EMPTY_DRAFT, volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpTypeId, RequestDraft, RequestState } from '@/features/volunteer/types';
+import { useDictation } from '@/features/voice/use-dictation';
 import { useT } from '@/i18n';
 
 import { EmergencyCard } from './emergency-card';
@@ -18,6 +19,9 @@ import { HelpCard } from './help-card';
 import { Hint, useHint } from './hint';
 import { NoteBanner } from './note-banner';
 import { NoteBox } from './note-box';
+
+/** NoteBox's maxLength; dictation can run past it, so it's cut here too. */
+const NOTE_MAX = 500;
 
 interface RequestFormProps {
   visitorName: string;
@@ -35,7 +39,10 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   const [error, setError] = useState<string | null>(null);
   const { hint, show } = useHint();
   const t = useT('volunteer');
+  const tc = useT('common');
   const location = mockLocation();
+  // Tap to dictate into the note (added after what's typed); tap again to stop.
+  const dictation = useDictation({ onText: text => edit({ note: text.slice(0, NOTE_MAX) }), onNote: show });
 
   function toggle(id: HelpTypeId) {
     setError(null);
@@ -51,6 +58,7 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 
   function send() {
     if (!helpTypes.length) return setError(t('form.pickOne'));
+    dictation.abort();
     volunteerRequests.dismissNotice();
     // Ordered as on screen, so the volunteer sees the same list.
     const ordered = HELP_TYPES.filter(id => helpTypes.includes(id));
@@ -105,7 +113,9 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         photoUri={photoUri}
         onAddPicture={addPicture}
         onRemovePicture={() => edit({ photoUri: null })}
-        onSpeak={() => show(t('form.voiceSoon'))}
+        onSpeak={() => dictation.toggle(note)}
+        speakLabel={tc('media.tapToSpeak')}
+        listening={dictation.listening}
       />
       <Hint text={hint} />
 
