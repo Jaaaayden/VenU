@@ -88,9 +88,10 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
   const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
-  const official = useMemo(() => officialMapFor(venue.id), [venue.id]);
+  const official = officialMapFor(venue.id); // the same object per venue
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  // An interactive official map needs the room: start with the sheet lowered to its peek.
+  // An interactive official map needs the room: start with the sheet lowered to its peek. Chosen
+  // once per mount; the route keys this screen by venue, so a new venue starts fresh.
   const [snap, setSnap] = useState<SheetSnap>(official?.kind === 'embed' ? 'down' : 'mid');
   const [box, setBox] = useState({ w: 0, h: 0 });
   // Set by the facility card after a submit; the list and other facilities clear it.
@@ -161,6 +162,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: top.get() }] }));
   // Keep the stadium centred in the strip of map above the sheet.
   const mapStyle = useAnimatedStyle(() => ({ transform: [{ translateY: Math.min((top.get() - snaps.get()[2]) / 2, 0) }] }));
+  // An official map fills the strip above the sheet, following it frame by frame while dragged.
+  const officialStyle = useAnimatedStyle(() => ({ height: Math.max(top.get(), 0) }));
 
   const pickCategory = useCallback((c: FacilityCategory | null) => {
     setCategory(c);
@@ -204,10 +207,9 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
           {box.w > 0 ? (
             <>
               {official ? (
-                // Fills the strip above the sheet; resizes when the sheet settles at a new height.
-                <View style={[styles.map, { height: positions[snap] }]}>
+                <Animated.View style={[styles.map, officialStyle]}>
                   <OfficialMapPanel map={official} />
-                </View>
+                </Animated.View>
               ) : (
                 <Animated.View style={[styles.map, mapStyle]}>
                   <StadiumMap

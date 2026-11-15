@@ -8,5 +8,6 @@ export default function VenueLayout() {
   const { venueId } = useLocalSearchParams<{ venueId: string }>();
   const venue = getVenue(venueId);
   if (!venue) return <Redirect href="/venue" />;
-  return <VenueMapScreen venue={venue} />;
+  // Keyed so another venue mounts a fresh screen (its own sheet height, category, map).
+  return <VenueMapScreen key={venue.id} venue={venue} />;
 }
