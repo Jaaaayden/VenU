@@ -1,7 +1,9 @@
 // The seam between the volunteer flow and the matching service. The app talks only to
 // `VolunteerBackend`; `createMockBackend()` fakes it on the device. A Supabase version (matching owned
 // by Krisha) implements the same interface and is swapped in where the store is created.
-import { greetingFrom, mockReply, MOCK_VOLUNTEERS } from './mock';
+import { chatLanguage } from '@/features/translate/languages';
+
+import { greetingFrom, mockReply, MOCK_VOLUNTEERS, mockTextLanguage } from './mock';
 import type { ChatMessage, Feedback, HelpRequest, Match, ProblemReport } from './types';
 
 export interface VolunteerBackend {
@@ -9,6 +11,11 @@ export interface VolunteerBackend {
   findVolunteer(request: HelpRequest, signal: AbortSignal): Promise<Match>;
   cancelRequest(requestId: string): Promise<void>;
   sendMessage(requestId: string, text: string): Promise<void>;
+  /**
+   * Picks a matched request back up after an app restart (the store calls it before listening), so
+   * the service knows who is on the other end. Optional: a server-side service already knows.
+   */
+  resume?(requestId: string, match: Match): void;
   /** Volunteer messages for a request, as they arrive. Returns an unsubscribe function. */
   onMessage(requestId: string, listener: (message: ChatMessage) => void): () => void;
   /**
@@ -45,6 +52,8 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
   const typingListeners = new Map<string, Set<(typing: boolean) => void>>();
   /** Replies scheduled but not sent yet, per request: the volunteer is "typing" while any are. */
   const pending = new Map<string, number>();
+  /** The language the matched volunteer's lines are in, per request (kept in the saved Match too). */
+  const langs = new Map<string, string>();
 
   function notifyTyping(requestId: string) {
     const typing = (pending.get(requestId) ?? 0) > 0;
@@ -52,7 +61,8 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
   }
 
   function emit(requestId: string, text: string) {
-    const message: ChatMessage = { id: newId('msg'), from: 'volunteer', text, sentAt: Date.now() };
+    const lang = langs.get(requestId);
+    const message: ChatMessage = { id: newId('msg'), from: 'volunteer', text, sentAt: Date.now(), ...(lang ? { lang } : {}) };
     listeners.get(requestId)?.forEach(l => l(message));
   }
 
@@ -83,9 +93,10 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
         if (signal.aborted) return reject(abortError());
         const t = setTimeout(() => {
           const volunteer = MOCK_VOLUNTEERS.find(v => v.languages.includes(request.language)) ?? MOCK_VOLUNTEERS[0]!;
+          langs.set(request.id, mockTextLanguage(volunteer));
           // Like a real volunteer, say hello once matched.
           replyLater(request.id, timing.greeting, greetingFrom(volunteer, request.visitorName, request.location.spot));
-          resolve({ volunteer, etaMinutes: 2, distanceFeet: 180 });
+          resolve({ volunteer, language: chatLanguage(volunteer.languages), etaMinutes: 2, distanceFeet: 180 });
         }, timing.search);
         signal.addEventListener('abort', () => { clearTimeout(t); reject(abortError()); }, { once: true });
       });
@@ -97,7 +108,10 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
     async sendMessage(requestId) {
       const i = replyIndex.get(requestId) ?? 0;
       replyIndex.set(requestId, i + 1);
-      replyLater(requestId, timing.reply, mockReply(i));
+      replyLater(requestId, timing.reply, mockReply(i, langs.get(requestId)));
+    },
+    resume(requestId, match) {
+      langs.set(requestId, mockTextLanguage(match.volunteer));
     },
     onMessage(requestId, listener) {
       const set = listeners.get(requestId) ?? new Set();

@@ -110,9 +110,29 @@
     "stickersSoon": "الملصقات قريبًا.",
     "record": "إملاء رسالة"
   },
+  "translation": {
+    "translatedFrom": "مترجمة من {{language}}",
+    "translated": "مترجمة",
+    "partial": "تُرجم الجزء الأول فقط من {{language}}",
+    "originalIn": "الأصل باللغة {{language}}",
+    "original": "الأصل",
+    "showOriginal": "عرض الأصل",
+    "showOriginalLabel": "عرض الرسالة الأصلية",
+    "showTranslation": "عرض الترجمة",
+    "showTranslationLabel": "عرض الرسالة المترجمة",
+    "translating": "جارٍ الترجمة…",
+    "failed": "تعذّرت الترجمة",
+    "tryAgain": "أعد المحاولة",
+    "tryAgainLabel": "أعد محاولة ترجمة هذه الرسالة",
+    "unsupported": "الترجمة إلى {{language}} غير متاحة بعد",
+    "notSetUp": "لم يتم إعداد الترجمة بعد",
+    "willSeeIn": "سيرى {{name}} هذه الرسالة مترجمة إلى {{language}}",
+    "readsLanguage": "يقرأ {{name}} باللغة {{language}}"
+  },
   "bubble": {
     "mine": "أنت، {{time}}: {{text}}",
     "theirs": "المتطوع، {{time}}: {{text}}",
+    "theirsTranslated": "المتطوع، {{time}}: {{text}} (مترجمة من {{language}})",
     "listen": "استمع",
     "listenLabel": "استمع إلى هذه الرسالة"
   },

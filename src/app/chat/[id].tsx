@@ -97,13 +97,18 @@ export default function ChatScreen() {
           {messages.length === 0 ? (
             <Text style={styles.empty}>{t('chat.empty', { name: v.firstName })}</Text>
           ) : (
-            messages.map((m, i) => (
+            messages.map((m, i, all) => (
               <Fragment key={m.id}>
                 {/* A day/time line only where the conversation paused for more than 10 minutes. */}
                 {i > 0 && needsSeparator(messages[i - 1]!.sentAt, m.sentAt) ? (
                   <Text style={styles.separator}>{formatDayTime(m.sentAt)}</Text>
                 ) : null}
-                <ChatBubble message={m} onListen={() => show(t('chat.listenSoon'))} />
+                <ChatBubble
+                  message={m}
+                  // Under your latest message: who reads it, and in which language.
+                  recipient={m.from === 'me' && !all.slice(i + 1).some(n => n.from === 'me') ? { name: v.firstName, language: match.language } : null}
+                  onListen={() => show(t('chat.listenSoon'))}
+                />
               </Fragment>
             ))
           )}

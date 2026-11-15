@@ -257,6 +257,40 @@ describe('volunteer request store', () => {
       expect(after.getState().messages.map(m => m.from)).toEqual(['volunteer', 'me', 'me', 'volunteer']);
     });
 
+    it('keeps the volunteer writing in their language, tagged, after a restart in another UI language', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest({ ...rosaNeedsHelp, language: 'es' });
+      await advance(TIMING.search + TIMING.greeting);
+      await done;
+      expect(before.getState().match?.language).toBe('en');
+
+      await i18n.changeLanguage('es');
+      try {
+        const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+        await after.setUser('rosa');
+        expect(after.getState().match?.language).toBe('en');
+        after.sendMessage('¿Estás cerca?');
+        await advance(TIMING.reply);
+        expect(after.getState().messages.at(-1)).toMatchObject({ from: 'volunteer', text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+      } finally {
+        await i18n.changeLanguage('en');
+      }
+    });
+
+    it('fills in the volunteer’s language for a request saved before it was stored', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      const raw = JSON.parse(storage.data.get(KEY)!);
+      delete raw.state.match.language;
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.match?.language).toBe('en');
+    });
+
     it('resumes a search that was in progress', async () => {
       const storage = memoryStorage();
       const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
@@ -326,17 +360,42 @@ describe('the mock volunteer in another language', () => {
     await i18n.changeLanguage('en');
   });
 
-  it('greets and replies in the UI language', async () => {
+  // The chat translates for the reader; the volunteer writes as they would, in their main language.
+  it('greets and replies in the volunteer’s own language, tagged with it', async () => {
     await i18n.changeLanguage('es');
     const store = setup();
-    void store.sendRequest({ ...rosaNeedsHelp, location: mockLocation() });
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es', location: mockLocation() });
     await advance(TIMING.search + TIMING.greeting);
-    expect(store.getState().messages[0]!.text).toBe(
-      '¡Hola, Rosa! Soy Daniel, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: Cerca de la rampa de la Puerta 2.',
-    );
+    expect(store.getState().match?.volunteer.firstName).toBe('Daniel');
+    expect(store.getState().messages[0]).toMatchObject({
+      text: "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+      lang: 'en',
+    });
     store.sendMessage('Gracias');
     await advance(TIMING.reply);
-    expect(store.getState().messages.at(-1)!.text).toBe('¡Entendido, gracias! Llego en un par de minutos.');
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+  });
+
+  it('tags your messages with your chat language once it is known', async () => {
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es' });
+    await advance(TIMING.search);
+    store.sendMessage('Hola');
+    expect(store.getState().messages.at(-1)).not.toHaveProperty('lang');
+    store.setLanguage('es');
+    store.sendMessage('Estoy aquí');
+    expect(store.getState().messages.at(-1)).toMatchObject({ from: 'me', text: 'Estoy aquí', lang: 'es' });
+  });
+
+  it('has a Korean-speaking volunteer write in Korean', async () => {
+    await i18n.changeLanguage('ko');
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'ko', location: mockLocation() });
+    await advance(TIMING.search + TIMING.greeting);
+    expect(store.getState().match?.volunteer.firstName).toBe('Min-ji');
+    store.sendMessage('감사합니다');
+    await advance(TIMING.reply);
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: '알겠어요, 감사합니다! 몇 분 안에 도착해요.', lang: 'ko' });
   });
 });
 

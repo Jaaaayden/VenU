@@ -106,9 +106,29 @@
     "stickersSoon": "Սթիքերները շուտով։",
     "record": "Թելադրել հաղորդագրություն"
   },
+  "translation": {
+    "translatedFrom": "Թարգմանված է (բնագիրը՝ {{language}})",
+    "translated": "Թարգմանված է",
+    "partial": "Թարգմանված է միայն սկիզբը (բնագիրը՝ {{language}})",
+    "originalIn": "Բնագիրը՝ {{language}}",
+    "original": "Բնագիր",
+    "showOriginal": "Ցույց տալ բնագիրը",
+    "showOriginalLabel": "Ցույց տալ բնօրինակ հաղորդագրությունը",
+    "showTranslation": "Ցույց տալ թարգմանությունը",
+    "showTranslationLabel": "Ցույց տալ թարգմանված հաղորդագրությունը",
+    "translating": "Թարգմանվում է…",
+    "failed": "Չհաջողվեց թարգմանել",
+    "tryAgain": "Կրկին փորձել",
+    "tryAgainLabel": "Կրկին փորձել թարգմանել այս հաղորդագրությունը",
+    "unsupported": "Թարգմանությունը ({{language}}) դեռ հասանելի չէ",
+    "notSetUp": "Թարգմանությունը դեռ կարգավորված չէ",
+    "willSeeIn": "{{name}}-ը սա կտեսնի թարգմանված (լեզուն՝ {{language}})",
+    "readsLanguage": "{{name}}-ը կարդում է՝ {{language}}"
+  },
   "bubble": {
     "mine": "Դուք, {{time}}՝ {{text}}",
     "theirs": "Կամավոր, {{time}}՝ {{text}}",
+    "theirsTranslated": "Կամավոր, {{time}}՝ {{text}} (թարգմանված է, բնագիրը՝ {{language}})",
     "listen": "լսել",
     "listenLabel": "Լսել այս հաղորդագրությունը"
   },

@@ -6,6 +6,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
+import { chatLanguage } from '@/features/translate/languages';
 import i18n from '@/i18n';
 
 import { createMockBackend, newId, type VolunteerBackend } from './backend';
@@ -125,7 +126,8 @@ export function parseSaved(raw: string | null, userId: string): RequestState | n
     ...INITIAL_STATE,
     status: s.status,
     request: s.request ? { ...s.request, photoUri: livePhoto(s.request.photoUri) } : null,
-    match: s.match ?? null,
+    // Saved before Match had `language`: work it out the same way the matcher does.
+    match: s.match ? { ...s.match, language: s.match.language ?? chatLanguage(s.match.volunteer?.languages ?? []) } : null,
     messages: s.messages,
     unread: typeof s.unread === 'number' ? s.unread : 0,
     draft: s.draft ? { ...EMPTY_DRAFT, ...s.draft, photoUri: livePhoto(s.draft.photoUri) } : null,
@@ -143,6 +145,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
   let restored = !persist;
   /** Bumped by every reset, so a restore that finishes after one is dropped. */
   let generation = 0;
+  /** The language the signed-in visitor writes in, tagged on sent messages (see setLanguage). */
+  let senderLanguage: string | null = null;
   /** Storage writes, chained so they land in order. */
   let writes: Promise<unknown> = Promise.resolve();
 
@@ -223,7 +227,10 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       dispatch({ type: 'restore', state: saved });
       // Pick up where it left off: keep waiting for a volunteer, or keep listening to the chat.
       if (saved.status === 'searching' && saved.request) void runSearch(saved.request);
-      else if (saved.status === 'matched' && saved.request) listen(saved.request.id);
+      else if (saved.status === 'matched' && saved.request && saved.match) {
+        backend.resume?.(saved.request.id, saved.match);
+        listen(saved.request.id);
+      }
     } catch {
       // Unreadable storage: start from the empty form.
     } finally {
@@ -277,7 +284,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const body = text.trim();
       const id = state.request?.id;
       if (!body || !id || state.status !== 'matched') return;
-      dispatch({ type: 'send', message: { id: newId('msg'), from: 'me', text: body, sentAt: Date.now() } });
+      const lang = senderLanguage ? { lang: senderLanguage } : {};
+      dispatch({ type: 'send', message: { id: newId('msg'), from: 'me', text: body, sentAt: Date.now(), ...lang } });
       backend.sendMessage(id, body).catch(() => {});
     },
 
@@ -322,6 +330,11 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     },
 
     reset,
+
+    /** The visitor's chat language (e.g. 'es'), so their messages carry it for the volunteer's translation. */
+    setLanguage(lang: string | null) {
+      senderLanguage = lang;
+    },
 
     /**
      * Called as the session changes. Signing out (null) or another user signing in resets and

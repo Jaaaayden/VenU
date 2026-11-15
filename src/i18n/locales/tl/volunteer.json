@@ -106,9 +106,29 @@
     "stickersSoon": "Malapit nang dumating ang stickers.",
     "record": "Magsalita ng mensahe"
   },
+  "translation": {
+    "translatedFrom": "Isinalin mula sa {{language}}",
+    "translated": "Isinalin",
+    "partial": "Ang unang bahagi lang ang isinalin mula sa {{language}}",
+    "originalIn": "Orihinal sa {{language}}",
+    "original": "Orihinal",
+    "showOriginal": "Ipakita ang orihinal",
+    "showOriginalLabel": "Ipakita ang orihinal na mensahe",
+    "showTranslation": "Ipakita ang salin",
+    "showTranslationLabel": "Ipakita ang isinaling mensahe",
+    "translating": "Isinasalin…",
+    "failed": "Hindi naisalin",
+    "tryAgain": "Subukang muli",
+    "tryAgainLabel": "Subukang isalin muli ang mensaheng ito",
+    "unsupported": "Hindi pa available ang pagsasalin sa {{language}}",
+    "notSetUp": "Hindi pa naka-set up ang pagsasalin",
+    "willSeeIn": "Makikita ito ni {{name}} na isinalin sa {{language}}",
+    "readsLanguage": "{{language}} ang binabasa ni {{name}}"
+  },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",
     "theirs": "Volunteer, {{time}}: {{text}}",
+    "theirsTranslated": "Volunteer, {{time}}: {{text}} (isinalin mula sa {{language}})",
     "listen": "pakinggan",
     "listenLabel": "Pakinggan ang mensaheng ito"
   },

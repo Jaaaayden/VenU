@@ -45,6 +45,8 @@ export interface Volunteer {
 /** What the backend returns once someone accepts the request. */
 export interface Match {
   volunteer: Volunteer;
+  /** The language the volunteer reads and writes chat in, e.g. 'en' (chatLanguage of their languages). */
+  language: string;
   etaMinutes: number;
   distanceFeet: number;
 }
@@ -54,6 +56,8 @@ export interface ChatMessage {
   from: 'me' | 'volunteer';
   text: string;
   sentAt: number;
+  /** Language the sender wrote in, when known (e.g. 'en'). Lets the reader skip translating their own language. */
+  lang?: string;
 }
 
 export type FeedbackTag = 'language' | 'venue' | 'patient' | 'fast' | 'helpful' | 'other';

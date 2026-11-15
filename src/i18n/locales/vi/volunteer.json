@@ -105,9 +105,29 @@
     "stickersSoon": "Nhãn dán sắp ra mắt.",
     "record": "Nói tin nhắn"
   },
+  "translation": {
+    "translatedFrom": "Dịch từ {{language}}",
+    "translated": "Đã dịch",
+    "partial": "Đã dịch phần đầu từ {{language}}",
+    "originalIn": "Bản gốc bằng {{language}}",
+    "original": "Bản gốc",
+    "showOriginal": "Xem bản gốc",
+    "showOriginalLabel": "Xem tin nhắn gốc",
+    "showTranslation": "Xem bản dịch",
+    "showTranslationLabel": "Xem tin nhắn đã dịch",
+    "translating": "Đang dịch…",
+    "failed": "Không dịch được",
+    "tryAgain": "Thử lại",
+    "tryAgainLabel": "Thử dịch lại tin nhắn này",
+    "unsupported": "Chưa hỗ trợ dịch sang {{language}}",
+    "notSetUp": "Chưa thiết lập tính năng dịch",
+    "willSeeIn": "{{name}} sẽ thấy tin này được dịch sang {{language}}",
+    "readsLanguage": "{{name}} đọc {{language}}"
+  },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",
     "theirs": "Tình nguyện viên, {{time}}: {{text}}",
+    "theirsTranslated": "Tình nguyện viên, {{time}}: {{text}} (dịch từ {{language}})",
     "listen": "nghe",
     "listenLabel": "Nghe tin nhắn này"
   },

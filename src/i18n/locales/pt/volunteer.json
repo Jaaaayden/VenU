@@ -107,9 +107,29 @@
     "stickersSoon": "Figurinhas em breve.",
     "record": "Ditar uma mensagem"
   },
+  "translation": {
+    "translatedFrom": "Traduzido do {{language}}",
+    "translated": "Traduzido",
+    "partial": "Primeira parte traduzida do {{language}}",
+    "originalIn": "Original em {{language}}",
+    "original": "Original",
+    "showOriginal": "Ver original",
+    "showOriginalLabel": "Ver a mensagem original",
+    "showTranslation": "Ver tradução",
+    "showTranslationLabel": "Ver a mensagem traduzida",
+    "translating": "Traduzindo…",
+    "failed": "Não foi possível traduzir",
+    "tryAgain": "Tentar de novo",
+    "tryAgainLabel": "Tentar traduzir esta mensagem de novo",
+    "unsupported": "A tradução para {{language}} ainda não está disponível",
+    "notSetUp": "A tradução ainda não está configurada",
+    "willSeeIn": "{{name}} verá isto traduzido para o {{language}}",
+    "readsLanguage": "{{name}} lê em {{language}}"
+  },
   "bubble": {
     "mine": "Você, {{time}}: {{text}}",
     "theirs": "Voluntário, {{time}}: {{text}}",
+    "theirsTranslated": "Voluntário, {{time}}: {{text}} (traduzido do {{language}})",
     "listen": "ouvir",
     "listenLabel": "Ouvir esta mensagem"
   },

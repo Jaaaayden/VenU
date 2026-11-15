@@ -107,9 +107,29 @@
     "stickersSoon": "Los stickers llegarán pronto.",
     "record": "Dictar un mensaje"
   },
+  "translation": {
+    "translatedFrom": "Traducido del {{language}}",
+    "translated": "Traducido",
+    "partial": "Primera parte traducida del {{language}}",
+    "originalIn": "Original en {{language}}",
+    "original": "Original",
+    "showOriginal": "Ver original",
+    "showOriginalLabel": "Ver el mensaje original",
+    "showTranslation": "Ver traducción",
+    "showTranslationLabel": "Ver el mensaje traducido",
+    "translating": "Traduciendo…",
+    "failed": "No se pudo traducir",
+    "tryAgain": "Reintentar",
+    "tryAgainLabel": "Volver a traducir este mensaje",
+    "unsupported": "La traducción al {{language}} aún no está disponible",
+    "notSetUp": "La traducción aún no está configurada",
+    "willSeeIn": "{{name}} lo verá traducido al {{language}}",
+    "readsLanguage": "{{name}} lee en {{language}}"
+  },
   "bubble": {
     "mine": "Tú, {{time}}: {{text}}",
     "theirs": "Voluntario, {{time}}: {{text}}",
+    "theirsTranslated": "Voluntario, {{time}}: {{text}} (traducido del {{language}})",
     "listen": "escuchar",
     "listenLabel": "Escuchar este mensaje"
   },

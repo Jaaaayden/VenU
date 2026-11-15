@@ -105,9 +105,29 @@
     "stickersSoon": "스티커는 곧 지원돼요.",
     "record": "음성으로 메시지 입력"
   },
+  "translation": {
+    "translatedFrom": "{{language}}에서 번역됨",
+    "translated": "번역됨",
+    "partial": "앞부분만 {{language}}에서 번역됨",
+    "originalIn": "원문({{language}})",
+    "original": "원문",
+    "showOriginal": "원문 보기",
+    "showOriginalLabel": "원래 메시지 보기",
+    "showTranslation": "번역 보기",
+    "showTranslationLabel": "번역된 메시지 보기",
+    "translating": "번역 중…",
+    "failed": "번역하지 못했어요",
+    "tryAgain": "다시 시도",
+    "tryAgainLabel": "이 메시지 다시 번역하기",
+    "unsupported": "{{language}} 번역은 아직 지원되지 않아요",
+    "notSetUp": "번역이 아직 설정되지 않았어요",
+    "willSeeIn": "{{name}} 님에게는 {{language}}로 번역되어 보여요",
+    "readsLanguage": "{{name}} 님은 {{language}}를 사용해요"
+  },
   "bubble": {
     "mine": "나, {{time}}: {{text}}",
     "theirs": "자원봉사자, {{time}}: {{text}}",
+    "theirsTranslated": "자원봉사자, {{time}}: {{text}} ({{language}}에서 번역됨)",
     "listen": "듣기",
     "listenLabel": "이 메시지 듣기"
   },

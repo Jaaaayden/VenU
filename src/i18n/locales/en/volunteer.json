@@ -106,9 +106,29 @@
     "stickersSoon": "Stickers are coming soon.",
     "record": "Speak a message"
   },
+  "translation": {
+    "translatedFrom": "Translated from {{language}}",
+    "translated": "Translated",
+    "partial": "First part translated from {{language}}",
+    "originalIn": "Original in {{language}}",
+    "original": "Original",
+    "showOriginal": "Show original",
+    "showOriginalLabel": "Show the original message",
+    "showTranslation": "Show translation",
+    "showTranslationLabel": "Show the translated message",
+    "translating": "Translating…",
+    "failed": "Couldn't translate",
+    "tryAgain": "Try again",
+    "tryAgainLabel": "Try translating this message again",
+    "unsupported": "Translation isn't available for {{language}} yet",
+    "notSetUp": "Translation isn't set up yet",
+    "willSeeIn": "{{name}} will see this translated into {{language}}",
+    "readsLanguage": "{{name}} reads {{language}}"
+  },
   "bubble": {
     "mine": "You, {{time}}: {{text}}",
     "theirs": "Volunteer, {{time}}: {{text}}",
+    "theirsTranslated": "Volunteer, {{time}}: {{text}} (translated from {{language}})",
     "listen": "listen",
     "listenLabel": "Listen to this message"
   },
