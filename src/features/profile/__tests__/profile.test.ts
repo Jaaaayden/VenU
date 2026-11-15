@@ -8,6 +8,7 @@ import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore,
 import { helperSummary, initials } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, withSpokenLanguages, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
+import i18n from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
 const rosa: ProfileDraft = {
@@ -153,8 +154,9 @@ describe('local store', () => {
 });
 
 describe('helperSummary', () => {
+  const t = i18n.getFixedT('en', 'profile');
   it('lists main language first, then needs (visitor)', () => {
-    expect(helperSummary({ ...rosa, communication: ['speaking', 'text'] })).toEqual([
+    expect(helperSummary({ ...rosa, communication: ['speaking', 'text'] }, t)).toEqual([
       'Speaks Spanish, English',
       'Wheelchair user',
       'Prefers text / writing',
@@ -162,7 +164,7 @@ describe('helperSummary', () => {
   });
 
   it('lists languages and training (volunteer)', () => {
-    expect(helperSummary(daniel)).toEqual(['Speaks English, Spanish', 'Wheelchair trained']);
+    expect(helperSummary(daniel, t)).toEqual(['Speaks English, Spanish', 'Wheelchair trained']);
   });
 });
 

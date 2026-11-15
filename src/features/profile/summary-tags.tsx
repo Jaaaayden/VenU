@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Radius, Type } from '@/constants/theme';
+import { useT } from '@/i18n';
 
 import { helperSummary } from './summary';
 
@@ -9,10 +10,11 @@ import { helperSummary } from './summary';
  * Used by both the setup preview and the Profile tab so the two can't drift apart.
  */
 export function SummaryTags({ draft }: { draft: Parameters<typeof helperSummary>[0] }) {
+  const t = useT('profile'); // re-renders on a language switch even when the profile doesn't change
   return (
     <View style={styles.tags}>
-      {helperSummary(draft).map(t => (
-        <Text key={t} style={styles.tag}>{t}</Text>
+      {helperSummary(draft, t).map(tag => (
+        <Text key={tag} style={styles.tag}>{tag}</Text>
       ))}
     </View>
   );

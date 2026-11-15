@@ -14,7 +14,7 @@ import { Checkbox } from '@/features/auth/auth-ui';
 import { useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
-import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, TRAININGS } from './options';
+import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, labeled, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
 import { withSpokenLanguages, type ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
@@ -100,7 +100,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
         {visitor ? (
           <>
             <FormSection title={t('form.accessNeeds')} optional error={errors.accessNeedsNote}>
-              <ChipGroup multiple options={ACCESS_NEEDS} value={d.accessNeeds} onChange={v => set('accessNeeds', v)} accessibilityLabel={t('form.accessNeedsLabel')} />
+              <ChipGroup multiple options={labeled(ACCESS_NEEDS, t)} value={d.accessNeeds} onChange={v => set('accessNeeds', v)} accessibilityLabel={t('form.accessNeedsLabel')} />
               {d.accessNeeds.includes('other') && (
                 <View style={styles.note}>
                   <TextField
@@ -118,30 +118,30 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
 
             {/* Not in Figma, but helpers see it ("Prefers sign language"), so it has to stay editable. */}
             <FormSection title={t('form.communication')} optional hint={t('form.communicationHint')}>
-              <ChipGroup multiple options={COMMUNICATION} value={d.communication} onChange={v => set('communication', v)} accessibilityLabel={t('form.communicationLabel')} />
+              <ChipGroup multiple options={labeled(COMMUNICATION, t)} value={d.communication} onChange={v => set('communication', v)} accessibilityLabel={t('form.communicationLabel')} />
             </FormSection>
 
             <FormSection title={t('form.helperPref')}>
               <LabeledRow label={t('form.gender')}>
-                <ChipGroup options={HELPER_GENDER} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel={t('form.helperGenderLabel')} />
+                <ChipGroup options={labeled(HELPER_GENDER, t)} value={d.helperGenderPref} onChange={v => set('helperGenderPref', v)} accessibilityLabel={t('form.helperGenderLabel')} />
               </LabeledRow>
               <LabeledRow label={t('form.age')}>
-                <ChipGroup options={HELPER_AGE} value={d.helperAgePref} onChange={v => set('helperAgePref', v)} accessibilityLabel={t('form.helperAgeLabel')} />
+                <ChipGroup options={labeled(HELPER_AGE, t)} value={d.helperAgePref} onChange={v => set('helperAgePref', v)} accessibilityLabel={t('form.helperAgeLabel')} />
               </LabeledRow>
             </FormSection>
           </>
         ) : (
           <>
             <FormSection title={t('form.training')} optional hint={t('form.trainingHint')}>
-              <ChipGroup multiple options={TRAININGS} value={d.trainings} onChange={v => set('trainings', v)} accessibilityLabel={t('form.training')} />
+              <ChipGroup multiple options={labeled(TRAININGS, t)} value={d.trainings} onChange={v => set('trainings', v)} accessibilityLabel={t('form.training')} />
             </FormSection>
 
             <FormSection title={t('form.yourGender')} hint={t('form.yourGenderHint')} error={errors.gender}>
-              <ChipGroup options={GENDERS} value={d.gender} onChange={v => set('gender', v)} accessibilityLabel={t('form.yourGender')} />
+              <ChipGroup options={labeled(GENDERS, t)} value={d.gender} onChange={v => set('gender', v)} accessibilityLabel={t('form.yourGender')} />
             </FormSection>
 
             <FormSection title={t('form.yourAge')} hint={t('form.yourAgeHint')} error={errors.ageBand}>
-              <ChipGroup options={AGE_BANDS} value={d.ageBand} onChange={v => set('ageBand', v)} accessibilityLabel={t('form.yourAge')} />
+              <ChipGroup options={labeled(AGE_BANDS, t)} value={d.ageBand} onChange={v => set('ageBand', v)} accessibilityLabel={t('form.yourAge')} />
             </FormSection>
           </>
         )}
