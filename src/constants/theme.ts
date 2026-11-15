@@ -84,3 +84,10 @@ export const Shadow = {
 
 /** Web only: the app renders in a centred column this wide instead of stretching across a desktop. */
 export const WEB_COLUMN_MAX = 520;
+
+/**
+ * Hides the browser's focus ring on text inputs that draw their own focus state. Web only: React
+ * Native's outlineStyle accepts only 'solid' | 'dotted' | 'dashed', so 'none' is invalid on iOS/Android.
+ * e.g. input: { ...Type.input, ...webNoOutline }
+ */
+export const webNoOutline: object = Platform.OS === 'web' ? { outlineStyle: 'none' } : {};

@@ -5,7 +5,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
+import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX, webNoOutline } from '@/constants/theme';
 import { LANGUAGES, languageName, searchLanguages, type Language } from '@/features/profile/options';
 import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT } from '@/i18n';
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   label: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted },
   value: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text },
   placeholder: { color: Colors.textFaint },
-  input: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text, paddingVertical: 0, outlineStyle: 'none' } as object,
+  input: { fontFamily: Fonts.display, fontSize: 16, lineHeight: 22, color: Colors.text, paddingVertical: 0, ...webNoOutline },
   trail: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginEnd: 4 },
   trailSpacer: { width: 52 },
 
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   doneTarget: { minHeight: 44, minWidth: 44, alignItems: 'flex-end', justifyContent: 'center' },
   done: { ...Type.bodyStrong, color: Colors.primary },
   searchBox: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt, paddingStart: 4, marginBottom: Spacing.md },
-  searchInput: { ...Type.input, flex: 1, paddingVertical: 12, paddingEnd: Spacing.lg, outlineStyle: 'none' } as object,
+  searchInput: { ...Type.input, flex: 1, paddingVertical: 12, paddingEnd: Spacing.lg, ...webNoOutline },
   item: { minHeight: 52, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.xs, gap: 2, justifyContent: 'center' },
   sep: { height: 1, backgroundColor: Colors.divider },
 });
