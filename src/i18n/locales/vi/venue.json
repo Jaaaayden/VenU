@@ -204,7 +204,9 @@
   "report": {
     "notFound": "Không tìm thấy báo cáo",
     "kind": "Báo cáo",
+    "authorFallback": "Khán giả VenU",
     "submitted": "Gửi ngày {{date}}",
+    "originalLanguage": "Ngôn ngữ gốc: {{language}}",
     "noBody": "Không có chi tiết."
   },
   "form": {

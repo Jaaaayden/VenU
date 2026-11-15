@@ -206,7 +206,9 @@
   "report": {
     "notFound": "Report not found",
     "kind": "Report",
+    "authorFallback": "VenU visitor",
     "submitted": "Submitted {{date}}",
+    "originalLanguage": "Original language: {{language}}",
     "noBody": "No details added."
   },
   "form": {

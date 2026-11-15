@@ -7,6 +7,7 @@ import { facilitiesFor, matchesCategory, searchFacilities, searchVenues } from '
 import {
   createMemoryReportStore,
   createPersistentReportStore,
+  reportAuthor,
   REPORTS_STORAGE_KEY,
   ReportValidationError,
   SEED_REPORTS,
@@ -58,6 +59,22 @@ describe('memory report store', () => {
     expect((await store.list('sofi', 'gate-2'))[0].id).toBe(saved.id);
     expect(await store.list('coliseum', 'gate-2')).toEqual([]);
     expect(await store.get(saved.id)).toEqual(saved);
+  });
+
+  it('marks the seed reports as English and keeps the language a report was written in', async () => {
+    expect(SEED_REPORTS.every(r => r.language === 'en')).toBe(true);
+    const store = createMemoryReportStore([], { now, makeId });
+    expect((await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', language: 'es', draft: good })).language).toBe('es');
+    expect((await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: 'Rosa', draft: good })).language).toBeUndefined();
+  });
+
+  it('stores no made-up English name; the screen words the fallback author in its language', async () => {
+    const store = createMemoryReportStore([], { now, makeId });
+    const saved = await store.add({ venueId: 'sofi', facilityId: 'gate-2', authorName: '  ', draft: good });
+    expect(saved.authorName).toBe('');
+    expect(reportAuthor(saved, i18n.getFixedT('en', 'venue'))).toBe('VenU visitor');
+    expect(reportAuthor(saved, i18n.getFixedT('es', 'venue'))).toBe('Visitante de VenU');
+    expect(reportAuthor({ authorName: 'Rosa W.' }, i18n.getFixedT('es', 'venue'))).toBe('Rosa W.');
   });
 
   it('rejects an incomplete draft with field errors', async () => {

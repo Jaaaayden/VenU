@@ -206,7 +206,9 @@
   "report": {
     "notFound": "Հաշվետվությունը չի գտնվել",
     "kind": "Հաշվետվություն",
+    "authorFallback": "VenU-ի այցելու",
     "submitted": "Ուղարկվել է {{date}}",
+    "originalLanguage": "Բնօրինակի լեզուն՝ {{language}}",
     "noBody": "Մանրամասներ չկան։"
   },
   "form": {

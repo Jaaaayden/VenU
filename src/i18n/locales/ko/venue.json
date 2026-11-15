@@ -204,7 +204,9 @@
   "report": {
     "notFound": "제보를 찾을 수 없습니다",
     "kind": "제보",
+    "authorFallback": "VenU 관람객",
     "submitted": "{{date}}에 제출됨",
+    "originalLanguage": "원문 언어: {{language}}",
     "noBody": "추가된 내용이 없습니다."
   },
   "form": {

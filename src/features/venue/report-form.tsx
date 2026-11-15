@@ -9,7 +9,7 @@ import { MediaActions } from '@/components/media-actions';
 import { TextField } from '@/components/text-field';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
-import { useT } from '@/i18n';
+import { useT, useUiLanguage } from '@/i18n';
 import { goBack } from '@/lib/navigation';
 
 import {
@@ -28,6 +28,7 @@ import { BackArrow, InlineNote, venueText } from './ui';
 
 export function ReportForm() {
   const t = useT('venue');
+  const { language } = useUiLanguage();
   const { venue, facilities, setSnap } = useVenueScreen();
   const { profile } = useProfile();
   const { facilityId } = useLocalSearchParams<{ facilityId: string }>();
@@ -55,7 +56,7 @@ export function ReportForm() {
     if (Object.keys(found).length) return;
     setSaving(true);
     try {
-      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', draft });
+      const saved = await submitReport({ venueId: venue.id, facilityId, authorName: profile?.firstName ?? '', language, draft });
       router.dismissTo({ ...facilityHref, params: { ...facilityHref.params, submitted: saved.id } });
     } catch (e) {
       if (e instanceof ReportValidationError) setErrors(e.errors);

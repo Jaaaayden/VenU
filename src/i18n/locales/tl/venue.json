@@ -206,7 +206,9 @@
   "report": {
     "notFound": "Hindi nakita ang ulat",
     "kind": "Ulat",
+    "authorFallback": "Bisita ng VenU",
     "submitted": "Ipinadala noong {{date}}",
+    "originalLanguage": "Orihinal na wika: {{language}}",
     "noBody": "Walang idinagdag na detalye."
   },
   "form": {

@@ -210,7 +210,9 @@
   "report": {
     "notFound": "Отзыв не найден",
     "kind": "Отзыв",
+    "authorFallback": "Зритель VenU",
     "submitted": "Отправлено {{date}}",
+    "originalLanguage": "Язык оригинала: {{language}}",
     "noBody": "Без подробностей."
   },
   "form": {

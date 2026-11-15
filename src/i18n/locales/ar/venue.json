@@ -214,7 +214,9 @@
   "report": {
     "notFound": "البلاغ غير موجود",
     "kind": "بلاغ",
+    "authorFallback": "زائر VenU",
     "submitted": "أُرسل في {{date}}",
+    "originalLanguage": "اللغة الأصلية: {{language}}",
     "noBody": "لا توجد تفاصيل."
   },
   "form": {

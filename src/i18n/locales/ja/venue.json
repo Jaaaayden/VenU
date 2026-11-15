@@ -204,7 +204,9 @@
   "report": {
     "notFound": "レポートが見つかりません",
     "kind": "レポート",
+    "authorFallback": "VenUの来場者",
     "submitted": "{{date}} に送信",
+    "originalLanguage": "原文の言語：{{language}}",
     "noBody": "詳細はありません。"
   },
   "form": {

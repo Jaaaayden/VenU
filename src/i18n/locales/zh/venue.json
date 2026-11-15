@@ -204,7 +204,9 @@
   "report": {
     "notFound": "未找到该反馈",
     "kind": "反馈",
+    "authorFallback": "VenU 观众",
     "submitted": "提交于 {{date}}",
+    "originalLanguage": "原文语言：{{language}}",
     "noBody": "未添加详情。"
   },
   "form": {

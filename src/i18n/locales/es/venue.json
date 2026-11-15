@@ -208,7 +208,9 @@
   "report": {
     "notFound": "Reporte no encontrado",
     "kind": "Reporte",
+    "authorFallback": "Visitante de VenU",
     "submitted": "Enviado el {{date}}",
+    "originalLanguage": "Idioma original: {{language}}",
     "noBody": "Sin detalles."
   },
   "form": {

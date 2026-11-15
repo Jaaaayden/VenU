@@ -208,7 +208,9 @@
   "report": {
     "notFound": "Signalement introuvable",
     "kind": "Signalement",
+    "authorFallback": "Spectateur VenU",
     "submitted": "Envoyé le {{date}}",
+    "originalLanguage": "Langue d’origine : {{language}}",
     "noBody": "Aucun détail ajouté."
   },
   "form": {
