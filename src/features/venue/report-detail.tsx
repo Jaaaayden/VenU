@@ -10,7 +10,7 @@ import { useT, useUiLanguage } from '@/i18n';
 import { formatDate } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
-import { reportAuthor, topicLabel, useReport } from './reports';
+import { reportAt, reportAuthor, topicLabel, useReport } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
@@ -20,7 +20,8 @@ export function ReportDetail() {
   const { language: onScreen } = useUiLanguage();
   const { venue, setSnap } = useVenueScreen();
   const { facilityId, reportId } = useLocalSearchParams<{ facilityId: string; reportId: string }>();
-  const report = useReport(reportId);
+  const stored = useReport(reportId);
+  const report = reportAt(stored, venue.id, facilityId);
 
   useEffect(() => { setSnap('up'); }, [setSnap]);
 

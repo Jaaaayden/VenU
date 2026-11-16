@@ -7,6 +7,7 @@ import { facilitiesFor, matchesCategory, searchFacilities, searchVenues } from '
 import {
   createMemoryReportStore,
   createPersistentReportStore,
+  reportAt,
   reportAuthor,
   REPORTS_STORAGE_KEY,
   ReportValidationError,
@@ -83,6 +84,24 @@ describe('memory report store', () => {
     await expect(store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: 'Rosa', draft: { title: '', topic: null, body: '' } }))
       .rejects.toBeInstanceOf(ReportValidationError);
     expect(await store.list('sofi', 'entry-4')).toEqual([]);
+  });
+});
+
+describe('reportAt', () => {
+  const restroom = SEED_REPORTS.find(r => r.id === 'seed-restroom')!;
+
+  it('keeps a report opened under its own facility', () => {
+    expect(reportAt(restroom, 'crypto-arena', 'restroom-m23')).toBe(restroom);
+  });
+
+  it('hides a report linked under another venue or facility', () => {
+    expect(reportAt(restroom, 'sofi', 'entry-4')).toBeNull();
+    expect(reportAt(restroom, 'crypto-arena', 'first-aid-m3')).toBeNull();
+  });
+
+  it('passes loading and missing through', () => {
+    expect(reportAt(undefined, 'sofi', 'entry-4')).toBeUndefined();
+    expect(reportAt(null, 'sofi', 'entry-4')).toBeNull();
   });
 });
 
