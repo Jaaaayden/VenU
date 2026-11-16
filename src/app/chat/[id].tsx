@@ -12,11 +12,13 @@ import { Avatar } from '@/components/avatar';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
+import { useStartAligned } from '@/components/volunteer/start-aligned';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { toggleState } from '@/features/voice/announce';
 import { useDictation } from '@/features/voice/use-dictation';
 import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
-import { useLayoutRtl, useT } from '@/i18n';
+import { languageOf, useLayoutRtl, useT } from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
 import { goBack } from '@/lib/navigation';
 
@@ -34,6 +36,7 @@ export default function ChatScreen() {
   const t = useT('volunteer');
   const tc = useT('common');
   const rtl = useLayoutRtl();
+  const startAligned = useStartAligned(); // "Daniel K." on the start edge in Arabic too
   // The mic dictates into the input for review; voice messages are sent as text.
   const dictation = useDictation({ onText: next => setText(next.slice(0, MESSAGE_MAX)), onNote: show });
   const [finishing, setFinishing] = useState(false);
@@ -74,8 +77,9 @@ export default function ChatScreen() {
           </Pressable>
           <Avatar name={v.firstName} uri={null} size={40} />
           <View style={styles.headerText}>
-            <Text style={styles.name} accessibilityRole="header" numberOfLines={1}>{v.name}</Text>
-            <Text style={styles.away}>{t('chat.away', { minutes: match.etaMinutes })}</Text>
+            <Text style={[styles.name, startAligned]} accessibilityRole="header" numberOfLines={1}>{v.name}</Text>
+            {/* Digits as on "Volunteer found" (۲ in Persian). */}
+            <Text style={[styles.away, startAligned]}>{t('chat.away', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}</Text>
           </View>
           <Pressable
             onPress={() => show(t('chat.callSoon', { name: v.firstName }))}

@@ -15,6 +15,7 @@ import { formatNumber } from '@/i18n/format';
 
 import { MeetMap } from './meet-map';
 import { MessageButton } from './message-button';
+import { useStartAligned } from './start-aligned';
 
 export function MatchView({ request, match, unread }: { request: HelpRequest; match: Match; unread: number }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -28,6 +29,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
   }[v.possessive];
   const openChat = () => router.push({ pathname: '/chat/[id]', params: { id: request.id } });
   const distance = formatDistance(match.distanceFeet, languageOf(t));
+  const startAligned = useStartAligned(); // "Daniel K." on the start edge in Arabic too
 
   return (
     <View style={styles.page}>
@@ -52,8 +54,8 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         <View style={styles.who}>
           <FigmaIcon name="person" size={24} color={Colors.ink} />
           <View style={styles.whoText}>
-            <Text style={styles.name}>{v.name}</Text>
-            <Text style={styles.role}>{t('role')}</Text>
+            <Text style={[styles.name, startAligned]}>{v.name}</Text>
+            <Text style={[styles.role, startAligned]}>{t('role')}</Text>
           </View>
           <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating, undefined, languageOf(t)) })}>
             <FigmaIcon name="star" size={18} color={Colors.warning} />
