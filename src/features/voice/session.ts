@@ -140,10 +140,15 @@ export class DictationSession {
     this.apply({ type: 'edit', text });
   }
 
-  /** The screen is going away: no more callbacks, then abort. */
+  /**
+   * The screen is going away: abort, and go quiet except for one last onCommit, so words still
+   * showing as interim (e.g. the visitor switched tabs mid-sentence) are saved, not lost.
+   */
   dispose(): void {
-    this.cb = SILENT;
+    const { onCommit } = this.cb;
+    this.cb = onCommit ? { ...SILENT, onCommit } : SILENT;
     this.abort();
+    this.cb = SILENT;
   }
 
   private async localeSupport(engine: SpeechEngine): Promise<LocaleSupport> {
