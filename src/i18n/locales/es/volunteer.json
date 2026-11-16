@@ -27,11 +27,24 @@
     "subtitle": "Te pondremos en contacto con alguien cerca",
     "languageLabel": "Ayuda en {{language}}. Cambiar idioma",
     "locationLabel": "Tu ubicación: {{spot}}, {{venue}}",
+    "near": "Cerca de {{place}}",
+    "locationUnset": "Tu ubicación: aún sin elegir, {{venue}}",
+    "whereAreYou": "¿Dónde estás?",
+    "tapToChoose": "Toca para elegir un lugar",
+    "locationHint": "Abre una lista de lugares de {{venue}}",
     "question": "¿Con qué necesitas ayuda?",
     "notePlaceholder": "p. ej., Necesito ayuda en la rampa 2",
     "photoOff": "El acceso a fotos está desactivado. Actívalo en Ajustes.",
     "pickOne": "Elige al menos una cosa con la que necesites ayuda.",
     "send": "Enviar solicitud"
+  },
+  "where": {
+    "title": "¿Dónde estás?",
+    "subtitle": "Elige el lugar más cercano a ti en {{venue}}.",
+    "search": "Buscar lugares",
+    "notSure": "No lo sé",
+    "notSureHint": "El voluntario te preguntará dónde verse",
+    "changeVenue": "Cambiar de sede"
   },
   "note": {
     "label": "Añade una nota <muted>(opcional)</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "Sí, cancelar"
   },
   "map": {
-    "label": "Mapa: {{name}} está a {{distance}} y va hacia ti en la Puerta 2.",
-    "gate": "Puerta 2",
+    "label": "Mapa: {{name}} está a {{distance}} y va hacia ti en {{place}}.",
     "you": "Tú"
   },
   "messages": {
@@ -227,15 +239,10 @@
     "paused": "Las solicitudes están en pausa mientras descansas. Cambia a Libre para ver quién necesita ayuda cerca."
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "Cerca de la rampa de la Puerta 2",
-      "section214": "Pasillo de la sección 214",
-      "mainPlaza": "Plaza de la entrada principal"
-    },
     "greeting": "¡Hola, {{name}}! Soy {{volunteer}}, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: {{spot}}.",
     "greetingNoName": "¡Hola! Soy {{volunteer}}, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: {{spot}}.",
     "reply1": "¡Entendido, gracias! Llego en un par de minutos.",
-    "reply2": "Ya veo la Puerta 2. Llevo un chaleco rosa de LA28.",
+    "reply2": "Ya casi llego. Llevo un chaleco rosa de LA28.",
     "reply3": "No hay problema, tómate tu tiempo. Me quedo contigo."
   }
 }

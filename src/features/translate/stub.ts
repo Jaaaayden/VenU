@@ -1,6 +1,6 @@
 // A fake translator for local and mock modes: offline, deterministic, and only as good as the string
 // tables. It recognizes the mock volunteer's canned chat lines (volunteer `mock.*` in every locale)
-// and answers with the same line from the target locale, names and places filled in. Anything else
+// and facility names (meeting spots), and answers with the same line from the target locale, names and places filled in. Anything else
 // comes back unchanged with `unavailable: true` ("translation unavailable in local mode").
 // Imports only core.ts (with its .ts extension), so scripts/mock-supabase.mjs loads this same file in Node.
 //
@@ -17,6 +17,19 @@ export function flattenStrings(table: Record<string, unknown>, prefix = ''): Rec
   for (const [k, v] of Object.entries(table)) {
     if (typeof v === 'string') out[prefix + k] = v;
     else if (v && typeof v === 'object') Object.assign(out, flattenStrings(v as Record<string, unknown>, `${prefix}${k}.`));
+  }
+  return out;
+}
+
+/**
+ * Facility names from venue `facilityText`, as stub lines, so a meeting spot inside a volunteer's
+ * line is translated too: { 'entry-4': { name: 'Entry 4', … } } → { 'places.entry-4': 'Entry 4' }.
+ */
+export function placeNames(facilityText: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [id, v] of Object.entries(facilityText)) {
+    const name = v && typeof v === 'object' ? (v as { name?: unknown }).name : undefined;
+    if (typeof name === 'string') out[`places.${id}`] = name;
   }
   return out;
 }

@@ -27,11 +27,24 @@
     "subtitle": "我们会为你匹配附近的人",
     "languageLabel": "帮助语言：{{language}}。更改语言",
     "locationLabel": "你的位置：{{spot}}，{{venue}}",
+    "near": "{{place}}附近",
+    "locationUnset": "你的位置：尚未选择，{{venue}}",
+    "whereAreYou": "你在哪里？",
+    "tapToChoose": "点按选择地点",
+    "locationHint": "打开 {{venue}} 的地点列表",
     "question": "你需要什么帮助？",
     "notePlaceholder": "例如：我在 2 号坡道附近过不去",
     "photoOff": "照片访问已关闭。请在“设置”中开启。",
     "pickOne": "请至少选择一项需要的帮助。",
     "send": "发送请求"
+  },
+  "where": {
+    "title": "你在哪里？",
+    "subtitle": "选择 {{venue}} 中离你最近的地点。",
+    "search": "搜索地点",
+    "notSure": "我不确定",
+    "notSureHint": "志愿者会问你在哪里见面",
+    "changeVenue": "更换场馆"
   },
   "note": {
     "label": "添加备注<muted>（可选）</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "是，取消"
   },
   "map": {
-    "label": "地图：{{name}} 距你 {{distance}}，正前往 2 号门与你会合。",
-    "gate": "2 号门",
+    "label": "地图：{{name}} 距你 {{distance}}，正前往{{place}}与你会合。",
     "you": "你"
   },
   "messages": {
@@ -223,15 +235,10 @@
     "paused": "休息期间请求已暂停。切换到“空闲”即可查看附近需要帮助的人。"
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "2 号门坡道附近",
-      "section214": "214 区走廊",
-      "mainPlaza": "主入口广场"
-    },
     "greeting": "{{name}}，你好！我是 {{volunteer}}，LA28 志愿者。我现在就过去找你。会合地点：{{spot}}。",
     "greetingNoName": "你好！我是 {{volunteer}}，LA28 志愿者。我现在就过去找你。会合地点：{{spot}}。",
     "reply1": "收到，谢谢！我几分钟后到。",
-    "reply2": "我已经看到 2 号门了。我穿着粉色的 LA28 背心。",
+    "reply2": "我快到了。我穿着粉色的 LA28 背心。",
     "reply3": "没问题，不着急。我会陪你一起等。"
   }
 }

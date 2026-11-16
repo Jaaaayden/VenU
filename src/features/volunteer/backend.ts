@@ -106,7 +106,7 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
           if (!volunteer) return; // nobody free: wait until the caller gives up
           langs.set(request.id, mockTextLanguage(volunteer));
           // Like a real volunteer, say hello once matched.
-          replyLater(request.id, timing.greeting, greetingFrom(volunteer, request.visitorName, request.location.spot));
+          replyLater(request.id, timing.greeting, greetingFrom(volunteer, request.visitorName, request.location));
           resolve({ volunteer, language: chatLanguage(volunteer.languages), etaMinutes: 2, distanceFeet: 180 });
         }, timing.search);
         signal.addEventListener('abort', () => { clearTimeout(t); reject(abortError()); }, { once: true });

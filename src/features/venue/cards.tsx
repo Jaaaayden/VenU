@@ -50,7 +50,7 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
         <FacilityIcon category={facility.category} size={30} />
       </View>
       <View style={styles.rowText}>
-        <Text style={styles.rowTitle} numberOfLines={1}>{name}</Text>
+        <Text style={styles.rowTitle} numberOfLines={2}>{name}</Text>
         <Text style={venueText.caption} numberOfLines={1}>{meta}</Text>
       </View>
       {facility.accessible ? <FigmaIcon name="wheelchair-6dc801" size={22} color={Colors.primary} /> : null}

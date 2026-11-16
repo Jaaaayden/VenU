@@ -27,11 +27,24 @@
     "subtitle": "Vamos conectar você a alguém por perto",
     "languageLabel": "Ajuda em {{language}}. Mudar idioma",
     "locationLabel": "Sua localização: {{spot}}, {{venue}}",
+    "near": "Perto de {{place}}",
+    "locationUnset": "Sua localização: ainda não escolhida, {{venue}}",
+    "whereAreYou": "Onde você está?",
+    "tapToChoose": "Toque para escolher um lugar",
+    "locationHint": "Abre a lista de lugares de {{venue}}",
     "question": "Com o que você precisa de ajuda?",
     "notePlaceholder": "ex.: Preciso de ajuda perto da rampa 2",
     "photoOff": "O acesso às fotos está desativado. Ative em Ajustes.",
     "pickOne": "Escolha pelo menos um tipo de ajuda.",
     "send": "Enviar pedido"
+  },
+  "where": {
+    "title": "Onde você está?",
+    "subtitle": "Escolha o lugar mais perto de você em {{venue}}.",
+    "search": "Buscar lugares",
+    "notSure": "Não sei",
+    "notSureHint": "O voluntário vai perguntar onde vocês se encontram",
+    "changeVenue": "Trocar de local"
   },
   "note": {
     "label": "Adicionar nota <muted>(opcional)</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "Sim, cancelar"
   },
   "map": {
-    "label": "Mapa: {{name}} está a {{distance}}, indo até você no Portão 2.",
-    "gate": "Portão 2",
+    "label": "Mapa: {{name}} está a {{distance}}, indo até você em {{place}}.",
     "you": "Você"
   },
   "messages": {
@@ -227,15 +239,10 @@
     "paused": "Os pedidos ficam pausados enquanto você descansa. Mude para Livre para ver quem precisa de ajuda por perto."
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "Perto da rampa do Portão 2",
-      "section214": "Corredor da seção 214",
-      "mainPlaza": "Praça da entrada principal"
-    },
     "greeting": "Oi, {{name}}! Aqui é {{volunteer}}, da equipe de voluntários do LA28. Estou indo até você agora. Ponto de encontro: {{spot}}.",
     "greetingNoName": "Oi! Aqui é {{volunteer}}, da equipe de voluntários do LA28. Estou indo até você agora. Ponto de encontro: {{spot}}.",
     "reply1": "Entendi, valeu! Chego em uns dois minutos.",
-    "reply2": "Já estou vendo o Portão 2. Estou com um colete rosa do LA28.",
+    "reply2": "Estou quase chegando. Estou com um colete rosa do LA28.",
     "reply3": "Sem problema, sem pressa. Vou esperar com você."
   }
 }

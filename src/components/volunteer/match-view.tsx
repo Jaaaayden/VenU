@@ -7,6 +7,7 @@ import { Button } from '@/components/button';
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { formatDistance } from '@/features/volunteer/format';
+import { meetSpotName, meetVenueName } from '@/features/volunteer/meet-point';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest, Match } from '@/features/volunteer/types';
 import { languageOf, useT } from '@/i18n';
@@ -18,6 +19,7 @@ import { MessageButton } from './message-button';
 export function MatchView({ request, match, unread }: { request: HelpRequest; match: Match; unread: number }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const t = useT('volunteer');
+  const tv = useT('venue');
   const v = match.volunteer;
   const onTheWay = {
     his: t('match.onTheWay.his', { name: v.firstName }),
@@ -44,7 +46,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         </View>
       </View>
 
-      <MeetMap volunteerName={v.name} distanceLabel={distance} />
+      <MeetMap volunteerName={v.name} distanceLabel={distance} place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
 
       <View style={[styles.gutter, styles.card]}>
         <View style={styles.who}>

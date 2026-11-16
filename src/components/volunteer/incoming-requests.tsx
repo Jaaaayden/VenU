@@ -11,6 +11,7 @@ import { formatNumber } from '@/i18n/format';
 
 import { HelpIcon } from './help-icon';
 import { Hint, useHint } from './hint';
+import { MeetPlaceText } from './meet-place';
 
 export function IncomingRequests() {
   const { hint, show } = useHint();
@@ -37,7 +38,7 @@ export function IncomingRequests() {
               </View>
               <View style={styles.text}>
                 <Text style={Type.bodyStrong}>{t('incoming.who', { help, name: r.visitorName })}</Text>
-                <Text style={styles.where}>{t('place', { spot: r.spot, venue: r.venue })}</Text>
+                <MeetPlaceText point={r.location} style={styles.where} />
                 <Text style={styles.meta}>
                   {t('incoming.meta', { distance: formatDistance(r.distanceFeet, languageOf(t)), minutes: formatNumber(r.minutesAgo, undefined, languageOf(t)), language: isolatedLanguageName(r.language) })}
                 </Text>

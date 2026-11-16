@@ -1,21 +1,17 @@
 // Mock data for the volunteer flow. The real matching backend (owned by Krisha) replaces
 // mockBackend in backend.ts; these lists stay as the UI's fixed options.
-// Places are read from the string table in the visitor's language. The volunteer writes in their own
-// main language (Daniel: English), so chat translation has something to do; the stub translator
-// (features/translate) knows these lines in every locale. Venue and people's names stay as they are.
+// Places are facility ids, worded in the reader's language. The volunteer writes in their own main
+// language (Daniel: English), so chat translation has something to do; the stub translator
+// (features/translate) knows these lines and the facility names in every locale. Venue and people's
+// names stay as they are.
 import { chatLanguage } from '@/features/translate/languages';
-import { localStub } from '@/features/translate/local';
 import i18n, { isUiLanguage } from '@/i18n';
 
+import { meetSpotName, meetVenueName } from './meet-point';
 import type { FeedbackTag, HelpTypeId, IncomingRequest, MeetPoint, ProblemKind, Volunteer } from './types';
 
 /** The six "What do you need help with?" cards, in grid order (labels: volunteer `helpTypes.<id>`). */
 export const HELP_TYPES: HelpTypeId[] = ['physical', 'directions', 'language', 'quiet', 'lost', 'other'];
-
-/** Where the visitor is, e.g. "Near Gate 2 Ramp" at SoFi Stadium. Later: from the venue map / device location. */
-export function mockLocation(): MeetPoint {
-  return { spot: i18n.t('volunteer:mock.spots.gate2Ramp'), venue: 'SoFi Stadium' };
-}
 
 /** Volunteers on shift near the visitor. The mock matcher picks the first who speaks the request's language. */
 export const MOCK_VOLUNTEERS: Volunteer[] = [
@@ -69,10 +65,13 @@ export function mockTextLanguage(v: Volunteer): string {
   return isUiLanguage(lang) ? lang : 'en';
 }
 
-/** "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp." */
-export function greetingFrom(v: Volunteer, visitorName: string, spot: string): string {
+/**
+ * "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4."
+ * The spot as the volunteer would write it (their language), or the venue when there's no spot.
+ */
+export function greetingFrom(v: Volunteer, visitorName: string, location: MeetPoint): string {
   const lng = mockTextLanguage(v);
-  const place = localStub.translateOne(spot, lng).text; // the spot as the volunteer would write it
+  const place = meetSpotName(location, i18n.getFixedT(lng, 'venue')) ?? meetVenueName(location);
   return visitorName
     ? i18n.t('volunteer:mock.greeting', { lng, name: visitorName, volunteer: v.firstName, spot: place })
     : i18n.t('volunteer:mock.greetingNoName', { lng, volunteer: v.firstName, spot: place });
@@ -93,10 +92,9 @@ export const PROBLEM_KINDS: ProblemKind[] = ['no_show', 'unsafe', 'rude', 'other
 
 /** What a signed-in volunteer sees on their tab until real matching exists. */
 export function mockIncoming(): IncomingRequest[] {
-  const spot = (key: 'gate2Ramp' | 'section214' | 'mainPlaza') => i18n.t(`volunteer:mock.spots.${key}`);
   return [
-    { id: 'in-1', visitorName: 'Rosa', helpType: 'physical', spot: spot('gate2Ramp'), venue: 'SoFi Stadium', language: 'es', minutesAgo: 1, distanceFeet: 180 },
-    { id: 'in-2', visitorName: 'Wei', helpType: 'directions', spot: spot('section214'), venue: 'SoFi Stadium', language: 'zh', minutesAgo: 4, distanceFeet: 420 },
-    { id: 'in-3', visitorName: 'Sam', helpType: 'quiet', spot: spot('mainPlaza'), venue: 'SoFi Stadium', language: 'en', minutesAgo: 7, distanceFeet: 650 },
+    { id: 'in-1', visitorName: 'Rosa', helpType: 'physical', location: { venueId: 'sofi', facilityId: 'pedestrian-ramp' }, language: 'es', minutesAgo: 1, distanceFeet: 180 },
+    { id: 'in-2', visitorName: 'Wei', helpType: 'directions', location: { venueId: 'sofi', facilityId: 'entry-8' }, language: 'zh', minutesAgo: 4, distanceFeet: 420 },
+    { id: 'in-3', visitorName: 'Sam', helpType: 'quiet', location: { venueId: 'sofi', facilityId: 'guest-services-sw' }, language: 'en', minutesAgo: 7, distanceFeet: 650 },
   ];
 }

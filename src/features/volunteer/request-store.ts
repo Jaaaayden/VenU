@@ -10,6 +10,7 @@ import { useSyncExternalStore } from 'react';
 import { chatLanguage } from '@/features/translate/languages';
 
 import { createMockBackend, newId, type VolunteerBackend } from './backend';
+import { restoreMeetPoint } from './meet-point';
 import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestDraft, RequestState } from './types';
 
 export const INITIAL_STATE: RequestState = {
@@ -150,7 +151,8 @@ export function parseSaved(raw: string | null, userId: string): RequestState | n
   return {
     ...INITIAL_STATE,
     status: s.status,
-    request: s.request ? { ...s.request, photoUri: livePhoto(s.request.photoUri) } : null,
+    // location: ids now; a request saved with the old translated-text shape keeps its venue.
+    request: s.request ? { ...s.request, photoUri: livePhoto(s.request.photoUri), location: restoreMeetPoint(s.request.location) } : null,
     // Saved before Match had `language`: work it out the same way the matcher does.
     match: s.match ? { ...s.match, language: s.match.language ?? chatLanguage(s.match.volunteer?.languages ?? []) } : null,
     messages: s.messages,

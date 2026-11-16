@@ -27,11 +27,24 @@
     "subtitle": "Ikokonekta ka namin sa malapit na tao",
     "languageLabel": "Tulong sa {{language}}. Palitan ang wika",
     "locationLabel": "Lokasyon mo: {{spot}}, {{venue}}",
+    "near": "Malapit sa {{place}}",
+    "locationUnset": "Lokasyon mo: hindi pa napipili, {{venue}}",
+    "whereAreYou": "Nasaan ka?",
+    "tapToChoose": "I-tap para pumili ng lugar",
+    "locationHint": "Bubuksan ang listahan ng mga lugar sa {{venue}}",
     "question": "Saan mo kailangan ng tulong?",
     "notePlaceholder": "hal. Naipit ako malapit sa ramp 2",
     "photoOff": "Naka-off ang access sa larawan. I-on ito sa Settings.",
     "pickOne": "Pumili ng kahit isang bagay na kailangan mo ng tulong.",
     "send": "Ipadala ang Request"
+  },
+  "where": {
+    "title": "Nasaan ka?",
+    "subtitle": "Piliin ang lugar na pinakamalapit sa iyo sa {{venue}}.",
+    "search": "Maghanap ng lugar",
+    "notSure": "Hindi ako sigurado",
+    "notSureHint": "Tatanungin ka ng volunteer kung saan kayo magkikita",
+    "changeVenue": "Palitan ang venue"
   },
   "note": {
     "label": "Magdagdag ng note <muted>(opsyonal)</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "Oo, kanselahin"
   },
   "map": {
-    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa Pasukan 2.",
-    "gate": "Pasukan 2",
+    "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa {{place}}.",
     "you": "Ikaw"
   },
   "messages": {
@@ -225,15 +237,10 @@
     "paused": "Naka-pause ang mga request habang naka-break ka. Lumipat sa Bakante para makita kung sino ang kailangan ng tulong sa malapit."
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "Malapit sa Rampa ng Pasukan 2",
-      "section214": "Concourse ng Section 214",
-      "mainPlaza": "Plaza ng pangunahing pasukan"
-    },
     "greeting": "Hi {{name}}! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "greetingNoName": "Hi! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",
     "reply1": "Sige, salamat! Nandiyan na ako sa loob ng ilang minuto.",
-    "reply2": "Nakikita ko na ang Pasukan 2. Naka-pink na LA28 vest ako.",
+    "reply2": "Malapit na ako. Naka-pink na LA28 vest ako.",
     "reply3": "Walang problema, dahan-dahan lang. Hihintayin kita."
   }
 }

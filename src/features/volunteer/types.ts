@@ -4,10 +4,14 @@
 export type HelpTypeId = 'physical' | 'directions' | 'language' | 'quiet' | 'lost' | 'other';
 
 
-/** Where the visitor is waiting, e.g. "Near Gate 2 Ramp" at "SoFi Stadium". */
+/**
+ * Where the visitor is waiting, as ids so it's worded in the language on screen (meet-point.ts).
+ * e.g. { venueId: 'sofi', facilityId: 'entry-4' } = "Near Entry 4 · SoFi Stadium".
+ */
 export interface MeetPoint {
-  spot: string;
-  venue: string;
+  venueId: string;
+  /** A facility in that venue, or null when the visitor isn't sure. */
+  facilityId: string | null;
 }
 
 export interface HelpRequest {
@@ -128,8 +132,7 @@ export interface IncomingRequest {
   id: string;
   visitorName: string;
   helpType: HelpTypeId;
-  spot: string;
-  venue: string;
+  location: MeetPoint;
   language: string;
   minutesAgo: number;
   distanceFeet: number;

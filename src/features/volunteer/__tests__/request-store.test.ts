@@ -3,9 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 import i18n from '@/i18n';
 
 import { createMockBackend, mockVolunteerFor } from '../backend';
-import { mockLocation } from '../mock';
 import { createRequestStore, INITIAL_STATE, parseSaved, reduce, SEARCH_TIMEOUT_MS, type KeyValueStorage, type NewRequest } from '../request-store';
-import type { HelpRequest, RequestState } from '../types';
+import type { HelpRequest, MeetPoint, RequestState } from '../types';
 import { formatClock, formatDayTime, formatDistance, needsSeparator } from '../format';
 
 // The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
@@ -24,6 +23,9 @@ function memoryStorage(): KeyValueStorage & { data: Map<string, string> } {
   };
 }
 
+/** Waiting at SoFi's Entry 4. */
+const AT_ENTRY_4: MeetPoint = { venueId: 'sofi', facilityId: 'entry-4' };
+
 const TIMING = { search: 1000, greeting: 500, reply: 800 };
 
 const rosaNeedsHelp: NewRequest = {
@@ -32,7 +34,7 @@ const rosaNeedsHelp: NewRequest = {
   note: 'Stuck near ramp 2',
   photoUri: null,
   language: 'en',
-  location: mockLocation(),
+  location: AT_ENTRY_4,
 };
 
 function setup() {
@@ -64,7 +66,7 @@ describe('volunteer request store', () => {
     await advance(TIMING.greeting);
     expect(store.getState().messages.map(m => m.from)).toEqual(['volunteer']);
     expect(store.getState().messages[0]!.text).toBe(
-      "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+      "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4.",
     );
     expect(store.getState().unread).toBe(1);
 
@@ -292,6 +294,36 @@ describe('volunteer request store', () => {
       expect(parseSaved(JSON.stringify(raw), 'rosa')?.match?.language).toBe('en');
     });
 
+    it('turns a meet point saved as translated text into ids, keeping the venue', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      const raw = JSON.parse(storage.data.get(KEY)!);
+
+      // How the request was saved before meet points were ids (text in the language of the day).
+      raw.state.request.location = { spot: 'Cerca de la rampa de la Puerta 2', venue: 'Crypto.com Arena' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'crypto-arena', facilityId: null });
+      raw.state.request.location = { spot: 'Near Gate 2 Ramp', venue: 'Somewhere else' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+      // Ids that no longer exist fall back the same way; good ids come back as they were.
+      raw.state.request.location = { venueId: 'sofi', facilityId: 'gate-2' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+      raw.state.request.location = { venueId: 'intuit-dome', facilityId: 'main-entrance' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'intuit-dome', facilityId: 'main-entrance' });
+      delete raw.state.request.location;
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+
+      // The restored request still works: a reloaded store shows it and keeps matching.
+      raw.state.request.location = { spot: 'Near Gate 2 Ramp', venue: 'SoFi Stadium' };
+      storage.data.set(KEY, JSON.stringify(raw));
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await after.setUser('rosa');
+      expect(after.getState()).toMatchObject({ status: 'matched', request: { location: { venueId: 'sofi', facilityId: null } } });
+    });
+
     it('resumes a search that was in progress', async () => {
       const storage = memoryStorage();
       const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
@@ -504,11 +536,11 @@ describe('the mock volunteer in another language', () => {
   it('greets and replies in the volunteer’s own language, tagged with it', async () => {
     await i18n.changeLanguage('es');
     const store = setup();
-    void store.sendRequest({ ...rosaNeedsHelp, language: 'es', location: mockLocation() });
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es', location: AT_ENTRY_4 });
     await advance(TIMING.search + TIMING.greeting);
     expect(store.getState().match?.volunteer.firstName).toBe('Daniel');
     expect(store.getState().messages[0]).toMatchObject({
-      text: "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+      text: "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4.",
       lang: 'en',
     });
     store.sendMessage('Gracias');
@@ -530,7 +562,7 @@ describe('the mock volunteer in another language', () => {
   it('has a Korean-speaking volunteer write in Korean', async () => {
     await i18n.changeLanguage('ko');
     const store = setup();
-    void store.sendRequest({ ...rosaNeedsHelp, language: 'ko', location: mockLocation() });
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'ko', location: AT_ENTRY_4 });
     await advance(TIMING.search + TIMING.greeting);
     expect(store.getState().match?.volunteer.firstName).toBe('Min-ji');
     store.sendMessage('감사합니다');

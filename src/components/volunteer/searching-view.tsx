@@ -15,6 +15,7 @@ import type { HelpRequest } from '@/features/volunteer/types';
 import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
+import { MeetPlaceText } from './meet-place';
 
 export function SearchingView({ request }: { request: HelpRequest }) {
   const t = useT('volunteer');
@@ -62,7 +63,7 @@ export function RequestSummary({ request }: { request: HelpRequest }) {
   const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
   return (
     <>
-      <Text style={styles.where}>{t('place', { spot: request.location.spot, venue: request.location.venue })}</Text>
+      <MeetPlaceText point={request.location} style={styles.where} />
 
       <View style={styles.summary}>
         <Text style={styles.summaryLabel}>{t('searching.askedFor')}</Text>

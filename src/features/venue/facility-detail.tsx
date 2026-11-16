@@ -1,4 +1,4 @@
-/** Sheet content: one facility (name, distance and wait, tags, Directions) and its reports. */
+/** Sheet content: one facility (name, distance and wait, tags, Directions, I'm here) and its reports. */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -11,6 +11,7 @@ import { formatNumber } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
 import { Notification, ReportCard } from './cards';
+import { setCurrentSpot, setCurrentVenue, useWhereAmI } from './current';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
@@ -23,6 +24,7 @@ export function FacilityDetail() {
   const facility = facilities.find(f => f.id === facilityId);
   const reports = useFacilityReports(venue.id, facilityId);
   const [directions, setDirections] = useState(false);
+  const where = useWhereAmI();
 
   // The form returns here with ?submitted=<id>. Closing the notification drops that param, so the
   // venue screen remembers the id and keeps "New" on the card while the user stays on this
@@ -56,6 +58,7 @@ export function FacilityDetail() {
 
   const location = facilityLocation(facility, t);
   const name = facilityName(facility, t);
+  const isMySpot = where.venueId === venue.id && where.facilityId === facility.id;
 
   const addReport = () => {
     setSnap('up');
@@ -95,6 +98,15 @@ export function FacilityDetail() {
             style={styles.directionsButton}
           />
           {directions ? <InlineNote>{t('facility.directionsSoon', { name, location })}</InlineNote> : null}
+          {/* Sets the spot the help request uses ("Near Entry 4"); shows a check once it's yours. */}
+          <Button
+            label={isMySpot ? t('facility.isHere') : t('facility.imHere')}
+            variant="outline"
+            icon={<FigmaIcon name={isMySpot ? 'check-circle' : 'location-on'} size={22} color={Colors.primary} />}
+            onPress={() => { setCurrentVenue(venue.id); setCurrentSpot(facility.id); }}
+            accessibilityHint={isMySpot ? undefined : t('facility.imHereHint')}
+            style={styles.directionsButton}
+          />
         </View>
 
         <View style={styles.reportsHead}>

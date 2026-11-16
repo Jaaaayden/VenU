@@ -1,7 +1,8 @@
 /**
  * The map strip on "Volunteer found". Figma has a placeholder image here; this draws a simple
- * stylized corner of the stadium: the bowl, the concourse, Gate 2, you, and the volunteer's route.
- * The map never mirrors in a right-to-left language; only its labels are translated.
+ * stylized corner of the stadium: the bowl, the concourse, the meeting spot, you, and the volunteer's
+ * route. The map never mirrors in a right-to-left language; only its labels are translated.
+ * e.g. place "Entry 4" labels the dark pill by where you wait.
  */
 import { useState } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
@@ -21,10 +22,17 @@ function pillWidth(label: string, min: number): number {
   return Math.max(min, Math.round(label.length * 7.2 + 18));
 }
 
-export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: string; distanceLabel: string }) {
+/** `label` cut with an ellipsis so its pill fits in `max` points, e.g. "Guest Services…". */
+function fitLabel(label: string, max: number): string {
+  const chars = Math.max(4, Math.floor((max - 18) / 7.2));
+  return label.length > chars ? `${label.slice(0, chars - 1)}…` : label;
+}
+
+/** `place`: where you wait, in the language on screen ("Entry 4", or the venue with no spot). */
+export function MeetMap({ volunteerName, distanceLabel, place }: { volunteerName: string; distanceLabel: string; place: string }) {
   const [w, setW] = useState(0);
   const t = useT('volunteer');
-  const gate = t('map.gate');
+  const gate = fitLabel(place, Math.max(64, w * 0.84));
   const youLabel = t('map.you');
   const gateW = pillWidth(gate, 64);
   const youW = pillWidth(youLabel, 40);
@@ -40,7 +48,7 @@ export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: strin
       style={styles.wrap}
       onLayout={onLayout}
       role="img"
-      aria-label={t('map.label', { name: volunteerName, distance: distanceLabel })}>
+      aria-label={t('map.label', { name: volunteerName, distance: distanceLabel, place })}>
       {w > 0 && (
         <Svg width={w} height={H}>
           <Rect x={0} y={0} width={w} height={H} fill={Colors.surfaceAlt} />
@@ -55,7 +63,7 @@ export function MeetMap({ volunteerName, distanceLabel }: { volunteerName: strin
             fill="none"
           />
           <Path d={`M-10 ${H * 0.55} Q${w * 0.55} ${H * 0.98} ${w + 10} ${H * 0.45}`} stroke={LINE} strokeWidth={1} fill="none" strokeDasharray="6 6" />
-          {/* Gate 2 */}
+          {/* The meeting spot */}
           <G>
             <Rect x={w * 0.1} y={H * 0.78} width={gateW} height={24} rx={6} fill={Colors.ink} />
             <SvgText x={w * 0.1 + gateW / 2} y={H * 0.78 + 16} fontSize={12} fontFamily={Fonts.textBold} fill={Colors.onPrimary} textAnchor="middle">

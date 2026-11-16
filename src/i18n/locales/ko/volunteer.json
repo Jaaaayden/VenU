@@ -27,11 +27,24 @@
     "subtitle": "가까운 분과 연결해 드릴게요",
     "languageLabel": "도움 언어: {{language}}. 언어 변경",
     "locationLabel": "내 위치: {{spot}}, {{venue}}",
+    "near": "{{place}} 근처",
+    "locationUnset": "내 위치: 아직 선택 안 함, {{venue}}",
+    "whereAreYou": "어디에 계세요?",
+    "tapToChoose": "눌러서 장소 선택",
+    "locationHint": "{{venue}}의 장소 목록을 엽니다",
     "question": "어떤 도움이 필요하세요?",
     "notePlaceholder": "예: 2번 경사로 근처에서 못 움직여요",
     "photoOff": "사진 접근이 꺼져 있어요. 설정에서 켜 주세요.",
     "pickOne": "필요한 도움을 하나 이상 선택하세요.",
     "send": "요청 보내기"
+  },
+  "where": {
+    "title": "어디에 계세요?",
+    "subtitle": "{{venue}}에서 가장 가까운 장소를 고르세요.",
+    "search": "장소 검색",
+    "notSure": "잘 모르겠어요",
+    "notSureHint": "자원봉사자가 만날 곳을 물어볼 거예요",
+    "changeVenue": "경기장 변경"
   },
   "note": {
     "label": "메모 추가 <muted>(선택)</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "네, 취소할게요"
   },
   "map": {
-    "label": "지도: {{name}} 님이 {{distance}} 거리에 있으며 2번 게이트로 오고 있어요.",
-    "gate": "2번 게이트",
+    "label": "지도: {{name}} 님이 {{distance}} 거리에 있으며 {{place}}(으)로 오고 있어요.",
     "you": "나"
   },
   "messages": {
@@ -223,15 +235,10 @@
     "paused": "쉬는 동안에는 요청이 잠시 멈춰요. 가능으로 바꾸면 근처에서 도움이 필요한 사람을 볼 수 있어요."
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "2번 게이트 경사로 근처",
-      "section214": "214구역 통로",
-      "mainPlaza": "정문 광장"
-    },
     "greeting": "{{name}} 님, 안녕하세요! LA28 자원봉사자 {{volunteer}}입니다. 지금 가고 있어요. 만날 곳: {{spot}}.",
     "greetingNoName": "안녕하세요! LA28 자원봉사자 {{volunteer}}입니다. 지금 가고 있어요. 만날 곳: {{spot}}.",
     "reply1": "알겠어요, 감사합니다! 몇 분 안에 도착해요.",
-    "reply2": "이제 2번 게이트가 보여요. 분홍색 LA28 조끼를 입고 있어요.",
+    "reply2": "거의 다 왔어요. 분홍색 LA28 조끼를 입고 있어요.",
     "reply3": "괜찮아요, 천천히 하세요. 함께 기다릴게요."
   }
 }

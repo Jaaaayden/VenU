@@ -27,11 +27,24 @@
     "subtitle": "Nous vous mettons en relation avec quelqu’un à proximité",
     "languageLabel": "Aide en {{language}}. Changer de langue",
     "locationLabel": "Votre position : {{spot}}, {{venue}}",
+    "near": "Près de {{place}}",
+    "locationUnset": "Votre position : pas encore choisie, {{venue}}",
+    "whereAreYou": "Où êtes-vous ?",
+    "tapToChoose": "Touchez pour choisir un endroit",
+    "locationHint": "Ouvre la liste des lieux de {{venue}}",
     "question": "De quelle aide avez-vous besoin ?",
     "notePlaceholder": "ex. : J’ai besoin d’aide près de la rampe 2",
     "photoOff": "L’accès aux photos est désactivé. Activez-le dans Réglages.",
     "pickOne": "Choisissez au moins un type d’aide.",
     "send": "Envoyer la demande"
+  },
+  "where": {
+    "title": "Où êtes-vous ?",
+    "subtitle": "Choisissez l’endroit le plus proche de vous à {{venue}}.",
+    "search": "Rechercher un lieu",
+    "notSure": "Je ne sais pas",
+    "notSureHint": "Votre bénévole vous demandera où vous retrouver",
+    "changeVenue": "Changer de site"
   },
   "note": {
     "label": "Ajouter une note <muted>(facultatif)</muted>",
@@ -88,8 +101,7 @@
     "yesCancel": "Oui, annuler"
   },
   "map": {
-    "label": "Carte : {{name}} est à {{distance}} et vient vers vous à la porte 2.",
-    "gate": "Porte 2",
+    "label": "Carte : {{name}} est à {{distance}} et vient vers vous ({{place}}).",
     "you": "Vous"
   },
   "messages": {
@@ -227,15 +239,10 @@
     "paused": "Les demandes sont suspendues pendant votre pause. Passez en Libre pour voir qui a besoin d’aide à proximité."
   },
   "mock": {
-    "spots": {
-      "gate2Ramp": "Près de la rampe de la porte 2",
-      "section214": "Coursive de la section 214",
-      "mainPlaza": "Esplanade de l’entrée principale"
-    },
     "greeting": "Bonjour {{name}} ! Je suis {{volunteer}}, bénévole LA28. J’arrive. Point de rendez-vous : {{spot}}.",
     "greetingNoName": "Bonjour ! Je suis {{volunteer}}, bénévole LA28. J’arrive. Point de rendez-vous : {{spot}}.",
     "reply1": "Bien reçu, merci ! J’arrive dans deux minutes.",
-    "reply2": "Je vois la porte 2. Je porte un gilet LA28 rose.",
+    "reply2": "J’arrive bientôt. Je porte un gilet LA28 rose.",
     "reply3": "Pas de souci, prenez votre temps. Je reste avec vous."
   }
 }

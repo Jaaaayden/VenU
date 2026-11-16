@@ -1,4 +1,7 @@
-/** "Find a Volunteer" (Figma 192:22809): where you are, what you need, a note, Send Request. */
+/**
+ * "Find a Volunteer" (Figma 192:22809): where you are, what you need, a note, Send Request.
+ * Where you are = the current venue and spot (features/venue/current); tap it to pick the spot.
+ */
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -8,15 +11,18 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName, languageName } from '@/features/profile/options';
-import { HELP_TYPES, mockLocation } from '@/features/volunteer/mock';
+import { useWhereAmI } from '@/features/venue/current';
+import { meetPointFrom, meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
+import { HELP_TYPES } from '@/features/volunteer/mock';
 import { EMPTY_DRAFT, volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpTypeId, RequestDraft, RequestState } from '@/features/volunteer/types';
 import { useDictation } from '@/features/voice/use-dictation';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 import { EmergencyCard } from './emergency-card';
 import { HelpCard } from './help-card';
 import { Hint, useHint } from './hint';
+import { LocationPicker } from './location-picker';
 import { NoteBanner } from './note-banner';
 import { NoteBox } from './note-box';
 
@@ -40,7 +46,12 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   const { hint, show } = useHint();
   const t = useT('volunteer');
   const tc = useT('common');
-  const location = mockLocation();
+  const tv = useT('venue');
+  const rtl = useLayoutRtl();
+  const [pickingSpot, setPickingSpot] = useState(false);
+  const location = meetPointFrom(useWhereAmI());
+  const spot = meetSpotLabel(location, tv, t);
+  const venueName = meetVenueName(location);
   // Tap to dictate into the note (added after what's typed); tap again to stop. Interim words show
   // from liveText; the saved draft only changes when they settle.
   const dictation = useDictation({ onCommit: text => edit({ note: text.slice(0, NOTE_MAX) }), onNote: show });
@@ -94,13 +105,23 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 
       {notice ? <NoteBanner notice={notice} onDismiss={volunteerRequests.dismissNotice} /> : null}
 
-      <View style={styles.location} accessible accessibilityLabel={t('form.locationLabel', { spot: location.spot, venue: location.venue })}>
-        <FigmaIcon name="location-on" size={36} color={Colors.ink} />
+      <Pressable
+        onPress={() => setPickingSpot(true)}
+        accessibilityRole="button"
+        accessibilityLabel={spot ? t('form.locationLabel', { spot, venue: venueName }) : t('form.locationUnset', { venue: venueName })}
+        accessibilityHint={t('form.locationHint', { venue: venueName })}
+        style={({ pressed }) => [styles.location, !spot && styles.locationUnset, pressed && styles.locationPressed]}>
+        <FigmaIcon name="location-on" size={36} color={spot ? Colors.ink : Colors.primary} />
+        {/* Lines start on the layout's start edge even when they begin with a Latin name ("Intuit Dome"). */}
         <View style={styles.locationText}>
-          <Text style={styles.spot}>{location.spot}</Text>
-          <Text style={styles.venue}>{location.venue}</Text>
+          <Text style={[styles.spot, rtl ? styles.rtlText : styles.ltrText]}>{spot ?? t('form.whereAreYou')}</Text>
+          <Text style={[styles.venue, rtl ? styles.rtlText : styles.ltrText]}>{spot ? venueName : `${venueName} · ${t('form.tapToChoose')}`}</Text>
         </View>
-      </View>
+        {/* Points to the end edge: left in right-to-left languages. */}
+        <View style={rtl && styles.flip}>
+          <FigmaIcon name="group-2-af556f" size={28} color={Colors.ink} />
+        </View>
+      </Pressable>
 
       <View style={styles.section}>
         <Text style={styles.question} accessibilityRole="header">{t('form.question')}</Text>
@@ -133,6 +154,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         <Button label={t('form.send')} size="lg" onPress={() => void send()} loading={finishing} style={styles.send} />
         <EmergencyCard />
       </View>
+
+      <LocationPicker visible={pickingSpot} onClose={() => setPickingSpot(false)} />
 
       <LanguageSearchModal
         visible={pickingLanguage}
@@ -170,12 +193,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 24,
     minHeight: 62,
-    paddingHorizontal: 28,
+    paddingStart: 28,
+    paddingEnd: Spacing.md,
     paddingVertical: Spacing.md,
     borderRadius: Radius.md,
     backgroundColor: Colors.surfaceAlt,
   },
-  locationText: { gap: 2 },
+  // No spot yet: a dashed blue outline asks for a tap.
+  locationUnset: { borderWidth: 1.5, borderColor: Colors.primary, borderStyle: 'dashed' },
+  locationPressed: { backgroundColor: Colors.border },
+  locationText: { flex: 1, gap: 2 },
+  flip: { transform: [{ scaleX: -1 }] },
+  rtlText: { writingDirection: 'rtl' },
+  ltrText: { writingDirection: 'ltr' },
   spot: { ...Type.body },
   venue: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text },
   section: { gap: Spacing.lg },

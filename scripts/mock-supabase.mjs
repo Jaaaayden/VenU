@@ -318,13 +318,16 @@ async function importShared(relativePath) {
   }
 }
 
-/** The stub's string tables: volunteer `mock.*` from every locale, as the app has them. */
-function stubCatalog(flattenStrings) {
+/** The stub's string tables: volunteer `mock.*` and facility names from every locale, as the app has them. */
+function stubCatalog(flattenStrings, placeNames) {
   const dir = join(ROOT, 'src', 'i18n', 'locales');
   const catalog = {};
   for (const lang of readdirSync(dir)) {
     const file = join(dir, lang, 'volunteer.json');
-    if (existsSync(file)) catalog[lang] = flattenStrings(JSON.parse(readFileSync(file, 'utf8')).mock ?? {});
+    if (!existsSync(file)) continue;
+    const venueFile = join(dir, lang, 'venue.json');
+    const places = existsSync(venueFile) ? placeNames(JSON.parse(readFileSync(venueFile, 'utf8')).facilityText ?? {}) : {};
+    catalog[lang] = { ...flattenStrings(JSON.parse(readFileSync(file, 'utf8')).mock ?? {}), ...places };
   }
   return catalog;
 }
@@ -332,7 +335,7 @@ function stubCatalog(flattenStrings) {
 /** The translate function's handler with the provider from .env.server.local, else the stub. */
 async function createTranslate({ verifyUser, control, log }) {
   const { chooseProvider, createHandler } = await importShared('supabase/functions/translate/handler.ts');
-  const { createStub, flattenStrings } = await importShared('src/features/translate/stub.ts');
+  const { createStub, flattenStrings, placeNames } = await importShared('src/features/translate/stub.ts');
   const env = readServerEnv();
   let translator = null;
   if (env.TRANSLATE_PROVIDER) {
@@ -341,7 +344,7 @@ async function createTranslate({ verifyUser, control, log }) {
     if (choice.ok) translator = choice.translator;
     else log(`mock supabase: ${choice.reason} in .env.server.local; using the stub translator`);
   }
-  translator ??= createStub(stubCatalog(flattenStrings)).translator;
+  translator ??= createStub(stubCatalog(flattenStrings, placeNames)).translator;
   log(translator.name === 'stub'
     ? 'Translate: offline stub (knows the mock volunteer lines). Real provider: see README "Chat translation".'
     : `Translate: ${translator.name}, keys from .env.server.local`);

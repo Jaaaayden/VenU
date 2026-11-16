@@ -238,12 +238,12 @@ describe('stub translator', () => {
   });
 
   it('fills in names and translates the meeting spot inside the greeting', () => {
-    const greeting = en.greeting!.replace('{{name}}', 'Rosa').replace('{{volunteer}}', 'Daniel').replace('{{spot}}', en['spots.gate2Ramp']!);
+    const greeting = en.greeting!.replace('{{name}}', 'Rosa').replace('{{volunteer}}', 'Daniel').replace('{{spot}}', en['places.entry-4']!);
     const out = stub.translateOne(greeting, 'es');
     expect(out.detectedSource).toBe('en');
     expect(out.text).toContain('Rosa');
     expect(out.text).toContain('Daniel');
-    expect(out.text).toContain(MOCK_CATALOG.es!['spots.gate2Ramp']);
+    expect(out.text).toContain(MOCK_CATALOG.es!['places.entry-4']);
     expect(out.unavailable).toBeUndefined();
   });
 
