@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { nextStep, stepErrors, STEP_FIELDS } from '../setup-draft';
+import { draftForRole, nextStep, stepErrors, STEP_FIELDS } from '../setup-draft';
 import { emptyDraft } from '../types';
 
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
@@ -36,5 +36,18 @@ describe('setup steps', () => {
     for (const f of ['firstName', 'languages', 'accessNeedsNote', 'gender', 'ageBand', 'privacyAccepted']) expect(covered.has(f as never)).toBe(true);
     for (const step of ['languages', 'preferences', 'photo'] as const) expect(stepErrors(step, visitor)).toEqual({});
     for (const step of ['languages', 'volunteer', 'photo'] as const) expect(stepErrors(step, volunteer)).toEqual({});
+  });
+});
+
+describe('draftForRole', () => {
+  it('starts a blank draft with the primary language and the Create Account name', () => {
+    expect(draftForRole('visitor', null, 'ar', 'Rosa')).toEqual({ ...emptyDraft('visitor', 'ar'), firstName: 'Rosa' });
+  });
+
+  it('switching role keeps the languages and name but starts the role questions over', () => {
+    const before = { ...visitor, languages: ['es', 'en'], mainLanguage: 'en', firstName: 'Rosa M', helperGenderPref: 'woman' as const, accessNeeds: ['wheelchair' as const] };
+    const after = draftForRole('volunteer', before, 'es', 'Rosa');
+    expect(after).toEqual({ ...emptyDraft('volunteer', 'es'), languages: ['es', 'en'], mainLanguage: 'en', firstName: 'Rosa M' });
+    expect(stepErrors('languages', after)).toEqual({});
   });
 });

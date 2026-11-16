@@ -9,8 +9,8 @@ import { Colors, Type } from '@/constants/theme';
 import { OnboardingScreen, PrimaryAction } from '@/features/auth/onboarding-screen';
 import { readPendingSetup, type PendingSetup } from '@/features/auth/pending-setup';
 import { useProfile } from '@/features/profile/profile-context';
-import { goToNextStep, stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
-import { emptyDraft, type Role } from '@/features/profile/types';
+import { draftForRole, goToNextStep, stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
+import type { Role } from '@/features/profile/types';
 import { useT, useUiLanguage } from '@/i18n';
 import { pickFor, setupPrimaryLanguage } from '@/i18n/languages';
 
@@ -43,7 +43,7 @@ export default function LanguagesStep() {
     if (!pending || !role || (draft && draft.role === role)) return;
     // Only a welcome pick seeds setup: pending.language may be the last account's language on a shared device.
     const pick = pickFor({ language: pending.language, picked: pending.languagePicked === true, pickedBy: pending.languagePickedBy }, userId);
-    start({ ...emptyDraft(role, setupPrimaryLanguage(pick, onScreen)), firstName: pending.firstName ?? '' });
+    start(draftForRole(role, draft, setupPrimaryLanguage(pick, onScreen), pending.firstName ?? ''));
   }, [pending, role, draft, start, userId, onScreen]);
 
   if (!pending) return null; // one storage read
@@ -60,7 +60,9 @@ export default function LanguagesStep() {
   return (
     <OnboardingScreen
       pill={<AppLanguagePill />}
-      back={<BackLink fallback="/onboarding/role" />}
+      // The screens before this one (welcome, Create Account) only redirect a signed-in user back
+      // here, so Back opens the role question instead: the way to switch visitor/volunteer.
+      back={<BackLink to={{ pathname: '/onboarding/role', params: { change: '1' } }} />}
       title={t('steps.languagesTitle')}
       subtitle={t('steps.languagesSubtitle')}
       actions={<PrimaryAction label={tc('actions.continue')} onPress={next} />}>

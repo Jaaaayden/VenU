@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import type { AvatarChange } from './profile-context';
-import type { ProfileDraft } from './types';
+import { emptyDraft, type ProfileDraft, type Role } from './types';
 import { validateDraft, type DraftErrors, type DraftField } from './validate';
 
 interface SetupDraft {
@@ -37,6 +37,17 @@ export function useSetupDraft(): SetupDraft {
   const ctx = useContext(Ctx);
   if (!ctx) throw new Error('useSetupDraft needs <SetupDraftProvider> (the onboarding layout)');
   return ctx;
+}
+
+/**
+ * The draft the languages step starts with. Switching role on the role step keeps the answers both
+ * roles share (languages, first name) and starts the role's own questions over.
+ * e.g. draftForRole('volunteer', visitorDraft with ['es','en'], 'en', 'Rosa') → volunteer, ['es','en'], gender unset
+ */
+export function draftForRole(role: Role, previous: ProfileDraft | null, mainLanguage: string, firstName: string): ProfileDraft {
+  const fresh = { ...emptyDraft(role, mainLanguage), firstName };
+  if (!previous) return fresh;
+  return { ...fresh, languages: previous.languages, mainLanguage: previous.mainLanguage, firstName: previous.firstName };
 }
 
 /** Which answers each step asks for, so Continue only checks that step's fields. */
