@@ -95,7 +95,10 @@ export function rememberPendingRole(role: Role): Promise<void> {
   return writePendingSetup({ role });
 }
 
-/** After setup saves: the name and role now live in the profile. The language stays as this device's choice. */
+/**
+ * After setup saves, or a sign-in to an account that's already set up: the name and role live in
+ * the profile now. The language stays as this device's choice.
+ */
 export function clearPendingName(): Promise<void> {
   return queued(async () => {
     const { language, languagePicked, languagePickedBy } = await readPendingSetup();
