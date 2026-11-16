@@ -175,7 +175,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 const styles = StyleSheet.create({
   page: { gap: Spacing.xl },
   header: { gap: 0 },
-  titles: { gap: 5, marginTop: -8 },
+  // No negative margin: a long title ("Maghanap ng Volunteer") runs under the language pill.
+  titles: { gap: 5, marginTop: 2 },
   title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
   appLang: { alignSelf: 'flex-end' },
