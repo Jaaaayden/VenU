@@ -8,9 +8,11 @@ import { AccessibilityInfo, Modal, Platform, Pressable, StyleSheet, Text, View }
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
-import { dial, textMessage, venueContact } from '@/features/venue/contacts';
+import { dial } from '@/features/venue/contacts';
 import { useWhereAmI } from '@/features/venue/current';
 import { useT } from '@/i18n';
+
+import { VenueStaffButtons } from './venue-staff-buttons';
 
 interface EmergencyDialogProps {
   visible: boolean;
@@ -20,7 +22,6 @@ interface EmergencyDialogProps {
 export function EmergencyDialog({ visible, onClose }: EmergencyDialogProps) {
   const t = useT('volunteer');
   const { venueId } = useWhereAmI();
-  const staff = venueContact(venueId);
   const titleId = useId();
   const title = useRef<ComponentRef<typeof Text>>(null);
 
@@ -53,8 +54,7 @@ export function EmergencyDialog({ visible, onClose }: EmergencyDialogProps) {
             style={({ pressed }) => [styles.call911, pressed && styles.pressed]}>
             <Text style={styles.call911Label}>{t('emergency.call911')}</Text>
           </Pressable>
-          {staff?.text ? <Button label={t('emergency.textStaff')} variant="outline" size="lg" onPress={() => textMessage(staff.text!)} /> : null}
-          {staff ? <Button label={t('emergency.callStaff')} variant="outline" size="lg" onPress={() => dial(staff.phone)} /> : null}
+          <VenueStaffButtons venueId={venueId} />
           <Button label={t('emergency.notEmergency')} variant="link" onPress={onClose} style={styles.dismiss} />
         </View>
       </View>

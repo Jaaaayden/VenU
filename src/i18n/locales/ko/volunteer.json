@@ -213,7 +213,6 @@
     "languageLabel": "앱 언어: {{language}}",
     "languageHint": "앱 전체의 언어를 바꿉니다",
     "languageTitle": "앱 언어",
-    "near": "{{place}} 근처",
     "locationLabel": "내 위치: {{place}}, {{venue}}",
     "locationHint": "장소 지도를 열어요",
     "statusTitle": "내 상태",

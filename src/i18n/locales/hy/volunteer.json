@@ -215,7 +215,6 @@
     "languageLabel": "Հավելվածի լեզուն՝ {{language}}",
     "languageHint": "Փոխում է ամբողջ հավելվածի լեզուն",
     "languageTitle": "Հավելվածի լեզուն",
-    "near": "Մոտակայքում՝ {{place}}",
     "locationLabel": "Ձեր գտնվելու վայրը՝ {{place}}, {{venue}}",
     "locationHint": "Բացում է վայրի քարտեզը",
     "statusTitle": "Ձեր կարգավիճակը",

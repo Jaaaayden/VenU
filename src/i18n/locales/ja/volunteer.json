@@ -213,7 +213,6 @@
     "languageLabel": "アプリの言語：{{language}}",
     "languageHint": "アプリ全体の言語を変更します",
     "languageTitle": "アプリの言語",
-    "near": "{{place}}付近",
     "locationLabel": "現在地：{{place}}、{{venue}}",
     "locationHint": "会場マップを開きます",
     "statusTitle": "あなたのステータス",

@@ -60,6 +60,8 @@ const states = new Map<string, AvailabilityState>();
 // Users whose status changed here; a slow read of the saved one never overwrites that.
 const touched = new Set<string>();
 const hydrations = new Map<string, Promise<void>>();
+// Bumped when the storage is swapped, so a read from the old one never lands.
+let generation = 0;
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -69,6 +71,7 @@ function emit() {
 /** Swaps where statuses are kept (a backend, or a fake in tests). Clears what's loaded. */
 export function setAvailabilityStorage(next: AvailabilityStorage) {
   storage = next;
+  generation += 1;
   states.clear();
   touched.clear();
   hydrations.clear();
@@ -83,11 +86,12 @@ export function getAvailability(userId: string): AvailabilityState {
 export function hydrateAvailability(userId: string): Promise<void> {
   let pending = hydrations.get(userId);
   if (!pending) {
+    const gen = generation;
     pending = storage
       .load(userId)
       .catch(() => null)
       .then(saved => {
-        if (touched.has(userId)) return;
+        if (gen !== generation || touched.has(userId)) return;
         states.set(userId, { status: saved ?? DEFAULT_AVAILABILITY, ready: true });
         emit();
       });

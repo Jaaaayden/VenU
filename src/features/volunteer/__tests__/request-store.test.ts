@@ -402,8 +402,9 @@ describe('no volunteer free in time', () => {
     expect(reduce(searching, { type: 'searchTimedOut', requestId: 'req-other' })).toBe(searching);
     expect(reduce(INITIAL_STATE, { type: 'searchTimedOut', requestId: 'req-1' })).toBe(INITIAL_STATE);
 
-    expect(reduce(notFound, { type: 'keepSearching' })).toEqual(searching);
-    expect(reduce(searching, { type: 'keepSearching' })).toBe(searching);
+    const again = { ...request, id: 'req-2' };
+    expect(reduce(notFound, { type: 'keepSearching', request: again })).toEqual({ ...searching, request: again });
+    expect(reduce(searching, { type: 'keepSearching', request: again })).toBe(searching);
     expect(reduce(notFound, { type: 'matched', requestId: 'req-1', match: {} as never })).toBe(notFound);
 
     expect(reduce(notFound, { type: 'cancel' })).toEqual({ ...INITIAL_STATE, draft });
@@ -443,7 +444,7 @@ describe('no volunteer free in time', () => {
     expect(store.getState().status).toBe('matched');
   });
 
-  it('keep searching sends the same request and waits the full time again', async () => {
+  it('keep searching sends the request again under a new id and waits the full time again', async () => {
     const store = setup();
     void store.sendRequest(nobodySpeaks);
     await advance(SEARCH_TIMEOUT_MS);
@@ -452,7 +453,8 @@ describe('no volunteer free in time', () => {
 
     void store.keepSearching();
     expect(store.getState().status).toBe('searching');
-    expect(store.getState().request?.id).toBe(id);
+    expect(store.getState().request?.id).not.toBe(id);
+    expect(store.getState().request).toMatchObject({ helpTypes: nobodySpeaks.helpTypes, language: nobodySpeaks.language });
     await advance(SEARCH_TIMEOUT_MS - 1);
     expect(store.getState().status).toBe('searching');
     await advance(1);

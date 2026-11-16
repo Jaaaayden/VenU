@@ -8,19 +8,16 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
-import { dial, textMessage, venueContact } from '@/features/venue/contacts';
-import { useWhereAmI } from '@/features/venue/current';
 import { announce } from '@/features/voice/announce';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest } from '@/features/volunteer/types';
 import { useT } from '@/i18n';
 
 import { RequestSummary } from './searching-view';
+import { VenueStaffButtons } from './venue-staff-buttons';
 
 export function NotFoundView({ request }: { request: HelpRequest }) {
   const t = useT('volunteer');
-  const { venueId } = useWhereAmI();
-  const staff = venueContact(venueId);
   const title = t('searching.notFoundTitle');
   const body = t('searching.notFoundBody');
 
@@ -47,8 +44,7 @@ export function NotFoundView({ request }: { request: HelpRequest }) {
 
       <View style={styles.actions}>
         <Button label={t('searching.keepSearching')} size="lg" onPress={() => void volunteerRequests.keepSearching()} />
-        {staff?.text ? <Button label={t('emergency.textStaff')} variant="outline" size="lg" onPress={() => textMessage(staff.text!)} /> : null}
-        {staff ? <Button label={t('emergency.callStaff')} variant="outline" size="lg" onPress={() => dial(staff.phone)} /> : null}
+        <VenueStaffButtons venueId={request.location.venueId} />
         <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
       </View>
     </View>

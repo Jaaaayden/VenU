@@ -219,7 +219,6 @@
     "languageLabel": "Язык приложения: {{language}}",
     "languageHint": "Меняет язык всего приложения",
     "languageTitle": "Язык приложения",
-    "near": "Рядом: {{place}}",
     "locationLabel": "Ваше местоположение: {{place}}, {{venue}}",
     "locationHint": "Открывает карту объекта",
     "statusTitle": "Ваш статус",

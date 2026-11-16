@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 
 import { useProfile } from '@/features/profile/profile-context';
 import { profileChatLanguage } from '@/features/translate/languages';
+import { setWhereAmIOwner } from '@/features/venue/current';
 
 import { volunteerRequests } from './request-store';
 
@@ -13,8 +14,14 @@ export function VolunteerSessionReset() {
   const language = profile ? profileChatLanguage(profile) : null;
   useEffect(() => {
     // 'loading' and 'error' keep the session (and the request) as it was.
-    if (status === 'signedOut') void volunteerRequests.setUser(null);
-    else if (status === 'ready') void volunteerRequests.setUser(userId);
+    // The venue and spot belong to the account too, so the next person on this phone starts fresh.
+    if (status === 'signedOut') {
+      void volunteerRequests.setUser(null);
+      setWhereAmIOwner(null);
+    } else if (status === 'ready') {
+      void volunteerRequests.setUser(userId);
+      setWhereAmIOwner(userId);
+    }
   }, [status, userId]);
   useEffect(() => {
     volunteerRequests.setLanguage(language);

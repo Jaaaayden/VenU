@@ -215,7 +215,6 @@
     "languageLabel": "Wika ng app: {{language}}",
     "languageHint": "Binabago ang wika ng buong app",
     "languageTitle": "Wika ng app",
-    "near": "Malapit sa {{place}}",
     "locationLabel": "Lokasyon mo: {{place}}, {{venue}}",
     "locationHint": "Binubuksan ang mapa ng venue",
     "statusTitle": "Iyong status",

@@ -217,7 +217,6 @@
     "languageLabel": "Idioma do app: {{language}}",
     "languageHint": "Muda o idioma de todo o app",
     "languageTitle": "Idioma do app",
-    "near": "Perto de {{place}}",
     "locationLabel": "Sua localização: {{place}}, {{venue}}",
     "locationHint": "Abre o mapa do local",
     "statusTitle": "Seu status",

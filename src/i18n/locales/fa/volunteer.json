@@ -215,7 +215,6 @@
     "languageLabel": "زبان برنامه: {{language}}",
     "languageHint": "زبان کل برنامه را تغییر می‌دهد",
     "languageTitle": "زبان برنامه",
-    "near": "نزدیک {{place}}",
     "locationLabel": "مکان شما: {{place}}، {{venue}}",
     "locationHint": "نقشهٔ مکان را باز می‌کند",
     "statusTitle": "وضعیت شما",

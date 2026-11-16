@@ -213,7 +213,6 @@
     "languageLabel": "应用语言：{{language}}",
     "languageHint": "更改整个应用的语言",
     "languageTitle": "应用语言",
-    "near": "{{place}}附近",
     "locationLabel": "你的位置：{{place}}，{{venue}}",
     "locationHint": "打开场馆地图",
     "statusTitle": "你的状态",

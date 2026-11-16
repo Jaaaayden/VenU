@@ -223,7 +223,6 @@
     "languageLabel": "لغة التطبيق: {{language}}",
     "languageHint": "يغيّر لغة التطبيق بالكامل",
     "languageTitle": "لغة التطبيق",
-    "near": "بالقرب من {{place}}",
     "locationLabel": "موقعك: {{place}}، {{venue}}",
     "locationHint": "يفتح خريطة المكان",
     "statusTitle": "حالتك",

@@ -11,8 +11,8 @@ import { labelFor, TRAININGS } from '@/features/profile/options';
 import { uiLanguageName } from '@/features/profile/summary';
 import type { Profile } from '@/features/profile/types';
 import { useWhereAmI } from '@/features/venue/current';
-import { facilityName } from '@/features/venue/labels';
-import { getFacility, getVenue } from '@/features/venue/mock';
+import { getVenue } from '@/features/venue/mock';
+import { meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
 import { useAvailability } from '@/features/volunteer/availability';
 import { useLayoutRtl, useT } from '@/i18n';
 
@@ -75,14 +75,14 @@ function Pin() {
   );
 }
 
-/** The blue card: "Near Gate 2" over the venue, or just the venue. Opens the venue map. */
+/** The blue card: "Near Entry 4" over the venue, or just the venue. Opens the venue map. */
 function LocationCard() {
   const t = useT('volunteer');
   const tv = useT('venue');
-  const { venueId, facilityId } = useWhereAmI();
-  const venueName = getVenue(venueId)?.name ?? '';
-  const facility = facilityId ? getFacility(venueId, facilityId) : undefined;
-  const near = facility ? t('home.near', { place: facilityName(facility, tv) }) : null;
+  const where = useWhereAmI();
+  const { venueId } = where;
+  const venueName = meetVenueName(where);
+  const near = meetSpotLabel(where, tv, t);
   const startAligned = useStartAligned();
 
   return (

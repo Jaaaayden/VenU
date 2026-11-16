@@ -34,7 +34,7 @@ export type RequestAction =
   | { type: 'matched'; requestId: string; match: Match }
   | { type: 'searchFailed'; requestId: string }
   | { type: 'searchTimedOut'; requestId: string }
-  | { type: 'keepSearching' }
+  | { type: 'keepSearching'; request: HelpRequest }
   | { type: 'cancel' }
   | { type: 'send'; message: ChatMessage }
   | { type: 'receive'; requestId: string; message: ChatMessage }
@@ -64,7 +64,7 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
       // Nobody free in time: keep the request (and draft) so "Keep searching" sends it again.
       return state.status === 'searching' && state.request?.id === action.requestId ? { ...state, status: 'notFound' } : state;
     case 'keepSearching':
-      return state.status === 'notFound' ? { ...state, status: 'searching' } : state;
+      return state.status === 'notFound' ? { ...state, status: 'searching', request: action.request } : state;
     case 'cancel':
       return state.status === 'searching' || state.status === 'notFound' || state.status === 'matched'
         ? { ...INITIAL_STATE, draft: state.draft }
@@ -316,12 +316,15 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       await runSearch(request);
     },
 
-    /** Nobody was free: send the same request again and wait another SEARCH_TIMEOUT_MS. */
+    /**
+     * Nobody was free: send the request again, under a new id (the timed-out one was withdrawn),
+     * and wait another SEARCH_TIMEOUT_MS.
+     */
     async keepSearching(): Promise<void> {
-      const { request } = state;
-      if (state.status !== 'notFound' || !request) return;
+      if (state.status !== 'notFound' || !state.request) return;
+      const request: HelpRequest = { ...state.request, id: newId('req'), createdAt: Date.now() };
       searchSince = Date.now();
-      dispatch({ type: 'keepSearching' });
+      dispatch({ type: 'keepSearching', request });
       await runSearch(request);
     },
 

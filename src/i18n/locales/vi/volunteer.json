@@ -213,7 +213,6 @@
     "languageLabel": "Ngôn ngữ ứng dụng: {{language}}",
     "languageHint": "Đổi ngôn ngữ của toàn bộ ứng dụng",
     "languageTitle": "Ngôn ngữ ứng dụng",
-    "near": "Gần {{place}}",
     "locationLabel": "Vị trí của bạn: {{place}}, {{venue}}",
     "locationHint": "Mở bản đồ địa điểm",
     "statusTitle": "Trạng thái của bạn",
