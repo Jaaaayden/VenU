@@ -39,3 +39,15 @@ Facility Search 128:3578, Report 134:15181, Icons 131:3653, Button group 134:151
 Header Auth 169:17275, Status bar 231:25873. Onboarding components: msft_TextInput 181:18333/18338/18344/18349,
 buttons 181:18409 / 184:18521, Filter chip 192:22671, language menu 192:22041. Volunteer: Volunteer Cards 152:16995,
 chat-bubble 231:25791, star rating 255:26852, Message 1 235:26730.
+
+## Update 2026-11-15 (file lastModified 2026-11-15T23:02Z), renders in update-2026-11-15/
+| Screen | Node | File |
+|---|---|---|
+| User flow (whole app, visitor + volunteer) | 1:30 (page "Storyboard + User Flow") | user-flow.png |
+| Role choice: "I am a visitor / I am a volunteer" | 427:29849 | onboarding-screen-2.png |
+| Volunteer home: "Hi, Jayden", status Free/Busy/Off, "What you can help with" | 444:31461 | onb-volunteer-home.png |
+| Find a Volunteer, revised (cream background, "Or hold to speak") | 381:28816, 444:31177, 444:31302, 396:29092 | vol-home-a..d.png |
+| Dialog "Need emergency help?": Call 911 / Call venue staff / not an emergency | 381:29053 | notif-d.png |
+| Dialog "Cancel request? Jayden is 2 minutes away" | 381:28738 | notif-c.png |
+| Toast "Thank you for your feedback!" | 396:29127 | notif-b.png |
+The user flow also names screens with no frames yet: Select Match, Volunteer Not Found (Continue searching / Call venue phone), volunteer Help Request Alert (accept / can't accept), Helping visitor, Wrap-up, volunteer Profile + stats (rating, weekly helps).
