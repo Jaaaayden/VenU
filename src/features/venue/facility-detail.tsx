@@ -62,6 +62,9 @@ export function FacilityDetail() {
 
   const addReport = () => {
     setSnap('up');
+    // "Submit another report": drop ?submitted first, so backing out of the form doesn't bring
+    // the "Report Submitted" toast back. The card keeps "New" through freshReport.
+    if (submitted) router.setParams({ submitted: undefined });
     router.push({ pathname: '/venue/[venueId]/[facilityId]/reports/new', params: { venueId: venue.id, facilityId: facility.id } });
   };
 
