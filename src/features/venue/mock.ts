@@ -427,12 +427,32 @@ export function getFacility(venueId: string, facilityId: string | undefined): Fa
   return facilitiesFor(venueId).find(f => f.id === facilityId);
 }
 
-/** Venues whose name, address or events (in English or the app language) contain every word of the query (case-insensitive). */
+/**
+ * Text as search compares it: lower case, without accents, with Arabic and Persian digits as 0-9,
+ * Arabic ي/ك as the Persian ی/ک, and curly apostrophes straight, so what people type on their own
+ * keyboard still matches.
+ * e.g. searchKey('Objets Trouvés') → 'objets trouves'; searchKey('البوابة ٢') → 'البوابة 2'; searchKey('Men’s') → "men's"
+ */
+export function searchKey(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/ي/g, 'ی')
+    .replace(/ك/g, 'ک')
+    .replace(/[‘’ʼ]/g, "'")
+    .toLowerCase();
+}
+
+const searchWords = (query: string) => searchKey(query).split(/\s+/).filter(Boolean);
+
+/** Venues whose name, address or events (in English or the app language) contain every word of the query (see searchKey). */
 export function searchVenues(query: string, venues: Venue[] = VENUES, t: VenueT = venueT()): Venue[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const words = searchWords(query);
   if (!words.length) return venues;
   return venues.filter(v => {
-    const hay = `${v.name} ${v.address} ${eventsLabel(v, venueT('en'), 'en')} ${eventsLabel(v, t)}`.toLowerCase();
+    const hay = searchKey(`${v.name} ${v.address} ${eventsLabel(v, venueT('en'), 'en')} ${eventsLabel(v, t)}`);
     return words.every(w => hay.includes(w));
   });
 }
@@ -443,12 +463,12 @@ export function matchesCategory(f: Facility, category: FacilityCategory | null):
   return f.category === category || (category === 'accessible' && f.accessible);
 }
 
-/** Matches name, description and location, in English and in `t`'s language. */
+/** Matches name, description and location, in English and in `t`'s language (see searchKey). */
 export function searchFacilities(facilities: Facility[], query: string, category: FacilityCategory | null, t: VenueT = venueT()): Facility[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const words = searchWords(query);
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
-    const hay = `${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`.toLowerCase();
+    const hay = searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`);
     return words.every(w => hay.includes(w));
   });
 }
