@@ -29,6 +29,8 @@ export function Chip({ label, selected = false, onPress, role = 'checkbox', dash
         style={[styles.main, fill && styles.mainFill]}
         accessibilityRole={role}
         accessibilityState={role === 'button' ? undefined : { checked: selected }}
+        // react-native-web reads only aria-* for state.
+        aria-checked={role === 'button' ? undefined : selected}
         accessibilityLabel={label}>
         <Text style={[styles.label, fill && styles.labelFill, (selected || dashed) && styles.labelSelected]}>
           {selected ? '✓ ' : ''}

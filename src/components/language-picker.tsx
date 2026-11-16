@@ -244,12 +244,14 @@ interface LanguageSearchModalProps {
   exclude?: string[];
   /** Picks the app language (welcome and venue pills): the search hint doesn't suggest ASL, which has no screens. */
   appLanguage?: boolean;
+  /** The language chosen now (the app language, or the language help is in): ticked in the list. */
+  selected?: string;
   onSelect: (code: string) => void;
   onClose: () => void;
 }
 
 /** Full-screen searchable list; names shown in their own script with the UI-language name underneath. */
-export function LanguageSearchModal({ visible, title, exclude = [], appLanguage = false, onSelect, onClose }: LanguageSearchModalProps) {
+export function LanguageSearchModal({ visible, title, exclude = [], appLanguage = false, selected, onSelect, onClose }: LanguageSearchModalProps) {
   const t = useT('common');
   const names = useLanguageNames();
   const nameDirection = useNameDirection();
@@ -292,17 +294,24 @@ export function LanguageSearchModal({ visible, title, exclude = [], appLanguage 
             ListEmptyComponent={<Text style={styles.empty}>{t('language.noMatch')}</Text>}
             renderItem={({ item }) => {
               const n = names.row(item);
+              const current = item.code === selected;
               return (
                 <Pressable
-                  style={({ pressed }) => [styles.item, pressed && styles.menuItemPressed]}
+                  style={({ pressed }) => [styles.item, styles.itemRow, current && styles.itemCurrent, pressed && styles.menuItemPressed]}
                   onPress={() => {
                     setQuery('');
                     onSelect(item.code);
                   }}
-                  accessibilityRole="button"
+                  // A one-of list when it has a current choice, so screen readers say which ("checked").
+                  accessibilityRole={selected === undefined ? 'button' : 'radio'}
+                  accessibilityState={selected === undefined ? undefined : { checked: current }}
+                  aria-checked={selected === undefined ? undefined : current}
                   accessibilityLabel={n.label}>
-                  <Text style={[styles.menuNative, nameDirection]}>{n.native}</Text>
-                  {n.gloss ? <Text style={[styles.menuGloss, nameDirection]}>{n.gloss}</Text> : null}
+                  <View style={styles.itemText}>
+                    <Text style={[styles.menuNative, current && styles.menuNativeCurrent, nameDirection]}>{n.native}</Text>
+                    {n.gloss ? <Text style={[styles.menuGloss, nameDirection]}>{n.gloss}</Text> : null}
+                  </View>
+                  {current ? <Text style={styles.currentTick} aria-hidden>✓</Text> : null}
                 </Pressable>
               );
             }}
@@ -348,5 +357,10 @@ const styles = StyleSheet.create({
   searchBox: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt, paddingStart: 4, marginBottom: Spacing.md },
   searchInput: { ...Type.input, flex: 1, paddingVertical: 12, paddingEnd: Spacing.lg, ...webNoOutline },
   item: { minHeight: 52, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.xs, gap: 2, justifyContent: 'center' },
+  itemRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingHorizontal: Spacing.sm, borderRadius: Radius.sm },
+  itemText: { flex: 1, gap: 2 },
+  itemCurrent: { backgroundColor: Colors.primarySoft },
+  menuNativeCurrent: { fontFamily: Fonts.displayMedium, color: Colors.primary },
+  currentTick: { fontFamily: Fonts.textBold, fontSize: 18, lineHeight: 22, color: Colors.primary },
   sep: { height: 1, backgroundColor: Colors.divider },
 });

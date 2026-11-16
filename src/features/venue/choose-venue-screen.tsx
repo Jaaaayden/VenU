@@ -101,6 +101,7 @@ export function ChooseVenueScreen() {
         title={t('choose.languageTitle')}
         exclude={UNTRANSLATED}
         appLanguage
+        selected={language}
         onSelect={pickLanguage}
         onClose={() => setPicking(false)}
       />
