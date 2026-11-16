@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Trans } from 'react-i18next';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { StepHeader } from '@/components/form-section';
@@ -59,6 +59,9 @@ const TERMS_SECTIONS: { key: TermsSectionKey; title: string; points: string[] }[
   },
 ];
 
+/** Web: lays a block out left to right whatever the page direction (react-native-web forwards `dir`). */
+const LTR_WEB = Platform.OS === 'web' ? ({ dir: 'ltr' } as object) : {};
+
 /** Terms of use, from Profile → Terms of use and Create Account's "Terms & Conditions" link. */
 export default function TermsScreen() {
   const t = useT('profile');
@@ -79,7 +82,7 @@ export default function TermsScreen() {
           <View key={section.key} style={styles.card}>
             <Text style={styles.cardTitle} accessibilityRole="header">{t(`terms.sections.${section.key}`)}</Text>
             {section.points.map(point => (
-              <View key={point} style={styles.point}>
+              <View key={point} style={[styles.point, styles.ltr]} {...LTR_WEB}>
                 <View style={styles.bullet} />
                 <Text style={styles.pointText}>{point}</Text>
               </View>
@@ -110,7 +113,11 @@ const styles = StyleSheet.create({
   // Same info tiles as the privacy policy: #F5F5F5, radius 10, no outline.
   card: { gap: Spacing.sm, padding: Spacing.lg, marginBottom: Spacing.md, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
   cardTitle: { fontFamily: Fonts.display, fontSize: 17, lineHeight: 22, color: Colors.text, marginBottom: 2 },
+  // The points are English in every language, so they stay left to right (bullet first) on an
+  // Arabic or Persian page instead of hanging off the right edge.
   point: { flexDirection: 'row', gap: Spacing.md },
+  // Native only: react-native-web rejects `direction` and takes the `dir` attribute instead (LTR_WEB).
+  ltr: Platform.select({ web: {}, default: { direction: 'ltr' as const } }),
   bullet: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.ink, marginTop: 8 },
   pointText: { fontFamily: Fonts.text, fontSize: 15, lineHeight: 21, color: Colors.text, flex: 1 },
   privacy: { ...Type.body, marginTop: Spacing.sm },
