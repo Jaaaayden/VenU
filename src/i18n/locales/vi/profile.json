@@ -22,7 +22,10 @@
   "edit": {
     "title": "Sửa hồ sơ",
     "subtitle": "Thay đổi sẽ áp dụng cho lần nhờ trợ giúp tiếp theo.",
-    "submit": "Lưu thay đổi"
+    "submit": "Lưu thay đổi",
+    "discardTitle": "Thoát mà không lưu? Các thay đổi sẽ bị mất.",
+    "keepEditing": "Tiếp tục chỉnh sửa",
+    "discard": "Bỏ thay đổi"
   },
   "form": {
     "aboutYou": "Về bạn",

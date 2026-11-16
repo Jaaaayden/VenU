@@ -22,7 +22,10 @@
   "edit": {
     "title": "Modifier le profil",
     "subtitle": "Les changements s'appliquent à votre prochaine demande d'aide.",
-    "submit": "Enregistrer"
+    "submit": "Enregistrer",
+    "discardTitle": "Quitter sans enregistrer ? Vos modifications seront perdues.",
+    "keepEditing": "Continuer à modifier",
+    "discard": "Annuler les modifications"
   },
   "form": {
     "aboutYou": "À propos de vous",

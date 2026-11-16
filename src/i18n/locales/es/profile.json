@@ -22,7 +22,10 @@
   "edit": {
     "title": "Editar perfil",
     "subtitle": "Los cambios se aplican a tu próxima solicitud de ayuda.",
-    "submit": "Guardar cambios"
+    "submit": "Guardar cambios",
+    "discardTitle": "¿Salir sin guardar? Perderás tus cambios.",
+    "keepEditing": "Seguir editando",
+    "discard": "Descartar cambios"
   },
   "form": {
     "aboutYou": "Sobre ti",

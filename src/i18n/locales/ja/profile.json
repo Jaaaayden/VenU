@@ -22,7 +22,10 @@
   "edit": {
     "title": "プロフィールを編集",
     "subtitle": "変更は次回のサポート依頼から反映されます。",
-    "submit": "変更を保存"
+    "submit": "変更を保存",
+    "discardTitle": "保存せずに戻りますか？変更は失われます。",
+    "keepEditing": "編集を続ける",
+    "discard": "変更を破棄"
   },
   "form": {
     "aboutYou": "あなたについて",

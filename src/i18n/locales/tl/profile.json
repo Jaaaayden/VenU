@@ -22,7 +22,10 @@
   "edit": {
     "title": "I-edit ang profile",
     "subtitle": "Gagamitin ang mga pagbabago sa susunod mong paghingi ng tulong.",
-    "submit": "I-save ang mga pagbabago"
+    "submit": "I-save ang mga pagbabago",
+    "discardTitle": "Umalis nang hindi nagse-save? Mawawala ang mga binago mo.",
+    "keepEditing": "Ituloy ang pag-edit",
+    "discard": "Itapon ang mga binago"
   },
   "form": {
     "aboutYou": "Tungkol sa iyo",
