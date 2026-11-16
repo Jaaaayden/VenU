@@ -53,7 +53,7 @@ export function Button({ label, onPress, variant = 'primary', size = 'md', icon,
       ) : (
         <View style={styles.row}>
           {icon}
-          <Text style={[size === 'lg' ? Type.buttonLarge : Type.button, labelStyles[variant]]}>{label}</Text>
+          <Text style={[size === 'lg' ? Type.buttonLarge : Type.button, labelStyles[variant], styles.label]}>{label}</Text>
         </View>
       )}
     </Pressable>
@@ -61,9 +61,13 @@ export function Button({ label, onPress, variant = 'primary', size = 'md', icon,
 }
 
 const styles = StyleSheet.create({
-  base: { minHeight: 44, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, borderWidth: 2, borderColor: 'transparent' },
+  // paddingVertical only shows once a label wraps (minHeight wins for one line): a two-line label,
+  // e.g. Arabic "اتصل بموظفي المكان" on a 320pt phone, otherwise runs into the border.
+  base: { minHeight: 44, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 6, borderWidth: 2, borderColor: 'transparent' },
   lg: { minHeight: 52 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  // A wrapped label stays centred like a one-line one (it was flush to the start edge).
+  label: { textAlign: 'center' },
   primary: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   dark: { backgroundColor: Colors.ink, borderColor: Colors.ink },
   secondary: { backgroundColor: Colors.surface, borderColor: Colors.ink },
