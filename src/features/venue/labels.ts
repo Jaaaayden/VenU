@@ -60,6 +60,20 @@ export function facilityLocation(f: Facility, t: VenueT = venueT()): string {
   return isKnown(id) ? t(`facilityText.${id}.location`) : f.location;
 }
 
+/** Longest search text echoed back in an empty-results line before it's cut with "…". */
+export const ECHO_MAX = 40;
+
+/**
+ * The search as echoed in "No restrooms match “…”": trimmed, and cut to ECHO_MAX characters so a
+ * pasted paragraph doesn't fill the sheet.
+ * e.g. echoQuery('  taco ') → 'taco'; echoQuery('x'.repeat(300)) → 'xxx…' (40 x's, then …)
+ */
+export function echoQuery(query: string): string {
+  const q = query.trim();
+  const chars = [...q]; // by code point, so an emoji or a surrogate pair isn't split
+  return chars.length > ECHO_MAX ? `${chars.slice(0, ECHO_MAX).join('').trimEnd()}…` : q;
+}
+
 /** "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian). */
 export function facilityMeta(f: Facility, t: VenueT = venueT()): string {
   const number = formatNumber(f.walkMinutes, undefined, languageOf(t));
