@@ -68,6 +68,7 @@
   "steps": {
     "languagesTitle": "言語を選ぶ",
     "languagesSubtitle": "ボランティアと話しやすくするためです。",
+    "languagesSubtitleVolunteer": "観戦者と話しやすくするためです。",
     "preferencesTitle": "サポーターの希望",
     "preferencesSubtitle": "あなたに合ったサポーターを見つけるためです。設定からいつでも変更できます。",
     "photoTitle": "プロフィール写真を選ぶ",

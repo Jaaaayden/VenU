@@ -68,6 +68,7 @@
   "steps": {
     "languagesTitle": "选择你的语言",
     "languagesSubtitle": "方便你和志愿者沟通。",
+    "languagesSubtitleVolunteer": "方便你和观众沟通。",
     "preferencesTitle": "帮手偏好",
     "preferencesSubtitle": "这样我们能为你找到合适的帮手。你可以随时在设置中修改。",
     "photoTitle": "选择头像",

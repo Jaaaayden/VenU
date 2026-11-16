@@ -68,6 +68,7 @@
   "steps": {
     "languagesTitle": "Elige tus idiomas",
     "languagesSubtitle": "Para ayudarte a comunicarte con los voluntarios.",
+    "languagesSubtitleVolunteer": "Para ayudarte a comunicarte con los visitantes.",
     "preferencesTitle": "Preferencias de voluntario",
     "preferencesSubtitle": "Así encontramos a la persona adecuada para ayudarte. Puedes cambiarlo cuando quieras en tus ajustes.",
     "photoTitle": "Elige una foto de perfil",

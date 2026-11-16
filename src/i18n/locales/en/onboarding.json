@@ -68,6 +68,7 @@
   "steps": {
     "languagesTitle": "Choose your languages",
     "languagesSubtitle": "To help you communicate with volunteers.",
+    "languagesSubtitleVolunteer": "To help you communicate with visitors.",
     "preferencesTitle": "Volunteer preferences",
     "preferencesSubtitle": "So we can find the right helper for you. Change it anytime in your settings.",
     "photoTitle": "Choose a profile picture",

@@ -64,7 +64,7 @@ export default function LanguagesStep() {
       // here, so Back opens the role question instead: the way to switch visitor/volunteer.
       back={<BackLink to={{ pathname: '/onboarding/role', params: { change: '1' } }} />}
       title={t('steps.languagesTitle')}
-      subtitle={t('steps.languagesSubtitle')}
+      subtitle={role === 'volunteer' ? t('steps.languagesSubtitleVolunteer') : t('steps.languagesSubtitle')}
       actions={<PrimaryAction label={tc('actions.continue')} onPress={next} />}>
       <LanguagePicker
         languages={draft.languages}
