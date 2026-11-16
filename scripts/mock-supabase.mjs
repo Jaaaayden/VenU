@@ -72,6 +72,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql).
   const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
   const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
+  // Supabase Auth stores and matches emails in lower case: "Rosa@Example.com" signs in as rosa@example.com.
+  const normalEmail = email => (typeof email === 'string' ? email.trim().toLowerCase() : '');
   function session(user) {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const refresh_token = randomUUID();
@@ -125,7 +127,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     }
     if (p === '/__control') { Object.assign(control, json()); return send(res, 200, control); }
     if (p === '/__confirm') {
-      const user = users.get(url.searchParams.get('email') ?? '');
+      const user = users.get(normalEmail(url.searchParams.get('email')));
       if (user) { user.confirmed = true; persist(); }
       res.writeHead(user ? 200 : 404, { 'content-type': 'text/html; charset=utf-8' });
       return res.end(user ? `<p style="font:16px system-ui">Email confirmed for ${user.email}. Go back to VenU and sign in.</p>` : 'No account with that email.');
@@ -143,7 +145,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
 
     // ---- auth
     if (p === '/auth/v1/signup' && req.method === 'POST') {
-      const { email, password, data } = json() ?? {};
+      const { email: typed, password, data } = json() ?? {};
+      const email = normalEmail(typed);
       if (users.has(email)) return authErr(res, 422, 'user_already_exists', 'User already registered');
       const username = normalUsername(data?.username) || undefined;
       // The claim_username trigger: a taken or malformed name fails the whole sign-up.
@@ -160,7 +163,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       const body = json() ?? {};
       const grant = url.searchParams.get('grant_type');
       if (grant === 'password') {
-        const user = users.get(body.email);
+        const user = users.get(normalEmail(body.email));
         if (!user || user.password !== body.password) return authErr(res, 400, 'invalid_credentials', 'Invalid login credentials');
         if (!user.confirmed) return authErr(res, 400, 'email_not_confirmed', 'Email not confirmed');
         return send(res, 200, session(user));
