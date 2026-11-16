@@ -123,7 +123,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         </View>
       </Pressable>
 
-      <View style={styles.section}>
+      {/* Figma 492:8829 groups the question and the grid on a tinted panel. */}
+      <View style={styles.panel}>
         <Text style={styles.question} accessibilityRole="header">{t('form.question')}</Text>
         <View style={styles.grid}>
           {[0, 3].map(start => (
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   page: { gap: Spacing.xl },
   header: { gap: 0 },
   titles: { gap: 5, marginTop: -8 },
-  title: { ...Type.title, fontSize: 26, lineHeight: 32 },
+  title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
   langPill: {
     flexDirection: 'row',
@@ -197,20 +198,31 @@ const styles = StyleSheet.create({
     paddingEnd: Spacing.md,
     paddingVertical: Spacing.md,
     borderRadius: Radius.md,
-    backgroundColor: Colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Colors.controlBorder,
+    backgroundColor: Colors.surface,
   },
   // No spot yet: a dashed blue outline asks for a tap.
   locationUnset: { borderWidth: 1.5, borderColor: Colors.primary, borderStyle: 'dashed' },
-  locationPressed: { backgroundColor: Colors.border },
+  locationPressed: { backgroundColor: Colors.primarySoft },
   locationText: { flex: 1, gap: 2 },
   flip: { transform: [{ scaleX: -1 }] },
   rtlText: { writingDirection: 'rtl' },
   ltrText: { writingDirection: 'ltr' },
   spot: { ...Type.body },
   venue: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text },
-  section: { gap: Spacing.lg },
+  panel: {
+    gap: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: 14,
+    paddingHorizontal: 14,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.controlBorder,
+    backgroundColor: Colors.primarySoft,
+  },
   question: { ...Type.body },
-  grid: { gap: Spacing.lg },
+  grid: { gap: Spacing.md },
   gridRow: { flexDirection: 'row', gap: Spacing.md },
   actions: { gap: Spacing.lg, marginTop: Spacing.md },
   send: { minHeight: 52 },
