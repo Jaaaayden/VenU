@@ -7,7 +7,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Colors, Fonts, Shadow } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
 import { facilityName } from './labels';
@@ -113,6 +113,25 @@ const NATIVE_LTR = Platform.OS === 'web' ? null : ({ direction: 'ltr' } as const
 
 const PIN = 34;
 const PIN_SELECTED = 42;
+const LABEL_WIDTH = 140;
+const LABEL_HEIGHT = 21;
+/** Pins this far south (map units) are labelled above: the sheet slides up over the space below them. */
+const LABEL_ABOVE_FROM_Y = 300;
+
+/**
+ * Where the open facility's name label goes, in the map's pixels: centred under its pin, or above it
+ * near the bottom, and kept inside the map so a pin on the edge (Parking Lot C) doesn't cut it off;
+ * a label pushed in from an edge hugs that edge, so the name stays next to its pin.
+ * e.g. a pin at (380, 120) on a 390-wide map → { left: 246, top: 143, alignItems: 'flex-end' }
+ */
+export function pinLabelPosition(pinX: number, pinY: number, mapY: number, width: number) {
+  const centred = pinX - LABEL_WIDTH / 2;
+  const max = Math.max(width - LABEL_WIDTH - 4, 4);
+  const left = Math.min(Math.max(centred, 4), max);
+  const alignItems: 'center' | 'flex-start' | 'flex-end' = left > centred ? 'flex-start' : left < centred ? 'flex-end' : 'center';
+  const top = mapY >= LABEL_ABOVE_FROM_Y ? pinY - PIN_SELECTED / 2 - 2 - LABEL_HEIGHT : pinY + PIN_SELECTED / 2 + 2;
+  return { left, top, alignItems };
+}
 
 export function StadiumMap({ shape, facilities, width, height, category, selectedId, onPinPress }: StadiumMapProps) {
   const t = useT('venue');
@@ -120,6 +139,10 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
   const ox = (width - MAP_SIZE * scale) / 2;
   const oy = (height - MAP_SIZE * scale) / 2;
   const selected = facilities.find(f => f.id === selectedId);
+  const label = selected ? pinLabelPosition(ox + selected.x * scale, oy + selected.y * scale, selected.y, width) : null;
+  // Web lays the map out right-to-left in Arabic (only native forces LTR): flex-start is the right edge there.
+  const flipAlign = useLayoutRtl() && Platform.OS === 'web';
+  if (label && flipAlign && label.alignItems !== 'center') label.alignItems = label.alignItems === 'flex-start' ? 'flex-end' : 'flex-start';
 
   return (
     // The map is geographic: east stays on the right in right-to-left languages. Web keeps `left`
@@ -157,7 +180,7 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
       {selected ? (
         <View
           pointerEvents="none"
-          style={[styles.label, { left: ox + selected.x * scale - 70, top: oy + selected.y * scale + PIN_SELECTED / 2 + 2 }]}>
+          style={[styles.label, label]}>
           <Text style={styles.labelText} numberOfLines={1}>{facilityName(selected, t)}</Text>
         </View>
       ) : null}
@@ -179,7 +202,7 @@ const styles = StyleSheet.create({
   pinMatch: { backgroundColor: Colors.primary, borderColor: Colors.surface, borderWidth: 2, transform: [{ scale: 1.08 }] },
   pinSelected: { backgroundColor: Colors.inkDeep, borderColor: Colors.surface, borderWidth: 2.5 },
   pinDim: { opacity: 0.3 },
-  label: { position: 'absolute', width: 140, alignItems: 'center', zIndex: 3 },
+  label: { position: 'absolute', width: LABEL_WIDTH, alignItems: 'center', zIndex: 3 },
   labelText: {
     fontFamily: Fonts.textBold,
     fontSize: 13,
