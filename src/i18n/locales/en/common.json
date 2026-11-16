@@ -30,7 +30,8 @@
   },
   "errors": {
     "offline": "Can't reach VenU. Check your connection and try again.",
-    "wrongLogin": "Wrong email or password.",
+    "wrongLogin": "Wrong username or password.",
+    "usernameTaken": "That username is taken. Try another.",
     "confirmEmail": "Confirm your email first. Check your inbox for the link.",
     "linkExpired": "That link has expired or was already used. Ask for a new one.",
     "alreadyRegistered": "That email already has an account. Try signing in.",

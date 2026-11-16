@@ -45,15 +45,17 @@ export function useAuthForm(mode: AuthMode) {
     try {
       const result = mode === 'signin'
         ? await auth.signIn(values.email, values.password)
-        : await auth.signUp(values.email, values.password);
+        : await auth.signUp(values.email, values.password, values.username ?? '');
       if (!result.ok) {
-        setError({ field: null, message: result.error });
+        setError({ field: result.field ?? null, message: result.error });
         return 'failed';
       }
       // Profile setup starts with the name typed on Create Account, tied to that email: a sign-in
       // to any other account on this device drops it, but signing in after confirming keeps it.
-      if (mode === 'signup') await rememberPendingName(values.email, values.name);
-      else await forgetPendingNameUnlessFor(values.email);
+      // (A username sign-in reports the account's email; local mode has none, so it uses what was typed.)
+      const email = result.email ?? values.email;
+      if (mode === 'signup') await rememberPendingName(email, values.name);
+      else await forgetPendingNameUnlessFor(email);
       if (result.needsConfirmation) return 'confirm';
       // No navigation here: once the provider is 'ready' (from this load or the auth listener's,
       // whichever lands last), the screen's redirect sends the user on.

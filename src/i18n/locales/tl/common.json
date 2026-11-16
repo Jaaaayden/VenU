@@ -30,7 +30,8 @@
   },
   "errors": {
     "offline": "Hindi maabot ang VenU. Tingnan ang iyong koneksyon at subukan muli.",
-    "wrongLogin": "Mali ang email o password.",
+    "wrongLogin": "Mali ang username o password.",
+    "usernameTaken": "May gumagamit na ng username na iyan. Subukan ang iba.",
     "confirmEmail": "Kumpirmahin muna ang iyong email. Hanapin ang link sa iyong inbox.",
     "linkExpired": "Expired na o nagamit na ang link na iyan. Humingi ng bago.",
     "alreadyRegistered": "May account na ang email na iyan. Subukang mag-sign in.",

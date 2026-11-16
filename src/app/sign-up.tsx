@@ -3,17 +3,18 @@ import { useRef, useState, type ComponentRef } from 'react';
 import { Trans } from 'react-i18next';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Button } from '@/components/button';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { AuthField, Checkbox, FooterPrompt } from '@/features/auth/auth-ui';
 import { AuthScreen } from '@/features/auth/auth-screen';
+import { PrimaryAction } from '@/features/auth/onboarding-screen';
 import { useAuthForm, useSignedInHref } from '@/features/auth/use-auth-form';
+import { USERNAME_MAX } from '@/features/auth/username';
 import { FIRST_NAME_MAX } from '@/features/profile/validate';
 import { useT } from '@/i18n';
 
 /**
- * Figma onboarding__create-account. No "Username" field: accounts are email + password and
- * there's nowhere to store one. The name pre-fills the first name in profile setup.
+ * Figma Create Account (Onboarding 2.0, 482:32140): name, email, username, password. The name
+ * pre-fills the first name in setup; the username lets Sign In take it instead of the email.
  */
 export default function SignUpScreen() {
   const signedInHref = useSignedInHref();
@@ -21,16 +22,18 @@ export default function SignUpScreen() {
   const { busy, error, errorFor, setError, submit } = useAuthForm('signup');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [terms, setTerms] = useState(false);
   const emailRef = useRef<ComponentRef<typeof TextInput>>(null);
+  const usernameRef = useRef<ComponentRef<typeof TextInput>>(null);
   const passwordRef = useRef<ComponentRef<typeof TextInput>>(null);
 
   // Signed in (just now, or by opening /sign-up while signed in): on to setup or home.
   if (signedInHref) return <Redirect href={signedInHref} />;
 
   async function go() {
-    const result = await submit({ name, email, password, termsAccepted: terms });
+    const result = await submit({ name, email, username, password, termsAccepted: terms });
     if (result === 'confirm') router.replace({ pathname: '/sign-in', params: { confirm: '1', email: email.trim() } });
   }
 
@@ -60,6 +63,22 @@ export default function SignUpScreen() {
           autoCorrect={false}
           autoComplete="email"
           textContentType="emailAddress"
+          returnKeyType="next"
+          onSubmitEditing={() => usernameRef.current?.focus()}
+        />
+        <AuthField
+          ref={usernameRef}
+          label={t('auth.username')}
+          placeholder={t('auth.usernamePlaceholder')}
+          value={username}
+          onChangeText={setUsername}
+          error={errorFor('username')}
+          hint={errorFor('username') ? undefined : t('auth.usernameHint')}
+          maxLength={USERNAME_MAX}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="username-new"
+          textContentType="username"
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
@@ -96,7 +115,9 @@ export default function SignUpScreen() {
 
       {error?.field === null && <Text style={styles.error} accessibilityLiveRegion="polite">{error.message}</Text>}
 
-      <Button label={t('signUp.submit')} variant="dark" onPress={go} loading={busy} style={styles.cta} />
+      <View style={styles.cta}>
+        <PrimaryAction label={t('signUp.submit')} onPress={go} loading={busy} />
+      </View>
     </AuthScreen>
   );
 }
@@ -105,5 +126,5 @@ const styles = StyleSheet.create({
   form: { gap: Spacing.gutter },
   link: { color: Colors.primary, textDecorationLine: 'underline' },
   error: { ...Type.caption, color: Colors.danger, textAlign: 'center', marginTop: Spacing.lg },
-  cta: { alignSelf: 'center', width: 240, marginTop: Spacing.lg },
+  cta: { alignItems: 'center', marginTop: Spacing.xxl },
 });

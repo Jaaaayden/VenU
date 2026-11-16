@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "Tạo tài khoản",
     "or": "hoặc",
+    "visitor": "Tôi là khán giả",
+    "volunteer": "Tôi là tình nguyện viên",
+    "roleQuestion": "Khán giả hay tình nguyện viên?",
     "signIn": "Đăng nhập",
     "socialTitle": "HOẶC đăng ký bằng",
     "socialSoon": "Đăng nhập bằng Google, Apple và Facebook sẽ sớm ra mắt.",
@@ -16,11 +19,15 @@
     "namePlaceholder": "Nhập tên",
     "email": "Thư điện tử",
     "emailPlaceholder": "Nhập email",
+    "username": "Tên người dùng",
+    "usernamePlaceholder": "Nhập tên người dùng",
+    "usernameHint": "3–20 chữ cái, số, _ hoặc .",
     "password": "Mật khẩu",
     "passwordPlaceholder": "Nhập mật khẩu"
   },
   "signIn": {
     "title": "Đăng nhập",
+    "identifierPlaceholder": "Nhập tên người dùng hoặc email",
     "noAccount": "Chưa có tài khoản?",
     "signUp": "Đăng ký",
     "forgot": "Quên mật khẩu?",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "Nhập email hợp lệ.",
+    "identifier": "Nhập tên người dùng hoặc email.",
+    "usernameLength": "Tên người dùng cần {{min}}–{{max}} ký tự.",
+    "usernameChars": "Tên người dùng chỉ gồm chữ cái không dấu, số, _ và .",
     "passwordLength": "Mật khẩu cần ít nhất {{min}} ký tự.",
     "password": "Nhập mật khẩu của bạn.",
     "terms": "Đồng ý với Điều khoản & Điều kiện để tiếp tục."
@@ -55,11 +65,18 @@
     "volunteerTitle": "Tôi là tình nguyện viên LA28",
     "volunteerBody": "Giúp khán giả gần bạn. Bạn sẽ hiện là chưa xác minh cho đến khi LA28 xác nhận."
   },
+  "steps": {
+    "languagesTitle": "Chọn ngôn ngữ của bạn",
+    "languagesSubtitle": "Để bạn dễ trò chuyện với tình nguyện viên.",
+    "preferencesTitle": "Người bạn muốn được giúp",
+    "preferencesSubtitle": "Để chúng tôi tìm đúng người giúp bạn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
+    "photoTitle": "Chọn ảnh đại diện",
+    "photoSubtitle": "Để tình nguyện viên dễ tìm thấy bạn hơn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
+    "photoSubtitleVolunteer": "Để khán giả nhận ra bạn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
+    "finish": "Hoàn tất"
+  },
   "setup": {
-    "visitorTitle": "Thiết lập hồ sơ",
-    "visitorSubtitle": "Để chúng tôi tìm đúng người giúp bạn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
     "volunteerTitle": "Hồ sơ tình nguyện viên",
-    "volunteerSubtitle": "Để chúng tôi gửi đến bạn những khán giả bạn giúp được nhiều nhất.",
-    "submit": "Lưu và tiếp tục"
+    "volunteerSubtitle": "Để chúng tôi gửi đến bạn những khán giả bạn giúp được nhiều nhất."
   }
 }

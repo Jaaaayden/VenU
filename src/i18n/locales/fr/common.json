@@ -30,7 +30,8 @@
   },
   "errors": {
     "offline": "Impossible de joindre VenU. Vérifiez votre connexion et réessayez.",
-    "wrongLogin": "E-mail ou mot de passe incorrect.",
+    "wrongLogin": "Nom d’utilisateur ou mot de passe incorrect.",
+    "usernameTaken": "Ce nom d’utilisateur est déjà pris. Essayez-en un autre.",
     "confirmEmail": "Confirmez d’abord votre e-mail. Le lien est dans votre boîte de réception.",
     "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
     "alreadyRegistered": "Cet e-mail a déjà un compte. Essayez de vous connecter.",

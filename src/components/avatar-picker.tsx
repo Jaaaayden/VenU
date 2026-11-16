@@ -16,6 +16,8 @@ interface AvatarPickerProps {
   uri: string | null;
   onPick: (image: PickedImage) => void;
   onRemove: () => void;
+  /** 'stacked': a large photo you can tap, actions centred under it (Figma "Choose a profile picture" 482:32439). */
+  layout?: 'row' | 'stacked';
 }
 
 const PICK_OPTIONS: ImagePicker.ImagePickerOptions = {
@@ -30,7 +32,7 @@ const PICK_OPTIONS: ImagePicker.ImagePickerOptions = {
 };
 
 /** Photo + "Choose photo" / "Take photo" / "Remove" actions. Must be launched from a tap (web rule). */
-export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps) {
+export function AvatarPicker({ name, uri, onPick, onRemove, layout = 'row' }: AvatarPickerProps) {
   const [error, setError] = useState<string | null>(null);
   const t = useT('common');
 
@@ -56,16 +58,23 @@ export function AvatarPicker({ name, uri, onPick, onRemove }: AvatarPickerProps)
     onPick(image);
   }
 
+  const stacked = layout === 'stacked';
   return (
-    <View style={styles.row}>
-      <Avatar name={name} uri={uri} size={72} />
-      <View style={styles.actions}>
-        <View style={styles.links}>
+    <View style={stacked ? styles.stacked : styles.row}>
+      {stacked ? (
+        <Pressable onPress={() => pick('library')} accessibilityRole="button" accessibilityLabel={uri ? t('photo.change') : t('photo.add')} style={({ pressed }) => pressed && styles.pressed}>
+          <Avatar name={name} uri={uri} size={120} />
+        </Pressable>
+      ) : (
+        <Avatar name={name} uri={uri} size={72} />
+      )}
+      <View style={stacked ? styles.actionsStacked : styles.actions}>
+        <View style={[styles.links, stacked && styles.linksStacked]}>
           <Action label={uri ? t('photo.change') : t('photo.add')} onPress={() => pick('library')} />
           {Platform.OS !== 'web' && <Action label={t('photo.take')} onPress={() => pick('camera')} />}
           {uri && <Action label={t('photo.remove')} onPress={onRemove} muted />}
         </View>
-        <Text style={[styles.hint, error && styles.error]} accessibilityLiveRegion="polite">
+        <Text style={[styles.hint, stacked && styles.hintStacked, error && styles.error]} accessibilityLiveRegion="polite">
           {error ?? t('photo.hint')}
         </Text>
       </View>
@@ -83,8 +92,13 @@ function Action({ label, onPress, muted }: { label: string; onPress: () => void;
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
+  stacked: { alignItems: 'center', gap: Spacing.md },
+  pressed: { opacity: 0.8 },
   actions: { flex: 1, gap: Spacing.xs },
+  actionsStacked: { alignItems: 'center', gap: Spacing.xs },
   links: { flexDirection: 'row', flexWrap: 'wrap', columnGap: Spacing.lg, rowGap: Spacing.xs },
+  linksStacked: { justifyContent: 'center' },
+  hintStacked: { textAlign: 'center' },
   target: { minHeight: 32, justifyContent: 'center' }, // >= 24px on web too, where hitSlop is ignored
   action: { ...Type.label, color: Colors.primary },
   actionMuted: { color: Colors.textMuted },

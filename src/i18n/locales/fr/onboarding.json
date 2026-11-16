@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "Créer un compte",
     "or": "ou",
+    "visitor": "Je suis spectateur",
+    "volunteer": "Je suis bénévole",
+    "roleQuestion": "Spectateur ou bénévole ?",
     "signIn": "Se connecter",
     "socialTitle": "OU s'inscrire avec",
     "socialSoon": "La connexion avec Google, Apple et Facebook arrive bientôt.",
@@ -16,11 +19,15 @@
     "namePlaceholder": "Saisissez votre prénom",
     "email": "E-mail",
     "emailPlaceholder": "Saisissez votre e-mail",
+    "username": "Nom d’utilisateur",
+    "usernamePlaceholder": "Saisissez votre nom d’utilisateur",
+    "usernameHint": "3 à 20 lettres, chiffres, _ ou .",
     "password": "Mot de passe",
     "passwordPlaceholder": "Saisissez votre mot de passe"
   },
   "signIn": {
     "title": "Connexion",
+    "identifierPlaceholder": "Nom d’utilisateur ou e-mail",
     "noAccount": "Pas encore de compte ?",
     "signUp": "S'inscrire",
     "forgot": "Mot de passe oublié ?",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "Saisissez un e-mail valide.",
+    "identifier": "Saisissez votre nom d’utilisateur ou votre e-mail.",
+    "usernameLength": "Utilisez {{min}} à {{max}} caractères pour votre nom d’utilisateur.",
+    "usernameChars": "N’utilisez que des lettres, des chiffres, _ et . dans votre nom d’utilisateur.",
     "passwordLength": "Utilisez au moins {{min}} caractères pour votre mot de passe.",
     "password": "Saisissez votre mot de passe.",
     "terms": "Acceptez les Conditions générales pour continuer."
@@ -55,11 +65,18 @@
     "volunteerTitle": "Je suis bénévole LA28",
     "volunteerBody": "Aidez les spectateurs près de vous. Vous apparaîtrez comme non vérifié jusqu'à la confirmation de LA28."
   },
+  "steps": {
+    "languagesTitle": "Choisissez vos langues",
+    "languagesSubtitle": "Pour vous aider à communiquer avec les bénévoles.",
+    "preferencesTitle": "Préférences d’aide",
+    "preferencesSubtitle": "Pour trouver la bonne personne pour vous aider. Modifiable à tout moment dans vos réglages.",
+    "photoTitle": "Choisissez une photo de profil",
+    "photoSubtitle": "Pour que les bénévoles vous trouvent plus facilement. Modifiable à tout moment dans vos réglages.",
+    "photoSubtitleVolunteer": "Pour que les spectateurs vous reconnaissent. Modifiable à tout moment dans vos réglages.",
+    "finish": "Terminer"
+  },
   "setup": {
-    "visitorTitle": "Créez votre profil",
-    "visitorSubtitle": "Pour trouver la bonne personne pour vous aider. Modifiable à tout moment dans vos réglages.",
     "volunteerTitle": "Votre profil bénévole",
-    "volunteerSubtitle": "Pour vous envoyer les spectateurs que vous pouvez le mieux aider.",
-    "submit": "Enregistrer et continuer"
+    "volunteerSubtitle": "Pour vous envoyer les spectateurs que vous pouvez le mieux aider."
   }
 }

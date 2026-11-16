@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { Redirect, router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,6 +7,7 @@ import { Button } from '@/components/button';
 import { StepHeader } from '@/components/form-section';
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { readPendingSetup } from '@/features/auth/pending-setup';
 import type { Role } from '@/features/profile/types';
 import { useT } from '@/i18n';
 
@@ -17,13 +18,25 @@ const ROLES: { value: Role; icon: FigmaIconName }[] = [
 ];
 
 /**
- * Before "Set up your profile": visitor or volunteer, since the two get different questions.
- * The language is chosen on the landing page's language pill and in profile setup.
+ * Visitor or volunteer, since the two get different questions. Usually answered on the first
+ * screen (/welcome) already, which skips this; it's asked here when that choice isn't on this
+ * device (e.g. signed in from a link).
  */
 export default function RoleStep() {
   const [role, setRole] = useState<Role | null>(null);
+  // undefined while reading; null when the first screen's choice isn't stored.
+  const [chosen, setChosen] = useState<Role | null | undefined>(undefined);
   const t = useT('onboarding');
   const tc = useT('common');
+
+  useEffect(() => {
+    let live = true;
+    readPendingSetup().then(p => live && setChosen(p.role ?? null));
+    return () => { live = false; };
+  }, []);
+
+  if (chosen === undefined) return null;
+  if (chosen) return <Redirect href={{ pathname: '/onboarding/languages', params: { role: chosen } }} />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
@@ -61,7 +74,7 @@ export default function RoleStep() {
           label={tc('actions.continue')}
           size="lg"
           disabled={!role}
-          onPress={() => role && router.push({ pathname: '/onboarding/profile', params: { role } })}
+          onPress={() => role && router.push({ pathname: '/onboarding/languages', params: { role } })}
         />
       </ScrollView>
     </SafeAreaView>

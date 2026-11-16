@@ -1,34 +1,70 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 
-import { friendlyError } from '@/lib/errors';
+import { isEmailLike, normalizeUsername } from '@/features/auth/username';
+import { codedError, friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
 
 export const LOCAL_USER_ID = 'local-guest';
 const LOCAL_SESSION_KEY = 'venu.local.session';
 
-export type AuthResult = { ok: true; needsConfirmation?: boolean } | { ok: false; error: string };
+/** `email`: the account's email once signed in (a username sign-in looks it up). `field`: where to show the error. */
+export type AuthResult =
+  | { ok: true; needsConfirmation?: boolean; email?: string }
+  | { ok: false; error: string; field?: 'username' };
 
 export const isLocalMode = supabase === null;
 
-export async function signIn(email: string, password: string): Promise<AuthResult> {
+/** No such username: worded exactly like a wrong password, so sign-in doesn't reveal which usernames exist. */
+const wrongLogin = () => friendlyError({ code: 'invalid_credentials' });
+
+/**
+ * Sign in with a username or an email. A username is looked up with the `email_for_username`
+ * function (supabase/migrations/20261116000000_usernames.sql) and then signs in by that email.
+ * e.g. signIn('rosa_m', pw) → email_for_username('rosa_m') = 'rosa@example.com' → password sign-in
+ */
+export async function signIn(identifier: string, password: string): Promise<AuthResult> {
   if (!supabase) {
     await AsyncStorage.setItem(LOCAL_SESSION_KEY, '1');
     return { ok: true };
   }
-  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-  return error ? { ok: false, error: friendlyError(error) } : { ok: true };
+  let email = identifier.trim();
+  if (!isEmailLike(email)) {
+    const { data, error } = await supabase.rpc('email_for_username', { p_username: normalizeUsername(email) });
+    if (error) return { ok: false, error: friendlyError(error) };
+    if (typeof data !== 'string' || !data) return { ok: false, error: wrongLogin() };
+    email = data;
+  }
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  return error ? { ok: false, error: friendlyError(error) } : { ok: true, email };
 }
 
-export async function signUp(email: string, password: string): Promise<AuthResult> {
+/**
+ * Create an account. The username goes in the user's metadata, where a database trigger claims
+ * it in public.usernames; a quick `username_available` check first gives a clear "taken" message.
+ */
+export async function signUp(email: string, password: string, username: string): Promise<AuthResult> {
   if (!supabase) {
     await AsyncStorage.setItem(LOCAL_SESSION_KEY, '1');
     return { ok: true };
   }
-  const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
-  if (error) return { ok: false, error: friendlyError(error) };
+  const name = normalizeUsername(username);
+  const taken = { ok: false as const, error: friendlyError(codedError('usernameTaken')), field: 'username' as const };
+  const check = await supabase.rpc('username_available', { p_username: name });
+  if (check.error) return { ok: false, error: friendlyError(check.error) };
+  if (check.data === false) return taken;
+  const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { username: name } } });
+  if (error) {
+    // Someone took the name between the check and the sign-up: the trigger's unique index fails
+    // the insert, which Supabase reports as a generic database error.
+    if (/database error saving new user/i.test(error.message)) {
+      const again = await supabase.rpc('username_available', { p_username: name });
+      if (again.data === false) return taken;
+    }
+    return { ok: false, error: friendlyError(error) };
+  }
   // With email confirmation on, Supabase returns a user but no session yet.
-  return { ok: true, needsConfirmation: !data.session };
+  return { ok: true, needsConfirmation: !data.session, email: email.trim() };
 }
 
 export async function signOut(): Promise<void> {

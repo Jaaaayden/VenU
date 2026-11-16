@@ -30,7 +30,8 @@
   },
   "errors": {
     "offline": "Không thể kết nối VenU. Hãy kiểm tra kết nối và thử lại.",
-    "wrongLogin": "Sai email hoặc mật khẩu.",
+    "wrongLogin": "Sai tên người dùng hoặc mật khẩu.",
+    "usernameTaken": "Tên người dùng này đã có người dùng. Hãy thử tên khác.",
     "confirmEmail": "Hãy xác nhận email trước. Kiểm tra hộp thư để lấy liên kết.",
     "linkExpired": "Liên kết này đã hết hạn hoặc đã được dùng. Hãy yêu cầu liên kết mới.",
     "alreadyRegistered": "Email này đã có tài khoản. Hãy thử đăng nhập.",

@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "Gumawa ng Account",
     "or": "o",
+    "visitor": "Bisita ako",
+    "volunteer": "Volunteer ako",
+    "roleQuestion": "Bisita o volunteer?",
     "signIn": "Mag-sign In",
     "socialTitle": "O mag-sign up gamit ang",
     "socialSoon": "Malapit nang magamit ang pag-sign in gamit ang Google, Apple at Facebook.",
@@ -16,11 +19,15 @@
     "namePlaceholder": "Ilagay ang pangalan",
     "email": "Email",
     "emailPlaceholder": "Ilagay ang email",
+    "username": "Username",
+    "usernamePlaceholder": "Ilagay ang username",
+    "usernameHint": "3–20 letra, numero, _ o .",
     "password": "Password",
     "passwordPlaceholder": "Ilagay ang password"
   },
   "signIn": {
     "title": "Mag-sign In",
+    "identifierPlaceholder": "Ilagay ang username o email",
     "noAccount": "Wala ka pang account?",
     "signUp": "Mag-sign Up",
     "forgot": "Nakalimutan ang Password?",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "Maglagay ng tamang email.",
+    "identifier": "Ilagay ang username o email mo.",
+    "usernameLength": "Gumamit ng {{min}}–{{max}} character sa username mo.",
+    "usernameChars": "Letra, numero, _ at . lang ang puwede sa username.",
     "passwordLength": "Gumamit ng hindi bababa sa {{min}} character para sa password.",
     "password": "Ilagay ang iyong password.",
     "terms": "Sumang-ayon sa Mga Tuntunin at Kundisyon para magpatuloy."
@@ -55,11 +65,18 @@
     "volunteerTitle": "Volunteer ako ng LA28",
     "volunteerBody": "Tumulong sa mga bisitang malapit sa iyo. Hindi ka pa verified hangga't hindi ka kinukumpirma ng LA28."
   },
+  "steps": {
+    "languagesTitle": "Piliin ang mga wika mo",
+    "languagesSubtitle": "Para madali kang makipag-usap sa mga volunteer.",
+    "preferencesTitle": "Gustong tutulong",
+    "preferencesSubtitle": "Para mahanap namin ang tamang tutulong sa iyo. Mababago mo ito anumang oras sa settings.",
+    "photoTitle": "Pumili ng profile picture",
+    "photoSubtitle": "Para mas madali kang mahanap ng mga volunteer. Mababago mo ito anumang oras sa settings.",
+    "photoSubtitleVolunteer": "Para makilala ka ng mga bisita. Mababago mo ito anumang oras sa settings.",
+    "finish": "Tapusin"
+  },
   "setup": {
-    "visitorTitle": "I-set up ang iyong profile",
-    "visitorSubtitle": "Para mahanap namin ang tamang tutulong sa iyo. Mababago mo ito anumang oras sa settings.",
     "volunteerTitle": "Ang iyong volunteer profile",
-    "volunteerSubtitle": "Para maipadala namin sa iyo ang mga bisitang pinakamatutulungan mo.",
-    "submit": "I-save at magpatuloy"
+    "volunteerSubtitle": "Para maipadala namin sa iyo ang mga bisitang pinakamatutulungan mo."
   }
 }

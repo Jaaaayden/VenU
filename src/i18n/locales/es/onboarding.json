@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "Crear cuenta",
     "or": "o",
+    "visitor": "Soy visitante",
+    "volunteer": "Soy voluntario",
+    "roleQuestion": "¿Visitante o voluntario?",
     "signIn": "Iniciar sesión",
     "socialTitle": "O regístrate con",
     "socialSoon": "El inicio de sesión con Google, Apple y Facebook llegará pronto.",
@@ -16,11 +19,15 @@
     "namePlaceholder": "Escribe tu nombre",
     "email": "Correo electrónico",
     "emailPlaceholder": "Escribe tu correo",
+    "username": "Nombre de usuario",
+    "usernamePlaceholder": "Escribe tu nombre de usuario",
+    "usernameHint": "De 3 a 20 letras, números, _ o .",
     "password": "Contraseña",
     "passwordPlaceholder": "Escribe tu contraseña"
   },
   "signIn": {
     "title": "Iniciar sesión",
+    "identifierPlaceholder": "Escribe tu usuario o correo",
     "noAccount": "¿No tienes cuenta?",
     "signUp": "Regístrate",
     "forgot": "¿Olvidaste tu contraseña?",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "Escribe un correo válido.",
+    "identifier": "Escribe tu nombre de usuario o correo.",
+    "usernameLength": "Usa de {{min}} a {{max}} caracteres en tu nombre de usuario.",
+    "usernameChars": "Usa solo letras, números, _ y . en tu nombre de usuario.",
     "passwordLength": "Usa al menos {{min}} caracteres en tu contraseña.",
     "password": "Escribe tu contraseña.",
     "terms": "Acepta los Términos y condiciones para continuar."
@@ -55,11 +65,18 @@
     "volunteerTitle": "Soy voluntario de LA28",
     "volunteerBody": "Ayuda a visitantes cerca de ti. Aparecerás como no verificado hasta que LA28 te confirme."
   },
+  "steps": {
+    "languagesTitle": "Elige tus idiomas",
+    "languagesSubtitle": "Para ayudarte a comunicarte con los voluntarios.",
+    "preferencesTitle": "Preferencias de voluntario",
+    "preferencesSubtitle": "Así encontramos a la persona adecuada para ayudarte. Puedes cambiarlo cuando quieras en tus ajustes.",
+    "photoTitle": "Elige una foto de perfil",
+    "photoSubtitle": "Así los voluntarios te encuentran más fácilmente. Puedes cambiarla cuando quieras en tus ajustes.",
+    "photoSubtitleVolunteer": "Así los visitantes te reconocen. Puedes cambiarla cuando quieras en tus ajustes.",
+    "finish": "Terminar"
+  },
   "setup": {
-    "visitorTitle": "Configura tu perfil",
-    "visitorSubtitle": "Así encontramos a la persona adecuada para ayudarte. Puedes cambiarlo cuando quieras en tus ajustes.",
     "volunteerTitle": "Tu perfil de voluntario",
-    "volunteerSubtitle": "Así te enviamos a los visitantes a los que mejor puedes ayudar.",
-    "submit": "Guardar y continuar"
+    "volunteerSubtitle": "Así te enviamos a los visitantes a los que mejor puedes ayudar."
   }
 }

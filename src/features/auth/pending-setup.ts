@@ -1,12 +1,14 @@
 // What someone picks before they have a profile, kept on this device until profile setup uses it:
-// the app language from the landing page's language pill, and the name typed on Create Account.
-// e.g. { language: 'es', firstName: 'Rosa', email: 'rosa@example.com' } → setup opens with Español
-// as primary and "Rosa" filled in, but only for rosa@example.com.
+// the app language from the landing page's language pill, the visitor/volunteer choice on the
+// first screen, and the name typed on Create Account.
+// e.g. { language: 'es', role: 'visitor', firstName: 'Rosa', email: 'rosa@example.com' } → setup
+// skips the role question, opens with Español as primary and "Rosa" filled in (for rosa@example.com only).
 // Stored (not a route param) so it survives an email-confirmation round trip or a web reload.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { isKnownLanguage } from '@/features/profile/options';
+import type { Role } from '@/features/profile/types';
 
 const KEY = 'venu.setup.pending';
 
@@ -20,6 +22,8 @@ export interface PendingSetup {
    * signed out, the only kind the next account to sign in takes on.
    */
   languagePickedBy?: string;
+  /** "I am a visitor" / "I am a volunteer" on the first screen (Figma 473:31895). */
+  role?: Role;
   firstName?: string;
   /** The account `firstName` was typed for (trimmed, lower case). */
   email?: string;
@@ -33,6 +37,7 @@ export async function readPendingSetup(): Promise<PendingSetup> {
       language: isKnownLanguage(v.language) ? v.language : undefined,
       languagePicked: v.languagePicked === true ? true : undefined,
       languagePickedBy: v.languagePicked === true && typeof v.languagePickedBy === 'string' ? v.languagePickedBy : undefined,
+      role: v.role === 'visitor' || v.role === 'volunteer' ? v.role : undefined,
       firstName: typeof v.firstName === 'string' ? v.firstName : undefined,
       email: typeof v.email === 'string' ? v.email : undefined,
     };
@@ -85,7 +90,12 @@ export async function forgetPendingNameUnlessFor(email: string): Promise<void> {
   if (pending.email !== normalEmail(email)) await writePendingSetup({ firstName: undefined, email: undefined });
 }
 
-/** After setup saves: the name now lives in the profile. The language stays as this device's choice. */
+/** The first screen's choice; setup starts with it (the onboarding role step is skipped). */
+export function rememberPendingRole(role: Role): Promise<void> {
+  return writePendingSetup({ role });
+}
+
+/** After setup saves: the name and role now live in the profile. The language stays as this device's choice. */
 export function clearPendingName(): Promise<void> {
   return queued(async () => {
     const { language, languagePicked, languagePickedBy } = await readPendingSetup();

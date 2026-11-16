@@ -48,6 +48,6 @@ describe('translated summary and validation', () => {
   it('writes form errors in the UI language', async () => {
     await i18n.changeLanguage('ar');
     expect(validateDraft({ ...rosa, firstName: '' }).firstName).toBe('أضف اسمك الأول.');
-    expect(validateAuth('signup', { email: 'rosa@example.com', password: 'short', termsAccepted: true }, false)?.message).toBe('استخدم 8 أحرف على الأقل لكلمة المرور.');
+    expect(validateAuth('signup', { email: 'rosa@example.com', username: 'rosa', password: 'short', termsAccepted: true }, false)?.message).toBe('استخدم 8 أحرف على الأقل لكلمة المرور.');
   });
 });
