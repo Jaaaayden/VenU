@@ -12,6 +12,19 @@ import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
 
+/** Padding plus border on each side of a card's label, for the grid's "does this word fit" check. */
+export const HELP_CARD_INSET = 11;
+
+/**
+ * 3 cards a row when every label's widest word fits a card, else 2, so no word splits. 3 until measured.
+ * e.g. helpGridColumns(326, 12, 60) → 3 (cards ~101pt, ~79pt for text); helpGridColumns(256, 12, 60) → 2
+ */
+export function helpGridColumns(gridWidth: number, gap: number, widestWord: number | null): 2 | 3 {
+  if (!gridWidth || widestWord === null) return 3;
+  const textWidth = (gridWidth - 2 * gap) / 3 - 2 * HELP_CARD_INSET;
+  return widestWord <= textWidth ? 3 : 2;
+}
+
 export function HelpCard({ type, selected, onPress }: { type: HelpTypeId; selected: boolean; onPress: () => void }) {
   const t = useT('volunteer');
   const label = t(`helpTypes.${type}`);
@@ -30,6 +43,9 @@ export function HelpCard({ type, selected, onPress }: { type: HelpTypeId; select
   );
 }
 
+/** The label's type, also used to measure its widest word. */
+export const HELP_LABEL = { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text } as const;
+
 const styles = StyleSheet.create({
   card: {
     flex: 1,
@@ -44,6 +60,6 @@ const styles = StyleSheet.create({
   },
   selected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   pressed: { opacity: 0.8 },
-  label: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text },
+  label: HELP_LABEL,
   labelSelected: { color: Colors.onPrimary },
 });
