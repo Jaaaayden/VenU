@@ -3,13 +3,14 @@
 import { router, type Href } from 'expo-router';
 import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Ellipse, Line, SvgXml } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
+import { LanguagePill } from '@/components/language-pill';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { TextField } from '@/components/text-field';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
 import { languageName } from '@/features/profile/options';
 import { UNTRANSLATED, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage } from '@/i18n/pending-language';
@@ -99,39 +100,6 @@ export function SocialButtons({ onPress }: { onPress: (provider: string) => void
   );
 }
 
-/** Globe outline for the language pill (no globe in the Figma SVG export). */
-function Globe({ size = 22, color = Colors.ink }: { size?: number; color?: string }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={1.6} />
-      <Ellipse cx={12} cy={12} rx={4.2} ry={9.5} stroke={color} strokeWidth={1.6} />
-      <Line x1={2.5} y1={12} x2={21.5} y2={12} stroke={color} strokeWidth={1.6} />
-      <Line x1={4} y1={7} x2={20} y2={7} stroke={color} strokeWidth={1.3} />
-      <Line x1={4} y1={17} x2={20} y2={17} stroke={color} strokeWidth={1.3} />
-    </Svg>
-  );
-}
-
-/** Top-right "🌐 English" pill on the landing page. */
-export function LanguagePill({ label, onPress }: { label: string; onPress: () => void }) {
-  const t = useT('onboarding');
-  return (
-    <Pressable
-      onPress={onPress}
-      style={styles.pillTarget}
-      accessibilityRole="button"
-      accessibilityLabel={t('auth.languagePill', { language: label })}
-      accessibilityHint={t('auth.languagePillHint')}>
-      {({ pressed }) => (
-        <View style={[styles.pill, pressed && styles.pressed]}>
-          <Globe />
-          <Text style={styles.pillLabel}>{label}</Text>
-        </View>
-      )}
-    </Pressable>
-  );
-}
-
 /**
  * The pill plus its language list, for signed-out screens: a pick switches the app now; signing in
  * saves it to the account, and setup starts with it as the primary language.
@@ -143,12 +111,18 @@ export function WelcomeLanguagePill() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <LanguagePill label={languageName(language)} onPress={() => setOpen(true)} />
+      <LanguagePill
+        label={languageName(language)}
+        onPress={() => setOpen(true)}
+        accessibilityLabel={t('auth.languagePill', { language: languageName(language) })}
+        accessibilityHint={t('auth.languagePillHint')}
+      />
       <LanguageSearchModal
         visible={open}
         title={t('welcome.languageTitle')}
         exclude={UNTRANSLATED}
         appLanguage
+        selected={language}
         onSelect={code => {
           setOpen(false);
           choosePendingLanguage(code);
@@ -182,19 +156,4 @@ const styles = StyleSheet.create({
   social: { width: 56, height: 56, borderRadius: 28, overflow: 'hidden' },
   pressed: { opacity: 0.7 },
 
-  pillTarget: { minHeight: 44, justifyContent: 'center' },
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    minHeight: 34,
-    paddingHorizontal: 14,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.controlBorder,
-    backgroundColor: Colors.surface,
-    ...Shadow.card,
-    shadowOpacity: 0.12,
-  },
-  pillLabel: { ...Type.body, writingDirection: 'ltr' },
 });

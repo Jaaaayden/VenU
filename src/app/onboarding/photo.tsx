@@ -13,6 +13,7 @@ import { OnboardingScreen, PrimaryAction } from '@/features/auth/onboarding-scre
 import { clearPendingName, readPendingSetupAfterWrites } from '@/features/auth/pending-setup';
 import { useProfile } from '@/features/profile/profile-context';
 import { stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
+import { clearSavedDraft } from '@/features/profile/setup-draft-storage';
 import { FIRST_NAME_MAX } from '@/features/profile/validate';
 import { useT, useUiLanguage } from '@/i18n';
 import { pickFor, setupAppLanguage } from '@/i18n/languages';
@@ -26,7 +27,7 @@ import { ERROR_CODES, errorText } from '@/lib/errors';
  */
 export default function PhotoStep() {
   const { save, userId } = useProfile();
-  const { draft, avatar, update, setAvatar } = useSetupDraft();
+  const { ready, draft, avatar, update, setAvatar } = useSetupDraft();
   const { language: onScreen } = useUiLanguage();
   const t = useT('onboarding');
   const tp = useT('profile');
@@ -37,6 +38,7 @@ export default function PhotoStep() {
   // A double tap (or Enter plus a tap on web) mustn't start two saves and two uploads.
   const inFlight = useRef(false);
 
+  if (!ready) return null; // reading the answers saved before a reload
   if (!draft) return <Redirect href="/onboarding/languages" />;
   const errors = submitted ? stepErrors('photo', draft) : {};
   const shown = avatar === 'remove' ? null : avatar ? avatar.uri : null;
@@ -58,6 +60,7 @@ export default function PhotoStep() {
       await save({ ...draft, appLanguage }, avatar);
       await forgetLanguagePick(); // saved with the profile; don't apply it to the account again
       await clearPendingName();
+      await clearSavedDraft();
       // No navigation: once the profile exists, the onboarding layout redirects to the home tab.
     } catch (e) {
       // The picked photo can't be read any more (e.g. after a web reload): drop it; the rest can be saved again.
@@ -72,7 +75,7 @@ export default function PhotoStep() {
   const back = draft.role === 'visitor' ? '/onboarding/preferences' : '/onboarding/volunteer';
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
+      pill={<AppLanguagePill look="onboarding" />}
       back={<BackLink fallback={back} />}
       title={t('steps.photoTitle')}
       subtitle={draft.role === 'visitor' ? t('steps.photoSubtitle') : t('steps.photoSubtitleVolunteer')}

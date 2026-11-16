@@ -15,12 +15,13 @@ import { useT } from '@/i18n';
  * and their own gender and age range, which visitors' "I'd prefer help from" choices match against.
  */
 export default function VolunteerStep() {
-  const { draft, update } = useSetupDraft();
+  const { ready, draft, update } = useSetupDraft();
   const t = useT('onboarding');
   const tp = useT('profile');
   const tc = useT('common');
   const [submitted, setSubmitted] = useState(false);
 
+  if (!ready) return null; // reading the answers saved before a reload
   if (!draft || draft.role !== 'volunteer') return <Redirect href="/onboarding/languages" />;
   const errors = submitted ? stepErrors('volunteer', draft) : {};
 
@@ -31,7 +32,7 @@ export default function VolunteerStep() {
 
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
+      pill={<AppLanguagePill look="onboarding" />}
       back={<BackLink fallback="/onboarding/languages" />}
       title={t('setup.volunteerTitle')}
       subtitle={t('setup.volunteerSubtitle')}

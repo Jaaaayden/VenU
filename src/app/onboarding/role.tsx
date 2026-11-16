@@ -53,7 +53,7 @@ export default function RoleStep() {
 
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
+      pill={<AppLanguagePill look="onboarding" />}
       title={t('role.title')}
       subtitle={t('role.subtitle')}
       actions={<PrimaryAction label={tc('actions.continue')} disabled={!role} onPress={() => void next()} />}>

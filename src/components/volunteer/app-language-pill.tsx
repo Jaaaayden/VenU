@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
+import { LanguagePill } from '@/components/language-pill';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName } from '@/features/profile/options';
@@ -14,7 +15,8 @@ import { UNTRANSLATED, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage, usePendingLanguage } from '@/i18n/pending-language';
 import { errorText } from '@/lib/errors';
 
-export function AppLanguagePill() {
+/** `onboarding`: the setup steps' look, the same pill as the signed-out screens before them. */
+export function AppLanguagePill({ look }: { look?: 'onboarding' }) {
   const t = useT('volunteer');
   const tc = useT('common');
   // The language on screen: an untranslated profile language shows in English, an unsaved pick over the profile's.
@@ -32,15 +34,24 @@ export function AppLanguagePill() {
 
   return (
     <View style={styles.wrap}>
-      <Pressable
-        onPress={() => setPicking(true)}
-        style={({ pressed }) => [styles.pill, pressed && styles.pressed]}
-        accessibilityRole="button"
-        accessibilityLabel={t('home.languageLabel', { language: isolatedLanguageName(language) })}
-        accessibilityHint={t('home.languageHint')}>
-        <FigmaIcon name="icon-c513eb" size={20} color={Colors.ink} />
-        <Text style={styles.text}>{isolatedLanguageName(language)}</Text>
-      </Pressable>
+      {look === 'onboarding' ? (
+        <LanguagePill
+          label={isolatedLanguageName(language)}
+          onPress={() => setPicking(true)}
+          accessibilityLabel={t('home.languageLabel', { language: isolatedLanguageName(language) })}
+          accessibilityHint={t('home.languageHint')}
+        />
+      ) : (
+        <Pressable
+          onPress={() => setPicking(true)}
+          style={({ pressed }) => [styles.pill, pressed && styles.pressed]}
+          accessibilityRole="button"
+          accessibilityLabel={t('home.languageLabel', { language: isolatedLanguageName(language) })}
+          accessibilityHint={t('home.languageHint')}>
+          <FigmaIcon name="icon-c513eb" size={20} color={Colors.ink} />
+          <Text style={styles.text}>{isolatedLanguageName(language)}</Text>
+        </Pressable>
+      )}
       {note ? <Text style={styles.note} accessibilityLiveRegion="polite">{note}</Text> : null}
 
       <LanguageSearchModal
@@ -48,6 +59,7 @@ export function AppLanguagePill() {
         title={t('home.languageTitle')}
         exclude={UNTRANSLATED}
         appLanguage
+        selected={language}
         onSelect={pick}
         onClose={() => setPicking(false)}
       />

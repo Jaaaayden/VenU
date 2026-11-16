@@ -19,13 +19,14 @@ import { useT } from '@/i18n';
  * (gender, age) and anything a helper should know (access needs). Volunteers get /onboarding/volunteer.
  */
 export default function PreferencesStep() {
-  const { draft, update } = useSetupDraft();
+  const { ready, draft, update } = useSetupDraft();
   const t = useT('onboarding');
   const tp = useT('profile');
   const tc = useT('common');
   const [submitted, setSubmitted] = useState(false);
 
   // No draft (a web reload mid-setup) or a volunteer's draft: back to the first step.
+  if (!ready) return null; // reading the answers saved before a reload
   if (!draft || draft.role !== 'visitor') return <Redirect href="/onboarding/languages" />;
   const errors = submitted ? stepErrors('preferences', draft) : {};
 
@@ -36,7 +37,7 @@ export default function PreferencesStep() {
 
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
+      pill={<AppLanguagePill look="onboarding" />}
       back={<BackLink fallback="/onboarding/languages" />}
       title={t('steps.preferencesTitle')}
       subtitle={t('steps.preferencesSubtitle')}

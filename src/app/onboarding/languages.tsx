@@ -1,5 +1,5 @@
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import { LanguagePicker } from '@/components/language-picker';
@@ -22,7 +22,7 @@ import { pickFor, setupPrimaryLanguage } from '@/i18n/languages';
 export default function LanguagesStep() {
   const params = useLocalSearchParams<{ role?: string }>();
   const { userId } = useProfile();
-  const { draft, start, update } = useSetupDraft();
+  const { ready, draft, start, update } = useSetupDraft();
   const { language: onScreen } = useUiLanguage();
   const t = useT('onboarding');
   const tc = useT('common');
@@ -36,17 +36,30 @@ export default function LanguagesStep() {
   }, []);
 
   const paramRole: Role | null = params.role === 'visitor' || params.role === 'volunteer' ? params.role : null;
-  const role = paramRole ?? pending?.role ?? null;
+  // After a reload the saved answers know the role too.
+  const role = paramRole ?? pending?.role ?? draft?.role ?? null;
 
   // Start (or, after a different role was picked on the role step, restart) the draft.
   useEffect(() => {
-    if (!pending || !role || (draft && draft.role === role)) return;
+    if (!pending || !ready || !role || (draft && draft.role === role)) return;
     // Only a welcome pick seeds setup: pending.language may be the last account's language on a shared device.
     const pick = pickFor({ language: pending.language, picked: pending.languagePicked === true, pickedBy: pending.languagePickedBy }, userId);
     start(draftForRole(role, draft, setupPrimaryLanguage(pick, onScreen), pending.firstName ?? ''));
-  }, [pending, role, draft, start, userId, onScreen]);
+  }, [pending, ready, role, draft, start, userId, onScreen]);
 
-  if (!pending) return null; // one storage read
+  // The corner pill and the primary language start out the same. Until the primary language is
+  // changed by hand, it follows the pill: switch the pill to 日本語 and primary becomes 日本語 too.
+  const shownBefore = useRef(onScreen);
+  useEffect(() => {
+    const before = shownBefore.current;
+    shownBefore.current = onScreen;
+    if (!draft || before === onScreen) return;
+    if (draft.mainLanguage === before && draft.languages.length === 1 && draft.languages[0] === before) {
+      update({ languages: [onScreen], mainLanguage: onScreen });
+    }
+  }, [onScreen, draft, update]);
+
+  if (!pending || !ready) return null; // storage reads (pending setup, answers saved before a reload)
   if (!role) return <Redirect href="/onboarding/role" />;
   if (!draft || draft.role !== role) return null;
 
@@ -59,7 +72,7 @@ export default function LanguagesStep() {
 
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
+      pill={<AppLanguagePill look="onboarding" />}
       // The screens before this one (welcome, Create Account) only redirect a signed-in user back
       // here, so Back opens the role question instead: the way to switch visitor/volunteer.
       back={<BackLink to={{ pathname: '/onboarding/role', params: { change: '1' } }} />}

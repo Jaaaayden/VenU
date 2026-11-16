@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 
 import { isEmailLike, normalizeUsername } from '@/features/auth/username';
+import { clearSavedDraft } from '@/features/profile/setup-draft-storage';
 import { codedError, friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
 
@@ -68,6 +69,8 @@ export async function signUp(email: string, password: string, username: string):
 }
 
 export async function signOut(): Promise<void> {
+  // Half-finished setup answers (name, access needs) shouldn't stay on a shared device.
+  await clearSavedDraft();
   if (!supabase) {
     await AsyncStorage.removeItem(LOCAL_SESSION_KEY);
     return;

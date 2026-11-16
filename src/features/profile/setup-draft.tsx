@@ -1,16 +1,19 @@
 /**
  * The profile being built across the Onboarding 2.0 steps (languages → preferences or volunteer
- * questions → photo), kept in the onboarding layout so Back and Continue keep every answer.
- * Lost on a web reload; the steps then start again from the languages step.
+ * questions → photo), kept in the onboarding layout so Back and Continue keep every answer, and
+ * saved on the device (setup-draft-storage) so a web reload resumes on the same step.
  */
 import { router } from 'expo-router';
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import type { AvatarChange } from './profile-context';
+import { useProfile, type AvatarChange } from './profile-context';
+import { readSavedDraft, writeSavedDraft } from './setup-draft-storage';
 import { emptyDraft, type ProfileDraft, type Role } from './types';
 import { validateDraft, type DraftErrors, type DraftField } from './validate';
 
 interface SetupDraft {
+  /** False until the saved draft (if any) is read; steps render nothing until then. */
+  ready: boolean;
   draft: ProfileDraft | null;
   avatar: AvatarChange;
   start: (draft: ProfileDraft) => void;
@@ -21,15 +24,34 @@ interface SetupDraft {
 const Ctx = createContext<SetupDraft | null>(null);
 
 export function SetupDraftProvider({ children }: { children: ReactNode }) {
+  const { userId } = useProfile();
+  const [ready, setReady] = useState(false);
   const [draft, setDraft] = useState<ProfileDraft | null>(null);
   const [avatar, setAvatar] = useState<AvatarChange>(null);
+
+  useEffect(() => {
+    let live = true;
+    readSavedDraft(userId).then(saved => {
+      if (!live) return;
+      if (saved) setDraft(prev => prev ?? saved);
+      setReady(true);
+    });
+    return () => { live = false; };
+  }, [userId]);
+
+  // Every answer, as it changes (only after the read, so an empty start never overwrites it).
+  useEffect(() => {
+    if (ready && draft) void writeSavedDraft(userId, draft);
+  }, [ready, draft, userId]);
+
   const value = useMemo<SetupDraft>(() => ({
+    ready,
     draft,
     avatar,
     start: setDraft,
     update: patch => setDraft(prev => (prev ? { ...prev, ...patch } : prev)),
     setAvatar,
-  }), [draft, avatar]);
+  }), [ready, draft, avatar]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
