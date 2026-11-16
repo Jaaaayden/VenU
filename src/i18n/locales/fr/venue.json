@@ -454,7 +454,7 @@
   "report": {
     "notFound": "Signalement introuvable",
     "kind": "Signalement",
-    "authorFallback": "Spectateur VenU",
+    "authorFallback": "Visiteur VenU",
     "submitted": "Envoyé le {{date}}",
     "originalLanguage": "Langue d’origine : {{language}}",
     "noBody": "Aucun détail ajouté."

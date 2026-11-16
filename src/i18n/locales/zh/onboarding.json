@@ -2,9 +2,9 @@
   "welcome": {
     "createAccount": "创建账户",
     "or": "或",
-    "visitor": "我是观众",
+    "visitor": "我是访客",
     "volunteer": "我是志愿者",
-    "roleQuestion": "观众还是志愿者？",
+    "roleQuestion": "访客还是志愿者？",
     "signIn": "登录",
     "socialTitle": "或使用以下方式注册",
     "socialSoon": "Google、Apple 和 Facebook 登录即将推出。",
@@ -60,24 +60,24 @@
   "role": {
     "title": "你将如何使用 VenU？",
     "subtitle": "这样我们才能问你合适的问题。",
-    "visitorTitle": "我是观众",
+    "visitorTitle": "我是访客",
     "visitorBody": "在场馆用你的语言获得帮助。",
     "volunteerTitle": "我是 LA28 志愿者",
-    "volunteerBody": "帮助你附近的观众。在 LA28 确认你之前，你将显示为未验证。"
+    "volunteerBody": "帮助你附近的访客。在 LA28 确认你之前，你将显示为未验证。"
   },
   "steps": {
     "languagesTitle": "选择你的语言",
     "languagesSubtitle": "方便你和志愿者沟通。",
-    "languagesSubtitleVolunteer": "方便你和观众沟通。",
+    "languagesSubtitleVolunteer": "方便你和访客沟通。",
     "preferencesTitle": "帮手偏好",
     "preferencesSubtitle": "这样我们能为你找到合适的帮手。你可以随时在设置中修改。",
     "photoTitle": "选择头像",
-    "photoSubtitle": "让志愿者更容易找到你。你可以随时在设置中修改。",
-    "photoSubtitleVolunteer": "让观众认出你。你可以随时在设置中修改。",
+    "photoSubtitle": "让志愿者更容易找到你。你可以随时在个人资料中修改。",
+    "photoSubtitleVolunteer": "让访客认出你。你可以随时在个人资料中修改。",
     "finish": "完成设置"
   },
   "setup": {
     "volunteerTitle": "你的志愿者资料",
-    "volunteerSubtitle": "这样我们能为你匹配最需要你帮助的观众。"
+    "volunteerSubtitle": "这样我们能为你匹配最需要你帮助的访客。"
   }
 }

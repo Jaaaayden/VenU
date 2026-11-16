@@ -450,15 +450,15 @@
   "report": {
     "notFound": "未找到该反馈",
     "kind": "反馈",
-    "authorFallback": "VenU 观众",
+    "authorFallback": "VenU 访客",
     "submitted": "提交于 {{date}}",
     "originalLanguage": "原文语言：{{language}}",
     "noBody": "未添加详情。"
   },
   "form": {
     "title": "添加反馈",
-    "subtitleAt": "分享你在{{facility}}的发现，帮助下一位观众",
-    "subtitle": "分享你的发现，帮助下一位观众",
+    "subtitleAt": "分享你在{{facility}}的发现，帮助下一位访客",
+    "subtitle": "分享你的发现，帮助下一位访客",
     "titleLabel": "反馈标题",
     "titlePlaceholder": "大家需要知道什么？",
     "bodyLabel": "你的反馈",

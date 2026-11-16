@@ -452,7 +452,7 @@
   "report": {
     "notFound": "گزارش پیدا نشد",
     "kind": "گزارش",
-    "authorFallback": "تماشاگر VenU",
+    "authorFallback": "بازدیدکننده VenU",
     "submitted": "ارسال‌شده در {{date}}",
     "originalLanguage": "زبان اصلی: {{language}}",
     "noBody": "جزئیاتی اضافه نشده."

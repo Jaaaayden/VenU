@@ -1,12 +1,12 @@
 {
   "tab": {
     "title": "Profil",
-    "visitor": "Spectateur",
+    "visitor": "Visiteur",
     "volunteer": "Bénévole",
     "verified": "✓ Vérifié LA28",
     "unverified": "Non vérifié",
     "sharedVisitor": "Ce que voit votre accompagnant",
-    "sharedVolunteer": "Ce que voient les spectateurs",
+    "sharedVolunteer": "Ce que voient les visiteurs",
     "account": "Compte",
     "support": "Assistance",
     "editProfile": "Modifier le profil",
@@ -47,7 +47,7 @@
     "training": "Formation",
     "trainingHint": "LA28 les vérifie lors de votre validation.",
     "yourGender": "Votre genre",
-    "yourGenderHint": "Utilisé seulement si un spectateur demande une femme ou un homme. Jamais affiché.",
+    "yourGenderHint": "Utilisé seulement si un visiteur demande une femme ou un homme. Jamais affiché.",
     "yourAge": "Votre tranche d'âge",
     "yourAgeHint": "Uniquement pour la mise en relation, jamais affichée.",
     "privacyAgree": "J'accepte que VenU utilise mes informations comme décrit dans la <a>politique de confidentialité</a>.",
@@ -217,7 +217,7 @@
       },
       "chat": {
         "label": "Messages du chat",
-        "hint": "Nouveaux messages de votre accompagnant ou du spectateur"
+        "hint": "Nouveaux messages de votre accompagnant ou du visiteur"
       },
       "venue": {
         "label": "Alertes du site",

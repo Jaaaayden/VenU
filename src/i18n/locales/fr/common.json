@@ -43,7 +43,7 @@
     "rateLimit": "Trop de tentatives. Patientez une minute et réessayez.",
     "sessionExpired": "Votre session a expiré. Reconnectez-vous.",
     "cantSave": "VenU n’a pas pu enregistrer cette modification. Si le problème persiste, déconnectez-vous puis reconnectez-vous.",
-    "roleMismatchVisitor": "Ce compte est déjà configuré comme spectateur. Rechargez l’application pour continuer.",
+    "roleMismatchVisitor": "Ce compte est déjà configuré comme visiteur. Rechargez l’application pour continuer.",
     "roleMismatchVolunteer": "Ce compte est déjà configuré comme bénévole. Rechargez l’application pour continuer.",
     "photoTooBig": "Cette photo dépasse {{size}} Mo. Choisissez-en une plus petite.",
     "photoTooBigLocal": "Cette photo est trop lourde pour être gardée sur cet appareil. Essayez-en une plus petite.",

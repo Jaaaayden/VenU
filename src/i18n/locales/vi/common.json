@@ -43,7 +43,7 @@
     "rateLimit": "Thử quá nhiều lần. Đợi một phút rồi thử lại.",
     "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
     "cantSave": "VenU không lưu được thay đổi này. Nếu vẫn xảy ra, hãy đăng xuất rồi đăng nhập lại.",
-    "roleMismatchVisitor": "Tài khoản này đã được thiết lập là khán giả. Hãy tải lại ứng dụng để tiếp tục.",
+    "roleMismatchVisitor": "Tài khoản này đã được thiết lập là khách tham quan. Hãy tải lại ứng dụng để tiếp tục.",
     "roleMismatchVolunteer": "Tài khoản này đã được thiết lập là tình nguyện viên. Hãy tải lại ứng dụng để tiếp tục.",
     "photoTooBig": "Ảnh lớn hơn {{size}} MB. Hãy chọn ảnh nhỏ hơn.",
     "photoTooBigLocal": "Ảnh quá lớn để lưu trên thiết bị này. Hãy thử ảnh nhỏ hơn.",

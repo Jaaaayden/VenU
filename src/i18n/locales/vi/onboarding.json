@@ -2,9 +2,9 @@
   "welcome": {
     "createAccount": "Tạo tài khoản",
     "or": "hoặc",
-    "visitor": "Tôi là khán giả",
+    "visitor": "Tôi là khách tham quan",
     "volunteer": "Tôi là tình nguyện viên",
-    "roleQuestion": "Khán giả hay tình nguyện viên?",
+    "roleQuestion": "Khách tham quan hay tình nguyện viên?",
     "signIn": "Đăng nhập",
     "socialTitle": "HOẶC đăng ký bằng",
     "socialSoon": "Đăng nhập bằng Google, Apple và Facebook sẽ sớm ra mắt.",
@@ -60,24 +60,24 @@
   "role": {
     "title": "Bạn sẽ dùng VenU thế nào?",
     "subtitle": "Để chúng tôi hỏi đúng câu hỏi.",
-    "visitorTitle": "Tôi là khán giả",
+    "visitorTitle": "Tôi là khách tham quan",
     "visitorBody": "Nhận trợ giúp tại địa điểm bằng ngôn ngữ của bạn.",
     "volunteerTitle": "Tôi là tình nguyện viên LA28",
-    "volunteerBody": "Giúp khán giả gần bạn. Bạn sẽ hiện là chưa xác minh cho đến khi LA28 xác nhận."
+    "volunteerBody": "Giúp khách tham quan gần bạn. Bạn sẽ hiện là chưa xác minh cho đến khi LA28 xác nhận."
   },
   "steps": {
     "languagesTitle": "Chọn ngôn ngữ của bạn",
     "languagesSubtitle": "Để bạn dễ trò chuyện với tình nguyện viên.",
-    "languagesSubtitleVolunteer": "Để bạn dễ trò chuyện với khán giả.",
+    "languagesSubtitleVolunteer": "Để bạn dễ trò chuyện với khách tham quan.",
     "preferencesTitle": "Người bạn muốn được giúp",
     "preferencesSubtitle": "Để chúng tôi tìm đúng người giúp bạn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
     "photoTitle": "Chọn ảnh đại diện",
-    "photoSubtitle": "Để tình nguyện viên dễ tìm thấy bạn hơn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
-    "photoSubtitleVolunteer": "Để khán giả nhận ra bạn. Bạn có thể thay đổi bất cứ lúc nào trong cài đặt.",
+    "photoSubtitle": "Để tình nguyện viên dễ tìm thấy bạn hơn. Bạn có thể thay đổi bất cứ lúc nào trong hồ sơ của bạn.",
+    "photoSubtitleVolunteer": "Để khách tham quan nhận ra bạn. Bạn có thể thay đổi bất cứ lúc nào trong hồ sơ của bạn.",
     "finish": "Hoàn tất"
   },
   "setup": {
     "volunteerTitle": "Hồ sơ tình nguyện viên",
-    "volunteerSubtitle": "Để chúng tôi gửi đến bạn những khán giả bạn giúp được nhiều nhất."
+    "volunteerSubtitle": "Để chúng tôi gửi đến bạn những khách tham quan bạn giúp được nhiều nhất."
   }
 }

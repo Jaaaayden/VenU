@@ -1,12 +1,12 @@
 {
   "tab": {
     "title": "个人资料",
-    "visitor": "观众",
+    "visitor": "访客",
     "volunteer": "志愿者",
     "verified": "✓ 已验证 LA28",
     "unverified": "未验证",
     "sharedVisitor": "帮手能看到的信息",
-    "sharedVolunteer": "观众能看到的信息",
+    "sharedVolunteer": "访客能看到的信息",
     "account": "账户",
     "support": "支持",
     "editProfile": "编辑资料",
@@ -47,7 +47,7 @@
     "training": "培训",
     "trainingHint": "LA28 验证你时会核查这些。",
     "yourGender": "你的性别",
-    "yourGenderHint": "仅在观众要求女性或男性帮手时使用，从不显示。",
+    "yourGenderHint": "仅在访客要求女性或男性帮手时使用，从不显示。",
     "yourAge": "你的年龄段",
     "yourAgeHint": "仅用于匹配，从不显示。",
     "privacyAgree": "我同意 VenU 按照<a>隐私政策</a>使用我的信息。",
@@ -217,7 +217,7 @@
       },
       "chat": {
         "label": "聊天消息",
-        "hint": "来自帮手或观众的新消息"
+        "hint": "来自帮手或访客的新消息"
       },
       "venue": {
         "label": "场馆提醒",

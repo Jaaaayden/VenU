@@ -1,12 +1,12 @@
 {
   "tab": {
     "title": "Hồ sơ",
-    "visitor": "Khán giả",
+    "visitor": "Khách tham quan",
     "volunteer": "Tình nguyện viên",
     "verified": "✓ Đã xác minh LA28",
     "unverified": "Chưa xác minh",
     "sharedVisitor": "Chia sẻ với người hỗ trợ",
-    "sharedVolunteer": "Hiển thị cho khán giả",
+    "sharedVolunteer": "Hiển thị cho khách tham quan",
     "account": "Tài khoản",
     "support": "Hỗ trợ",
     "editProfile": "Sửa hồ sơ",
@@ -47,7 +47,7 @@
     "training": "Đào tạo",
     "trainingHint": "LA28 kiểm tra những mục này khi xác minh bạn.",
     "yourGender": "Giới tính của bạn",
-    "yourGenderHint": "Chỉ dùng khi khán giả yêu cầu người hỗ trợ nữ hoặc nam. Không bao giờ hiển thị.",
+    "yourGenderHint": "Chỉ dùng khi khách tham quan yêu cầu người hỗ trợ nữ hoặc nam. Không bao giờ hiển thị.",
     "yourAge": "Độ tuổi của bạn",
     "yourAgeHint": "Chỉ để ghép đôi, không bao giờ hiển thị.",
     "privacyAgree": "Tôi đồng ý với cách VenU dùng thông tin của tôi, theo <a>chính sách quyền riêng tư</a>.",
@@ -217,7 +217,7 @@
       },
       "chat": {
         "label": "Tin nhắn trò chuyện",
-        "hint": "Tin nhắn mới từ người hỗ trợ hoặc khán giả"
+        "hint": "Tin nhắn mới từ người hỗ trợ hoặc khách tham quan"
       },
       "venue": {
         "label": "Cảnh báo địa điểm",

@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
-import { isolatedLanguageName } from '@/features/profile/options';
+import { uiLanguageName } from '@/features/profile/summary';
 import { formatDistance } from '@/features/volunteer/format';
 import { mockIncoming } from '@/features/volunteer/mock';
 import { languageOf, useT } from '@/i18n';
@@ -13,9 +13,14 @@ import { HelpIcon } from './help-icon';
 import { Hint, useHint } from './hint';
 import { MeetPlaceText } from './meet-place';
 
+// Named in the UI language, as in "Fluent languages" above it (e.g. "Spanish", not "Español").
+// Isolated so an RTL name doesn't reorder the line around it.
+const isolate = (name: string) => `⁨${name}⁩`;
+
 export function IncomingRequests() {
   const { hint, show } = useHint();
   const t = useT('volunteer');
+  const tp = useT('profile');
   return (
     <View style={styles.page}>
       <View style={styles.titles}>
@@ -40,7 +45,7 @@ export function IncomingRequests() {
                 <Text style={Type.bodyStrong}>{t('incoming.who', { help, name: r.visitorName })}</Text>
                 <MeetPlaceText point={r.location} style={styles.where} />
                 <Text style={styles.meta}>
-                  {t('incoming.meta', { distance: formatDistance(r.distanceFeet, languageOf(t)), minutes: formatNumber(r.minutesAgo, undefined, languageOf(t)), language: isolatedLanguageName(r.language) })}
+                  {t('incoming.meta', { distance: formatDistance(r.distanceFeet, languageOf(t)), minutes: formatNumber(r.minutesAgo, undefined, languageOf(t)), language: isolate(uiLanguageName(r.language, tp)) })}
                 </Text>
               </View>
             </View>
