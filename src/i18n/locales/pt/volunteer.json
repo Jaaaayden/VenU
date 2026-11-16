@@ -96,6 +96,9 @@
     "message": "Falar com o voluntário",
     "done": "Marcar ajuda como concluída",
     "doneHint": "Encerra o pedido e pede que você avalie {{name}}",
+    "confirmDone": "{{name}} terminou de ajudar você? Isso encerra a conversa.",
+    "notYet": "Ainda não",
+    "yesDone": "Sim, terminou",
     "confirmCancel": "Cancelar seu pedido? {{name}} vai parar de vir até você.",
     "keep": "Manter pedido",
     "yesCancel": "Sim, cancelar"

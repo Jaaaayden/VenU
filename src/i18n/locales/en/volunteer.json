@@ -96,6 +96,9 @@
     "message": "Message Volunteer",
     "done": "Mark help as done",
     "doneHint": "Ends the request and asks you to rate {{name}}",
+    "confirmDone": "Did {{name}} finish helping you? This ends your chat.",
+    "notYet": "Not yet",
+    "yesDone": "Yes, all done",
     "confirmCancel": "Cancel your request? {{name}} will stop coming to you.",
     "keep": "Keep request",
     "yesCancel": "Yes, cancel"

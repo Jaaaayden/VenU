@@ -18,7 +18,8 @@ import { MessageButton } from './message-button';
 import { useStartAligned } from './start-aligned';
 
 export function MatchView({ request, match, unread }: { request: HelpRequest; match: Match; unread: number }) {
-  const [confirmCancel, setConfirmCancel] = useState(false);
+  // Done and Cancel both end the chat, so each asks once before it does.
+  const [confirming, setConfirming] = useState<'done' | 'cancel' | null>(null);
   const t = useT('volunteer');
   const tv = useT('venue');
   const v = match.volunteer;
@@ -87,17 +88,27 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
 
       <View style={[styles.gutter, styles.actions]}>
         <Button label={t('match.message')} size="lg" onPress={openChat} />
-        <Button label={t('match.done')} variant="outline" onPress={volunteerRequests.endHelp} accessibilityHint={t('match.doneHint', { name: v.firstName })} />
-        {confirmCancel ? (
+        {confirming === 'done' ? (
+          <View style={styles.confirmDone} accessibilityLiveRegion="polite">
+            <Text style={styles.confirmText}>{t('match.confirmDone', { name: v.firstName })}</Text>
+            <View style={styles.confirmButtons}>
+              <Button label={t('match.notYet')} variant="neutral" onPress={() => setConfirming(null)} style={styles.flex} />
+              <Button label={t('match.yesDone')} onPress={volunteerRequests.endHelp} style={styles.flex} />
+            </View>
+          </View>
+        ) : (
+          <Button label={t('match.done')} variant="outline" onPress={() => setConfirming('done')} accessibilityHint={t('match.doneHint', { name: v.firstName })} />
+        )}
+        {confirming === 'cancel' ? (
           <View style={styles.confirm} accessibilityLiveRegion="polite">
             <Text style={styles.confirmText}>{t('match.confirmCancel', { name: v.firstName })}</Text>
             <View style={styles.confirmButtons}>
-              <Button label={t('match.keep')} variant="neutral" onPress={() => setConfirmCancel(false)} style={styles.flex} />
+              <Button label={t('match.keep')} variant="neutral" onPress={() => setConfirming(null)} style={styles.flex} />
               <Button label={t('match.yesCancel')} variant="danger" onPress={volunteerRequests.cancel} style={styles.flex} />
             </View>
           </View>
         ) : (
-          <Button label={t('cancelRequest')} variant="link" onPress={() => setConfirmCancel(true)} style={styles.cancel} />
+          <Button label={t('cancelRequest')} variant="link" onPress={() => setConfirming('cancel')} style={styles.cancel} />
         )}
       </View>
     </View>
@@ -167,6 +178,7 @@ const styles = StyleSheet.create({
   actions: { gap: Spacing.md, marginTop: Spacing.sm },
   cancel: { alignSelf: 'center' },
   confirm: { gap: Spacing.md, padding: Spacing.lg, borderRadius: Radius.md, backgroundColor: Colors.dangerSoft },
+  confirmDone: { gap: Spacing.md, padding: Spacing.lg, borderRadius: Radius.md, backgroundColor: Colors.primarySoft },
   confirmText: { ...Type.body },
   confirmButtons: { flexDirection: 'row', gap: Spacing.md },
 });

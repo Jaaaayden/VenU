@@ -96,6 +96,9 @@
     "message": "Écrire au bénévole",
     "done": "Marquer l’aide comme terminée",
     "doneHint": "Termine la demande et vous invite à noter {{name}}",
+    "confirmDone": "L’aide de {{name}} est-elle terminée ? Cela met fin à la conversation.",
+    "notYet": "Pas encore",
+    "yesDone": "Oui, c’est fini",
     "confirmCancel": "Annuler votre demande ? {{name}} ne viendra plus vers vous.",
     "keep": "Garder la demande",
     "yesCancel": "Oui, annuler"
