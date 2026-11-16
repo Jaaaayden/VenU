@@ -51,6 +51,15 @@ describe('where am I', () => {
     expect(validWhere('{bad')).toEqual(DEFAULT_WHERE);
   });
 
+  it('opening the default venue before the saved value loads still saves it', async () => {
+    await AsyncStorage.setItem(WHERE_KEY, JSON.stringify({ venueId: 'intuit-dome', facilityId: null }));
+    const loading = hydrateWhereAmI();
+    setCurrentVenue('sofi');
+    await loading;
+    expect(getWhereAmI().venueId).toBe('sofi');
+    expect((await saved()).venueId).toBe('sofi');
+  });
+
   it('a change made before the saved value loads wins', async () => {
     await AsyncStorage.setItem(WHERE_KEY, JSON.stringify({ venueId: 'intuit-dome', facilityId: null }));
     const loading = hydrateWhereAmI();

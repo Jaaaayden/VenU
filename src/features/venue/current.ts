@@ -1,8 +1,8 @@
 // Where the person is right now: the venue they last opened, and optionally the spot in it
-// (a facility, e.g. Gate 2). Kept on this device under one key. The help request, the emergency
+// (a facility, e.g. Entry 4). Kept on this device under one key. The help request, the emergency
 // "call venue staff" number and the volunteer home all read it.
 //
-// e.g. { venueId: 'crypto-arena', facilityId: 'gate-2' } = "Near Gate 2, Crypto.com Arena".
+// e.g. { venueId: 'crypto-arena', facilityId: 'star-plaza-entrance' } = "Near Star Plaza Entrance, Crypto.com Arena".
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
@@ -39,9 +39,11 @@ function emit() {
 
 function set(next: WhereAmI) {
   touched = true;
-  if (next.venueId === state.venueId && next.facilityId === state.facilityId) return;
-  state = next;
-  emit();
+  // Saved even when unchanged: opening SoFi before the saved value has loaded must still replace it.
+  if (next.venueId !== state.venueId || next.facilityId !== state.facilityId) {
+    state = next;
+    emit();
+  }
   AsyncStorage.setItem(WHERE_KEY, JSON.stringify(next)).catch(() => {
     // Storage blocked (private browsing): it still holds for this visit.
   });
