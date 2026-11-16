@@ -28,9 +28,13 @@ function mono(svg) {
   return svg.replace(new RegExp(`(fill|stroke)="${only.replace('#', '#?')}"`, 'gi'), '$1="currentColor"');
 }
 const clean = svg => svg.replace(/\r?\n/g, '').replace(/>\s+</g, '><').trim();
+// Some exports start with the frame's fill as a full-size <rect> (location_on has a #F5F5F5 one).
+// It shows as a grey square on any other background and makes the icon two-colored, so `color`
+// can't recolor it. Drop it.
+const noBackdrop = svg => svg.replace(/(<svg[^>]*>)\s*<rect width="[\d.]+" height="[\d.]+"(?: transform="[^"]*")? fill="#[0-9A-Fa-f]{3,8}"\/>/, '$1');
 
 const icons = {};
-for (const f of readdirSync(SRC).filter(f => f.endsWith('.svg')).sort()) icons[f.replace(/\.svg$/, '')] = clean(mono(readFileSync(join(SRC, f), 'utf8')));
+for (const f of readdirSync(SRC).filter(f => f.endsWith('.svg')).sort()) icons[f.replace(/\.svg$/, '')] = clean(mono(noBackdrop(readFileSync(join(SRC, f), 'utf8'))));
 
 // The Tab Bar's three icons come out of Figma as one 262x32 SVG; cut it into 32x32 icons.
 const tab = readFileSync(join(SRC, 'frame-2275-957711.svg'), 'utf8');
