@@ -40,6 +40,8 @@ export function Checkbox({ checked, onToggle, error, children, accessibilityLabe
           style={styles.checkTarget}
           accessibilityRole="checkbox"
           accessibilityState={{ checked }}
+          // react-native-web reads only aria-* for state.
+          aria-checked={checked}
           accessibilityLabel={accessibilityLabel}>
           {checked ? (
             <View style={[styles.box, error && styles.boxError]}>

@@ -59,7 +59,9 @@ export default function WelcomeScreen() {
                 onPress={() => setRole(r)}
                 style={({ pressed }) => [styles.choice, on && styles.choiceOn, pressed && !on && styles.choicePressed]}
                 accessibilityRole="radio"
-                accessibilityState={{ checked: on }}>
+                accessibilityState={{ checked: on }}
+                // react-native-web reads only aria-* for state.
+                aria-checked={on}>
                 <Text style={[styles.choiceText, on && styles.choiceTextOn]}>{t(r === 'visitor' ? 'welcome.visitor' : 'welcome.volunteer')}</Text>
               </Pressable>
             </View>
