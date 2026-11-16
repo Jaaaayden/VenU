@@ -65,4 +65,19 @@ describe('signUp', () => {
     });
     expect(mockSignUp).not.toHaveBeenCalled();
   });
+
+  it('reports "taken" when someone claims the name between the check and the sign-up', async () => {
+    // The claim_username trigger fails the insert, which Supabase words as a generic database error.
+    mockSignUp.mockImplementationOnce(async () => {
+      mockAccounts.sam = 'sam@example.com';
+      return { data: { session: null }, error: { message: 'Database error saving new user' } } as never;
+    });
+    expect(await createAccount('other@example.com', 'longenough', 'Sam')).toEqual({
+      ok: false,
+      error: 'That username is taken. Try another.',
+      field: 'username',
+    });
+    expect(mockRpc.mock.calls.filter(([fn]) => fn === 'username_available')).toHaveLength(2);
+    delete mockAccounts.sam;
+  });
 });
