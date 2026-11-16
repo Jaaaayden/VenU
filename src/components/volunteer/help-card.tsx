@@ -20,6 +20,8 @@ export function HelpCard({ type, selected, onPress }: { type: HelpTypeId; select
       onPress={onPress}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: selected }}
+      // react-native-web reads only aria-* for state.
+      aria-checked={selected}
       accessibilityLabel={label}
       style={({ pressed }) => [styles.card, selected && styles.selected, pressed && styles.pressed]}>
       <HelpIcon type={type} size={26} color={selected ? Colors.onPrimary : Colors.ink} />

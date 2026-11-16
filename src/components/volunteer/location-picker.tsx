@@ -52,6 +52,8 @@ export function LocationPicker({ visible, onClose }: { visible: boolean; onClose
       onPress={() => pick(null)}
       accessibilityRole="radio"
       accessibilityState={{ checked: facilityId === null }}
+      // react-native-web reads only aria-* for state.
+      aria-checked={facilityId === null}
       accessibilityLabel={`${t('where.notSure')}. ${t('where.notSureHint')}`}
       style={({ pressed }) => [styles.row, facilityId === null && styles.rowSelected, pressed && styles.rowPressed]}>
       <View style={[styles.icon, styles.unsureIcon]}>
@@ -103,6 +105,7 @@ export function LocationPicker({ visible, onClose }: { visible: boolean; onClose
                   onPress={() => pick(item.id)}
                   accessibilityRole="radio"
                   accessibilityState={{ checked: selected }}
+                  aria-checked={selected}
                   accessibilityLabel={tv(item.accessible ? 'row.labelAccessible' : 'row.label', { name, meta: location })}
                   style={({ pressed }) => [styles.row, selected && styles.rowSelected, pressed && styles.rowPressed]}>
                   <View style={styles.icon}>
