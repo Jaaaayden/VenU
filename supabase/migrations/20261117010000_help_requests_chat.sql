@@ -34,7 +34,6 @@ create table public.help_requests (
   volunteer_name      text,
   volunteer_languages text[],
   volunteer_trainings text[],
-  volunteer_gender    text,
 
   closed_by           uuid references auth.users (id) on delete set null,
   created_at          timestamptz not null default now(),
@@ -97,7 +96,7 @@ create policy "visitors open requests" on public.help_requests
     (select auth.uid()) = visitor_id
     and status = 'open'
     and volunteer_id is null and volunteer_name is null and volunteer_languages is null
-    and volunteer_trainings is null and volunteer_gender is null
+    and volunteer_trainings is null
     and closed_by is null and matched_at is null and closed_at is null
   );
 
@@ -141,7 +140,6 @@ begin
          volunteer_name = vol.first_name,
          volunteer_languages = array[vol.main_language] || array_remove(vol.languages, vol.main_language),
          volunteer_trainings = vol.trainings,
-         volunteer_gender = vol.gender,
          matched_at = now()
    where r.id = p_request_id and r.status = 'open' and r.visitor_id <> me
    returning * into accepted;
