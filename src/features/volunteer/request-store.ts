@@ -382,8 +382,13 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       dispatch({ type: 'dismissNotice' });
     },
 
-    /** The request form's fields live here, so they come back after a failed search or a cancel. */
+    /**
+     * The request form's fields live here, so they come back after a failed search or a cancel.
+     * Ignored while nobody is signed in: a form unmounting after sign-out (e.g. dictation saving
+     * its last words) mustn't leave its note for the next person.
+     */
     editDraft(patch: Partial<RequestDraft>) {
+      if (owner === null) return;
       dispatch({ type: 'editDraft', patch });
     },
 
