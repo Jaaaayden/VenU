@@ -29,7 +29,7 @@ const WRONG = { code: 'invalid_credentials', message: 'Invalid login credentials
 describe('username-sign-in function', () => {
   it('signs in by username (any case) and returns only the session', async () => {
     const { handle, emailForUsername, passwordGrant } = setup();
-    const res = await call(handle, { username: '  Rosa_M ', password: 'right-pw' }, 'POST', { 'X-Forwarded-For': '203.0.113.7, 10.0.0.1' });
+    const res = await call(handle, { username: '  Rosa_M ', password: 'right-pw' }, 'POST', { 'Cf-Connecting-Ip': '203.0.113.7' });
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body).toEqual(SESSION);
@@ -37,6 +37,30 @@ describe('username-sign-in function', () => {
     expect(emailForUsername).toHaveBeenCalledWith('rosa_m');
     // The caller's IP goes to Auth so its per-IP rate limit counts the caller, not the function.
     expect(passwordGrant).toHaveBeenCalledWith('rosa@example.com', 'right-pw', '203.0.113.7');
+  });
+
+  it('never forwards an X-Forwarded-For IP, which callers can fake', async () => {
+    const { handle, passwordGrant } = setup();
+    for (const fake of ['198.51.100.1', '198.51.100.2, 10.0.0.1']) {
+      await call(handle, { username: 'rosa_m', password: 'wrong' }, 'POST', { 'X-Forwarded-For': fake });
+    }
+    // Nothing forwarded: Auth counts every attempt against the function's own IP.
+    expect(passwordGrant.mock.calls.map(c => c[2])).toEqual([null, null]);
+    // Cf-Connecting-Ip wins over a spoofed X-Forwarded-For.
+    await call(handle, { username: 'rosa_m', password: 'wrong' }, 'POST', { 'X-Forwarded-For': '198.51.100.3', 'Cf-Connecting-Ip': '203.0.113.9' });
+    expect(passwordGrant.mock.calls[2][2]).toBe('203.0.113.9');
+  });
+
+  it('logs which IP source it uses once per source, never the IP', async () => {
+    const { handle, log } = setup();
+    for (let i = 0; i < 3; i++) await call(handle, { username: 'rosa_m', password: 'right-pw' }, 'POST', { 'Cf-Connecting-Ip': `203.0.113.${i}` });
+    await call(handle, { username: 'rosa_m', password: 'right-pw' });
+    await call(handle, { username: 'rosa_m', password: 'right-pw' });
+    expect(log.mock.calls.map(c => c[0])).toEqual([
+      "username-sign-in: Auth rate-limits sign-ins by the caller's Cf-Connecting-Ip",
+      "username-sign-in: no Cf-Connecting-Ip; Auth rate-limits sign-ins by the function's own IP",
+    ]);
+    expect(log.mock.calls.flat().join('\n')).not.toContain('203.0.113');
   });
 
   it('words a wrong password like Auth does', async () => {

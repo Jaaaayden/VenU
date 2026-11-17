@@ -48,13 +48,31 @@ const PASS_ON: Record<string, { status: number; message: string }> = {
 };
 const wrongLogin = () => json(400, { code: 'invalid_credentials', message: PASS_ON.invalid_credentials.message });
 
-/** The caller's IP: the first X-Forwarded-For entry (the Supabase gateway sets it). */
-function clientIpOf(req: Request): string | null {
-  const first = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  return first || null;
+export type ClientIpSource = 'cf-connecting-ip' | 'none';
+
+/**
+ * The caller's IP for Auth's per-IP rate limit, and where it came from. Only Cf-Connecting-Ip:
+ * Cloudflare, in front of Supabase's functions, overwrites whatever a caller sends there. Never
+ * X-Forwarded-For, whose leftmost entry is the caller's own say-so (a brute-forcer would rotate it
+ * and never be limited). Without the header nothing is forwarded, and Auth counts the function's
+ * own IP: stricter, never looser.
+ *   Cf-Connecting-Ip: 203.0.113.7               → { ip: '203.0.113.7', source: 'cf-connecting-ip' }
+ *   X-Forwarded-For: 198.51.100.1, 203.0.113.7  → { ip: null, source: 'none' }
+ */
+export function clientIpOf(req: Request): { ip: string | null; source: ClientIpSource } {
+  const cf = req.headers.get('cf-connecting-ip')?.trim();
+  return cf ? { ip: cf, source: 'cf-connecting-ip' } : { ip: null, source: 'none' };
 }
 
+const IP_SOURCE_LOG: Record<ClientIpSource, string> = {
+  'cf-connecting-ip': "username-sign-in: Auth rate-limits sign-ins by the caller's Cf-Connecting-Ip",
+  none: "username-sign-in: no Cf-Connecting-Ip; Auth rate-limits sign-ins by the function's own IP",
+};
+
 export function createHandler({ emailForUsername, passwordGrant, log = console.error }: HandlerDeps) {
+  // Which IP source sign-ins use, logged the first time each is seen in this instance (one per cold
+  // start; never the IP itself), so the function's logs show what Auth counts.
+  const ipSourcesLogged = new Set<ClientIpSource>();
   return async function handle(req: Request): Promise<Response> {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     if (req.method !== 'POST') return json(405, { code: 'method_not_allowed', message: 'Use POST.' });
@@ -85,9 +103,15 @@ export function createHandler({ emailForUsername, passwordGrant, log = console.e
     }
     if (!email) return wrongLogin();
 
+    const client = clientIpOf(req);
+    if (!ipSourcesLogged.has(client.source)) {
+      ipSourcesLogged.add(client.source);
+      log(IP_SOURCE_LOG[client.source]);
+    }
+
     let grant: GrantResult;
     try {
-      grant = await passwordGrant(email, password, clientIpOf(req));
+      grant = await passwordGrant(email, password, client.ip);
     } catch (e) {
       log(`username-sign-in: auth unreachable: ${e instanceof Error ? e.message : String(e)}`);
       return json(502, { code: 'unexpected_failure', message: 'Sign-in failed. Try again later.' });
