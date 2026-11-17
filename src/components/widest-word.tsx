@@ -33,8 +33,10 @@ export function useWidestWord(labels: readonly string[], style: StyleProp<TextSt
   const probe = (
     <View style={[styles.clip, webHidden]} pointerEvents="none" aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <View style={styles.row}>
+        {/* Keyed by the whole word set too: when the labels change, every probe mounts again and
+            reports its width, including a word both sets share (es → fr keeps "Libre"). */}
         {words.map(w => (
-          <Text key={w} style={[style, styles.word]} numberOfLines={1} onLayout={e => record(w, e)}>{w}</Text>
+          <Text key={`${key}|${w}`} style={[style, styles.word]} numberOfLines={1} onLayout={e => record(w, e)}>{w}</Text>
         ))}
       </View>
     </View>

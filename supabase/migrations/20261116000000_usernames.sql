@@ -6,9 +6,6 @@
 -- The username is sent at sign-up as user metadata (options.data.username); a trigger on
 -- auth.users claims it here, so a taken name fails the sign-up itself.
 -- Matches src/lib/auth.ts and src/features/auth/username.ts (3-20 of a-z 0-9 _ .).
---
--- A name held by a sign-up whose email was never confirmed is freed after an hour, so someone who
--- typo'd their email can sign up again with the same username. (The old account just keeps no name.)
 
 create table public.usernames (
   username   text primary key check (username ~ '^[a-z0-9_.]{3,20}$'),
@@ -25,13 +22,6 @@ declare
   wanted text := lower(trim(new.raw_user_meta_data ->> 'username'));
 begin
   if wanted is not null and wanted <> '' then
-    -- Free the name if an unconfirmed sign-up has held it for over an hour (see the top).
-    delete from public.usernames n
-      using auth.users u
-      where n.username = wanted
-        and u.id = n.user_id
-        and u.email_confirmed_at is null
-        and u.created_at < now() - interval '1 hour';
     -- A taken or malformed name raises here, which rolls back the sign-up.
     insert into public.usernames (username, user_id) values (wanted, new.id);
   end if;
@@ -54,16 +44,9 @@ create function public.email_for_username(p_username text) returns text
 $$;
 
 -- Create Account: false when the name is taken (checked before sign-up for a clear message).
--- A name an unconfirmed sign-up has held for over an hour counts as free, as in claim_username.
 create function public.username_available(p_username text) returns boolean
   language sql stable security definer set search_path = '' as $$
-  select not exists (
-    select 1
-    from public.usernames n
-    join auth.users u on u.id = n.user_id
-    where n.username = lower(trim(p_username))
-      and (u.email_confirmed_at is not null or u.created_at >= now() - interval '1 hour')
-  );
+  select not exists (select 1 from public.usernames where username = lower(trim(p_username)));
 $$;
 
 revoke all on function public.email_for_username(text) from public;

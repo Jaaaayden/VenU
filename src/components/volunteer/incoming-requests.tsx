@@ -9,6 +9,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { isolate } from '@/features/profile/options';
 import { uiLanguageName } from '@/features/profile/summary';
 import { useVolunteerDesk, volunteerDesk } from '@/features/volunteer/desk-store';
 import { formatDistance } from '@/features/volunteer/format';
@@ -21,10 +22,6 @@ import { HelpIcon } from './help-icon';
 import { Hint, useHint } from './hint';
 import { MeetPlaceText } from './meet-place';
 import { DeskBanner } from './note-banner';
-
-// Named in the UI language, as in "Fluent languages" above it (e.g. "Spanish", not "Español").
-// Isolated so an RTL name doesn't reorder the line around it.
-const isolate = (name: string) => `⁨${name}⁩`;
 
 export function IncomingRequests() {
   return volunteerDesk.live ? <LiveRequests /> : <ExampleRequests />;
@@ -100,6 +97,8 @@ function RequestCard({ request: r, children }: { request: IncomingRequest; child
   const help = t(`helpTypes.${r.helpType}`);
   const lng = languageOf(t);
   const minutes = formatNumber(r.minutesAgo, undefined, lng);
+  // In the UI language ("Spanish", not "Español"), as in "Fluent languages"; isolated so an RTL
+  // name doesn't reorder the line.
   const language = isolate(uiLanguageName(r.language, tp));
   return (
     <View style={styles.card}>

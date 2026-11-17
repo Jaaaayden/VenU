@@ -63,7 +63,15 @@ export function languageName(code: string): string {
  * Without it, an RTL name flips the whole string: "فارسی · main" renders as "main · فارسی".
  */
 export function isolatedLanguageName(code: string): string {
-  return `\u2068${languageName(code)}\u2069`;
+  return isolate(languageName(code));
+}
+
+/**
+ * `text` wrapped in Unicode isolate marks (FSI\u2026PDI), so its direction doesn't reorder the label
+ * around it. e.g. isolate('\u0627\u0644\u0639\u0631\u0628\u064a\u0629') \u2192 '\u2068\u0627\u0644\u0639\u0631\u0628\u064a\u0629\u2069'
+ */
+export function isolate(text: string): string {
+  return `\u2068${text}\u2069`;
 }
 
 export function englishLanguageName(code: string): string {

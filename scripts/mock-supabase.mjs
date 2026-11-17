@@ -11,7 +11,9 @@
 //
 // Test hooks: GET /__state (everything stored), POST /__control { dropNextProfileWrite: n }
 // (drop the next n profile-save responses, to test lost connections), { failTranslate: n } (the next
-// n translate calls fail), { translateDelayMs: ms } (slow translations), GET /__confirm?email=...
+// n translate calls fail), { translateDelayMs: ms } (slow translations), { clockOffsetMs: ms } (move the
+// clock used for how long a sign-up has waited unconfirmed, e.g. 2h to free its username),
+// GET /__confirm?email=...
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -34,12 +36,13 @@ export const MOCK_SUPABASE_PORT = 47330;
  *   stateFile: keep accounts, profiles and photos here between runs.
  */
 export function startMockSupabase({ port, confirmEmail = false, stateFile, log = console.log }) {
-  const users = new Map(); // email -> { id, email, password, confirmed, username? }
+  const users = new Map(); // email -> { id, email, password, confirmed, createdAt, username?, wantedUsername? }
   const profiles = new Map(); // user id -> row
   const files = new Map(); // path -> { bytes: Buffer, type }
   const refreshTokens = new Map(); // token -> user id
   const requests = [];
-  const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0 };
+  const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0, clockOffsetMs: 0 };
+  const now = () => Date.now() + control.clockOffsetMs;
 
   if (stateFile && existsSync(stateFile)) {
     try {
@@ -67,12 +70,22 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const publicUser = u => ({
     id: u.id, aud: 'authenticated', role: 'authenticated', email: u.email,
     email_confirmed_at: u.confirmed ? '2026-11-09T00:00:00Z' : null,
-    app_metadata: { provider: 'email' }, user_metadata: u.username ? { username: u.username } : {}, created_at: '2026-11-09T00:00:00Z',
+    app_metadata: { provider: 'email' }, user_metadata: u.username ? { username: u.username } : {},
+    created_at: new Date(u.createdAt ?? Date.parse('2026-11-09T00:00:00Z')).toISOString(),
   });
-  // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql).
+  // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql and
+  // 20261116120000_free_unconfirmed_usernames.sql).
   const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
   const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
   let usernameSignIn = null; // the username-sign-in function's handler, loaded on first use
+  // A name an unconfirmed sign-up has held for over an hour is free. (Saved users from before
+  // createdAt was kept count as old.)
+  const USERNAME_HOLD_MS = 60 * 60 * 1000;
+  const holdsUsername = u => u.confirmed || now() - (u.createdAt ?? 0) < USERNAME_HOLD_MS;
+  const usernameTaken = name => {
+    const holder = userByUsername(name);
+    return !!holder && holdsUsername(holder);
+  };
   // Supabase Auth stores and matches emails in lower case: "Rosa@Example.com" signs in as rosa@example.com.
   const normalEmail = email => (typeof email === 'string' ? email.trim().toLowerCase() : '');
   function session(user) {
@@ -124,12 +137,18 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
 
     // ---- test hooks
     if (p === '/__state') {
-      return send(res, 200, { users: [...users.values()].map(u => ({ id: u.id, email: u.email, confirmed: u.confirmed })), profiles: [...profiles.values()], files: [...files.keys()], log: requests });
+      return send(res, 200, { users: [...users.values()].map(u => ({ id: u.id, email: u.email, confirmed: u.confirmed, username: u.username ?? null })), profiles: [...profiles.values()], files: [...files.keys()], log: requests });
     }
     if (p === '/__control') { Object.assign(control, json()); return send(res, 200, control); }
     if (p === '/__confirm') {
       const user = users.get(normalEmail(url.searchParams.get('email')));
-      if (user) { user.confirmed = true; persist(); }
+      if (user && !user.confirmed) {
+        user.confirmed = true;
+        // reclaim_username_on_confirm: a name lost while unconfirmed comes back if still free, else it's dropped.
+        if (user.wantedUsername && !user.username && !userByUsername(user.wantedUsername)) user.username = user.wantedUsername;
+        delete user.wantedUsername;
+        persist();
+      }
       res.writeHead(user ? 200 : 404, { 'content-type': 'text/html; charset=utf-8' });
       return res.end(user ? `<p style="font:16px system-ui">Email confirmed for ${user.email}. Go back to VenU and sign in.</p>` : 'No account with that email.');
     }
@@ -151,9 +170,12 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       if (users.has(email)) return authErr(res, 422, 'user_already_exists', 'User already registered');
       const username = normalUsername(data?.username) || undefined;
       // The claim_username trigger: a taken or malformed name fails the whole sign-up.
-      if (username && (userByUsername(username) || !/^[a-z0-9_.]{3,20}$/.test(username)))
+      if (username && (usernameTaken(username) || !/^[a-z0-9_.]{3,20}$/.test(username)))
         return authErr(res, 500, 'unexpected_failure', 'Database error saving new user');
-      const user = { id: randomUUID(), email, password, confirmed: !confirmEmail, username };
+      // It frees the name from an unconfirmed sign-up that held it for over an hour.
+      const stale = username && userByUsername(username);
+      if (stale) { stale.wantedUsername = stale.username; delete stale.username; }
+      const user = { id: randomUUID(), email, password, confirmed: !confirmEmail, createdAt: now(), username };
       users.set(email, user);
       persist();
       if (!confirmEmail) return send(res, 200, session(user));
@@ -213,7 +235,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       return res.end(Buffer.from(await reply.arrayBuffer()));
     }
     if (p === '/rest/v1/rpc/username_available' && req.method === 'POST') {
-      return send(res, 200, !userByUsername(json()?.p_username));
+      return send(res, 200, !usernameTaken(json()?.p_username));
     }
 
     // ---- the profiles table
@@ -584,6 +606,6 @@ async function createTranslate({ verifyUser, control, log }) {
 // Run on its own: node scripts/mock-supabase.mjs [port] [--confirm-email]
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.argv.find(a => /^\d+$/.test(a)) ?? MOCK_SUPABASE_PORT);
-  await startMockSupabase({ port, confirmEmail: process.argv.includes('--confirm-email') });
-  console.log(`mock supabase on http://localhost:${port}`);
+  const server = await startMockSupabase({ port, confirmEmail: process.argv.includes('--confirm-email') });
+  console.log(`mock supabase on http://localhost:${server.address().port}`); // port 0 picks a free one
 }

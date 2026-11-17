@@ -16,7 +16,7 @@ import { ERROR_CODES, errorText } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, labeled, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
-import type { ProfileDraft } from './types';
+import { sameDraft, type ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
 
 interface ProfileFormProps {
@@ -46,7 +46,7 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
   const errors = submitted ? validateDraft(d) : {};
   const shownAvatar = avatar === 'remove' ? null : avatar ? avatar.uri : savedAvatarUrl;
 
-  const dirty = avatar !== null || JSON.stringify(d) !== JSON.stringify(initial);
+  const dirty = avatar !== null || !sameDraft(d, initial);
   useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
 
   function set<K extends keyof ProfileDraft>(key: K, value: ProfileDraft[K]) {
