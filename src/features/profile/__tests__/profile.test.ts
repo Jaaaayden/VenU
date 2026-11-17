@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
-import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
+import { isKnownLanguage, isolate, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
 import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, setAppLanguageIfCurrent, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials, uiLanguageName } from '../summary';
@@ -182,6 +182,7 @@ describe('small helpers', () => {
   });
 
   it('wraps language names in Unicode isolates so RTL names keep chip order', () => {
+    expect(isolate('Arabic')).toBe('\u2068Arabic\u2069'); // a name in the UI language, e.g. on incoming requests
     expect(isolatedLanguageName('fa')).toBe('\u2068فارسی\u2069');
     expect(`${isolatedLanguageName('ar')} · main`).toBe('\u2068العربية\u2069 · main');
   });
