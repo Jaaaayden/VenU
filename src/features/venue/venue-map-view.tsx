@@ -18,20 +18,9 @@ import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import type { Route } from './directions';
+import { startMarker, type Route } from './directions';
 import { facilityName } from './labels';
-import {
-  centreOn,
-  clampView,
-  contentSize,
-  fitRect,
-  isVisible,
-  toMap,
-  zoomAt,
-  type Box,
-  type MapRect,
-  type MapView,
-} from './map-geometry';
+import { clampView, contentSize, mapUpdate, zoomAt, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
 import { VenueDrawing } from './stadium-map';
 import type { Facility } from './types';
 import { mapAspect, type VenueMap } from './venue-maps';
@@ -107,29 +96,27 @@ export function VenueMapView(props: VenueMapViewProps) {
     setZoom(v.s);
   };
 
-  // Fit on a new key. When the sheet moves, fit again if the visitor left the fitted view alone,
-  // else keep what was in the middle of the visible part in the middle. Bring a revealed pin on
-  // screen if it's hidden.
-  const last = useRef<{ key: string; vh: number; w: number; reveal: string | null | undefined } | null>(null);
+  // Fit on a new key or a sheet move, then bring a newly revealed pin on screen (see mapUpdate).
+  const last = useRef<MapLayout | null>(null);
   useEffect(() => {
     dims.set({ content, viewport });
     const prev = last.current;
-    last.current = { key: fitKey, vh: viewport.h, w: width, reveal: revealId };
-    if (!prev || prev.key !== fitKey || prev.w !== width || (prev.vh !== viewport.h && !moved.get())) {
-      moved.set(false);
-      go(fitRect(rect, content, viewport, 24, fitMax, FIT_INSETS), !!prev);
-      return;
-    }
-    if (prev.vh !== viewport.h) {
-      const mid = toMap({ x: width / 2, y: prev.vh / 2 }, content, current());
-      go(centreOn(mid, { x: width / 2, y: viewport.h / 2 }, current(), content, viewport));
-      return;
-    }
-    if (revealId && prev.reveal !== revealId) {
-      const pin = pins.find(f => f.id === revealId);
-      const room: Box = { w: viewport.w, h: Math.max(viewport.h - revealInset, 1) };
-      if (pin && !isVisible(pin, content, current(), room, 32)) go(centreOn(pin, { x: width / 2, y: room.h / 2 }, current(), content, viewport));
-    }
+    const next: MapLayout = { key: fitKey, vh: viewport.h, w: width, reveal: revealId };
+    last.current = next;
+    const update = mapUpdate({
+      prev,
+      next,
+      moved: moved.get(),
+      view: current(),
+      content,
+      viewport,
+      fit: { rect, max: fitMax, pad: 24, insets: FIT_INSETS },
+      revealPin: revealId ? pins.find(f => f.id === revealId) : undefined,
+      revealInset,
+    });
+    if (!update) return;
+    if (update.refit) moved.set(false);
+    go(update.view, !!prev);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs on these inputs only; the rest is read fresh
   }, [fitKey, viewport.h, width, revealId]);
 
@@ -218,7 +205,8 @@ export function VenueMapView(props: VenueMapViewProps) {
   const counterScale = useAnimatedStyle(() => ({ transform: [{ scale: 1 / s.get() }] }));
 
   const highlighted = new Set(highlightIds.filter(Boolean));
-  const fromId = route && !route.here ? route.from.id : null;
+  const start = startMarker(route);
+  const youId = start?.kind === 'you' ? start.at.id : null;
   const scaleLine = (n: number) => n / Math.max(zoom, 0.1);
   // The dashed line from the visitor's spot to the facility, in content px.
   const line = route && !route.here
@@ -259,11 +247,12 @@ export function VenueMapView(props: VenueMapViewProps) {
                 counterScale={counterScale}
                 big={highlighted.has(f.id)}
                 tinted={tinted}
-                hidden={f.id === fromId}
+                hidden={f.id === youId}
                 onPress={onPinPress}
               />
             ))}
-            {route && fromId ? <YouMarker left={route.from.x * content.w} top={route.from.y * content.h} counterScale={counterScale} label={t('map.you')} /> : null}
+            {start?.kind === 'you' ? <YouMarker left={start.at.x * content.w} top={start.at.y * content.h} counterScale={counterScale} label={t('map.you')} /> : null}
+            {start?.kind === 'start' ? <StartTag left={start.at.x * content.w} top={start.at.y * content.h} counterScale={counterScale} label={t('map.start')} /> : null}
           </Animated.View>
         </View>
       </GestureDetector>
@@ -334,6 +323,15 @@ function YouMarker({ left, top, counterScale, label }: { left: number; top: numb
   );
 }
 
+/** A "Start" tag under the pin where a walk starts (the venue's way in, still tappable). */
+function StartTag({ left, top, counterScale, label }: { left: number; top: number; counterScale: ReturnType<typeof useAnimatedStyle>; label: string }) {
+  return (
+    <Animated.View style={[styles.pinBox, styles.onTop, { left: left - HIT / 2, top: top - HIT / 2 }, counterScale]} pointerEvents="none">
+      <Text style={[styles.youLabel, styles.startLabel]} numberOfLines={1}>{label}</Text>
+    </Animated.View>
+  );
+}
+
 /** "Map: SoFi Stadium · Open interactive map" over the top of the map. */
 function SourceBar({ map }: { map: VenueMap }) {
   const t = useT('venue');
@@ -388,6 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     overflow: 'hidden',
   },
+  startLabel: { top: HIT - 4, backgroundColor: Colors.inkDeep },
   sourceBar: {
     position: 'absolute',
     top: 0,

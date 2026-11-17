@@ -2,7 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 import i18n from '@/i18n';
 
-import { routeFor, routeStart } from '../directions';
+import { routeFor, routeStart, startMarker } from '../directions';
 import { contentSize, toScreen } from '../map-geometry';
 import { facilitiesFor, getVenue } from '../mock';
 import { mapAspect, venueMapFor } from '../venue-maps';
@@ -61,6 +61,23 @@ describe('routeFor', () => {
 
   it('has no route to an unknown facility', () => {
     expect(routeFor(sofi, facilities, nowhere, 'sofi', 'gate-99')).toBeNull();
+  });
+});
+
+describe('startMarker', () => {
+  it('says "You" only at a spot the visitor set', () => {
+    const route = routeFor(sofi, facilities, { venueId: 'sofi', facilityId: 'entry-11' }, 'sofi', 'blue-zone');
+    expect(startMarker(route)).toEqual({ kind: 'you', at: facilities.find(f => f.id === 'entry-11') });
+  });
+
+  it('tags the main way in "Start" (its pin stays) until they do', () => {
+    const route = routeFor(sofi, facilities, nowhere, 'sofi', 'blue-zone');
+    expect(startMarker(route)).toEqual({ kind: 'start', at: facilities.find(f => f.id === 'entry-4') });
+  });
+
+  it('marks nothing without a walk', () => {
+    expect(startMarker(null)).toBeNull();
+    expect(startMarker(routeFor(sofi, facilities, nowhere, 'sofi', 'entry-4'))).toBeNull();
   });
 });
 

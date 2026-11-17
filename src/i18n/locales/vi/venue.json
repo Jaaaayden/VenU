@@ -79,6 +79,7 @@
     "north": "B",
     "label": "Bản đồ {{venue}} có ghim các tiện ích. Kéo để di chuyển, chụm ngón tay hoặc dùng nút để phóng to, thu nhỏ.",
     "you": "Bạn",
+    "start": "Xuất phát",
     "cardHint": "Mở trong bảng bên dưới"
   },
   "officialMap": {

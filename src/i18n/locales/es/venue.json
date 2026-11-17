@@ -79,6 +79,7 @@
     "north": "N",
     "label": "Mapa de {{venue}} con los servicios marcados. Arrastra para moverlo; pellizca o usa los botones para hacer zoom.",
     "you": "Tú",
+    "start": "Inicio",
     "cardHint": "Lo abre en el panel de abajo"
   },
   "officialMap": {
