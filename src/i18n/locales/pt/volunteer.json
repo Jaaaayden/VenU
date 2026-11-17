@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Não conseguimos falar com um voluntário. Verifique sua conexão e tente de novo.",
-    "thanks": "Obrigado! Sua avaliação ajuda {{name}} e a equipe LA28."
+    "thanks": "Obrigado! Sua avaliação ajuda {{name}} e a equipe LA28.",
+    "volunteerLeft": "Seu voluntário precisou sair. Estamos procurando outra pessoa."
   },
   "searching": {
     "title": "Procurando um voluntário",
@@ -105,7 +106,8 @@
   },
   "map": {
     "label": "Mapa: {{name}} está a {{distance}}, indo até você em {{place}}.",
-    "you": "Você"
+    "you": "Você",
+    "labelNoDistance": "Mapa: {{name}} está indo até você em {{place}}."
   },
   "messages": {
     "label": "Mensagens",
@@ -130,7 +132,8 @@
     "messageTo": "Mensagem para {{name}}",
     "stickers": "Figurinhas",
     "stickersSoon": "Figurinhas em breve.",
-    "record": "Ditar uma mensagem"
+    "record": "Ditar uma mensagem",
+    "emptyVolunteer": "Diga oi para {{name}} e avise que você está a caminho."
   },
   "translation": {
     "translatedFrom": "Traduzido do {{language}}",
@@ -153,10 +156,13 @@
   },
   "bubble": {
     "mine": "Você, {{time}}: {{text}}",
-    "theirs": "Voluntário, {{time}}: {{text}}",
-    "theirsTranslated": "Voluntário, {{time}}: {{text}} (traduzido do {{language}})",
     "listen": "ouvir",
-    "listenLabel": "Ouvir esta mensagem"
+    "listenLabel": "Ouvir esta mensagem",
+    "from": "{{name}}, {{time}}: {{text}}",
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (traduzido do {{language}})",
+    "notSent": "Não enviada",
+    "retry": "Toque para tentar de novo",
+    "retryLabel": "Não enviada. Enviar esta mensagem de novo"
   },
   "feedback": {
     "skip": "Pular",
@@ -213,7 +219,25 @@
     "who": "{{help}} · {{name}}",
     "meta": "A {{distance}} · há {{minutes}} min · {{language}}",
     "accept": "Aceitar",
-    "acceptSoon": "Você poderá aceitar pedidos quando a conexão for ativada."
+    "acceptSoon": "Você poderá aceitar pedidos quando a conexão for ativada.",
+    "empty": "Ninguém por perto precisa de ajuda agora. Novos pedidos aparecem aqui.",
+    "metaLive": "há {{minutes}} min · {{language}}"
+  },
+  "active": {
+    "title": "Você está ajudando {{name}}",
+    "subtitle": "Vá até essa pessoa e diga oi na conversa.",
+    "end": "Encerrar conversa",
+    "endHint": "Marca a ajuda como concluída para você e para {{name}}",
+    "confirmEnd": "Encerrar a conversa com {{name}}? Isso marca a ajuda como concluída.",
+    "yesEnd": "Sim, encerrar"
+  },
+  "desk": {
+    "taken": "Outra pessoa já aceitou este pedido.",
+    "acceptFailed": "Não foi possível aceitar o pedido. Verifique sua conexão e tente de novo.",
+    "cancelled": "{{name}} cancelou o pedido.",
+    "done": "{{name}} marcou a ajuda como concluída. Obrigado!",
+    "ended": "Conversa encerrada. Obrigado por ajudar {{name}}!",
+    "withdrawn": "Este pedido foi retirado."
   },
   "home": {
     "greeting": "Oi, {{name}}",

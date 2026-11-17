@@ -222,11 +222,6 @@ export const SEED_REPORTS: FacilityReport[] = [
     title: 'Listening device in two minutes', authorName: 'Leila H.', createdAt: '2026-10-15T03:20:00.000Z', language: 'en',
     body: 'Picked up a free assisted listening device at the Answers Portal near Main 6. They held my photo ID until I brought it back.',
   },
-  {
-    id: 'seed-tacos', venueId: 'coliseum', facilityId: 'food-south', topic: 'crowds',
-    title: 'Go before halftime', authorName: 'Kenji S.', createdAt: '2026-10-11T02:40:00.000Z', language: 'en',
-    body: 'The line was 25 minutes at halftime and under 5 minutes in the first quarter.',
-  },
 ];
 
 let store: ReportStore = createPersistentReportStore(AsyncStorage, SEED_REPORTS);

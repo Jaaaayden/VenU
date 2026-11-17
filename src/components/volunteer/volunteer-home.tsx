@@ -1,6 +1,6 @@
 /**
  * A volunteer's Volunteer tab (Figma "Volunteer Home"): where they are, Free / Busy / Off, what they
- * can help with, then nearby requests while Free.
+ * can help with, then nearby requests while Free, or the request they accepted.
  */
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -14,11 +14,14 @@ import { useWhereAmI } from '@/features/venue/current';
 import { getVenue } from '@/features/venue/mock';
 import { meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
 import { useAvailability } from '@/features/volunteer/availability';
+import { useVolunteerDesk } from '@/features/volunteer/desk-store';
 import { useT } from '@/i18n';
 
+import { ActiveRequest } from './active-request';
 import { AppLanguagePill } from './app-language-pill';
 import { EmergencyCard } from './emergency-card';
 import { IncomingRequests } from './incoming-requests';
+import { DeskBanner } from './note-banner';
 import { useStartAligned } from './start-aligned';
 import { StatusCard } from './status-card';
 
@@ -30,6 +33,7 @@ export function VolunteerHome({ profile }: { profile: HomeProfile }) {
   const venueName = getVenue(venueId)?.name ?? '';
   const { status, ready, setStatus } = useAvailability(profile.id);
   const startAligned = useStartAligned();
+  const { assignment, unread, notice } = useVolunteerDesk();
 
   return (
     <View style={styles.page}>
@@ -41,12 +45,16 @@ export function VolunteerHome({ profile }: { profile: HomeProfile }) {
         </View>
       </View>
 
+      {/* How the last chat ended. "Already taken" shows by the list instead, where Accept was tapped. */}
+      {notice?.tone === 'success' ? <DeskBanner notice={notice} /> : null}
+      {assignment ? <ActiveRequest assignment={assignment} unread={unread} /> : null}
+
       <LocationCard />
       <StatusCard status={status} onChange={setStatus} />
       <HelpWithCard profile={profile} />
 
       {/* Until the saved status is read, show neither list nor note, so a Busy volunteer never sees requests flash. */}
-      {!ready ? null : status === 'free' ? (
+      {assignment || !ready ? null : status === 'free' ? (
         <IncomingRequests />
       ) : (
         <Text style={styles.paused}>{t('home.paused')}</Text>

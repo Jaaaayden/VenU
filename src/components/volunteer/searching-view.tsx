@@ -11,13 +11,15 @@ import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName } from '@/features/profile/options';
 import { HELP_TYPES } from '@/features/volunteer/mock';
 import { volunteerRequests } from '@/features/volunteer/request-store';
-import type { HelpRequest } from '@/features/volunteer/types';
+import type { HelpRequest, Notice } from '@/features/volunteer/types';
 import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
 import { MeetPlaceText } from './meet-place';
+import { NoteBanner } from './note-banner';
 
-export function SearchingView({ request }: { request: HelpRequest }) {
+/** `notice`: why it's searching again, e.g. "Your volunteer had to leave. Finding someone else." */
+export function SearchingView({ request, notice }: { request: HelpRequest; notice?: Notice | null }) {
   const t = useT('volunteer');
   const [pulse] = useState(() => new Animated.Value(0));
   useEffect(() => {
@@ -30,6 +32,9 @@ export function SearchingView({ request }: { request: HelpRequest }) {
 
   return (
     <View style={styles.page}>
+      {notice ? (
+        <NoteBanner tone={notice.tone} text={t(`notice.${notice.key}`, { name: notice.params?.name ?? '' })} onDismiss={volunteerRequests.dismissNotice} />
+      ) : null}
       <View style={styles.titles}>
         <Text style={styles.title} accessibilityRole="header">{t('searching.title')}</Text>
         <Text style={styles.subtitle} accessibilityLiveRegion="polite">{t('searching.subtitle')}</Text>

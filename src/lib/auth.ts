@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isAuthRetryableFetchError } from '@supabase/supabase-js';
+import { isAuthRetryableFetchError, type SupabaseClient } from '@supabase/supabase-js';
 
 import { isEmailLike, normalizeUsername } from '@/features/auth/username';
 import { clearSavedDraft } from '@/features/profile/setup-draft-storage';
+import { runBeforeSignOut } from '@/lib/before-sign-out';
 import { codedError, friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
 
 export const LOCAL_USER_ID = 'local-guest';
 const LOCAL_SESSION_KEY = 'venu.local.session';
 
-/** `email`: the account's email once signed in (a username sign-in looks it up). `field`: where to show the error. */
+/** `email`: the account's email once signed in (a username sign-in reads it from the new session). `field`: where to show the error. */
 export type AuthResult =
   | { ok: true; needsConfirmation?: boolean; email?: string }
   | { ok: false; error: string; field?: 'username' };
@@ -20,24 +21,58 @@ export const isLocalMode = supabase === null;
 const wrongLogin = () => friendlyError({ code: 'invalid_credentials' });
 
 /**
- * Sign in with a username or an email. A username is looked up with the `email_for_username`
- * function (supabase/migrations/20261116000000_usernames.sql) and then signs in by that email.
- * e.g. signIn('rosa_m', pw) → email_for_username('rosa_m') = 'rosa@example.com' → password sign-in
+ * Sign in with a username or an email. A username goes to the `username-sign-in` Edge Function,
+ * which looks the email up server-side and returns only a session, so the app never sees the email
+ * of an account it can't sign in to. The account's email then comes from the signed-in user.
+ * e.g. signIn('rosa_m', pw) → username-sign-in → { access_token, refresh_token } → setSession
+ *      → { ok: true, email: 'rosa@example.com' }
  */
 export async function signIn(identifier: string, password: string): Promise<AuthResult> {
   if (!supabase) {
     await AsyncStorage.setItem(LOCAL_SESSION_KEY, '1');
     return { ok: true };
   }
-  let email = identifier.trim();
-  if (!isEmailLike(email)) {
-    const { data, error } = await supabase.rpc('email_for_username', { p_username: normalizeUsername(email) });
-    if (error) return { ok: false, error: friendlyError(error) };
-    if (typeof data !== 'string' || !data) return { ok: false, error: wrongLogin() };
-    email = data;
-  }
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const typed = identifier.trim();
+  if (!isEmailLike(typed)) return signInByUsername(supabase, normalizeUsername(typed), password);
+  return signInByEmail(supabase, typed, password);
+}
+
+async function signInByEmail(client: SupabaseClient, email: string, password: string): Promise<AuthResult> {
+  const { error } = await client.auth.signInWithPassword({ email, password });
   return error ? { ok: false, error: friendlyError(error) } : { ok: true, email };
+}
+
+interface FunctionSession {
+  access_token?: unknown;
+  refresh_token?: unknown;
+}
+
+async function signInByUsername(client: SupabaseClient, username: string, password: string): Promise<AuthResult> {
+  const { data, error, response } = await client.functions.invoke<FunctionSession>('username-sign-in', { body: { username, password } });
+  if (error) {
+    // Not deployed yet (the gateway's 404; the function itself never answers 404): sign in the old
+    // way until it is. Deploy the function before revoking email_for_username (see its migration).
+    if (response?.status === 404) return signInByLookup(client, username, password);
+    // The function answers like Auth ({ code: 'invalid_credentials', … }); a network failure has
+    // no response, and its cause (e.g. "Failed to fetch") says so.
+    const reason = response ? await response.json().catch(() => null) : (error as { context?: unknown }).context ?? error;
+    return { ok: false, error: friendlyError(reason) };
+  }
+  if (typeof data?.access_token !== 'string' || typeof data.refresh_token !== 'string') return { ok: false, error: friendlyError(null) };
+  const set = await client.auth.setSession({ access_token: data.access_token, refresh_token: data.refresh_token });
+  if (set.error) return { ok: false, error: friendlyError(set.error) };
+  return { ok: true, email: set.data.user?.email ?? undefined };
+}
+
+/**
+ * Before the function is deployed: the email from `email_for_username` (granted to anon until
+ * supabase/migrations/20261117000000_private_username_lookup.sql), then a password sign-in.
+ */
+async function signInByLookup(client: SupabaseClient, username: string, password: string): Promise<AuthResult> {
+  const { data, error } = await client.rpc('email_for_username', { p_username: username });
+  if (error) return { ok: false, error: friendlyError(error) };
+  if (typeof data !== 'string' || !data) return { ok: false, error: wrongLogin() };
+  return signInByEmail(client, data, password);
 }
 
 /**
@@ -71,6 +106,8 @@ export async function signUp(email: string, password: string, username: string):
 export async function signOut(): Promise<void> {
   // Half-finished setup answers (name, access needs) shouldn't stay on a shared device.
   await clearSavedDraft();
+  // While still signed in: e.g. close an open help request, which the server refuses once signed out.
+  await runBeforeSignOut();
   if (!supabase) {
     await AsyncStorage.removeItem(LOCAL_SESSION_KEY);
     return;

@@ -77,6 +77,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   // 20261116120000_free_unconfirmed_usernames.sql).
   const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
   const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
+  let usernameSignIn = null; // the username-sign-in function's handler, loaded on first use
   // A name an unconfirmed sign-up has held for over an hour is free. (Saved users from before
   // createdAt was kept count as old.)
   const USERNAME_HOLD_MS = 60 * 60 * 1000;
@@ -209,9 +210,29 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       return user ? send(res, 200, publicUser(user)) : authErr(res, 401, 'bad_jwt', 'invalid JWT');
     }
 
-    // ---- username functions (callable signed out, like the anon grants in the migration)
+    // ---- username functions. username_available is callable signed out (Create Account needs it);
+    // email_for_username is service role only (20261117000000_private_username_lookup.sql), so Sign
+    // In by username goes through the username-sign-in Edge Function, the same code as
+    // supabase/functions/username-sign-in, which looks the email up here and never returns it.
     if (p === '/rest/v1/rpc/email_for_username' && req.method === 'POST') {
-      return send(res, 200, userByUsername(json()?.p_username)?.email ?? null);
+      return pgErr(res, uid ? 403 : 401, '42501', 'permission denied for function email_for_username');
+    }
+    if (p === '/functions/v1/username-sign-in') {
+      usernameSignIn ??= importShared('supabase/functions/username-sign-in/handler.ts').then(({ createHandler, httpPasswordGrant }) => createHandler({
+        emailForUsername: async name => userByUsername(name)?.email ?? null,
+        // Auth's password grant on this same server, as the real function calls Supabase Auth.
+        passwordGrant: httpPasswordGrant(`http://localhost:${port}`, 'mock-secret-key'),
+        log: line => log(`mock supabase: ${line}`),
+      })).catch(e => {
+        log(`mock supabase: username sign-in is off (${e.message}). It needs Node 22.18+, which loads the shared .ts files.`);
+        return null;
+      });
+      const handle = await usernameSignIn;
+      if (!handle) return send(res, 503, { code: 'unexpected_failure', message: 'Username sign-in needs Node 22.18 or newer in mock mode.' });
+      const headers = Object.entries(req.headers).filter(([, v]) => typeof v === 'string');
+      const reply = await handle(new Request(`http://mock${req.url}`, { method: req.method, headers, body: req.method === 'POST' ? raw : undefined }));
+      res.writeHead(reply.status, Object.fromEntries(reply.headers));
+      return res.end(Buffer.from(await reply.arrayBuffer()));
     }
     if (p === '/rest/v1/rpc/username_available' && req.method === 'POST') {
       return send(res, 200, !usernameTaken(json()?.p_username));
@@ -278,6 +299,9 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       }
     }
 
+    // ---- help requests and chat (see handleHelpRequests below)
+    if (handleHelpRequests({ req, res, p, url, body: json, uid, profiles, send, pgErr })) return;
+
     // ---- the avatars bucket (private: owners only)
     const ownPath = path => path.split('/')[0] === uid;
     let m;
@@ -327,6 +351,181 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     server.once('error', reject);
     server.listen(port, () => resolve(server));
   });
+}
+
+// ---- help requests and chat: the help_requests and messages tables and their functions, with the
+// rules of supabase/migrations/20261117010000_help_requests_chat.sql. One store per server (keyed
+// by its profiles map), kept in memory only. There's no Realtime here: the app sees its channels fail
+// and polls instead (src/features/volunteer/supabase-backend.ts).
+// Test hooks: GET /__help (every request and message); POST /__help { rejectSends: true } makes
+// message inserts fail (as RLS would), to try "Not sent · Tap to retry"; false turns that off.
+const helpStores = new WeakMap();
+const HELP_TYPE_IDS = ['physical', 'directions', 'language', 'quiet', 'lost', 'other'];
+const HELP_ROUTES = new Set([
+  '/__help', '/rest/v1/help_requests', '/rest/v1/messages', '/rest/v1/rpc/accept_help_request',
+  '/rest/v1/rpc/close_help_request', '/rest/v1/rpc/release_help_request', '/rest/v1/rpc/open_help_requests',
+]);
+/** open_help_requests(): requests opened within this long are listed. */
+const OPEN_WINDOW_MS = 5 * 60 * 1000;
+
+/** PostgREST-style filters from the query string, e.g. status=eq.open&created_at=gte.2026-11-17T18:00:00Z. */
+function rowFilter(url) {
+  const tests = [];
+  for (const [col, raw] of url.searchParams) {
+    if (['select', 'order', 'limit', 'offset', 'columns'].includes(col)) continue;
+    const dot = raw.indexOf('.');
+    const op = raw.slice(0, dot);
+    const v = raw.slice(dot + 1);
+    const cmp = (a, b) => (a == null ? -1 : String(a) < b ? -1 : String(a) > b ? 1 : 0);
+    if (op === 'eq') tests.push(r => String(r[col]) === v);
+    else if (op === 'neq') tests.push(r => String(r[col]) !== v);
+    else if (op === 'gt') tests.push(r => cmp(r[col], v) > 0);
+    else if (op === 'gte') tests.push(r => cmp(r[col], v) >= 0);
+    else if (op === 'lt') tests.push(r => cmp(r[col], v) < 0);
+    else if (op === 'lte') tests.push(r => cmp(r[col], v) <= 0);
+    else if (op === 'is') tests.push(r => (v === 'null' ? r[col] == null : String(r[col]) === v));
+    else if (op === 'in') { const set = v.replace(/^\(|\)$/g, '').split(','); tests.push(r => set.includes(String(r[col]))); }
+  }
+  return row => tests.every(t => t(row));
+}
+
+/** order=created_at.desc and limit=n, as PostgREST applies them. */
+function orderAndLimit(rows, url) {
+  const order = url.searchParams.get('order');
+  let out = [...rows];
+  if (order) {
+    const [col, dir] = order.split('.');
+    out.sort((a, b) => (String(a[col] ?? '') < String(b[col] ?? '') ? -1 : String(a[col] ?? '') > String(b[col] ?? '') ? 1 : 0) * (dir === 'desc' ? -1 : 1));
+  }
+  const limit = Number(url.searchParams.get('limit'));
+  return limit > 0 ? out.slice(0, limit) : out;
+}
+
+/** Handles the help request routes; false for anything else. */
+function handleHelpRequests({ req, res, p, url, body, uid, profiles, send, pgErr }) {
+  if (!HELP_ROUTES.has(p)) return false;
+  if (!helpStores.has(profiles)) helpStores.set(profiles, { requests: new Map(), messages: [], rejectSends: false });
+  helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, helpStores.get(profiles));
+  return true;
+}
+
+function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store) {
+  if (p === '/__help') {
+    if (req.method === 'POST') store.rejectSends = !!body()?.rejectSends;
+    return send(res, 200, { requests: [...store.requests.values()], messages: store.messages, rejectSends: store.rejectSends });
+  }
+  if (!uid) return pgErr(res, 401, 'PGRST301', 'JWT expired');
+
+  const isVolunteer = profiles.get(uid)?.role === 'volunteer';
+  const canSee = r => r.visitor_id === uid || r.volunteer_id === uid || (r.status === 'open' && isVolunteer);
+  const isParty = id => { const r = store.requests.get(id); return !!r && (r.visitor_id === uid || r.volunteer_id === uid); };
+  // can_read_message: the visitor or the current volunteer, a message from one of them, sent since that volunteer accepted.
+  const canRead = m => {
+    const r = store.requests.get(m.request_id);
+    if (!r || !r.matched_at || m.created_at < r.matched_at) return false;
+    const parties = [r.visitor_id, r.volunteer_id];
+    return parties.includes(uid) && parties.includes(m.sender_id);
+  };
+  const wantsRows = (req.headers.prefer ?? '').includes('return=representation');
+  const wantsObject = (req.headers.accept ?? '').includes('vnd.pgrst.object');
+  const rls = table => pgErr(res, 403, '42501', `new row violates row-level security policy for table "${table}"`);
+  const reply = (rows, status = 200) => {
+    if (!wantsObject) return send(res, status, rows);
+    if (rows.length !== 1) return pgErr(res, 406, 'PGRST116', 'JSON object requested, multiple (or no) rows returned');
+    return send(res, status, rows[0]);
+  };
+  const now = () => new Date().toISOString();
+  const input = body();
+
+  if (p === '/rest/v1/help_requests') {
+    if (req.method === 'GET') return reply(orderAndLimit([...store.requests.values()].filter(canSee).filter(rowFilter(url)), url));
+    if (req.method === 'POST') {
+      const row = Array.isArray(input) ? input[0] : input;
+      const visitorId = row?.visitor_id ?? uid;
+      const opensClean = (row?.status ?? 'open') === 'open'
+        && ['volunteer_id', 'volunteer_name', 'volunteer_languages', 'volunteer_trainings', 'closed_by', 'matched_at', 'closed_at'].every(k => row?.[k] == null);
+      if (!row || visitorId !== uid || !opensClean) return rls('help_requests');
+      const types = row.help_types;
+      if (!Array.isArray(types) || types.length < 1 || types.length > 6 || !types.every(t => HELP_TYPE_IDS.includes(t)) || !row.venue_id || !row.language)
+        return pgErr(res, 400, '23514', 'new row for relation "help_requests" violates check constraint');
+      const id = row.id ?? randomUUID();
+      if (store.requests.has(id)) return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "help_requests_pkey"');
+      const at = now();
+      const full = {
+        id, visitor_id: uid, visitor_name: String(row.visitor_name ?? '').slice(0, 40), venue_id: row.venue_id, spot: row.spot ?? null,
+        help_types: types, note: String(row.note ?? '').slice(0, 500), language: row.language, status: 'open',
+        volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
+        closed_by: null, created_at: at, opened_at: at, matched_at: null, closed_at: null,
+      };
+      store.requests.set(id, full);
+      return wantsRows ? reply([full], 201) : send(res, 201);
+    }
+    return pgErr(res, 403, '42501', 'permission denied for table help_requests'); // no direct updates or deletes
+  }
+
+  if (p === '/rest/v1/messages') {
+    if (req.method === 'GET') {
+      const rows = store.messages.filter(canRead).filter(rowFilter(url));
+      return reply(orderAndLimit(rows, url));
+    }
+    if (req.method === 'POST') {
+      const row = Array.isArray(input) ? input[0] : input;
+      const r = row && store.requests.get(row.request_id);
+      if (store.rejectSends || !row || (row.sender_id ?? uid) !== uid || !isParty(row.request_id) || r?.status !== 'matched') return rls('messages');
+      const text = String(row.text ?? '');
+      if (text.length < 1 || text.length > 1000) return pgErr(res, 400, '23514', 'new row for relation "messages" violates check constraint');
+      const full = { id: randomUUID(), request_id: row.request_id, sender_id: uid, text, language: row.language ?? null, created_at: now() };
+      store.messages.push(full);
+      return wantsRows ? reply([full], 201) : send(res, 201);
+    }
+    return pgErr(res, 403, '42501', 'permission denied for table messages');
+  }
+
+  if (p === '/rest/v1/rpc/open_help_requests' && (req.method === 'GET' || req.method === 'POST')) {
+    const nowMs = Date.now();
+    const rows = [...store.requests.values()]
+      .filter(r => r.status === 'open' && canSee(r))
+      .map(r => ({ ...r, age_seconds: Math.floor((nowMs - Date.parse(r.opened_at)) / 1000) }))
+      .filter(r => r.age_seconds >= 0 && r.age_seconds * 1000 <= OPEN_WINDOW_MS)
+      .sort((a, b) => (a.opened_at < b.opened_at ? 1 : a.opened_at > b.opened_at ? -1 : 0))
+      .slice(0, 20);
+    return send(res, 200, rows);
+  }
+  if (req.method !== 'POST') return pgErr(res, 405, 'PGRST117', 'Unsupported HTTP method');
+  if (p === '/rest/v1/rpc/accept_help_request') {
+    const me = profiles.get(uid);
+    if (me?.role !== 'volunteer') return pgErr(res, 403, '42501', 'not_a_volunteer');
+    if ([...store.requests.values()].some(x => x.volunteer_id === uid && x.status === 'matched')) return pgErr(res, 400, 'P0001', 'already_helping');
+    const r = store.requests.get(input?.p_request_id);
+    // Node runs one request at a time, so check-and-set here is as atomic as the SQL update.
+    if (!r || r.status === 'cancelled' || r.status === 'done') return pgErr(res, 400, 'P0001', 'request_closed');
+    if (r.status !== 'open' || r.visitor_id === uid) return pgErr(res, 400, 'P0001', 'already_taken');
+    Object.assign(r, {
+      status: 'matched', volunteer_id: uid, volunteer_name: me.first_name,
+      volunteer_languages: [me.main_language, ...me.languages.filter(l => l !== me.main_language)],
+      volunteer_trainings: me.trainings ?? [], matched_at: now(),
+    });
+    return send(res, 200, r);
+  }
+  if (p === '/rest/v1/rpc/close_help_request') {
+    const status = input?.p_status;
+    if (status !== 'cancelled' && status !== 'done') return pgErr(res, 400, '22023', 'bad_status');
+    const r = store.requests.get(input?.p_request_id);
+    const allowed = r && (r.status === 'open' || r.status === 'matched')
+      && (r.visitor_id === uid || (r.volunteer_id === uid && r.status === 'matched' && status === 'done'));
+    if (allowed) Object.assign(r, { status, closed_by: uid, closed_at: now() });
+    return send(res, 204);
+  }
+  if (p === '/rest/v1/rpc/release_help_request') {
+    const r = store.requests.get(input?.p_request_id);
+    if (r && r.status === 'matched' && r.volunteer_id === uid) {
+      Object.assign(r, {
+        status: 'open', volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
+        matched_at: null, opened_at: now(),
+      });
+    }
+    return send(res, 204);
+  }
 }
 
 /** KEY=value lines from .env.server.local (git-ignored), or {} when there's no such file. */

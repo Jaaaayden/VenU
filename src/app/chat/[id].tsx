@@ -1,5 +1,6 @@
 /**
- * Chat with the matched volunteer (Figma 231:25476 keyboard down, 231:26460 keyboard up).
+ * Chat about one help request (Figma 231:25476 keyboard down, 231:26460 keyboard up), from either
+ * side: a visitor with the volunteer who accepted, or that volunteer with the visitor.
  * Full screen without the tab bar; the bottom bar rides above the keyboard.
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
@@ -12,6 +13,7 @@ import { Avatar } from '@/components/avatar';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { ChatBubble } from '@/components/volunteer/chat-bubble';
 import { Hint, useHint } from '@/components/volunteer/hint';
+import { MeetPlaceText } from '@/components/volunteer/meet-place';
 import { useStartAligned } from '@/components/volunteer/start-aligned';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { toggleState } from '@/features/voice/announce';
@@ -19,7 +21,7 @@ import { useDictation } from '@/features/voice/use-dictation';
 import { formatDayTime, needsSeparator } from '@/features/volunteer/format';
 import { languageOf, useLayoutRtl, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
-import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from '@/features/volunteer/request-store';
+import { useConversation } from '@/features/volunteer/conversation';
 import { goBack } from '@/lib/navigation';
 
 /** Longest message the input takes, typed or dictated. */
@@ -27,8 +29,7 @@ const MESSAGE_MAX = 1000;
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { status, request, match, messages, unread, typing } = useVolunteerRequest();
-  const restored = useVolunteerRestored();
+  const { conversation: c, restored } = useConversation(id);
   const [text, setText] = useState('');
   const { hint, show } = useHint();
   const insets = useSafeAreaInsets();
@@ -40,17 +41,18 @@ export default function ChatScreen() {
   // The mic dictates into the input for review; voice messages are sent as text.
   const dictation = useDictation({ onText: next => setText(next.slice(0, MESSAGE_MAX)), onNote: show });
   const [finishing, setFinishing] = useState(false);
-  const active = status === 'matched' && request?.id === id && !!match;
+  const unread = c?.unread ?? 0;
+  const markRead = c?.markRead;
 
-  // Reading the chat clears the dot on "Volunteer found", including for messages that arrive while open.
+  // Reading the chat clears the dot on Message, including for messages that arrive while open.
   useEffect(() => {
-    if (active && unread) volunteerRequests.markRead();
-  }, [active, unread]);
+    if (unread) markRead?.();
+  }, [unread, markRead]);
 
   // The request ended or was cancelled (or this is a stale link). After a reload, wait for the
   // saved request to come back before deciding.
-  if (!active) return restored ? <Redirect href="/volunteer" /> : null;
-  const v = match.volunteer;
+  if (!c) return restored ? <Redirect href="/volunteer" /> : null;
+  const { peer, messages, typing } = c;
 
   async function send() {
     if (finishing) return;
@@ -62,7 +64,7 @@ export default function ChatScreen() {
       setFinishing(false);
     }
     if (!message.trim()) return;
-    volunteerRequests.sendMessage(message);
+    c?.send(message);
     setText('');
   }
 
@@ -75,16 +77,20 @@ export default function ChatScreen() {
               <FigmaIcon name="arrow-left" size={36} color={Colors.ink} />
             </View>
           </Pressable>
-          <Avatar name={v.firstName} uri={null} size={40} />
+          <Avatar name={peer.firstName} uri={null} size={40} />
           <View style={styles.headerText}>
-            <Text style={[styles.name, startAligned]} accessibilityRole="header" numberOfLines={1}>{v.name}</Text>
-            {/* Digits as on "Volunteer found" (۲ in Persian). */}
-            <Text style={[styles.away, startAligned]}>{t('chat.away', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}</Text>
+            <Text style={[styles.name, startAligned]} accessibilityRole="header" numberOfLines={1}>{peer.name}</Text>
+            {/* Digits as on "Volunteer found" (۲ in Persian). The volunteer sees where the visitor waits. */}
+            {c.etaMinutes != null ? (
+              <Text style={[styles.away, startAligned]}>{t('chat.away', { minutes: formatNumber(c.etaMinutes, undefined, languageOf(t)) })}</Text>
+            ) : c.meetPoint ? (
+              <MeetPlaceText point={c.meetPoint} style={[styles.away, startAligned]} />
+            ) : null}
           </View>
           <Pressable
-            onPress={() => show(t('chat.callSoon', { name: v.firstName }))}
+            onPress={() => show(t('chat.callSoon', { name: peer.firstName }))}
             accessibilityRole="button"
-            accessibilityLabel={t('chat.call', { name: v.firstName })}
+            accessibilityLabel={t('chat.call', { name: peer.firstName })}
             style={({ pressed }) => [styles.call, pressed && styles.pressed]}>
             <FigmaIcon name="group-43-c358d1" size={50} />
           </Pressable>
@@ -99,7 +105,7 @@ export default function ChatScreen() {
           onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
           accessibilityLabel={t('chat.messages')}>
           {messages.length === 0 ? (
-            <Text style={styles.empty}>{t('chat.empty', { name: v.firstName })}</Text>
+            <Text style={styles.empty}>{c.side === 'visitor' ? t('chat.empty', { name: peer.firstName }) : t('chat.emptyVolunteer', { name: peer.firstName })}</Text>
           ) : (
             messages.map((m, i, all) => (
               <Fragment key={m.id}>
@@ -110,14 +116,16 @@ export default function ChatScreen() {
                 <ChatBubble
                   message={m}
                   // Under your latest message: who reads it, and in which language.
-                  recipient={m.from === 'me' && !all.slice(i + 1).some(n => n.from === 'me') ? { name: v.firstName, language: match.language } : null}
+                  recipient={m.from === 'me' && !all.slice(i + 1).some(n => n.from === 'me') ? { name: peer.firstName, language: peer.language } : null}
+                  senderName={peer.name}
                   onListen={() => show(t('chat.listenSoon'))}
+                  onRetry={() => c.retry(m.id)}
                 />
               </Fragment>
             ))
           )}
           {typing ? (
-            <Text style={styles.typing} accessibilityLiveRegion="polite">{t('chat.typing', { name: v.firstName })}</Text>
+            <Text style={styles.typing} accessibilityLiveRegion="polite">{t('chat.typing', { name: peer.firstName })}</Text>
           ) : null}
         </ScrollView>
 
@@ -136,7 +144,7 @@ export default function ChatScreen() {
               onSubmitEditing={() => void send()}
               submitBehavior="submit"
               returnKeyType="send"
-              accessibilityLabel={t('chat.messageTo', { name: v.firstName })}
+              accessibilityLabel={t('chat.messageTo', { name: peer.firstName })}
               maxLength={MESSAGE_MAX}
             />
             <Pressable onPress={() => show(t('chat.stickersSoon'))} accessibilityRole="button" accessibilityLabel={t('chat.stickers')} style={styles.sticker}>

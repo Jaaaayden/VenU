@@ -10,7 +10,7 @@ export type FacilityCategory =
   | 'accessible'
   | 'parking';
 
-export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'soccer' | 'gymnastics' | 'basketball';
+export type VenueEvent = 'opening_ceremony' | 'swimming' | 'gymnastics' | 'basketball';
 
 /** How the venue is drawn on the map: an open-air bowl or an indoor arena. */
 export type VenueShape = 'bowl' | 'arena';
@@ -69,7 +69,9 @@ export interface Facility {
   /** Step-free and wheelchair usable. Shows the blue wheelchair badge. */
   accessible: boolean;
   tags: FacilityTag[];
-  /** Position on the venue map, in the map's 400×400 coordinate space. */
+  /** Position on the venue's map image (./venue-maps.ts), from 0 to 1 across and down. */
   x: number;
   y: number;
+  /** A photo of the spot, hotlinked from the venue's site; the pin card shows the category icon without one. */
+  photo?: string;
 }

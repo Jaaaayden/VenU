@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Không liên lạc được với tình nguyện viên. Hãy kiểm tra kết nối và thử lại.",
-    "thanks": "Cảm ơn bạn! Góp ý của bạn giúp {{name}} và đội LA28."
+    "thanks": "Cảm ơn bạn! Góp ý của bạn giúp {{name}} và đội LA28.",
+    "volunteerLeft": "Tình nguyện viên của bạn phải rời đi. Đang tìm người khác."
   },
   "searching": {
     "title": "Đang tìm tình nguyện viên",
@@ -105,7 +106,8 @@
   },
   "map": {
     "label": "Bản đồ: {{name}} cách bạn {{distance}}, đang đến chỗ bạn ở {{place}}.",
-    "you": "Bạn"
+    "you": "Bạn",
+    "labelNoDistance": "Bản đồ: {{name}} đang đến chỗ bạn ở {{place}}."
   },
   "messages": {
     "label": "Tin nhắn",
@@ -128,7 +130,8 @@
     "messageTo": "Nhắn cho {{name}}",
     "stickers": "Nhãn dán",
     "stickersSoon": "Nhãn dán sắp ra mắt.",
-    "record": "Nói tin nhắn"
+    "record": "Nói tin nhắn",
+    "emptyVolunteer": "Hãy chào {{name}} và cho họ biết bạn đang đến."
   },
   "translation": {
     "translatedFrom": "Dịch từ {{language}}",
@@ -151,10 +154,13 @@
   },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",
-    "theirs": "Tình nguyện viên, {{time}}: {{text}}",
-    "theirsTranslated": "Tình nguyện viên, {{time}}: {{text}} (dịch từ {{language}})",
     "listen": "nghe",
-    "listenLabel": "Nghe tin nhắn này"
+    "listenLabel": "Nghe tin nhắn này",
+    "from": "{{name}}, {{time}}: {{text}}",
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (dịch từ {{language}})",
+    "notSent": "Chưa gửi",
+    "retry": "Nhấn để thử lại",
+    "retryLabel": "Chưa gửi. Gửi lại tin nhắn này"
   },
   "feedback": {
     "skip": "Bỏ qua",
@@ -209,7 +215,25 @@
     "who": "{{help}} · {{name}}",
     "meta": "Cách {{distance}} · {{minutes}} phút trước · {{language}}",
     "accept": "Nhận",
-    "acceptSoon": "Bạn có thể nhận yêu cầu khi tính năng ghép đôi hoạt động."
+    "acceptSoon": "Bạn có thể nhận yêu cầu khi tính năng ghép đôi hoạt động.",
+    "empty": "Hiện không có ai gần đây cần giúp đỡ. Yêu cầu mới sẽ hiện ở đây.",
+    "metaLive": "{{minutes}} phút trước · {{language}}"
+  },
+  "active": {
+    "title": "Bạn đang giúp {{name}}",
+    "subtitle": "Hãy đến gặp họ và chào trong cuộc trò chuyện.",
+    "end": "Kết thúc trò chuyện",
+    "endHint": "Đánh dấu đã giúp xong cho bạn và {{name}}",
+    "confirmEnd": "Kết thúc trò chuyện với {{name}}? Việc giúp đỡ sẽ được đánh dấu là xong.",
+    "yesEnd": "Có, kết thúc"
+  },
+  "desk": {
+    "taken": "Người khác đã nhận yêu cầu này.",
+    "acceptFailed": "Không thể nhận yêu cầu. Hãy kiểm tra kết nối và thử lại.",
+    "cancelled": "{{name}} đã hủy yêu cầu.",
+    "done": "{{name}} đã đánh dấu là đã được giúp xong. Cảm ơn bạn!",
+    "ended": "Đã kết thúc trò chuyện. Cảm ơn bạn đã giúp {{name}}!",
+    "withdrawn": "Yêu cầu này đã được rút lại."
   },
   "home": {
     "greeting": "Xin chào, {{name}}",

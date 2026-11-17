@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Cerimônia de abertura",
     "swimming": "Natação",
-    "athletics": "Atletismo",
-    "soccer": "Futebol",
     "gymnastics": "Ginástica",
     "basketball": "Basquete"
   },
@@ -78,29 +76,21 @@
   },
   "map": {
     "pin": "{{name}} no mapa",
-    "north": "N"
+    "north": "N",
+    "label": "Mapa de {{venue}} com os serviços marcados. Arraste para mover; faça pinça ou use os botões para dar zoom.",
+    "you": "Você",
+    "start": "Partida",
+    "cardHint": "Abre no painel abaixo"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",
-    "open": "Abrir no navegador",
     "openLabel": "Abrir o mapa oficial de {{source}} no navegador",
-    "frameLabel": "Mapa oficial de {{source}}. Com um leitor de tela, use a lista Serviços perto de você abaixo.",
-    "loading": "Carregando o mapa de {{source}}…",
     "error": "Não foi possível carregar o mapa. Abra-o no navegador.",
     "retry": "Tentar de novo",
-    "viewsLabel": "Vista do mapa",
-    "views": {
-      "exterior": "Exterior",
-      "east_garage": "Garagem leste",
-      "west_garage": "Garagem oeste"
-    },
-    "imageLabel": "Mapa de {{source}}: {{view}}",
-    "imageLabelZoom": "Mapa de {{source}}: {{view}}. Faça o movimento de pinça ou use os botões de zoom.",
-    "enlarge": "Toque para ampliar",
-    "enlargeHint": "Abre o mapa em tela cheia para ampliar",
-    "close": "Fechar mapa",
     "zoomIn": "Ampliar",
-    "zoomOut": "Reduzir"
+    "zoomOut": "Reduzir",
+    "openInteractive": "Abrir mapa interativo",
+    "schematic": "Mapa simplificado"
   },
   "walk_one": "{{number}} min a pé",
   "walk_many": "{{number}} min a pé",
@@ -137,69 +127,6 @@
     "changing_table": "Trocador"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Portão 1",
-      "description": "Entrada norte, a mais próxima do ponto do ônibus do Metro.",
-      "location": "Lado norte, no ponto do ônibus"
-    },
-    "gate-2": {
-      "name": "Portão 2",
-      "description": "Entrada leste com rampa, ao lado do estacionamento acessível do Lote C.",
-      "location": "Lado leste, perto do Lote C"
-    },
-    "gate-3": {
-      "name": "Portão 3",
-      "description": "Entrada sul para embarque e desembarque de carros por app.",
-      "location": "Lado sul, na área de carros por app"
-    },
-    "gate-4": {
-      "name": "Portão 4",
-      "description": "Entrada oeste para ingressos dos setores 200 a 240.",
-      "location": "Lado oeste, junto à praça principal"
-    },
-    "info-desk": {
-      "name": "Atendimento ao público",
-      "description": "Dúvidas, ingressos perdidos, kits sensoriais e protetores auriculares.",
-      "location": "Corredor, setor 105"
-    },
-    "first-aid": {
-      "name": "Primeiros socorros",
-      "description": "Enfermeiros e socorristas de plantão da abertura dos portões até o local esvaziar.",
-      "location": "Corredor, setor 112"
-    },
-    "restroom-east": {
-      "name": "Banheiros leste",
-      "description": "Banheiros masculino, feminino e uma sala família para todos com trocador.",
-      "location": "Corredor, setor 118"
-    },
-    "food-south": {
-      "description": "Tacos, burritos e agua fresca. Opções vegetarianas.",
-      "location": "Corredor, setor 124"
-    },
-    "lost-found": {
-      "name": "Achados e perdidos",
-      "description": "Deixe ou retire objetos perdidos. Crianças perdidas também são trazidas aqui.",
-      "location": "Corredor, setor 131"
-    },
-    "accessible-seating": {
-      "name": "Serviços de acessibilidade",
-      "description": "Empréstimo de cadeiras de rodas, assentos para acompanhantes e aparelhos de escuta assistida.",
-      "location": "Corredor, setor 136"
-    },
-    "food-west": {
-      "description": "Hambúrgueres, batata frita e refrigerantes. Há carne halal.",
-      "location": "Corredor, setor 140"
-    },
-    "restroom-west": {
-      "name": "Banheiros oeste",
-      "description": "Banheiros masculino e feminino. A cabine acessível fica à esquerda.",
-      "location": "Corredor, setor 145"
-    },
-    "parking-c": {
-      "name": "Estacionamento C",
-      "description": "Estacionamento acessível com um caminho curto e plano até o Portão 2.",
-      "location": "Lote sudeste"
-    },
     "entry-3": {
       "name": "Entrada 3",
       "description": "Entrada norte. Todas as entradas têm caminho acessível e acompanhamento gratuito em cadeira de rodas.",
@@ -420,7 +347,6 @@
     "notFound": "Serviço não encontrado",
     "wheelchair": "Acessível para cadeira de rodas",
     "directions": "Como chegar",
-    "directionsSoon": "As rotas passo a passo chegam em breve. {{name}}: {{location}}.",
     "imHere": "Estou aqui",
     "imHereHint": "Usa este lugar como sua localização ao pedir ajuda",
     "isHere": "Sua localização",
@@ -476,5 +402,28 @@
     "titleTooLong": "O título deve ter menos de {{max}} caracteres.",
     "topicRequired": "Escolha o assunto que melhor se encaixa.",
     "bodyTooLong": "O relato deve ter menos de {{max}} caracteres."
+  },
+  "directions": {
+    "title": "Rota a pé",
+    "from": "De {{from}}",
+    "fromArrival": "De {{from}}, a entrada principal. Está em outro lugar? Abra esse local e toque em “Estou aqui”.",
+    "steps_many": "cerca de {{number}} de passos",
+    "steps_one": "cerca de {{number}} passo",
+    "steps_other": "cerca de {{number}} passos",
+    "stepStart": "Comece em {{from}}.",
+    "stepHead": "Siga para o {{direction}} por cerca de {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Você já está aqui.",
+    "end": "Encerrar rota",
+    "dir": {
+      "n": "norte",
+      "ne": "nordeste",
+      "e": "leste",
+      "se": "sudeste",
+      "s": "sul",
+      "sw": "sudoeste",
+      "w": "oeste",
+      "nw": "noroeste"
+    }
   }
 }

@@ -1,11 +1,10 @@
 /**
  * Translated display text for venue records: event names, categories, tags, wait levels and the
- * mock facilities' names and descriptions. Venue names, proper-noun facility names (Taco Corner)
- * and street addresses are never translated.
+ * mock facilities' names and descriptions. Venue names and street addresses are never translated.
  *
  * Components pass their own `t` from useT('venue'): the React Compiler memoizes calls by their
  * arguments, so a helper that read the global language would keep showing the old one.
- * e.g. facilityMeta(gate2, t) → "3 min walk · Short wait" (en), "3 min a pie · Poca espera" (es)
+ * e.g. facilityMeta(entry4, t) → "4 min walk · Short wait" (en), "4 min a pie · Poca espera" (es)
  */
 import type { TFunction } from 'i18next';
 
@@ -40,8 +39,8 @@ type KnownFacility = keyof typeof FACILITY_TEXT;
 const isKnown = (id: string): id is KnownFacility => id in FACILITY_TEXT;
 
 /**
- * The facility's name in `t`'s language: "Gate 2" → "Puerta 2" (es), "دروازه ۲" (fa). Proper nouns
- * (Taco Corner, Burger Stand) and facilities without a translation keep their own name.
+ * The facility's name in `t`'s language: "Entry 4" → "Entrada 4" (es), "ورودی ۴" (fa). A facility
+ * without a translated name keeps its own.
  */
 export function facilityName(f: Facility, t: VenueT = venueT()): string {
   const id = f.id;

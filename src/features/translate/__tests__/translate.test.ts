@@ -202,7 +202,7 @@ describe('chat language', () => {
 });
 
 describe('what a bubble shows', () => {
-  const incoming: ChatMessage = { id: 'm1', from: 'volunteer', text: 'Got it, thanks!', sentAt: 0, lang: 'en' };
+  const incoming: ChatMessage = { id: 'm1', from: 'them', text: 'Got it, thanks!', sentAt: 0, lang: 'en' };
   const done = (result: Translation) => ({ status: 'done' as const, result });
 
   it('skips yours and messages already in the reader’s language', () => {

@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Cérémonie d’ouverture",
     "swimming": "Natation",
-    "athletics": "Athlétisme",
-    "soccer": "Football",
     "gymnastics": "Gymnastique",
     "basketball": "Basketball"
   },
@@ -78,29 +76,21 @@
   },
   "map": {
     "pin": "{{name}} sur le plan",
-    "north": "N"
+    "north": "N",
+    "label": "Carte de {{venue}} avec les services épinglés. Faites glisser pour la déplacer, pincez ou utilisez les boutons pour zoomer.",
+    "you": "Vous",
+    "start": "Départ",
+    "cardHint": "L’ouvre dans le panneau ci-dessous"
   },
   "officialMap": {
     "attribution": "Plan : {{source}}",
-    "open": "Ouvrir dans le navigateur",
     "openLabel": "Ouvrir le plan officiel de {{source}} dans votre navigateur",
-    "frameLabel": "Plan officiel de {{source}}. Avec un lecteur d’écran, utilisez plutôt la liste Services à proximité ci-dessous.",
-    "loading": "Chargement du plan de {{source}}…",
     "error": "Impossible de charger le plan. Ouvrez-le dans votre navigateur.",
     "retry": "Réessayer",
-    "viewsLabel": "Vue du plan",
-    "views": {
-      "exterior": "Extérieur",
-      "east_garage": "Parking est",
-      "west_garage": "Parking ouest"
-    },
-    "imageLabel": "Plan de {{source}} : {{view}}",
-    "imageLabelZoom": "Plan de {{source}} : {{view}}. Pincez ou utilisez les boutons pour zoomer.",
-    "enlarge": "Touchez pour agrandir",
-    "enlargeHint": "Ouvre le plan en plein écran pour zoomer",
-    "close": "Fermer le plan",
     "zoomIn": "Zoom avant",
-    "zoomOut": "Zoom arrière"
+    "zoomOut": "Zoom arrière",
+    "openInteractive": "Ouvrir la carte interactive",
+    "schematic": "Plan simplifié"
   },
   "walk_one": "{{number}} min à pied",
   "walk_many": "{{number}} min à pied",
@@ -137,69 +127,6 @@
     "changing_table": "Table à langer"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Porte 1",
-      "description": "Entrée nord, la plus proche de l’arrêt de la navette Metro.",
-      "location": "Côté nord, à l’arrêt de la navette"
-    },
-    "gate-2": {
-      "name": "Porte 2",
-      "description": "Entrée est avec rampe, à côté du parking accessible du parc C.",
-      "location": "Côté est, près du parc C"
-    },
-    "gate-3": {
-      "name": "Porte 3",
-      "description": "Entrée sud pour la dépose et la prise en charge en VTC.",
-      "location": "Côté sud, à la zone VTC"
-    },
-    "gate-4": {
-      "name": "Porte 4",
-      "description": "Entrée ouest pour les billets des sections 200 à 240.",
-      "location": "Côté ouest, près de la place principale"
-    },
-    "info-desk": {
-      "name": "Accueil des spectateurs",
-      "description": "Questions, billets perdus, kits sensoriels et casques anti-bruit.",
-      "location": "Promenade, section 105"
-    },
-    "first-aid": {
-      "name": "Poste de secours",
-      "description": "Infirmiers et secouristes présents de l’ouverture des portes jusqu’à l’évacuation du site.",
-      "location": "Promenade, section 112"
-    },
-    "restroom-east": {
-      "name": "Toilettes est",
-      "description": "Toilettes hommes, femmes et un espace famille mixte avec table à langer.",
-      "location": "Promenade, section 118"
-    },
-    "food-south": {
-      "description": "Tacos, burritos et agua fresca. Options végétariennes.",
-      "location": "Promenade, section 124"
-    },
-    "lost-found": {
-      "name": "Objets trouvés",
-      "description": "Déposez ou récupérez des objets perdus. Les enfants perdus sont aussi accompagnés ici.",
-      "location": "Promenade, section 131"
-    },
-    "accessible-seating": {
-      "name": "Services d’accessibilité",
-      "description": "Prêt de fauteuils roulants, places accompagnateur et aides à l’écoute.",
-      "location": "Promenade, section 136"
-    },
-    "food-west": {
-      "description": "Burgers, frites et boissons fraîches. Steaks halal disponibles.",
-      "location": "Promenade, section 140"
-    },
-    "restroom-west": {
-      "name": "Toilettes ouest",
-      "description": "Toilettes hommes et femmes. La cabine accessible est à gauche.",
-      "location": "Promenade, section 145"
-    },
-    "parking-c": {
-      "name": "Parking C",
-      "description": "Parking accessible avec un chemin court et plat jusqu’à la Porte 2.",
-      "location": "Parc sud-est"
-    },
     "entry-3": {
       "name": "Entrée 3",
       "description": "Entrée nord. Chaque entrée a un accès adapté et un accompagnement gratuit en fauteuil roulant.",
@@ -420,7 +347,6 @@
     "notFound": "Service introuvable",
     "wheelchair": "Accessible en fauteuil roulant",
     "directions": "Itinéraire",
-    "directionsSoon": "L’itinéraire pas à pas arrive bientôt. {{name}} : {{location}}.",
     "imHere": "Je suis ici",
     "imHereHint": "Utilise cet endroit comme votre position quand vous demandez de l’aide",
     "isHere": "Votre position",
@@ -476,5 +402,28 @@
     "titleTooLong": "Le titre doit faire moins de {{max}} caractères.",
     "topicRequired": "Choisissez le sujet le plus adapté.",
     "bodyTooLong": "Le signalement doit faire moins de {{max}} caractères."
+  },
+  "directions": {
+    "title": "Itinéraire à pied",
+    "from": "Depuis {{from}}",
+    "fromArrival": "Depuis {{from}}, l’entrée principale. Vous êtes ailleurs ? Ouvrez cet endroit et touchez « Je suis ici ».",
+    "steps_many": "environ {{number}} de pas",
+    "steps_one": "environ {{number}} pas",
+    "steps_other": "environ {{number}} pas",
+    "stepStart": "Partez de {{from}}.",
+    "stepHead": "Allez vers le {{direction}} sur environ {{meters}} m.",
+    "stepArrive": "{{name}} : {{location}}.",
+    "here": "Vous y êtes déjà.",
+    "end": "Terminer l’itinéraire",
+    "dir": {
+      "n": "nord",
+      "ne": "nord-est",
+      "e": "est",
+      "se": "sud-est",
+      "s": "sud",
+      "sw": "sud-ouest",
+      "w": "ouest",
+      "nw": "nord-ouest"
+    }
   }
 }

@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "无法联系到志愿者。请检查网络连接后重试。",
-    "thanks": "谢谢！你的反馈能帮助 {{name}} 和 LA28 团队。"
+    "thanks": "谢谢！你的反馈能帮助 {{name}} 和 LA28 团队。",
+    "volunteerLeft": "你的志愿者需要离开。正在为你寻找其他人。"
   },
   "searching": {
     "title": "正在寻找志愿者",
@@ -105,7 +106,8 @@
   },
   "map": {
     "label": "地图：{{name}} 距你 {{distance}}，正前往{{place}}与你会合。",
-    "you": "你"
+    "you": "你",
+    "labelNoDistance": "地图：{{name}} 正前往{{place}}与你会合。"
   },
   "messages": {
     "label": "消息",
@@ -128,7 +130,8 @@
     "messageTo": "给 {{name}} 发消息",
     "stickers": "贴纸",
     "stickersSoon": "贴纸即将推出。",
-    "record": "语音输入消息"
+    "record": "语音输入消息",
+    "emptyVolunteer": "向 {{name}} 打个招呼，告诉对方你正在路上。"
   },
   "translation": {
     "translatedFrom": "译自{{language}}",
@@ -151,10 +154,13 @@
   },
   "bubble": {
     "mine": "你，{{time}}：{{text}}",
-    "theirs": "志愿者，{{time}}：{{text}}",
-    "theirsTranslated": "志愿者，{{time}}：{{text}}（译自{{language}}）",
     "listen": "收听",
-    "listenLabel": "收听这条消息"
+    "listenLabel": "收听这条消息",
+    "from": "{{name}}，{{time}}：{{text}}",
+    "fromTranslated": "{{name}}，{{time}}：{{text}}（译自{{language}}）",
+    "notSent": "未发送",
+    "retry": "点按重试",
+    "retryLabel": "未发送。重新发送这条消息"
   },
   "feedback": {
     "skip": "跳过",
@@ -209,7 +215,25 @@
     "who": "{{help}} · {{name}}",
     "meta": "距离 {{distance}} · {{minutes}} 分钟前 · {{language}}",
     "accept": "接受",
-    "acceptSoon": "匹配功能上线后即可接受请求。"
+    "acceptSoon": "匹配功能上线后即可接受请求。",
+    "empty": "附近暂时没有人需要帮助。新的请求会显示在这里。",
+    "metaLive": "{{minutes}} 分钟前 · {{language}}"
+  },
+  "active": {
+    "title": "你正在帮助 {{name}}",
+    "subtitle": "前去与对方会合，并在聊天中打个招呼。",
+    "end": "结束聊天",
+    "endHint": "为你和 {{name}} 将帮助标记为完成",
+    "confirmEnd": "要结束与 {{name}} 的聊天吗？帮助将被标记为完成。",
+    "yesEnd": "是的，结束聊天"
+  },
+  "desk": {
+    "taken": "这个请求已被其他志愿者接受。",
+    "acceptFailed": "无法接受请求。请检查网络连接后重试。",
+    "cancelled": "{{name}} 取消了请求。",
+    "done": "{{name}} 已将帮助标记为完成。谢谢你！",
+    "ended": "聊天已结束。感谢你帮助 {{name}}！",
+    "withdrawn": "此请求已被撤回。"
   },
   "home": {
     "greeting": "你好，{{name}}",

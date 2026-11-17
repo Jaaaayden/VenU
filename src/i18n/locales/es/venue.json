@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Ceremonia de apertura",
     "swimming": "Natación",
-    "athletics": "Atletismo",
-    "soccer": "Fútbol",
     "gymnastics": "Gimnasia",
     "basketball": "Baloncesto"
   },
@@ -78,29 +76,21 @@
   },
   "map": {
     "pin": "{{name}} en el mapa",
-    "north": "N"
+    "north": "N",
+    "label": "Mapa de {{venue}} con los servicios marcados. Arrastra para moverlo; pellizca o usa los botones para hacer zoom.",
+    "you": "Tú",
+    "start": "Inicio",
+    "cardHint": "Lo abre en el panel de abajo"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",
-    "open": "Abrir en el navegador",
     "openLabel": "Abrir el mapa oficial de {{source}} en tu navegador",
-    "frameLabel": "Mapa oficial de {{source}}. Con un lector de pantalla, usa la lista Servicios cerca de ti de abajo.",
-    "loading": "Cargando el mapa de {{source}}…",
     "error": "No se pudo cargar el mapa. Ábrelo en tu navegador.",
     "retry": "Reintentar",
-    "viewsLabel": "Vista del mapa",
-    "views": {
-      "exterior": "Exterior",
-      "east_garage": "Garaje este",
-      "west_garage": "Garaje oeste"
-    },
-    "imageLabel": "Mapa de {{source}}: {{view}}",
-    "imageLabelZoom": "Mapa de {{source}}: {{view}}. Pellizca o usa los botones para hacer zoom.",
-    "enlarge": "Toca para ampliar",
-    "enlargeHint": "Abre el mapa a pantalla completa para hacer zoom",
-    "close": "Cerrar mapa",
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar"
+    "zoomOut": "Alejar",
+    "openInteractive": "Abrir mapa interactivo",
+    "schematic": "Mapa simplificado"
   },
   "walk_one": "{{number}} min a pie",
   "walk_many": "{{number}} min a pie",
@@ -137,69 +127,6 @@
     "changing_table": "Cambiador"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Puerta 1",
-      "description": "Entrada norte, la más cercana a la parada del autobús del Metro.",
-      "location": "Lado norte, en la parada del autobús"
-    },
-    "gate-2": {
-      "name": "Puerta 2",
-      "description": "Entrada este con rampa, junto al estacionamiento accesible del Lote C.",
-      "location": "Lado este, junto al Lote C"
-    },
-    "gate-3": {
-      "name": "Puerta 3",
-      "description": "Entrada sur para dejar y recoger pasajeros de viajes compartidos.",
-      "location": "Lado sur, en la zona de viajes compartidos"
-    },
-    "gate-4": {
-      "name": "Puerta 4",
-      "description": "Entrada oeste para quienes tienen boletos en las secciones 200 a 240.",
-      "location": "Lado oeste, junto a la plaza principal"
-    },
-    "info-desk": {
-      "name": "Atención al visitante",
-      "description": "Preguntas, boletos perdidos, kits sensoriales y protectores auditivos.",
-      "location": "Explanada, sección 105"
-    },
-    "first-aid": {
-      "name": "Primeros auxilios",
-      "description": "Enfermeros y paramédicos desde la apertura de puertas hasta que se vacía la sede.",
-      "location": "Explanada, sección 112"
-    },
-    "restroom-east": {
-      "name": "Baños este",
-      "description": "Baños de hombres, de mujeres y una sala familiar para todos con cambiador.",
-      "location": "Explanada, sección 118"
-    },
-    "food-south": {
-      "description": "Tacos, burritos y agua fresca. Opciones vegetarianas.",
-      "location": "Explanada, sección 124"
-    },
-    "lost-found": {
-      "name": "Objetos perdidos",
-      "description": "Deja o recoge objetos perdidos. Aquí también se trae a los niños perdidos.",
-      "location": "Explanada, sección 131"
-    },
-    "accessible-seating": {
-      "name": "Servicios de accesibilidad",
-      "description": "Préstamo de sillas de ruedas, asientos para acompañantes y dispositivos de ayuda auditiva.",
-      "location": "Explanada, sección 136"
-    },
-    "food-west": {
-      "description": "Hamburguesas, papas fritas y refrescos. Hay carne halal.",
-      "location": "Explanada, sección 140"
-    },
-    "restroom-west": {
-      "name": "Baños oeste",
-      "description": "Baños de hombres y de mujeres. El cubículo accesible está a la izquierda.",
-      "location": "Explanada, sección 145"
-    },
-    "parking-c": {
-      "name": "Estacionamiento Lote C",
-      "description": "Estacionamiento accesible con un camino corto y plano hasta la Puerta 2.",
-      "location": "Lote sureste"
-    },
     "entry-3": {
       "name": "Entrada 3",
       "description": "Entrada norte. Todas las entradas tienen un camino accesible y acompañamiento gratuito en silla de ruedas.",
@@ -420,7 +347,6 @@
     "notFound": "Servicio no encontrado",
     "wheelchair": "Accesible en silla de ruedas",
     "directions": "Cómo llegar",
-    "directionsSoon": "Las indicaciones paso a paso llegarán pronto. {{name}}: {{location}}.",
     "imHere": "Estoy aquí",
     "imHereHint": "Usa este lugar como tu ubicación al pedir ayuda",
     "isHere": "Tu ubicación",
@@ -476,5 +402,28 @@
     "titleTooLong": "El título debe tener menos de {{max}} caracteres.",
     "topicRequired": "Elige el tema que mejor encaje.",
     "bodyTooLong": "El reporte debe tener menos de {{max}} caracteres."
+  },
+  "directions": {
+    "title": "Ruta a pie",
+    "from": "Desde {{from}}",
+    "fromArrival": "Desde {{from}}, la entrada principal. ¿Estás en otro sitio? Ábrelo y toca «Estoy aquí».",
+    "steps_many": "unos {{number}} de pasos",
+    "steps_one": "unos {{number}} paso",
+    "steps_other": "unos {{number}} pasos",
+    "stepStart": "Empieza en {{from}}.",
+    "stepHead": "Ve hacia el {{direction}} unos {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Ya estás aquí.",
+    "end": "Terminar ruta",
+    "dir": {
+      "n": "norte",
+      "ne": "noreste",
+      "e": "este",
+      "se": "sureste",
+      "s": "sur",
+      "sw": "suroeste",
+      "w": "oeste",
+      "nw": "noroeste"
+    }
   }
 }

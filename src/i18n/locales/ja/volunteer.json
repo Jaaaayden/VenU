@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "ボランティアにつながりませんでした。接続を確認して、もう一度お試しください。",
-    "thanks": "ありがとうございます！フィードバックは {{name}} さんと LA28 チームの役に立ちます。"
+    "thanks": "ありがとうございます！フィードバックは {{name}} さんと LA28 チームの役に立ちます。",
+    "volunteerLeft": "ボランティアが離れなければならなくなりました。別の人を探しています。"
   },
   "searching": {
     "title": "ボランティアを探しています",
@@ -105,7 +106,8 @@
   },
   "map": {
     "label": "地図：{{name}} さんは {{distance}} 先にいて、{{place}}であなたのもとへ向かっています。",
-    "you": "あなた"
+    "you": "あなた",
+    "labelNoDistance": "地図：{{name}} さんが{{place}}であなたのもとへ向かっています。"
   },
   "messages": {
     "label": "メッセージ",
@@ -128,7 +130,8 @@
     "messageTo": "{{name}} さんへのメッセージ",
     "stickers": "スタンプ",
     "stickersSoon": "スタンプは近日対応予定です。",
-    "record": "音声でメッセージを入力"
+    "record": "音声でメッセージを入力",
+    "emptyVolunteer": "{{name}} さんにあいさつして、向かっていることを伝えましょう。"
   },
   "translation": {
     "translatedFrom": "{{language}}から翻訳",
@@ -151,10 +154,13 @@
   },
   "bubble": {
     "mine": "あなた、{{time}}：{{text}}",
-    "theirs": "ボランティア、{{time}}：{{text}}",
-    "theirsTranslated": "ボランティア、{{time}}：{{text}}（{{language}}から翻訳）",
     "listen": "聞く",
-    "listenLabel": "このメッセージを聞く"
+    "listenLabel": "このメッセージを聞く",
+    "from": "{{name}}、{{time}}：{{text}}",
+    "fromTranslated": "{{name}}、{{time}}：{{text}}（{{language}}から翻訳）",
+    "notSent": "未送信",
+    "retry": "タップして再試行",
+    "retryLabel": "未送信。このメッセージをもう一度送信"
   },
   "feedback": {
     "skip": "スキップ",
@@ -209,7 +215,25 @@
     "who": "{{help}} · {{name}}",
     "meta": "{{distance}} 先 · {{minutes}} 分前 · {{language}}",
     "accept": "引き受ける",
-    "acceptSoon": "マッチング開始後にリクエストを引き受けられます。"
+    "acceptSoon": "マッチング開始後にリクエストを引き受けられます。",
+    "empty": "近くで助けを求めている人は今いません。新しいリクエストはここに表示されます。",
+    "metaLive": "{{minutes}} 分前 · {{language}}"
+  },
+  "active": {
+    "title": "{{name}} さんをサポート中",
+    "subtitle": "相手のもとへ向かい、チャットであいさつしましょう。",
+    "end": "チャットを終了",
+    "endHint": "あなたと {{name}} さんの両方でサポート完了になります",
+    "confirmEnd": "{{name}} さんとのチャットを終了しますか？サポートは完了になります。",
+    "yesEnd": "はい、終了します"
+  },
+  "desk": {
+    "taken": "このリクエストはすでに別の人が引き受けました。",
+    "acceptFailed": "リクエストを引き受けられませんでした。接続を確認して、もう一度お試しください。",
+    "cancelled": "{{name}} さんがリクエストをキャンセルしました。",
+    "done": "{{name}} さんがサポート完了にしました。ありがとうございました！",
+    "ended": "チャットを終了しました。{{name}} さんのサポートをありがとうございました！",
+    "withdrawn": "このリクエストは取り下げられました。"
   },
   "home": {
     "greeting": "こんにちは、{{name}}さん",

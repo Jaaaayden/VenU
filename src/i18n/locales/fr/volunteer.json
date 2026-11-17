@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Impossible de joindre un bénévole. Vérifiez votre connexion et réessayez.",
-    "thanks": "Merci ! Votre avis aide {{name}} et l’équipe LA28."
+    "thanks": "Merci ! Votre avis aide {{name}} et l’équipe LA28.",
+    "volunteerLeft": "Votre bénévole a dû partir. Nous cherchons quelqu’un d’autre."
   },
   "searching": {
     "title": "Recherche d’un bénévole",
@@ -105,7 +106,8 @@
   },
   "map": {
     "label": "Carte : {{name}} est à {{distance}} et vient vers vous ({{place}}).",
-    "you": "Vous"
+    "you": "Vous",
+    "labelNoDistance": "Carte : {{name}} vient vers vous ({{place}})."
   },
   "messages": {
     "label": "Messages",
@@ -130,7 +132,8 @@
     "messageTo": "Message à {{name}}",
     "stickers": "Autocollants",
     "stickersSoon": "Les autocollants arrivent bientôt.",
-    "record": "Dicter un message"
+    "record": "Dicter un message",
+    "emptyVolunteer": "Dites bonjour à {{name}} et prévenez que vous arrivez."
   },
   "translation": {
     "translatedFrom": "Traduit (original : {{language}})",
@@ -153,10 +156,13 @@
   },
   "bubble": {
     "mine": "Vous, {{time}} : {{text}}",
-    "theirs": "Bénévole, {{time}} : {{text}}",
-    "theirsTranslated": "Bénévole, {{time}} : {{text}} (traduit, original : {{language}})",
     "listen": "écouter",
-    "listenLabel": "Écouter ce message"
+    "listenLabel": "Écouter ce message",
+    "from": "{{name}}, {{time}} : {{text}}",
+    "fromTranslated": "{{name}}, {{time}} : {{text}} (traduit, original : {{language}})",
+    "notSent": "Non envoyé",
+    "retry": "Touchez pour réessayer",
+    "retryLabel": "Non envoyé. Renvoyer ce message"
   },
   "feedback": {
     "skip": "Passer",
@@ -213,7 +219,25 @@
     "who": "{{help}} · {{name}}",
     "meta": "À {{distance}} · il y a {{minutes}} min · {{language}}",
     "accept": "Accepter",
-    "acceptSoon": "Vous pourrez accepter des demandes quand la mise en relation sera active."
+    "acceptSoon": "Vous pourrez accepter des demandes quand la mise en relation sera active.",
+    "empty": "Personne à proximité n’a besoin d’aide pour l’instant. Les nouvelles demandes s’afficheront ici.",
+    "metaLive": "il y a {{minutes}} min · {{language}}"
+  },
+  "active": {
+    "title": "Vous aidez {{name}}",
+    "subtitle": "Allez à sa rencontre et dites bonjour dans la conversation.",
+    "end": "Terminer la conversation",
+    "endHint": "Indique que l’aide est terminée, pour vous et pour {{name}}",
+    "confirmEnd": "Terminer la conversation avec {{name}} ? L’aide sera indiquée comme terminée.",
+    "yesEnd": "Oui, terminer"
+  },
+  "desk": {
+    "taken": "Quelqu’un d’autre a déjà accepté cette demande.",
+    "acceptFailed": "Impossible d’accepter la demande. Vérifiez votre connexion et réessayez.",
+    "cancelled": "{{name}} a annulé la demande.",
+    "done": "{{name}} a indiqué que l’aide est terminée. Merci !",
+    "ended": "Conversation terminée. Merci d’avoir aidé {{name}} !",
+    "withdrawn": "Cette demande a été retirée."
   },
   "home": {
     "greeting": "Bonjour, {{name}}",

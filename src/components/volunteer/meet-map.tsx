@@ -28,8 +28,11 @@ function fitLabel(label: string, max: number): string {
   return label.length > chars ? `${label.slice(0, chars - 1)}…` : label;
 }
 
-/** `place`: where you wait, in the language on screen ("Entry 4", or the venue with no spot). */
-export function MeetMap({ volunteerName, distanceLabel, place }: { volunteerName: string; distanceLabel: string; place: string }) {
+/**
+ * `place`: where you wait, in the language on screen ("Entry 4", or the venue with no spot).
+ * `distanceLabel`: "180 ft", or null when the service doesn't know (live matching).
+ */
+export function MeetMap({ volunteerName, distanceLabel, place }: { volunteerName: string; distanceLabel: string | null; place: string }) {
   const [w, setW] = useState(0);
   const t = useT('volunteer');
   const gate = fitLabel(place, Math.max(64, w * 0.84));
@@ -48,7 +51,7 @@ export function MeetMap({ volunteerName, distanceLabel, place }: { volunteerName
       style={styles.wrap}
       onLayout={onLayout}
       role="img"
-      aria-label={t('map.label', { name: volunteerName, distance: distanceLabel, place })}>
+      aria-label={distanceLabel ? t('map.label', { name: volunteerName, distance: distanceLabel, place }) : t('map.labelNoDistance', { name: volunteerName, place })}>
       {w > 0 && (
         <Svg width={w} height={H}>
           <Rect x={0} y={0} width={w} height={H} fill={Colors.surfaceAlt} />
