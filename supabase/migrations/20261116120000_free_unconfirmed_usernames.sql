@@ -25,7 +25,7 @@ begin
       where n.username = wanted
         and u.id = n.user_id
         and u.email_confirmed_at is null
-        and u.created_at < now() - interval '1 hour';
+        and coalesce(u.created_at, now()) < now() - interval '1 hour';
     -- A taken or malformed name raises here, which rolls back the sign-up.
     insert into public.usernames (username, user_id) values (wanted, new.id);
   end if;
@@ -35,6 +35,7 @@ $$;
 
 -- Create Account: false when the name is taken (checked before sign-up for a clear message).
 -- A name an unconfirmed sign-up has held for over an hour counts as free, as in claim_username.
+-- (An account with no created_at counts as just signed up, in both places.)
 create or replace function public.username_available(p_username text) returns boolean
   language sql stable security definer set search_path = '' as $$
   select not exists (
@@ -42,7 +43,7 @@ create or replace function public.username_available(p_username text) returns bo
     from public.usernames n
     join auth.users u on u.id = n.user_id
     where n.username = lower(trim(p_username))
-      and (u.email_confirmed_at is not null or u.created_at >= now() - interval '1 hour')
+      and (u.email_confirmed_at is not null or coalesce(u.created_at, now()) >= now() - interval '1 hour')
   );
 $$;
 
