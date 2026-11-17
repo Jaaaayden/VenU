@@ -256,6 +256,9 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       }
     }
 
+    // ---- help requests and chat (see handleHelpRequests below)
+    if (handleHelpRequests({ req, res, p, url, body: json, uid, profiles, send, pgErr })) return;
+
     // ---- the avatars bucket (private: owners only)
     const ownPath = path => path.split('/')[0] === uid;
     let m;
@@ -305,6 +308,143 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     server.once('error', reject);
     server.listen(port, () => resolve(server));
   });
+}
+
+// ---- help requests and chat: the help_requests and messages tables and their two functions, with
+// the rules of supabase/migrations/20261117010000_help_requests_chat.sql. One store per server (keyed
+// by its profiles map), kept in memory only. There's no Realtime here: the app sees its channels fail
+// and polls instead (src/features/volunteer/supabase-backend.ts).
+// Test hook: GET /__help (every request and message).
+const helpStores = new WeakMap();
+const HELP_TYPE_IDS = ['physical', 'directions', 'language', 'quiet', 'lost', 'other'];
+
+/** PostgREST-style filters from the query string, e.g. status=eq.open&created_at=gte.2026-11-17T18:00:00Z. */
+function rowFilter(url) {
+  const tests = [];
+  for (const [col, raw] of url.searchParams) {
+    if (['select', 'order', 'limit', 'offset', 'columns'].includes(col)) continue;
+    const dot = raw.indexOf('.');
+    const op = raw.slice(0, dot);
+    const v = raw.slice(dot + 1);
+    const cmp = (a, b) => (a == null ? -1 : String(a) < b ? -1 : String(a) > b ? 1 : 0);
+    if (op === 'eq') tests.push(r => String(r[col]) === v);
+    else if (op === 'neq') tests.push(r => String(r[col]) !== v);
+    else if (op === 'gt') tests.push(r => cmp(r[col], v) > 0);
+    else if (op === 'gte') tests.push(r => cmp(r[col], v) >= 0);
+    else if (op === 'lt') tests.push(r => cmp(r[col], v) < 0);
+    else if (op === 'lte') tests.push(r => cmp(r[col], v) <= 0);
+    else if (op === 'is') tests.push(r => (v === 'null' ? r[col] == null : String(r[col]) === v));
+    else if (op === 'in') { const set = v.replace(/^\(|\)$/g, '').split(','); tests.push(r => set.includes(String(r[col]))); }
+  }
+  return row => tests.every(t => t(row));
+}
+
+/** order=created_at.desc and limit=n, as PostgREST applies them. */
+function orderAndLimit(rows, url) {
+  const order = url.searchParams.get('order');
+  let out = [...rows];
+  if (order) {
+    const [col, dir] = order.split('.');
+    out.sort((a, b) => (String(a[col] ?? '') < String(b[col] ?? '') ? -1 : String(a[col] ?? '') > String(b[col] ?? '') ? 1 : 0) * (dir === 'desc' ? -1 : 1));
+  }
+  const limit = Number(url.searchParams.get('limit'));
+  return limit > 0 ? out.slice(0, limit) : out;
+}
+
+/** Handles the help request routes; false for anything else. */
+function handleHelpRequests({ req, res, p, url, body, uid, profiles, send, pgErr }) {
+  const isHelp = p === '/__help' || p === '/rest/v1/help_requests' || p === '/rest/v1/messages'
+    || p === '/rest/v1/rpc/accept_help_request' || p === '/rest/v1/rpc/close_help_request';
+  if (!isHelp) return false;
+  if (!helpStores.has(profiles)) helpStores.set(profiles, { requests: new Map(), messages: [] });
+  helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, helpStores.get(profiles));
+  return true;
+}
+
+function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store) {
+  if (p === '/__help') return send(res, 200, { requests: [...store.requests.values()], messages: store.messages });
+  if (!uid) return pgErr(res, 401, 'PGRST301', 'JWT expired');
+
+  const isVolunteer = profiles.get(uid)?.role === 'volunteer';
+  const canSee = r => r.visitor_id === uid || r.volunteer_id === uid || (r.status === 'open' && isVolunteer);
+  const isParty = id => { const r = store.requests.get(id); return !!r && (r.visitor_id === uid || r.volunteer_id === uid); };
+  const wantsRows = (req.headers.prefer ?? '').includes('return=representation');
+  const wantsObject = (req.headers.accept ?? '').includes('vnd.pgrst.object');
+  const rls = table => pgErr(res, 403, '42501', `new row violates row-level security policy for table "${table}"`);
+  const reply = (rows, status = 200) => {
+    if (!wantsObject) return send(res, status, rows);
+    if (rows.length !== 1) return pgErr(res, 406, 'PGRST116', 'JSON object requested, multiple (or no) rows returned');
+    return send(res, status, rows[0]);
+  };
+  const now = () => new Date().toISOString();
+  const input = body();
+
+  if (p === '/rest/v1/help_requests') {
+    if (req.method === 'GET') return reply(orderAndLimit([...store.requests.values()].filter(canSee).filter(rowFilter(url)), url));
+    if (req.method === 'POST') {
+      const row = Array.isArray(input) ? input[0] : input;
+      const visitorId = row?.visitor_id ?? uid;
+      const opensClean = (row?.status ?? 'open') === 'open'
+        && ['volunteer_id', 'volunteer_name', 'volunteer_languages', 'volunteer_trainings', 'volunteer_gender', 'closed_by', 'matched_at', 'closed_at'].every(k => row?.[k] == null);
+      if (!row || visitorId !== uid || !opensClean) return rls('help_requests');
+      const types = row.help_types;
+      if (!Array.isArray(types) || types.length < 1 || types.length > 6 || !types.every(t => HELP_TYPE_IDS.includes(t)) || !row.venue_id || !row.language)
+        return pgErr(res, 400, '23514', 'new row for relation "help_requests" violates check constraint');
+      const id = row.id ?? randomUUID();
+      if (store.requests.has(id)) return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "help_requests_pkey"');
+      const full = {
+        id, visitor_id: uid, visitor_name: String(row.visitor_name ?? '').slice(0, 40), venue_id: row.venue_id, spot: row.spot ?? null,
+        help_types: types, note: String(row.note ?? '').slice(0, 500), language: row.language, status: 'open',
+        volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null, volunteer_gender: null,
+        closed_by: null, created_at: now(), matched_at: null, closed_at: null,
+      };
+      store.requests.set(id, full);
+      return wantsRows ? reply([full], 201) : send(res, 201);
+    }
+    return pgErr(res, 403, '42501', 'permission denied for table help_requests'); // no direct updates or deletes
+  }
+
+  if (p === '/rest/v1/messages') {
+    if (req.method === 'GET') {
+      const rows = store.messages.filter(m => isParty(m.request_id)).filter(rowFilter(url));
+      return reply(orderAndLimit(rows, url));
+    }
+    if (req.method === 'POST') {
+      const row = Array.isArray(input) ? input[0] : input;
+      const r = row && store.requests.get(row.request_id);
+      if (!row || (row.sender_id ?? uid) !== uid || !isParty(row.request_id) || r?.status !== 'matched') return rls('messages');
+      const text = String(row.text ?? '');
+      if (text.length < 1 || text.length > 1000) return pgErr(res, 400, '23514', 'new row for relation "messages" violates check constraint');
+      const full = { id: randomUUID(), request_id: row.request_id, sender_id: uid, text, language: row.language ?? null, created_at: now() };
+      store.messages.push(full);
+      return wantsRows ? reply([full], 201) : send(res, 201);
+    }
+    return pgErr(res, 403, '42501', 'permission denied for table messages');
+  }
+
+  if (req.method !== 'POST') return pgErr(res, 405, 'PGRST117', 'Unsupported HTTP method');
+  if (p === '/rest/v1/rpc/accept_help_request') {
+    const me = profiles.get(uid);
+    if (me?.role !== 'volunteer') return pgErr(res, 403, '42501', 'not_a_volunteer');
+    const r = store.requests.get(input?.p_request_id);
+    // Node runs one request at a time, so check-and-set here is as atomic as the SQL update.
+    if (!r || r.status !== 'open' || r.visitor_id === uid) return pgErr(res, 400, 'P0001', 'already_taken');
+    Object.assign(r, {
+      status: 'matched', volunteer_id: uid, volunteer_name: me.first_name,
+      volunteer_languages: [me.main_language, ...me.languages.filter(l => l !== me.main_language)],
+      volunteer_trainings: me.trainings ?? [], volunteer_gender: me.gender ?? null, matched_at: now(),
+    });
+    return send(res, 200, r);
+  }
+  if (p === '/rest/v1/rpc/close_help_request') {
+    const status = input?.p_status;
+    if (status !== 'cancelled' && status !== 'done') return pgErr(res, 400, '22023', 'bad_status');
+    const r = store.requests.get(input?.p_request_id);
+    const allowed = r && (r.status === 'open' || r.status === 'matched')
+      && (r.visitor_id === uid || (r.volunteer_id === uid && r.status === 'matched' && status === 'done'));
+    if (allowed) Object.assign(r, { status, closed_by: uid, closed_at: now() });
+    return send(res, 204);
+  }
 }
 
 /** KEY=value lines from .env.server.local (git-ignored), or {} when there's no such file. */
