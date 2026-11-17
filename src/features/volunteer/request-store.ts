@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
 import { chatLanguage } from '@/features/translate/languages';
+import { onBeforeSignOut } from '@/lib/before-sign-out';
 
 import { appBackend } from './app-backend';
 import { newId, type VolunteerBackend } from './backend';
@@ -412,6 +413,15 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
      * clears the saved request; a user signing in gets back the request saved for them.
      * Resolves once any saved request has been read back.
      */
+    /**
+     * Cancels a searching or matched request on the server while the user is still signed in
+     * (runs just before sign-out; after it, the server would refuse). The local reset follows on sign-out.
+     */
+    async endSession(): Promise<void> {
+      const live = state.status === 'searching' || state.status === 'matched' ? state.request?.id : undefined;
+      if (live) await backend.cancelRequest(live);
+    },
+
     async setUser(userId: string | null): Promise<void> {
       if (userId === null) {
         reset();
@@ -434,6 +444,8 @@ export const volunteerRequests: RequestStore = createRequestStore(appBackend, {
   storage: AsyncStorage,
   key: 'venu.volunteer.request',
 });
+
+onBeforeSignOut(() => volunteerRequests.endSession());
 
 export function useVolunteerRequest(store: RequestStore = volunteerRequests): RequestState {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);
