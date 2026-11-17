@@ -105,7 +105,8 @@
   },
   "map": {
     "label": "Mapa: {{distance}} ang layo ni {{name}}, papunta sa iyo sa {{place}}.",
-    "you": "Ikaw"
+    "you": "Ikaw",
+    "labelNoDistance": "Mapa: papunta sa iyo si {{name}} sa {{place}}."
   },
   "messages": {
     "label": "Mga mensahe",
@@ -129,7 +130,8 @@
     "messageTo": "Mensahe kay {{name}}",
     "stickers": "Mga sticker",
     "stickersSoon": "Malapit nang dumating ang stickers.",
-    "record": "Magsalita ng mensahe"
+    "record": "Magsalita ng mensahe",
+    "emptyVolunteer": "Batiin si {{name}} at sabihing papunta ka na."
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {{language}}",
@@ -152,10 +154,10 @@
   },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",
-    "theirs": "Boluntaryo, {{time}}: {{text}}",
-    "theirsTranslated": "Boluntaryo, {{time}}: {{text}} (isinalin mula sa {{language}})",
     "listen": "pakinggan",
-    "listenLabel": "Pakinggan ang mensaheng ito"
+    "listenLabel": "Pakinggan ang mensaheng ito",
+    "from": "{{name}}, {{time}}: {{text}}",
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (isinalin mula sa {{language}})"
   },
   "feedback": {
     "skip": "Laktawan",
@@ -211,7 +213,24 @@
     "who": "{{help}} · {{name}}",
     "meta": "{{distance}} ang layo · {{minutes}} min ang nakalipas · {{language}}",
     "accept": "Tanggapin",
-    "acceptSoon": "Puwede nang tumanggap ng request kapag live na ang matching."
+    "acceptSoon": "Puwede nang tumanggap ng request kapag live na ang matching.",
+    "empty": "Walang nangangailangan ng tulong sa malapit ngayon. Dito lalabas ang mga bagong request.",
+    "metaLive": "{{minutes}} min ang nakalipas · {{language}}"
+  },
+  "active": {
+    "title": "Tinutulungan mo si {{name}}",
+    "subtitle": "Puntahan siya at bumati sa chat.",
+    "end": "Tapusin ang chat",
+    "endHint": "Mamarkahang tapos na ang tulong para sa iyo at kay {{name}}",
+    "confirmEnd": "Tapusin ang chat ninyo ni {{name}}? Mamarkahang tapos na ang tulong.",
+    "yesEnd": "Oo, tapusin"
+  },
+  "desk": {
+    "taken": "May iba nang tumanggap sa request na ito.",
+    "acceptFailed": "Hindi matanggap ang request. Tingnan ang koneksyon mo at subukan ulit.",
+    "cancelled": "Kinansela ni {{name}} ang request.",
+    "done": "Minarkahan ni {{name}} na tapos na ang tulong. Salamat!",
+    "ended": "Tapos na ang chat. Salamat sa pagtulong kay {{name}}!"
   },
   "home": {
     "greeting": "Kumusta, {{name}}",

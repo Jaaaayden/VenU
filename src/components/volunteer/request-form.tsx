@@ -114,7 +114,9 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         </View>
       </View>
 
-      {notice ? <NoteBanner notice={notice} onDismiss={volunteerRequests.dismissNotice} /> : null}
+      {notice ? (
+        <NoteBanner tone={notice.tone} text={t(`notice.${notice.key}`, { name: notice.params?.name ?? '' })} onDismiss={volunteerRequests.dismissNotice} />
+      ) : null}
 
       <Pressable
         onPress={() => setPickingSpot(true)}

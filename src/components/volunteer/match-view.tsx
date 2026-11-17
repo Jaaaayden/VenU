@@ -51,7 +51,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         </View>
       </View>
 
-      <MeetMap volunteerName={v.name} distanceLabel={distance ?? ''}place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
+      <MeetMap volunteerName={v.name} distanceLabel={distance} place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
 
       <View style={[styles.gutter, styles.card]}>
         <View style={styles.who}>

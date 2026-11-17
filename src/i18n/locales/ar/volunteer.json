@@ -105,7 +105,8 @@
   },
   "map": {
     "label": "خريطة: {{name}} على بُعد {{distance}}، في الطريق إليك عند {{place}}.",
-    "you": "أنت"
+    "you": "أنت",
+    "labelNoDistance": "خريطة: {{name}} في الطريق إليك عند {{place}}."
   },
   "messages": {
     "label": "الرسائل",
@@ -133,7 +134,8 @@
     "messageTo": "رسالة إلى {{name}}",
     "stickers": "الملصقات",
     "stickersSoon": "الملصقات قريبًا.",
-    "record": "إملاء رسالة"
+    "record": "إملاء رسالة",
+    "emptyVolunteer": "ألقِ التحية على {{name}} وأخبره أنك في الطريق."
   },
   "translation": {
     "translatedFrom": "مترجمة من {{language}}",
@@ -156,10 +158,10 @@
   },
   "bubble": {
     "mine": "أنت، {{time}}: {{text}}",
-    "theirs": "المتطوع، {{time}}: {{text}}",
-    "theirsTranslated": "المتطوع، {{time}}: {{text}} (مترجمة من {{language}})",
     "listen": "استمع",
-    "listenLabel": "استمع إلى هذه الرسالة"
+    "listenLabel": "استمع إلى هذه الرسالة",
+    "from": "{{name}}، {{time}}: {{text}}",
+    "fromTranslated": "{{name}}، {{time}}: {{text}} (مترجمة من {{language}})"
   },
   "feedback": {
     "skip": "تخطي",
@@ -219,7 +221,24 @@
     "who": "{{help}} · {{name}}",
     "meta": "على بُعد {{distance}} · منذ {{minutes}} د · {{language}}",
     "accept": "قبول",
-    "acceptSoon": "سيُتاح قبول الطلبات عند تفعيل المطابقة."
+    "acceptSoon": "سيُتاح قبول الطلبات عند تفعيل المطابقة.",
+    "empty": "لا أحد بالقرب منك يحتاج إلى مساعدة الآن. ستظهر الطلبات الجديدة هنا.",
+    "metaLive": "منذ {{minutes}} د · {{language}}"
+  },
+  "active": {
+    "title": "أنت تساعد {{name}}",
+    "subtitle": "اذهب لمقابلته وألقِ التحية في المحادثة.",
+    "end": "إنهاء المحادثة",
+    "endHint": "يُعلِّم المساعدة كمنتهية لك ولـ {{name}}",
+    "confirmEnd": "هل تريد إنهاء محادثتك مع {{name}}؟ سيتم تعليم المساعدة كمنتهية.",
+    "yesEnd": "نعم، أنهِ المحادثة"
+  },
+  "desk": {
+    "taken": "قبل شخص آخر هذا الطلب بالفعل.",
+    "acceptFailed": "تعذّر قبول الطلب. تحقق من اتصالك وحاول مرة أخرى.",
+    "cancelled": "ألغى {{name}} الطلب.",
+    "done": "أشار {{name}} إلى أن المساعدة انتهت. شكرًا لك!",
+    "ended": "انتهت المحادثة. شكرًا لمساعدتك {{name}}!"
   },
   "home": {
     "greeting": "مرحبًا، {{name}}",
