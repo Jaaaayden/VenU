@@ -1,0 +1,20 @@
+{
+  "onboarding/landing": "184:18502",
+  "onboarding/create-account": "179:17357",
+  "onboarding/sign-in": "181:18452",
+  "onboarding/profile-setup": "184:18561",
+  "venue/choose-venue": "77:13",
+  "venue/facilities": "131:12137",
+  "venue/facilities-down": "94:1493",
+  "venue/facilities-up": "133:12305",
+  "venue/facility-popup": "133:12901",
+  "venue/facility-popup-lowered": "195:22973",
+  "venue/report-read": "264:27198",
+  "venue/report-write": "276:27844",
+  "venue/report-submitted": "276:28618",
+  "volunteer/home": "192:22809",
+  "volunteer/found": "214:25058",
+  "volunteer/chat": "231:25476",
+  "volunteer/chat-keyboard": "231:26460",
+  "volunteer/feedback": "235:26589"
+}

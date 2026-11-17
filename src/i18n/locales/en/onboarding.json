@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "Create Account",
     "or": "or",
+    "visitor": "I am a visitor",
+    "volunteer": "I am a volunteer",
+    "roleQuestion": "Visitor or volunteer?",
     "signIn": "Sign In",
     "socialTitle": "OR sign up using",
     "socialSoon": "Google, Apple and Facebook sign-in are coming soon.",
@@ -16,11 +19,15 @@
     "namePlaceholder": "Enter name",
     "email": "Email",
     "emailPlaceholder": "Enter email",
+    "username": "Username",
+    "usernamePlaceholder": "Enter username",
+    "usernameHint": "3–20 letters, numbers, _ or .",
     "password": "Password",
     "passwordPlaceholder": "Enter password"
   },
   "signIn": {
     "title": "Sign In",
+    "identifierPlaceholder": "Enter username or email",
     "noAccount": "Don’t have an account?",
     "signUp": "Sign Up",
     "forgot": "Forgot Password?",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "Enter a valid email.",
+    "identifier": "Enter your username or email.",
+    "usernameLength": "Use {{min}}–{{max}} characters for your username.",
+    "usernameChars": "Use only letters, numbers, _ and . in your username.",
     "passwordLength": "Use at least {{min}} characters for your password.",
     "password": "Enter your password.",
     "terms": "Agree to the Terms & Conditions to continue."
@@ -55,11 +65,18 @@
     "volunteerTitle": "I'm an LA28 volunteer",
     "volunteerBody": "Help visitors near you. You'll show as unverified until LA28 confirms you."
   },
+  "steps": {
+    "languagesTitle": "Choose your languages",
+    "languagesSubtitle": "To help you communicate with volunteers.",
+    "preferencesTitle": "Volunteer preferences",
+    "preferencesSubtitle": "So we can find the right helper for you. Change it anytime in your settings.",
+    "photoTitle": "Choose a profile picture",
+    "photoSubtitle": "So volunteers can find you more easily. Change it anytime in your settings.",
+    "photoSubtitleVolunteer": "So visitors can recognize you. Change it anytime in your settings.",
+    "finish": "Finish Setup"
+  },
   "setup": {
-    "visitorTitle": "Set up your profile",
-    "visitorSubtitle": "So we can find the right helper for you. Change it anytime in your settings.",
     "volunteerTitle": "Your volunteer profile",
-    "volunteerSubtitle": "So we can send you the visitors you can help most.",
-    "submit": "Save and continue"
+    "volunteerSubtitle": "So we can send you the visitors you can help most."
   }
 }

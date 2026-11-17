@@ -33,6 +33,8 @@ export const ERROR_CODES = {
   photoTooBigLocal: 'VENU_PHOTO_TOO_BIG_LOCAL',
   /** The picked photo can't be read any more (e.g. a web blob: URL after a reload). */
   photoUnreadable: 'VENU_PHOTO_UNREADABLE',
+  /** Create Account: someone already has that username. */
+  usernameTaken: 'VENU_USERNAME_TAKEN',
 } as const;
 
 /** An Error with one of ERROR_CODES (and anything else the message needs), e.g. codedError('photoUnreadable'). */
@@ -45,6 +47,7 @@ const BY_CODE: Record<string, (e: { role?: unknown }) => ErrorMessage> = {
   [ERROR_CODES.roleMismatch]: e => ({ key: e.role === 'volunteer' ? 'roleMismatchVolunteer' : 'roleMismatchVisitor' }),
   [ERROR_CODES.photoTooBigLocal]: () => ({ key: 'photoTooBigLocal' }),
   [ERROR_CODES.photoUnreadable]: () => ({ key: 'photoUnreadable' }),
+  [ERROR_CODES.usernameTaken]: () => ({ key: 'usernameTaken' }),
   // Supabase Auth error codes (AuthApiError.code).
   invalid_credentials: () => ({ key: 'wrongLogin' }),
   email_not_confirmed: () => ({ key: 'confirmEmail' }),

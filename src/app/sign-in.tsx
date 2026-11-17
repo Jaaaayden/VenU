@@ -2,14 +2,14 @@ import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useRef, useState, type ComponentRef } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { Button } from '@/components/button';
 import { Colors, Spacing, Type } from '@/constants/theme';
 import { AuthField, FooterPrompt } from '@/features/auth/auth-ui';
 import { AuthScreen } from '@/features/auth/auth-screen';
+import { PrimaryAction } from '@/features/auth/onboarding-screen';
 import { useAuthForm, useSignedInHref } from '@/features/auth/use-auth-form';
 import { useT } from '@/i18n';
 
-/** Figma onboarding__sign-in. Email, not the Figma "Username": accounts are email + password. */
+/** Figma Sign In (Onboarding 2.0, 482:32247). The "Username" field takes a username or an email. */
 export default function SignInScreen() {
   // Set by Create Account when Supabase wants the email confirmed first.
   const params = useLocalSearchParams<{ confirm?: string; email?: string }>();
@@ -31,16 +31,15 @@ export default function SignInScreen() {
     <AuthScreen title={t('signIn.title')} footer={<FooterPrompt text={t('signIn.noAccount')} action={t('signIn.signUp')} href="/sign-up" />}>
       <View style={styles.form}>
         <AuthField
-          label={t('auth.email')}
-          placeholder={t('auth.emailPlaceholder')}
+          label={t('auth.username')}
+          placeholder={t('signIn.identifierPlaceholder')}
           value={email}
           onChangeText={setEmail}
           error={errorFor('email')}
-          keyboardType="email-address"
           autoCapitalize="none"
           autoCorrect={false}
-          autoComplete="email"
-          textContentType="emailAddress"
+          autoComplete="username"
+          textContentType="username"
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
@@ -70,7 +69,9 @@ export default function SignInScreen() {
       {error?.field === null && <Text style={styles.error} accessibilityLiveRegion="polite">{error.message}</Text>}
       {notice && <Text style={styles.notice} accessibilityLiveRegion="polite">{notice}</Text>}
 
-      <Button label={t('signIn.submit')} variant="dark" onPress={go} loading={busy} style={styles.cta} />
+      <View style={styles.cta}>
+        <PrimaryAction label={t('signIn.submit')} onPress={go} loading={busy} />
+      </View>
     </AuthScreen>
   );
 }
@@ -82,5 +83,5 @@ const styles = StyleSheet.create({
   link: { ...Type.body, color: Colors.primary, textDecorationLine: 'underline' },
   error: { ...Type.caption, color: Colors.danger, textAlign: 'center', marginTop: Spacing.lg },
   notice: { ...Type.caption, color: Colors.success, textAlign: 'center', marginTop: Spacing.lg },
-  cta: { alignSelf: 'center', width: 240, marginTop: Spacing.xl },
+  cta: { alignItems: 'center', marginTop: Spacing.xxl },
 });

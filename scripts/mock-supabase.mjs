@@ -34,7 +34,7 @@ export const MOCK_SUPABASE_PORT = 47330;
  *   stateFile: keep accounts, profiles and photos here between runs.
  */
 export function startMockSupabase({ port, confirmEmail = false, stateFile, log = console.log }) {
-  const users = new Map(); // email -> { id, email, password, confirmed }
+  const users = new Map(); // email -> { id, email, password, confirmed, username? }
   const profiles = new Map(); // user id -> row
   const files = new Map(); // path -> { bytes: Buffer, type }
   const refreshTokens = new Map(); // token -> user id
@@ -67,8 +67,11 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const publicUser = u => ({
     id: u.id, aud: 'authenticated', role: 'authenticated', email: u.email,
     email_confirmed_at: u.confirmed ? '2026-11-09T00:00:00Z' : null,
-    app_metadata: { provider: 'email' }, user_metadata: {}, created_at: '2026-11-09T00:00:00Z',
+    app_metadata: { provider: 'email' }, user_metadata: u.username ? { username: u.username } : {}, created_at: '2026-11-09T00:00:00Z',
   });
+  // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql).
+  const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
+  const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
   function session(user) {
     const exp = Math.floor(Date.now() / 1000) + 3600;
     const refresh_token = randomUUID();
@@ -140,9 +143,13 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
 
     // ---- auth
     if (p === '/auth/v1/signup' && req.method === 'POST') {
-      const { email, password } = json() ?? {};
+      const { email, password, data } = json() ?? {};
       if (users.has(email)) return authErr(res, 422, 'user_already_exists', 'User already registered');
-      const user = { id: randomUUID(), email, password, confirmed: !confirmEmail };
+      const username = normalUsername(data?.username) || undefined;
+      // The claim_username trigger: a taken or malformed name fails the whole sign-up.
+      if (username && (userByUsername(username) || !/^[a-z0-9_.]{3,20}$/.test(username)))
+        return authErr(res, 500, 'unexpected_failure', 'Database error saving new user');
+      const user = { id: randomUUID(), email, password, confirmed: !confirmEmail, username };
       users.set(email, user);
       persist();
       if (!confirmEmail) return send(res, 200, session(user));
@@ -175,6 +182,14 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     if (p === '/auth/v1/user' && req.method === 'GET') {
       const user = [...users.values()].find(u => u.id === uid);
       return user ? send(res, 200, publicUser(user)) : authErr(res, 401, 'bad_jwt', 'invalid JWT');
+    }
+
+    // ---- username functions (callable signed out, like the anon grants in the migration)
+    if (p === '/rest/v1/rpc/email_for_username' && req.method === 'POST') {
+      return send(res, 200, userByUsername(json()?.p_username)?.email ?? null);
+    }
+    if (p === '/rest/v1/rpc/username_available' && req.method === 'POST') {
+      return send(res, 200, !userByUsername(json()?.p_username));
     }
 
     // ---- the profiles table

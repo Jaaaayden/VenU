@@ -2,6 +2,9 @@
   "welcome": {
     "createAccount": "创建账户",
     "or": "或",
+    "visitor": "我是观众",
+    "volunteer": "我是志愿者",
+    "roleQuestion": "观众还是志愿者？",
     "signIn": "登录",
     "socialTitle": "或使用以下方式注册",
     "socialSoon": "Google、Apple 和 Facebook 登录即将推出。",
@@ -16,11 +19,15 @@
     "namePlaceholder": "输入姓名",
     "email": "电子邮件",
     "emailPlaceholder": "输入电子邮件",
+    "username": "用户名",
+    "usernamePlaceholder": "输入用户名",
+    "usernameHint": "3–20 个字母、数字、_ 或 .",
     "password": "密码",
     "passwordPlaceholder": "输入密码"
   },
   "signIn": {
     "title": "登录",
+    "identifierPlaceholder": "输入用户名或电子邮件",
     "noAccount": "还没有账户？",
     "signUp": "注册",
     "forgot": "忘记密码？",
@@ -38,6 +45,9 @@
   },
   "validate": {
     "email": "请输入有效的电子邮件。",
+    "identifier": "请输入用户名或电子邮件。",
+    "usernameLength": "用户名需要 {{min}}–{{max}} 个字符。",
+    "usernameChars": "用户名只能包含英文字母、数字、_ 和 .",
     "passwordLength": "密码至少需要 {{min}} 个字符。",
     "password": "请输入密码。",
     "terms": "请同意条款与条件后继续。"
@@ -55,11 +65,18 @@
     "volunteerTitle": "我是 LA28 志愿者",
     "volunteerBody": "帮助你附近的观众。在 LA28 确认你之前，你将显示为未验证。"
   },
+  "steps": {
+    "languagesTitle": "选择你的语言",
+    "languagesSubtitle": "方便你和志愿者沟通。",
+    "preferencesTitle": "帮手偏好",
+    "preferencesSubtitle": "这样我们能为你找到合适的帮手。你可以随时在设置中修改。",
+    "photoTitle": "选择头像",
+    "photoSubtitle": "让志愿者更容易找到你。你可以随时在设置中修改。",
+    "photoSubtitleVolunteer": "让观众认出你。你可以随时在设置中修改。",
+    "finish": "完成设置"
+  },
   "setup": {
-    "visitorTitle": "设置你的资料",
-    "visitorSubtitle": "这样我们能为你找到合适的帮手。你可以随时在设置中修改。",
     "volunteerTitle": "你的志愿者资料",
-    "volunteerSubtitle": "这样我们能为你匹配最需要你帮助的观众。",
-    "submit": "保存并继续"
+    "volunteerSubtitle": "这样我们能为你匹配最需要你帮助的观众。"
   }
 }

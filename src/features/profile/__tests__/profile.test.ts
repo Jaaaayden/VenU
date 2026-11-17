@@ -393,7 +393,7 @@ describe('friendlyError', () => {
     const offline = "Can't reach VenU. Check your connection and try again.";
     expect(friendlyError(new TypeError('Failed to fetch'))).toBe(offline);
     expect(friendlyError({ name: 'AuthRetryableFetchError', message: '{}' })).toBe(offline);
-    expect(friendlyError(new Error('Invalid login credentials'))).toBe('Wrong email or password.');
+    expect(friendlyError(new Error('Invalid login credentials'))).toBe('Wrong username or password.');
     // A policy refusal isn't a session problem, so it mustn't say "session expired".
     expect(friendlyError({ message: 'new row violates row-level security policy for table "profiles"' })).toBe(
       "VenU couldn't save that change. If it keeps happening, sign out and back in.",

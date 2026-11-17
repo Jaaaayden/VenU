@@ -9,7 +9,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { AppLanguagePill } from '@/components/volunteer/app-language-pill';
+import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName, languageName } from '@/features/profile/options';
 import { useWhereAmI } from '@/features/venue/current';
 import { meetPointFrom, meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
@@ -88,18 +89,22 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   return (
     <View style={styles.page}>
       <View style={styles.header}>
-        {/* Figma's small segmented control: the language you want help in. */}
-        <Pressable
-          onPress={() => setPickingLanguage(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t('form.languageLabel', { language: isolatedLanguageName(language) })}
-          style={({ pressed }) => [styles.langPill, pressed && styles.langPressed]}>
-          <FigmaIcon name="icon-c513eb" size={18} color={Colors.ink} />
-          <Text style={styles.langText} numberOfLines={1}>{languageName(language)}</Text>
-        </Pressable>
+        {/* The app language, as on every tab. The help language is its own control below. */}
+        <View style={styles.appLang}>
+          <AppLanguagePill />
+        </View>
         <View style={styles.titles}>
           <Text style={styles.title} accessibilityRole="header">{t('form.title')}</Text>
           <Text style={styles.subtitle}>{t('form.subtitle')}</Text>
+          {/* The language you want help in, sent with the request; starts as your main language. */}
+          <Pressable
+            onPress={() => setPickingLanguage(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('form.languageLabel', { language: isolatedLanguageName(language) })}
+            style={({ pressed }) => [styles.langPill, pressed && styles.langPressed]}>
+            <FigmaIcon name="icon-c513eb" size={16} color={Colors.primary} />
+            <Text style={styles.langText} numberOfLines={1}>{t('helpIn', { language: languageName(language) })}</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -123,7 +128,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
         </View>
       </Pressable>
 
-      <View style={styles.section}>
+      {/* Figma 492:8829 groups the question and the grid on a tinted panel. */}
+      <View style={styles.panel}>
         <Text style={styles.question} accessibilityRole="header">{t('form.question')}</Text>
         <View style={styles.grid}>
           {[0, 3].map(start => (
@@ -170,24 +176,22 @@ const styles = StyleSheet.create({
   page: { gap: Spacing.xl },
   header: { gap: 0 },
   titles: { gap: 5, marginTop: -8 },
-  title: { ...Type.title, fontSize: 26, lineHeight: 32 },
+  title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
+  appLang: { alignSelf: 'flex-end' },
   langPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    minHeight: 36,
-    maxWidth: 160,
-    alignSelf: 'flex-end',
-    paddingHorizontal: 14,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: Colors.controlBorder,
-    backgroundColor: Colors.surface,
-    ...Shadow.card,
+    gap: 6,
+    minHeight: 32,
+    alignSelf: 'flex-start',
+    marginTop: Spacing.xs,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: Colors.primarySoft,
   },
-  langPressed: { backgroundColor: Colors.primarySoft },
-  langText: { fontFamily: Fonts.text, fontSize: 14, color: Colors.text, flexShrink: 1 },
+  langPressed: { opacity: 0.7 },
+  langText: { fontFamily: Fonts.text, fontSize: 14, color: Colors.primary, flexShrink: 1 },
   location: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -197,20 +201,31 @@ const styles = StyleSheet.create({
     paddingEnd: Spacing.md,
     paddingVertical: Spacing.md,
     borderRadius: Radius.md,
-    backgroundColor: Colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: Colors.controlBorder,
+    backgroundColor: Colors.surface,
   },
   // No spot yet: a dashed blue outline asks for a tap.
   locationUnset: { borderWidth: 1.5, borderColor: Colors.primary, borderStyle: 'dashed' },
-  locationPressed: { backgroundColor: Colors.border },
+  locationPressed: { backgroundColor: Colors.primarySoft },
   locationText: { flex: 1, gap: 2 },
   flip: { transform: [{ scaleX: -1 }] },
   rtlText: { writingDirection: 'rtl' },
   ltrText: { writingDirection: 'ltr' },
   spot: { ...Type.body },
   venue: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.text },
-  section: { gap: Spacing.lg },
+  panel: {
+    gap: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: 14,
+    paddingHorizontal: 14,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.controlBorder,
+    backgroundColor: Colors.primarySoft,
+  },
   question: { ...Type.body },
-  grid: { gap: Spacing.lg },
+  grid: { gap: Spacing.md },
   gridRow: { flexDirection: 'row', gap: Spacing.md },
   actions: { gap: Spacing.lg, marginTop: Spacing.md },
   send: { minHeight: 52 },

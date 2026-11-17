@@ -30,7 +30,8 @@
   },
   "errors": {
     "offline": "无法连接 VenU。请检查网络后重试。",
-    "wrongLogin": "邮箱或密码错误。",
+    "wrongLogin": "用户名或密码错误。",
+    "usernameTaken": "这个用户名已被使用，请换一个。",
     "confirmEmail": "请先验证邮箱。请查看收件箱中的链接。",
     "linkExpired": "该链接已过期或已被使用。请重新获取。",
     "alreadyRegistered": "该邮箱已注册。请直接登录。",

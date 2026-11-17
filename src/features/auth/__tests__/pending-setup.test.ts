@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { clearPendingName, forgetPendingNameUnlessFor, readPendingSetup, rememberPendingName, writePendingSetup } from '../pending-setup';
+import { clearPendingName, forgetPendingNameUnlessFor, readPendingSetup, rememberPendingName, rememberPendingRole, writePendingSetup } from '../pending-setup';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -49,7 +49,26 @@ describe('pending setup name', () => {
   it('clearPendingName keeps only the language', async () => {
     await writePendingSetup({ language: 'ko' });
     await rememberPendingName('rosa@example.com', 'Rosa');
+    await rememberPendingRole('visitor');
     await clearPendingName();
-    expect(await readPendingSetup()).toEqual({ language: 'ko', firstName: undefined, email: undefined });
+    expect(await readPendingSetup()).toEqual({ language: 'ko', firstName: undefined, email: undefined, role: undefined });
+  });
+});
+
+describe('pending setup role', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+  });
+
+  it("keeps the first screen's choice next to the language and name", async () => {
+    await writePendingSetup({ language: 'es' });
+    await rememberPendingRole('volunteer');
+    await rememberPendingName('daniel@example.com', 'Daniel');
+    expect(await readPendingSetup()).toMatchObject({ language: 'es', role: 'volunteer', firstName: 'Daniel' });
+  });
+
+  it('ignores a role that is not visitor or volunteer', async () => {
+    await AsyncStorage.setItem('venu.setup.pending', JSON.stringify({ role: 'admin' }));
+    expect((await readPendingSetup()).role).toBeUndefined();
   });
 });

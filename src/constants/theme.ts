@@ -23,6 +23,9 @@ export const Colors = {
   dangerSoft: '#FDECEC',  // error banners
   emergencySoft: '#F7B9B9', // "Emergency? Call 911" card
   bg: '#FFFFFF',          // page background
+  gradientTop: '#FBF7F3', // PageGradient: cream at the top…
+  gradientMid: '#E9EDF3',
+  gradientBottom: '#BAD3F9', // …light blue at the bottom
   surface: '#FFFFFF',     // inputs, raised cards
   surfaceAlt: '#F5F5F5',  // tiles and info cards on a white page
   controlBorder: '#8C8C8C', // input and chip outlines (>= 3:1 on white)

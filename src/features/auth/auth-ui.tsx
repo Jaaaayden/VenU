@@ -1,15 +1,18 @@
 // Pieces shared by the landing, Sign In and Create Account screens (Figma "onboarding" frames).
 
 import { router, type Href } from 'expo-router';
-import type { ComponentProps, ReactNode } from 'react';
+import { useState, type ComponentProps, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, Line, SvgXml } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
+import { LanguageSearchModal } from '@/components/language-picker';
 import { TextField } from '@/components/text-field';
 import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { languageName } from '@/features/profile/options';
+import { UNTRANSLATED, useT, useUiLanguage } from '@/i18n';
+import { choosePendingLanguage } from '@/i18n/pending-language';
 
 /** Alexandria field label over the Figma "msft_TextInput" box. */
 export function AuthField({ label, ...field }: { label: string } & ComponentProps<typeof TextField>) {
@@ -124,6 +127,33 @@ export function LanguagePill({ label, onPress }: { label: string; onPress: () =>
         </View>
       )}
     </Pressable>
+  );
+}
+
+/**
+ * The pill plus its language list, for signed-out screens: a pick switches the app now; signing in
+ * saves it to the account, and setup starts with it as the primary language.
+ */
+export function WelcomeLanguagePill() {
+  const t = useT('onboarding');
+  // The language on screen (an earlier pick, the last account's, or the device's).
+  const { language } = useUiLanguage();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <LanguagePill label={languageName(language)} onPress={() => setOpen(true)} />
+      <LanguageSearchModal
+        visible={open}
+        title={t('welcome.languageTitle')}
+        exclude={UNTRANSLATED}
+        appLanguage
+        onSelect={code => {
+          setOpen(false);
+          choosePendingLanguage(code);
+        }}
+        onClose={() => setOpen(false)}
+      />
+    </>
   );
 }
 

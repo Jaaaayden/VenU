@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PageGradient } from '@/components/page-gradient';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { FeedbackView } from '@/components/volunteer/feedback-view';
 import { MatchView } from '@/components/volunteer/match-view';
@@ -29,16 +30,22 @@ export default function VolunteerScreen() {
   const { status, request, match } = state;
   const isVolunteer = profile.role === 'volunteer';
   let body: React.ReactNode;
+  // Figma 492:8829 puts Find a Volunteer (only) on the cream-to-blue page gradient.
+  let onForm = false;
   if (isVolunteer) body = <VolunteerHome profile={profile} />;
   else if (status === 'searching' && request) body = <SearchingView request={request} />;
   else if (status === 'notFound' && request) body = <NotFoundView request={request} />;
   else if (status === 'matched' && request && match) body = <MatchView request={request} match={match} unread={state.unread} />;
   else if (status === 'done' && match) body = <FeedbackView match={match} />;
-  else body = <RequestForm visitorName={profile.firstName} defaultLanguage={profile.mainLanguage || 'en'} notice={state.notice} draft={state.draft} />;
+  else {
+    body = <RequestForm visitorName={profile.firstName} defaultLanguage={profile.mainLanguage || 'en'} notice={state.notice} draft={state.draft} />;
+    onForm = true;
+  }
   const bleed = !isVolunteer && status === 'matched'; // the map runs edge to edge
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
+      {onForm ? <PageGradient /> : null}
       <ScrollView
         key={isVolunteer ? 'volunteer' : status} // each step starts at the top
         style={styles.scroll}
