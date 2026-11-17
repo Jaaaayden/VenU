@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "开幕式",
     "swimming": "游泳",
-    "athletics": "田径",
-    "soccer": "足球",
     "gymnastics": "体操",
     "basketball": "篮球"
   },
@@ -135,69 +133,6 @@
     "changing_table": "尿布台"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "1 号门",
-      "description": "北入口，离 Metro 接驳车站最近。",
-      "location": "北侧，接驳车站旁"
-    },
-    "gate-2": {
-      "name": "2 号门",
-      "description": "东入口，设有坡道，紧邻 C 停车场的无障碍车位。",
-      "location": "东侧，C 停车场旁"
-    },
-    "gate-3": {
-      "name": "3 号门",
-      "description": "南入口，供网约车上下客。",
-      "location": "南侧，网约车区"
-    },
-    "gate-4": {
-      "name": "4 号门",
-      "description": "西入口，供 200 至 240 区持票观众使用。",
-      "location": "西侧，主广场旁"
-    },
-    "info-desk": {
-      "name": "观众服务处",
-      "description": "咨询、遗失门票、感官工具包和降噪耳罩。",
-      "location": "环廊，105 区"
-    },
-    "first-aid": {
-      "name": "急救站",
-      "description": "从开门到观众全部离场，护士和急救员全程值守。",
-      "location": "环廊，112 区"
-    },
-    "restroom-east": {
-      "name": "东侧洗手间",
-      "description": "男洗手间、女洗手间，以及带尿布台的全性别家庭间。",
-      "location": "环廊，118 区"
-    },
-    "food-south": {
-      "description": "塔可、墨西哥卷饼和鲜果水，有素食选择。",
-      "location": "环廊，124 区"
-    },
-    "lost-found": {
-      "name": "失物招领处",
-      "description": "交还或领取遗失物品。走失儿童也会被带到这里。",
-      "location": "环廊，131 区"
-    },
-    "accessible-seating": {
-      "name": "无障碍服务处",
-      "description": "轮椅借用、陪同座位和助听设备。",
-      "location": "环廊，136 区"
-    },
-    "food-west": {
-      "description": "汉堡、薯条和软饮，提供清真肉饼。",
-      "location": "环廊，140 区"
-    },
-    "restroom-west": {
-      "name": "西侧洗手间",
-      "description": "男女洗手间。无障碍隔间在左侧。",
-      "location": "环廊，145 区"
-    },
-    "parking-c": {
-      "name": "C 停车场",
-      "description": "无障碍停车场，有一条平坦的短路通往2 号门。",
-      "location": "东南停车场"
-    },
     "entry-3": {
       "name": "3 号入口",
       "description": "北入口。每个入口都有无障碍通道，并提供免费轮椅陪同服务。",

@@ -20,10 +20,6 @@ export const VENUE_CONTACTS: Readonly<Record<string, VenueContact>> = {
   'crypto-arena': { phone: '+12137427326', source: 'https://www.cryptoarena.com/general-info-faq' },
   // Customer Support: "or by calling 1-888-311-0231"
   'intuit-dome': { phone: '+18883110231', source: 'https://www.intuitdome.com/contact-us/customer-support' },
-  // The Coliseum's main line (no separate guest services number is published)
-  coliseum: { phone: '+12137477111', source: 'https://www.lacoliseum.com/contact-us/' },
-  // The stadium's main line, "Phone: (626) 577-3100"
-  'rose-bowl': { phone: '+16265773100', source: 'https://rosebowlstadium.com/about' },
 };
 
 /** The venue's staff line, or null when no official number is known. */

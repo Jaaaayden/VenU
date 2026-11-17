@@ -44,9 +44,7 @@ describe('officialMapFor', () => {
     }
   });
 
-  it('keeps the schematic map for the Coliseum and the Rose Bowl', () => {
-    expect(officialMapFor('coliseum')).toBeUndefined();
-    expect(officialMapFor('rose-bowl')).toBeUndefined();
+  it('has no map for an unknown venue', () => {
     expect(officialMapFor('nowhere')).toBeUndefined();
     expect(officialMapFor('constructor')).toBeUndefined();
   });

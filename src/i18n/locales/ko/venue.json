@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "개막식",
     "swimming": "수영",
-    "athletics": "육상",
-    "soccer": "축구",
     "gymnastics": "체조",
     "basketball": "농구"
   },
@@ -135,69 +133,6 @@
     "changing_table": "기저귀 교환대"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "1번 게이트",
-      "description": "북쪽 입구로, Metro 셔틀 정류장과 가장 가깝습니다.",
-      "location": "북쪽, 셔틀 정류장 앞"
-    },
-    "gate-2": {
-      "name": "2번 게이트",
-      "description": "경사로가 있는 동쪽 입구로, C 주차장의 장애인 주차 구역 옆입니다.",
-      "location": "동쪽, C 주차장 옆"
-    },
-    "gate-3": {
-      "name": "3번 게이트",
-      "description": "차량 호출 승하차용 남쪽 입구입니다.",
-      "location": "남쪽, 차량 호출 구역"
-    },
-    "gate-4": {
-      "name": "4번 게이트",
-      "description": "200~240구역 티켓 소지자를 위한 서쪽 입구입니다.",
-      "location": "서쪽, 중앙 광장 옆"
-    },
-    "info-desk": {
-      "name": "관람객 서비스센터",
-      "description": "문의, 분실 티켓, 감각 키트, 귀마개.",
-      "location": "콘코스, 105구역"
-    },
-    "first-aid": {
-      "name": "응급처치실",
-      "description": "개문부터 관중이 모두 나갈 때까지 간호사와 응급구조사가 대기합니다.",
-      "location": "콘코스, 112구역"
-    },
-    "restroom-east": {
-      "name": "동쪽 화장실",
-      "description": "남성용, 여성용 화장실과 기저귀 교환대가 있는 모두를 위한 가족실.",
-      "location": "콘코스, 118구역"
-    },
-    "food-south": {
-      "description": "타코, 부리토, 아과 프레스카. 채식 메뉴 있음.",
-      "location": "콘코스, 124구역"
-    },
-    "lost-found": {
-      "name": "분실물 센터",
-      "description": "분실물을 맡기거나 찾아가세요. 길 잃은 아이도 이곳으로 데려옵니다.",
-      "location": "콘코스, 131구역"
-    },
-    "accessible-seating": {
-      "name": "접근성 지원 센터",
-      "description": "휠체어 대여, 동반자석, 보조 청취 기기.",
-      "location": "콘코스, 136구역"
-    },
-    "food-west": {
-      "description": "버거, 감자튀김, 탄산음료. 할랄 패티 제공.",
-      "location": "콘코스, 140구역"
-    },
-    "restroom-west": {
-      "name": "서쪽 화장실",
-      "description": "남성용, 여성용 화장실. 장애인 칸은 왼쪽에 있습니다.",
-      "location": "콘코스, 145구역"
-    },
-    "parking-c": {
-      "name": "C 주차장",
-      "description": "2번 게이트까지 짧고 평탄한 길이 있는 장애인 주차장입니다.",
-      "location": "남동쪽 주차장"
-    },
     "entry-3": {
       "name": "3번 입구",
       "description": "북쪽 입구. 모든 입구에 무장애 통로가 있고 무료 휠체어 동행 서비스를 제공합니다.",

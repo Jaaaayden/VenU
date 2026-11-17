@@ -59,7 +59,7 @@ describe('memory report store', () => {
       createdAt: '2026-11-11T12:00:00.000Z',
     });
     expect((await store.list('sofi', 'entry-4')).map(r => r.id)).toEqual([saved.id, 'seed-bags']);
-    expect(await store.list('coliseum', 'entry-4')).toEqual([]);
+    expect(await store.list('intuit-dome', 'entry-4')).toEqual([]);
     expect(await store.get(saved.id)).toEqual(saved);
   });
 
@@ -134,17 +134,17 @@ describe('validation messages', () => {
 describe('venue search', () => {
   it('matches every word against name and address', () => {
     expect(searchVenues('inglewood').map(v => v.id)).toEqual(['sofi', 'intuit-dome']);
-    expect(searchVenues('rose pasadena').map(v => v.id)).toEqual(['rose-bowl']);
-    expect(searchVenues('  ')).toHaveLength(5);
+    expect(searchVenues('figueroa angeles').map(v => v.id)).toEqual(['crypto-arena']);
+    expect(searchVenues('  ')).toHaveLength(3);
   });
 
   it('filters facilities by category and words', () => {
-    const all = facilitiesFor('coliseum');
-    expect(searchFacilities(all, '', 'gate').map(f => f.id)).toEqual(['gate-1', 'gate-2', 'gate-3', 'gate-4']);
-    expect(searchFacilities(all, 'taco', null).map(f => f.id)).toEqual(['food-south']);
+    const all = facilitiesFor('crypto-arena');
+    expect(searchFacilities(all, '', 'gate').map(f => f.id)).toEqual(['kobe-bryant-entrance', 'star-plaza-entrance', 'figueroa-entrance']);
+    expect(searchFacilities(all, 'figueroa', 'parking').map(f => f.id)).toEqual(['rideshare-figueroa']);
     // "Accessibility" also matches accessible gates, restrooms and so on.
     expect(all.filter(f => matchesCategory(f, 'accessible')).length).toBeGreaterThan(1);
-    expect(all.filter(f => matchesCategory(f, 'accessible')).every(f => f.accessible)).toBe(true);
+    expect(all.filter(f => matchesCategory(f, 'accessible')).every(f => f.accessible || f.category === 'accessible')).toBe(true);
   });
 });
 

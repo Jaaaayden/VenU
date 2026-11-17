@@ -11,7 +11,7 @@ import { MAP_SIZE } from '../stadium-map';
 // reports.ts builds its store on AsyncStorage, which has no native module under jest.
 jest.mock('@react-native-async-storage/async-storage', () => ({ __esModule: true, default: { getItem: async () => null, setItem: async () => {} } }));
 
-// The three venues whose facilities come from their official guides (see mock.ts).
+// Every venue's facilities come from its official guide (see mock.ts).
 const RESEARCHED = ['sofi', 'crypto-arena', 'intuit-dome'];
 // A pin is a 34pt circle; keep its centre this far inside the map and away from other pins.
 const EDGE = 16;
@@ -42,21 +42,13 @@ describe('venue facility data', () => {
     }
   });
 
-  it('gives each researched venue its own facilities, not the shared layout', () => {
-    const coliseum = new Set(facilitiesFor('coliseum').map(f => f.id));
-    for (const venueId of RESEARCHED) {
-      expect(facilitiesFor(venueId).filter(f => coliseum.has(f.id))).toEqual([]);
-    }
-  });
-
   it('has a name, description and location for every facility in all 13 languages', () => {
     const all = VENUES.flatMap(v => facilitiesFor(v.id));
     for (const lng of LANGS) {
       const text = resources[lng].venue.facilityText as Record<string, { name?: string; description?: string; location?: string }>;
       for (const f of all) {
         const row = text[f.id];
-        // Proper-noun food stands (Taco Corner) keep their own name and have no "name" key.
-        const ok = !!row?.description && !!row.location && (f.category === 'food' || !!row.name);
+        const ok = !!row?.description && !!row.location && !!row.name;
         expect({ lng, id: f.id, ok }).toEqual({ lng, id: f.id, ok: true });
       }
     }

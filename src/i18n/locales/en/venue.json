@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Opening Ceremony",
     "swimming": "Swimming",
-    "athletics": "Athletics",
-    "soccer": "Soccer",
     "gymnastics": "Gymnastics",
     "basketball": "Basketball"
   },
@@ -136,69 +134,6 @@
     "changing_table": "Changing table"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Gate 1",
-      "description": "North entrance, closest to the Metro shuttle stop.",
-      "location": "North side, at the shuttle stop"
-    },
-    "gate-2": {
-      "name": "Gate 2",
-      "description": "East entrance with a ramp, next to accessible parking in Lot C.",
-      "location": "East side, by Lot C"
-    },
-    "gate-3": {
-      "name": "Gate 3",
-      "description": "South entrance for rideshare drop-off and pick-up.",
-      "location": "South side, at the rideshare zone"
-    },
-    "gate-4": {
-      "name": "Gate 4",
-      "description": "West entrance for ticket holders in sections 200 to 240.",
-      "location": "West side, off the main plaza"
-    },
-    "info-desk": {
-      "name": "Guest Services",
-      "description": "Questions, lost tickets, sensory kits and ear defenders.",
-      "location": "Concourse, section 105"
-    },
-    "first-aid": {
-      "name": "First Aid",
-      "description": "Nurses and EMTs on duty from gates open until the venue clears.",
-      "location": "Concourse, section 112"
-    },
-    "restroom-east": {
-      "name": "Restrooms East",
-      "description": "Men’s, women’s and an all-gender family room with a changing table.",
-      "location": "Concourse, section 118"
-    },
-    "food-south": {
-      "description": "Tacos, burritos and agua fresca. Vegetarian options.",
-      "location": "Concourse, section 124"
-    },
-    "lost-found": {
-      "name": "Lost & Found",
-      "description": "Drop off or pick up lost items. Lost children are brought here too.",
-      "location": "Concourse, section 131"
-    },
-    "accessible-seating": {
-      "name": "Accessibility Services",
-      "description": "Wheelchair loans, companion seating and assistive listening devices.",
-      "location": "Concourse, section 136"
-    },
-    "food-west": {
-      "description": "Burgers, fries and soft drinks. Halal patties available.",
-      "location": "Concourse, section 140"
-    },
-    "restroom-west": {
-      "name": "Restrooms West",
-      "description": "Men’s and women’s restrooms. The accessible stall is on the left.",
-      "location": "Concourse, section 145"
-    },
-    "parking-c": {
-      "name": "Parking Lot C",
-      "description": "Accessible parking with a short, level path to Gate 2.",
-      "location": "Southeast lot"
-    },
     "entry-3": {
       "name": "Entry 3",
       "description": "North entrance. Every entry has an accessible path and free wheelchair escorts.",

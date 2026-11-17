@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "開会式",
     "swimming": "競泳",
-    "athletics": "陸上競技",
-    "soccer": "サッカー",
     "gymnastics": "体操",
     "basketball": "バスケットボール"
   },
@@ -135,69 +133,6 @@
     "changing_table": "おむつ交換台"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "1番ゲート",
-      "description": "北口。Metro シャトル乗り場から最も近い入口です。",
-      "location": "北側、シャトル乗り場前"
-    },
-    "gate-2": {
-      "name": "2番ゲート",
-      "description": "スロープのある東口。C 駐車場のバリアフリー区画の隣です。",
-      "location": "東側、C 駐車場そば"
-    },
-    "gate-3": {
-      "name": "3番ゲート",
-      "description": "配車サービスの乗降用の南口です。",
-      "location": "南側、配車サービス乗り場"
-    },
-    "gate-4": {
-      "name": "4番ゲート",
-      "description": "200〜240 セクションのチケットをお持ちの方向けの西口です。",
-      "location": "西側、メイン広場そば"
-    },
-    "info-desk": {
-      "name": "ゲストサービス",
-      "description": "お問い合わせ、チケット紛失、感覚過敏キット、イヤーマフ。",
-      "location": "コンコース、105 セクション"
-    },
-    "first-aid": {
-      "name": "救護室",
-      "description": "開門から観客の退場まで、看護師と救急隊員が待機しています。",
-      "location": "コンコース、112 セクション"
-    },
-    "restroom-east": {
-      "name": "東側トイレ",
-      "description": "男性用、女性用、おむつ交換台のある誰でも使えるファミリールーム。",
-      "location": "コンコース、118 セクション"
-    },
-    "food-south": {
-      "description": "タコス、ブリトー、アグア・フレスカ。ベジタリアン向けメニューあり。",
-      "location": "コンコース、124 セクション"
-    },
-    "lost-found": {
-      "name": "落とし物センター",
-      "description": "落とし物の届け出と受け取り。迷子のお子さまもこちらでお預かりします。",
-      "location": "コンコース、131 セクション"
-    },
-    "accessible-seating": {
-      "name": "バリアフリーサービス",
-      "description": "車いす貸出、同伴者席、補聴支援機器。",
-      "location": "コンコース、136 セクション"
-    },
-    "food-west": {
-      "description": "ハンバーガー、フライドポテト、ソフトドリンク。ハラールパティあり。",
-      "location": "コンコース、140 セクション"
-    },
-    "restroom-west": {
-      "name": "西側トイレ",
-      "description": "男性用・女性用トイレ。バリアフリー個室は左側です。",
-      "location": "コンコース、145 セクション"
-    },
-    "parking-c": {
-      "name": "C駐車場",
-      "description": "2番ゲートまで短く平らな通路があるバリアフリー駐車場です。",
-      "location": "南東の駐車場"
-    },
     "entry-3": {
       "name": "3番入口",
       "description": "北側の入口。すべての入口にバリアフリーの通路があり、無料の車いす介助を受けられます。",

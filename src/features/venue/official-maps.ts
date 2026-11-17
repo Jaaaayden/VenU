@@ -7,7 +7,7 @@
  * - `images`: static map images the venue publishes, hotlinked from its site (never committed).
  *
  * e.g. officialMapFor('crypto-arena') → { kind: 'embed', url: 'https://visit.cryptoarena.com/map', … }
- *      officialMapFor('coliseum') → undefined (schematic map)
+ *      officialMapFor('nowhere') → undefined (schematic map)
  */
 
 /** Ids of the image views; each shows translated (venue:officialMap.views.<id>). */

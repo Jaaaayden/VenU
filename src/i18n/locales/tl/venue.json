@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Seremonya ng Pagbubukas",
     "swimming": "Paglangoy",
-    "athletics": "Atletiks",
-    "soccer": "Putbol",
     "gymnastics": "Himnastiko",
     "basketball": "Basketbol"
   },
@@ -136,69 +134,6 @@
     "changing_table": "Palitan ng lampin"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Pasukan 1",
-      "description": "Hilagang pasukan, pinakamalapit sa hintuan ng Metro shuttle.",
-      "location": "Hilagang bahagi, sa hintuan ng shuttle"
-    },
-    "gate-2": {
-      "name": "Pasukan 2",
-      "description": "Silangang pasukan na may rampa, katabi ng accessible na paradahan sa Paradahan C.",
-      "location": "Silangang bahagi, malapit sa Paradahan C"
-    },
-    "gate-3": {
-      "name": "Pasukan 3",
-      "description": "Timog na pasukan para sa pagbaba at pagsakay sa rideshare.",
-      "location": "Timog na bahagi, sa rideshare zone"
-    },
-    "gate-4": {
-      "name": "Pasukan 4",
-      "description": "Kanlurang pasukan para sa may tiket sa mga seksyon 200 hanggang 240.",
-      "location": "Kanlurang bahagi, malapit sa pangunahing plaza"
-    },
-    "info-desk": {
-      "name": "Serbisyo sa Bisita",
-      "description": "Mga tanong, nawawalang tiket, sensory kit at ear defender.",
-      "location": "Concourse, seksyon 105"
-    },
-    "first-aid": {
-      "name": "Pangunang Lunas",
-      "description": "May nurse at EMT mula pagbukas ng gate hanggang makaalis ang lahat.",
-      "location": "Concourse, seksyon 112"
-    },
-    "restroom-east": {
-      "name": "Mga CR sa Silangan",
-      "description": "CR ng lalaki, babae, at all-gender na family room na may changing table.",
-      "location": "Concourse, seksyon 118"
-    },
-    "food-south": {
-      "description": "Tacos, burrito at agua fresca. May vegetarian na pagpipilian.",
-      "location": "Concourse, seksyon 124"
-    },
-    "lost-found": {
-      "name": "Mga Nawawalang Gamit",
-      "description": "Mag-iwan o kumuha ng nawawalang gamit. Dito rin dinadala ang mga batang nawawala.",
-      "location": "Concourse, seksyon 131"
-    },
-    "accessible-seating": {
-      "name": "Serbisyo para sa May Kapansanan",
-      "description": "Pahiram ng wheelchair, upuan para sa kasama, at assistive listening device.",
-      "location": "Concourse, seksyon 136"
-    },
-    "food-west": {
-      "description": "Burger, fries at soft drinks. May halal na patty.",
-      "location": "Concourse, seksyon 140"
-    },
-    "restroom-west": {
-      "name": "Mga CR sa Kanluran",
-      "description": "CR ng lalaki at babae. Nasa kaliwa ang accessible na cubicle.",
-      "location": "Concourse, seksyon 145"
-    },
-    "parking-c": {
-      "name": "Paradahan C",
-      "description": "Accessible na paradahan na may maikli at patag na daan papuntang Pasukan 2.",
-      "location": "Timog-silangang lote"
-    },
     "entry-3": {
       "name": "Pasukan 3",
       "description": "Hilagang pasukan. May accessible na daan at libreng wheelchair escort sa bawat pasukan.",
