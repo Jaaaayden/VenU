@@ -19,6 +19,7 @@ import { choosePendingLanguage, usePendingLanguage } from '@/i18n/pending-langua
 import { errorText } from '@/lib/errors';
 
 import { StadiumCard } from './cards';
+import { echoQuery } from './labels';
 import { searchVenues } from './mock';
 import { InlineNote, SearchField, venueText } from './ui';
 
@@ -91,7 +92,7 @@ export function ChooseVenueScreen() {
               onPress={() => router.push({ pathname: '/venue/[venueId]', params: { venueId: v.id } })}
             />
           ))}
-          {!venues.length ? <Text style={styles.empty}>{t('choose.empty', { query: query.trim() })}</Text> : null}
+          {!venues.length ? <Text style={styles.empty}>{t('choose.empty', { query: echoQuery(query) })}</Text> : null}
         </View>
       </ScrollView>
 
@@ -100,6 +101,7 @@ export function ChooseVenueScreen() {
         title={t('choose.languageTitle')}
         exclude={UNTRANSLATED}
         appLanguage
+        selected={language}
         onSelect={pickLanguage}
         onClose={() => setPicking(false)}
       />

@@ -1,12 +1,12 @@
 {
   "tab": {
     "title": "프로필",
-    "visitor": "관람객",
+    "visitor": "방문객",
     "volunteer": "자원봉사자",
     "verified": "✓ LA28 인증됨",
     "unverified": "미인증",
     "sharedVisitor": "도우미에게 공유되는 정보",
-    "sharedVolunteer": "관람객에게 보이는 정보",
+    "sharedVolunteer": "방문객에게 보이는 정보",
     "account": "계정",
     "support": "지원",
     "editProfile": "프로필 편집",
@@ -22,7 +22,10 @@
   "edit": {
     "title": "프로필 편집",
     "subtitle": "변경 사항은 다음 도움 요청부터 적용됩니다.",
-    "submit": "변경 사항 저장"
+    "submit": "변경 사항 저장",
+    "discardTitle": "저장하지 않고 나갈까요? 변경 내용이 사라집니다.",
+    "keepEditing": "계속 수정",
+    "discard": "변경 취소"
   },
   "form": {
     "aboutYou": "내 정보",
@@ -47,7 +50,7 @@
     "training": "교육",
     "trainingHint": "LA28이 인증할 때 확인합니다.",
     "yourGender": "내 성별",
-    "yourGenderHint": "관람객이 여성 또는 남성 도우미를 요청할 때만 사용하며, 표시되지 않습니다.",
+    "yourGenderHint": "방문객이 여성 또는 남성 도우미를 요청할 때만 사용하며, 표시되지 않습니다.",
     "yourAge": "내 연령대",
     "yourAgeHint": "연결에만 사용하며, 표시되지 않습니다.",
     "privacyAgree": "VenU가 <a>개인정보 처리방침</a>에 따라 내 정보를 사용하는 데 동의합니다.",
@@ -217,7 +220,7 @@
       },
       "chat": {
         "label": "채팅 메시지",
-        "hint": "도우미나 관람객의 새 메시지"
+        "hint": "도우미나 방문객의 새 메시지"
       },
       "venue": {
         "label": "경기장 알림",

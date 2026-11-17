@@ -5,6 +5,7 @@ import { StepHeader } from '@/components/form-section';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { PRIVACY_SECTIONS, PRIVACY_VERSION } from '@/features/profile/privacy';
 import { useT, useUiLanguage } from '@/i18n';
+import { LTR_STYLE, LTR_WEB } from '@/lib/direction';
 import { goBack } from '@/lib/navigation';
 
 /**
@@ -30,7 +31,7 @@ export default function PrivacyScreen() {
           <View key={section.key} style={styles.card}>
             <Text style={styles.cardTitle} accessibilityRole="header">{t(`privacy.sections.${section.key}`)}</Text>
             {section.points.map(point => (
-              <View key={point} style={styles.point}>
+              <View key={point} style={[styles.point, LTR_STYLE]} {...LTR_WEB}>
                 <View style={styles.bullet} />
                 <Text style={styles.pointText}>{point}</Text>
               </View>
@@ -54,6 +55,8 @@ const styles = StyleSheet.create({
   // Figma info tiles: #F5F5F5, radius 10, no outline.
   card: { gap: Spacing.sm, padding: Spacing.lg, marginBottom: Spacing.md, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
   cardTitle: { fontFamily: Fonts.display, fontSize: 17, lineHeight: 22, color: Colors.text, marginBottom: 2 },
+  // The points are English in every language, so they stay left to right (bullet first) on an
+  // Arabic or Persian page instead of hanging off the right edge.
   point: { flexDirection: 'row', gap: Spacing.md },
   bullet: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.ink, marginTop: 8 },
   pointText: { fontFamily: Fonts.text, fontSize: 15, lineHeight: 21, color: Colors.text, flex: 1 },

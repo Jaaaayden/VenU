@@ -2,9 +2,9 @@
   "welcome": {
     "createAccount": "Créer un compte",
     "or": "ou",
-    "visitor": "Je suis spectateur",
+    "visitor": "Je suis visiteur",
     "volunteer": "Je suis bénévole",
-    "roleQuestion": "Spectateur ou bénévole ?",
+    "roleQuestion": "Visiteur ou bénévole ?",
     "signIn": "Se connecter",
     "socialTitle": "OU s'inscrire avec",
     "socialSoon": "La connexion avec Google, Apple et Facebook arrive bientôt.",
@@ -60,23 +60,24 @@
   "role": {
     "title": "Comment utiliserez-vous VenU ?",
     "subtitle": "Pour vous poser les bonnes questions.",
-    "visitorTitle": "Je suis spectateur",
+    "visitorTitle": "Je suis visiteur",
     "visitorBody": "Obtenez de l'aide sur le site dans votre langue.",
     "volunteerTitle": "Je suis bénévole LA28",
-    "volunteerBody": "Aidez les spectateurs près de vous. Vous apparaîtrez comme non vérifié jusqu'à la confirmation de LA28."
+    "volunteerBody": "Aidez les visiteurs près de vous. Vous apparaîtrez comme non vérifié jusqu'à la confirmation de LA28."
   },
   "steps": {
     "languagesTitle": "Choisissez vos langues",
     "languagesSubtitle": "Pour vous aider à communiquer avec les bénévoles.",
+    "languagesSubtitleVolunteer": "Pour vous aider à communiquer avec les visiteurs.",
     "preferencesTitle": "Préférences d’aide",
     "preferencesSubtitle": "Pour trouver la bonne personne pour vous aider. Modifiable à tout moment dans vos réglages.",
     "photoTitle": "Choisissez une photo de profil",
-    "photoSubtitle": "Pour que les bénévoles vous trouvent plus facilement. Modifiable à tout moment dans vos réglages.",
-    "photoSubtitleVolunteer": "Pour que les spectateurs vous reconnaissent. Modifiable à tout moment dans vos réglages.",
+    "photoSubtitle": "Pour que les bénévoles vous trouvent plus facilement. Modifiable à tout moment dans votre profil.",
+    "photoSubtitleVolunteer": "Pour que les visiteurs vous reconnaissent. Modifiable à tout moment dans votre profil.",
     "finish": "Terminer"
   },
   "setup": {
     "volunteerTitle": "Votre profil bénévole",
-    "volunteerSubtitle": "Pour vous envoyer les spectateurs que vous pouvez le mieux aider."
+    "volunteerSubtitle": "Pour vous envoyer les visiteurs que vous pouvez le mieux aider."
   }
 }

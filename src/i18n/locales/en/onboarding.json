@@ -68,11 +68,12 @@
   "steps": {
     "languagesTitle": "Choose your languages",
     "languagesSubtitle": "To help you communicate with volunteers.",
+    "languagesSubtitleVolunteer": "To help you communicate with visitors.",
     "preferencesTitle": "Volunteer preferences",
     "preferencesSubtitle": "So we can find the right helper for you. Change it anytime in your settings.",
     "photoTitle": "Choose a profile picture",
-    "photoSubtitle": "So volunteers can find you more easily. Change it anytime in your settings.",
-    "photoSubtitleVolunteer": "So visitors can recognize you. Change it anytime in your settings.",
+    "photoSubtitle": "So volunteers can find you more easily. Change it anytime in your profile.",
+    "photoSubtitleVolunteer": "So visitors can recognize you. Change it anytime in your profile.",
     "finish": "Finish Setup"
   },
   "setup": {

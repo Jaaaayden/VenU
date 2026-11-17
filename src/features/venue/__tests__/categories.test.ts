@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
 
 import { emptyFacilitiesMessage, facilityIconXml } from '../categories';
+import { echoQuery } from '../labels';
 
 describe('facilityIconXml', () => {
   afterEach(() => { jest.restoreAllMocks(); });
@@ -28,6 +29,16 @@ describe('emptyFacilitiesMessage', () => {
   it('names the search and the category', () => {
     expect(emptyFacilitiesMessage('restroom', ' xyz ', 'SoFi Stadium')).toBe('No restrooms match “xyz”');
     expect(emptyFacilitiesMessage(null, 'xyz', 'SoFi Stadium')).toBe('No facilities match “xyz”');
+  });
+
+  it('cuts a very long search short instead of echoing all of it', () => {
+    const message = emptyFacilitiesMessage('restroom', 'x'.repeat(300), 'SoFi Stadium');
+    expect(message).toBe(`No restrooms match “${'x'.repeat(40)}…”`);
+  });
+
+  it('never splits an emoji when cutting', () => {
+    expect(echoQuery('😀'.repeat(41))).toBe(`${'😀'.repeat(40)}…`);
+    expect(echoQuery('  taco  ')).toBe('taco');
   });
 
   it('says when a category has nothing at this venue', () => {

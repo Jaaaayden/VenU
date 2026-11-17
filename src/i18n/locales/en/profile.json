@@ -22,7 +22,10 @@
   "edit": {
     "title": "Edit profile",
     "subtitle": "Changes apply to your next help request.",
-    "submit": "Save changes"
+    "submit": "Save changes",
+    "discardTitle": "Leave without saving? Your changes will be lost.",
+    "keepEditing": "Keep editing",
+    "discard": "Discard changes"
   },
   "form": {
     "aboutYou": "About you",

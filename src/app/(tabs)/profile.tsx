@@ -100,7 +100,12 @@ export default function ProfileScreen() {
           <View style={styles.profileRow}>
             <Avatar name={profile.firstName} uri={avatarUrl} size={64} />
             <View style={styles.profileInfo}>
-              <Text style={styles.name}>{profile.firstName}</Text>
+              {/* Badges sit under the name and the Edit button, so a long Edit label (e.g. Armenian
+                  "Խմբագրել") doesn't squeeze "✓ Verified LA28" into a three-line pill. */}
+              <View style={styles.nameRow}>
+                <Text style={[styles.name, styles.nameFill]}>{profile.firstName}</Text>
+                <Button label={tc('actions.edit')} variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
+              </View>
               <View style={styles.badges}>
                 <Text style={[styles.badge, styles.badgeRole]}>{profile.role === 'visitor' ? t('tab.visitor') : t('tab.volunteer')}</Text>
                 {profile.role === 'volunteer' && (
@@ -110,7 +115,6 @@ export default function ProfileScreen() {
                 )}
               </View>
             </View>
-            <Button label={tc('actions.edit')} variant="secondary" onPress={() => router.push('/edit-profile')} style={styles.editBtn} />
           </View>
 
           <Text style={styles.shareTitle}>
@@ -184,6 +188,10 @@ const styles = StyleSheet.create({
   card: { backgroundColor: Colors.surfaceAlt, borderRadius: Radius.md, padding: Spacing.lg, marginBottom: Spacing.xxl },
   profileRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   profileInfo: { flex: 1, gap: Spacing.xs },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  // minWidth 0: on web a text's minimum is its longest word, so a long name ("Maximiliana-Alexandra")
+  // would push Edit out of the card on a 320pt phone instead of wrapping.
+  nameFill: { flex: 1, minWidth: 0 },
   name: { fontFamily: Fonts.display, fontSize: 20, lineHeight: 26, color: Colors.text },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   badge: { ...Type.caption, fontFamily: Fonts.textSemiBold, paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },

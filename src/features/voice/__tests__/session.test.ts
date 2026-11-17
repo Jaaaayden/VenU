@@ -265,6 +265,20 @@ describe('a dictation session', () => {
     expect(onEnd).not.toHaveBeenCalled();
   });
 
+  it('saves words still interim when disposed (switched tabs mid-sentence)', async () => {
+    const fake = fakeEngine();
+    const { session, commits, texts } = setup(fake);
+    await session.start('Short.', 'en-US');
+    fake.emit('start');
+    fake.emit('result', result('hello there', false));
+    expect(texts).toEqual(['Short. hello there']);
+    expect(commits).toEqual([]);
+    session.dispose();
+    expect(commits).toEqual(['Short. hello there']);
+    fake.emit('result', result('hello there again', true)); // nothing after dispose
+    expect(commits).toEqual(['Short. hello there']);
+  });
+
   it('gives up waiting for "end" a few seconds after stop()', async () => {
     jest.useFakeTimers();
     try {

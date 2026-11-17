@@ -96,6 +96,9 @@
     "message": "I-message ang Volunteer",
     "done": "Tapos na ang tulong",
     "doneHint": "Tatapusin ang request at hihilingin mong i-rate si {{name}}",
+    "confirmDone": "Tapos na ba si {{name}} sa pagtulong sa iyo? Matatapos ang chat.",
+    "notYet": "Hindi pa",
+    "yesDone": "Oo, tapos na",
     "confirmCancel": "Kanselahin ang request? Hindi na pupunta si {{name}}.",
     "keep": "Ituloy ang request",
     "yesCancel": "Oo, kanselahin"

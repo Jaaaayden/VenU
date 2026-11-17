@@ -1,4 +1,4 @@
-import type { Href } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
@@ -36,13 +36,21 @@ export function TopBar({ back, backLabel, fallback = '/', right }: {
  * Borderless back arrow for screens styled after the Figma setup frames (no bar), e.g. "← Profile".
  * Without `label` it shows only the arrow and reads as "Back".
  */
-export function BackLink({ label, fallback = '/' }: { label?: string; fallback?: Href }) {
+export function BackLink({ label, fallback = '/', to, onPress }: {
+  label?: string;
+  /** Where Back goes when there's no history (web reload, deep link). */
+  fallback?: Href;
+  /** Always go here instead (replacing this screen), e.g. when the screens behind only redirect back. */
+  to?: Href;
+  /** Runs instead of navigating, e.g. to ask before discarding unsaved edits. */
+  onPress?: () => void;
+}) {
   const t = useT('common');
   const rtl = useLayoutRtl();
   return (
     <View style={styles.backRow}>
       <Pressable
-        onPress={() => goBack(fallback)}
+        onPress={onPress ?? (() => (to ? router.replace(to) : goBack(fallback)))}
         style={styles.backLink}
         accessibilityRole="button"
         accessibilityLabel={label ? t('nav.backTo', { label }) : t('actions.back')}>

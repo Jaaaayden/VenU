@@ -23,6 +23,8 @@ export function StarRating({ value, onChange }: { value: number; onChange: (star
               onPress={() => onChange(n)}
               accessibilityRole="radio"
               accessibilityState={{ checked: n === value }}
+              // react-native-web reads only aria-* for state.
+              aria-checked={n === value}
               accessibilityLabel={t('rating.star', { count: n, number: formatNumber(n, undefined, languageOf(t)), word: word(n) })}
               style={({ pressed }) => [styles.star, pressed && styles.pressed]}>
               <Svg width={40} height={40} viewBox="0 0 32 32" aria-hidden>

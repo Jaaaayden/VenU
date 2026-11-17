@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Trans } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -16,7 +16,7 @@ import { ERROR_CODES, errorText } from '@/lib/errors';
 
 import { ACCESS_NEEDS, AGE_BANDS, COMMUNICATION, GENDERS, HELPER_AGE, HELPER_GENDER, labeled, TRAININGS } from './options';
 import type { AvatarChange } from './profile-context';
-import type { ProfileDraft } from './types';
+import { sameDraft, type ProfileDraft } from './types';
 import { FIRST_NAME_MAX, isValid, NOTE_MAX, validateDraft } from './validate';
 
 interface ProfileFormProps {
@@ -27,10 +27,12 @@ interface ProfileFormProps {
   onSubmit: (draft: ProfileDraft, avatar: AvatarChange) => Promise<void>;
   /** Rendered above the form (title, subtitle…). */
   header?: ReactNode;
+  /** Told whether anything differs from `initial` (or a photo was picked or removed), e.g. to ask before Back. */
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 /** Figma onboarding__profile-setup, also used by Edit profile. Volunteers get their own questions. */
-export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, header }: ProfileFormProps) {
+export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, header, onDirtyChange }: ProfileFormProps) {
   const [d, setD] = useState<ProfileDraft>(initial);
   const [avatar, setAvatar] = useState<AvatarChange>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -43,6 +45,9 @@ export function ProfileForm({ initial, savedAvatarUrl, submitLabel, onSubmit, he
   const visitor = d.role === 'visitor';
   const errors = submitted ? validateDraft(d) : {};
   const shownAvatar = avatar === 'remove' ? null : avatar ? avatar.uri : savedAvatarUrl;
+
+  const dirty = avatar !== null || !sameDraft(d, initial);
+  useEffect(() => { onDirtyChange?.(dirty); }, [dirty, onDirtyChange]);
 
   function set<K extends keyof ProfileDraft>(key: K, value: ProfileDraft[K]) {
     setD(prev => ({ ...prev, [key]: value }));

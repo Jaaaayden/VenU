@@ -68,11 +68,12 @@
   "steps": {
     "languagesTitle": "Escolha seus idiomas",
     "languagesSubtitle": "Para ajudar você a se comunicar com os voluntários.",
+    "languagesSubtitleVolunteer": "Para ajudar você a se comunicar com os visitantes.",
     "preferencesTitle": "Preferências de voluntário",
     "preferencesSubtitle": "Assim encontramos a pessoa certa para ajudar você. Mude quando quiser nas configurações.",
     "photoTitle": "Escolha uma foto de perfil",
-    "photoSubtitle": "Assim os voluntários encontram você com mais facilidade. Mude quando quiser nas configurações.",
-    "photoSubtitleVolunteer": "Assim os visitantes reconhecem você. Mude quando quiser nas configurações.",
+    "photoSubtitle": "Assim os voluntários encontram você com mais facilidade. Mude quando quiser no seu perfil.",
+    "photoSubtitleVolunteer": "Assim os visitantes reconhecem você. Mude quando quiser no seu perfil.",
     "finish": "Concluir"
   },
   "setup": {

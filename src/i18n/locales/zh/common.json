@@ -43,7 +43,7 @@
     "rateLimit": "尝试次数过多。请等一分钟再试。",
     "sessionExpired": "登录已过期，请重新登录。",
     "cantSave": "VenU 无法保存此更改。如果问题持续，请退出后重新登录。",
-    "roleMismatchVisitor": "此账户已设置为观众。请重新加载应用以继续。",
+    "roleMismatchVisitor": "此账户已设置为访客。请重新加载应用以继续。",
     "roleMismatchVolunteer": "此账户已设置为志愿者。请重新加载应用以继续。",
     "photoTooBig": "照片超过 {{size}} MB，请选择更小的照片。",
     "photoTooBigLocal": "照片太大，无法保存在此设备上。请换一张更小的照片。",

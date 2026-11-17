@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepHeader } from '@/components/form-section';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { useT, useUiLanguage } from '@/i18n';
+import { LTR_STYLE, LTR_WEB } from '@/lib/direction';
 import { goBack } from '@/lib/navigation';
 
 // Plain-language terms for a student project. DRAFT, not legal text: the team reviews it before launch.
@@ -79,7 +80,7 @@ export default function TermsScreen() {
           <View key={section.key} style={styles.card}>
             <Text style={styles.cardTitle} accessibilityRole="header">{t(`terms.sections.${section.key}`)}</Text>
             {section.points.map(point => (
-              <View key={point} style={styles.point}>
+              <View key={point} style={[styles.point, LTR_STYLE]} {...LTR_WEB}>
                 <View style={styles.bullet} />
                 <Text style={styles.pointText}>{point}</Text>
               </View>
@@ -110,6 +111,8 @@ const styles = StyleSheet.create({
   // Same info tiles as the privacy policy: #F5F5F5, radius 10, no outline.
   card: { gap: Spacing.sm, padding: Spacing.lg, marginBottom: Spacing.md, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
   cardTitle: { fontFamily: Fonts.display, fontSize: 17, lineHeight: 22, color: Colors.text, marginBottom: 2 },
+  // The points are English in every language, so they stay left to right (bullet first) on an
+  // Arabic or Persian page instead of hanging off the right edge.
   point: { flexDirection: 'row', gap: Spacing.md },
   bullet: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.ink, marginTop: 8 },
   pointText: { fontFamily: Fonts.text, fontSize: 15, lineHeight: 21, color: Colors.text, flex: 1 },

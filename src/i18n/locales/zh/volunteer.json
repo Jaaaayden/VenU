@@ -96,6 +96,9 @@
     "message": "给志愿者发消息",
     "done": "标记为已完成帮助",
     "doneHint": "结束请求并请你为 {{name}} 评分",
+    "confirmDone": "{{name}}已经帮完你了吗？聊天将会结束。",
+    "notYet": "还没有",
+    "yesDone": "是的，已完成",
     "confirmCancel": "要取消请求吗？{{name}} 将不再前来。",
     "keep": "保留请求",
     "yesCancel": "是，取消"

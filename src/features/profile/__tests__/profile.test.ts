@@ -2,11 +2,11 @@ import { describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
-import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
+import { isKnownLanguage, isolate, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
 import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, setAppLanguageIfCurrent, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
 import { helperSummary, initials, uiLanguageName } from '../summary';
-import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
+import { draftFromProfile, emptyDraft, homeFor, sameDraft, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
 import i18n from '@/i18n';
 import { codedError, friendlyError } from '@/lib/errors';
@@ -182,6 +182,7 @@ describe('small helpers', () => {
   });
 
   it('wraps language names in Unicode isolates so RTL names keep chip order', () => {
+    expect(isolate('Arabic')).toBe('\u2068Arabic\u2069'); // a name in the UI language, e.g. on incoming requests
     expect(isolatedLanguageName('fa')).toBe('\u2068فارسی\u2069');
     expect(`${isolatedLanguageName('ar')} · main`).toBe('\u2068العربية\u2069 · main');
   });
@@ -206,6 +207,16 @@ describe('review fixes', () => {
   it('asks for consent again once the policy version changes', () => {
     expect(draftFromProfile(saved).privacyAccepted).toBe(true);
     expect(draftFromProfile({ ...saved, privacyVersion: 'old-version' }).privacyAccepted).toBe(false);
+  });
+
+  it('counts a chip ticked off and on again as no change (Edit profile asks before Back only when dirty)', () => {
+    const before: ProfileDraft = { ...rosa, accessNeeds: ['wheelchair', 'low_vision'], communication: ['text', 'speaking'] };
+    const after: ProfileDraft = { ...before, accessNeeds: ['low_vision', 'wheelchair'], communication: ['speaking', 'text'] };
+    expect(sameDraft(before, after)).toBe(true);
+    expect(sameDraft(before, { ...before, accessNeeds: ['wheelchair'] })).toBe(false);
+    expect(sameDraft(before, { ...before, accessNeeds: ['wheelchair', 'hard_of_hearing'] })).toBe(false);
+    expect(sameDraft(before, { ...before, firstName: 'Rosa M' })).toBe(false);
+    expect(sameDraft(daniel, { ...daniel, trainings: ['wheelchair', 'asl'] })).toBe(false);
   });
 
   it('sends each role to its own home tab', () => {

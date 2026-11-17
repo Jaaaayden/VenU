@@ -4,7 +4,7 @@ import i18n from '@/i18n';
 
 import { emptyFacilitiesMessage } from '../categories';
 import { eventsLabel, facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from '../labels';
-import { facilitiesFor, getVenue, searchFacilities, searchVenues } from '../mock';
+import { facilitiesFor, getVenue, searchFacilities, searchKey, searchVenues } from '../mock';
 import type { Facility } from '../types';
 
 const sofi = getVenue('sofi')!;
@@ -90,5 +90,23 @@ describe('search in the app language', () => {
     const all = facilitiesFor('coliseum');
     expect(searchFacilities(all, 'rampa', null).map(f => f.id)).toEqual(['gate-2']);
     expect(searchFacilities(all, 'ramp', 'gate').map(f => f.id)).toEqual(['gate-2']);
+  });
+
+  it('ignores accents, digit scripts, Arabic vs Persian letters and curly apostrophes', () => {
+    const all = facilitiesFor('coliseum');
+    const ids = (q: string, lang: string) => searchFacilities(all, q, null, i18n.getFixedT(lang, 'venue')).map(f => f.id);
+    expect(ids('objets trouves', 'fr')).toEqual(['lost-found']);
+    expect(searchVenues('natacion', undefined, i18n.getFixedT('es', 'venue')).map(v => v.id)).toEqual(['sofi']);
+    expect(ids('دروازه 2', 'fa')).toContain('gate-2'); // shown as دروازه ۲
+    expect(ids('البوابة ٢', 'ar')).toContain('gate-2'); // shown as البوابة 2
+    expect(ids('سرويس شرقی', 'fa')).toEqual(['restroom-east']); // typed with the Arabic ي
+    expect(ids("men's", 'en')).toEqual(['restroom-east', 'restroom-west']); // written Men’s
+  });
+
+  it('folds search text the same way on both sides', () => {
+    expect(searchKey('Objets Trouvés')).toBe('objets trouves');
+    expect(searchKey('دروازه ۲')).toBe('دروازه 2');
+    expect(searchKey('Men’s')).toBe("men's");
+    expect(searchKey('出口 4')).toBe('出口 4');
   });
 });

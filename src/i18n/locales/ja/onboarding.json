@@ -4,7 +4,7 @@
     "or": "または",
     "visitor": "観戦に来ました",
     "volunteer": "ボランティアです",
-    "roleQuestion": "観戦者ですか、ボランティアですか？",
+    "roleQuestion": "来場者ですか、ボランティアですか？",
     "signIn": "ログイン",
     "socialTitle": "または次の方法で登録",
     "socialSoon": "Google、Apple、Facebook でのログインは近日対応予定です。",
@@ -68,11 +68,12 @@
   "steps": {
     "languagesTitle": "言語を選ぶ",
     "languagesSubtitle": "ボランティアと話しやすくするためです。",
+    "languagesSubtitleVolunteer": "来場者と話しやすくするためです。",
     "preferencesTitle": "サポーターの希望",
     "preferencesSubtitle": "あなたに合ったサポーターを見つけるためです。設定からいつでも変更できます。",
     "photoTitle": "プロフィール写真を選ぶ",
-    "photoSubtitle": "ボランティアがあなたを見つけやすくなります。設定からいつでも変更できます。",
-    "photoSubtitleVolunteer": "観戦者があなたに気づきやすくなります。設定からいつでも変更できます。",
+    "photoSubtitle": "ボランティアがあなたを見つけやすくなります。プロフィールからいつでも変更できます。",
+    "photoSubtitleVolunteer": "来場者があなたに気づきやすくなります。プロフィールからいつでも変更できます。",
     "finish": "設定を完了"
   },
   "setup": {

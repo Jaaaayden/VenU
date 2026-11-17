@@ -96,6 +96,9 @@
     "message": "Nhắn tin cho tình nguyện viên",
     "done": "Đánh dấu đã được giúp",
     "doneHint": "Kết thúc yêu cầu và mời bạn đánh giá {{name}}",
+    "confirmDone": "{{name}} đã giúp bạn xong chưa? Cuộc trò chuyện sẽ kết thúc.",
+    "notYet": "Chưa",
+    "yesDone": "Rồi, xong rồi",
     "confirmCancel": "Hủy yêu cầu? {{name}} sẽ không đến chỗ bạn nữa.",
     "keep": "Giữ yêu cầu",
     "yesCancel": "Có, hủy"

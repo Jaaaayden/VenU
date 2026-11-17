@@ -1,5 +1,5 @@
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
 import { LanguagePicker } from '@/components/language-picker';
@@ -9,10 +9,10 @@ import { Colors, Type } from '@/constants/theme';
 import { OnboardingScreen, PrimaryAction } from '@/features/auth/onboarding-screen';
 import { readPendingSetup, type PendingSetup } from '@/features/auth/pending-setup';
 import { useProfile } from '@/features/profile/profile-context';
-import { goToNextStep, stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
-import { emptyDraft, type Role } from '@/features/profile/types';
+import { draftForRole, goToNextStep, stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
+import type { Role } from '@/features/profile/types';
 import { useT, useUiLanguage } from '@/i18n';
-import { pickFor, setupPrimaryLanguage } from '@/i18n/languages';
+import { languagesFollowingPill, pickFor, setupPrimaryLanguage } from '@/i18n/languages';
 
 /**
  * Setup step 1, "Choose your languages" (Figma 482:32493 / 492:5984): primary, secondary
@@ -22,7 +22,7 @@ import { pickFor, setupPrimaryLanguage } from '@/i18n/languages';
 export default function LanguagesStep() {
   const params = useLocalSearchParams<{ role?: string }>();
   const { userId } = useProfile();
-  const { draft, start, update } = useSetupDraft();
+  const { ready, draft, start, update } = useSetupDraft();
   const { language: onScreen } = useUiLanguage();
   const t = useT('onboarding');
   const tc = useT('common');
@@ -36,17 +36,30 @@ export default function LanguagesStep() {
   }, []);
 
   const paramRole: Role | null = params.role === 'visitor' || params.role === 'volunteer' ? params.role : null;
-  const role = paramRole ?? pending?.role ?? null;
+  // After a reload the saved answers know the role too.
+  const role = paramRole ?? pending?.role ?? draft?.role ?? null;
 
   // Start (or, after a different role was picked on the role step, restart) the draft.
   useEffect(() => {
-    if (!pending || !role || (draft && draft.role === role)) return;
+    if (!pending || !ready || !role || (draft && draft.role === role)) return;
     // Only a welcome pick seeds setup: pending.language may be the last account's language on a shared device.
     const pick = pickFor({ language: pending.language, picked: pending.languagePicked === true, pickedBy: pending.languagePickedBy }, userId);
-    start({ ...emptyDraft(role, setupPrimaryLanguage(pick, onScreen)), firstName: pending.firstName ?? '' });
-  }, [pending, role, draft, start, userId, onScreen]);
+    start(draftForRole(role, draft, setupPrimaryLanguage(pick, onScreen), pending.firstName ?? ''));
+  }, [pending, ready, role, draft, start, userId, onScreen]);
 
-  if (!pending) return null; // one storage read
+  // The corner pill and the primary language start out the same. Until the languages are changed
+  // by hand, primary follows the pill: switch the pill to 日本語 and primary becomes 日本語 too.
+  // Once they are (even back to the pill's language), the pill leaves them alone.
+  const shownBefore = useRef(onScreen);
+  const changedByHand = useRef(false);
+  useEffect(() => {
+    const before = shownBefore.current;
+    shownBefore.current = onScreen;
+    const next = draft ? languagesFollowingPill(draft, before, onScreen, changedByHand.current) : null;
+    if (next) update(next);
+  }, [onScreen, draft, update]);
+
+  if (!pending || !ready) return null; // storage reads (pending setup, answers saved before a reload)
   if (!role) return <Redirect href="/onboarding/role" />;
   if (!draft || draft.role !== role) return null;
 
@@ -59,16 +72,21 @@ export default function LanguagesStep() {
 
   return (
     <OnboardingScreen
-      pill={<AppLanguagePill />}
-      back={<BackLink fallback="/onboarding/role" />}
+      pill={<AppLanguagePill look="onboarding" />}
+      // The screens before this one (welcome, Create Account) only redirect a signed-in user back
+      // here, so Back opens the role question instead: the way to switch visitor/volunteer.
+      back={<BackLink to={{ pathname: '/onboarding/role', params: { change: '1' } }} />}
       title={t('steps.languagesTitle')}
-      subtitle={t('steps.languagesSubtitle')}
+      subtitle={role === 'volunteer' ? t('steps.languagesSubtitleVolunteer') : t('steps.languagesSubtitle')}
       actions={<PrimaryAction label={tc('actions.continue')} onPress={next} />}>
       <LanguagePicker
         languages={draft.languages}
         main={draft.mainLanguage}
         // Spoken languages only: the app language belongs to the language pills.
-        onChange={(languages, mainLanguage) => update({ languages, mainLanguage })}
+        onChange={(languages, mainLanguage) => {
+          changedByHand.current = true;
+          update({ languages, mainLanguage });
+        }}
       />
       {errors.languages ? <Text style={styles.error} accessibilityLiveRegion="polite">{errors.languages}</Text> : null}
     </OnboardingScreen>

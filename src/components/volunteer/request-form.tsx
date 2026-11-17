@@ -10,6 +10,7 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { AppLanguagePill } from '@/components/volunteer/app-language-pill';
+import { useWidestWord } from '@/components/widest-word';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName, languageName } from '@/features/profile/options';
 import { useWhereAmI } from '@/features/venue/current';
@@ -21,7 +22,7 @@ import { useDictation } from '@/features/voice/use-dictation';
 import { useLayoutRtl, useT } from '@/i18n';
 
 import { EmergencyCard } from './emergency-card';
-import { HelpCard } from './help-card';
+import { HELP_LABEL, HelpCard, helpGridColumns } from './help-card';
 import { Hint, useHint } from './hint';
 import { LocationPicker } from './location-picker';
 import { NoteBanner } from './note-banner';
@@ -57,6 +58,11 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   // from liveText; the saved draft only changes when they settle.
   const dictation = useDictation({ onCommit: text => edit({ note: text.slice(0, NOTE_MAX) }), onNote: show });
   const [finishing, setFinishing] = useState(false);
+  // Two cards a row when a label's longest word wouldn't fit a third of the row (320pt phones, Armenian, Japanese).
+  const [gridWidth, setGridWidth] = useState(0);
+  const helpLabels = useWidestWord(HELP_TYPES.map(id => t(`helpTypes.${id}`)), HELP_LABEL);
+  const columns = helpGridColumns(gridWidth, Spacing.md, helpLabels.widest);
+  const rowStarts = HELP_TYPES.map((_, i) => i).filter(i => i % columns === 0);
 
   function toggle(id: HelpTypeId) {
     setError(null);
@@ -131,10 +137,11 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
       {/* Figma 492:8829 groups the question and the grid on a tinted panel. */}
       <View style={styles.panel}>
         <Text style={styles.question} accessibilityRole="header">{t('form.question')}</Text>
-        <View style={styles.grid}>
-          {[0, 3].map(start => (
+        <View style={styles.grid} onLayout={e => setGridWidth(e.nativeEvent.layout.width)}>
+          {helpLabels.probe}
+          {rowStarts.map(start => (
             <View key={start} style={styles.gridRow}>
-              {HELP_TYPES.slice(start, start + 3).map(id => (
+              {HELP_TYPES.slice(start, start + columns).map(id => (
                 <HelpCard key={id} type={id} selected={helpTypes.includes(id)} onPress={() => toggle(id)} />
               ))}
             </View>
@@ -165,6 +172,7 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 
       <LanguageSearchModal
         visible={pickingLanguage}
+        selected={language}
         onSelect={code => { edit({ language: code }); setPickingLanguage(false); }}
         onClose={() => setPickingLanguage(false)}
       />
@@ -175,7 +183,8 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
 const styles = StyleSheet.create({
   page: { gap: Spacing.xl },
   header: { gap: 0 },
-  titles: { gap: 5, marginTop: -8 },
+  // No negative margin: a long title ("Maghanap ng Volunteer") runs under the language pill.
+  titles: { gap: 5, marginTop: 2 },
   title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
   appLang: { alignSelf: 'flex-end' },

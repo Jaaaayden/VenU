@@ -11,7 +11,7 @@
  * into English" once a real translator has answered, else just "Daniel reads English".
  */
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
@@ -203,7 +203,9 @@ const styles = StyleSheet.create({
     rowGap: 6,
     paddingVertical: 12,
   },
-  text: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flexShrink: 1 },
+  // A link or a long unbroken word wraps inside the bubble instead of running off it. Native
+  // breaks long words on its own; browsers need word-break.
+  text: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 20, color: Colors.text, flexShrink: 1, ...Platform.select({ web: { wordBreak: 'break-word' } as object }) },
   textMine: { color: Colors.onPrimary },
   meta: { marginStart: 'auto', flexDirection: 'row', alignItems: 'center', gap: 4 },
   time: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: MUTED_TIME },

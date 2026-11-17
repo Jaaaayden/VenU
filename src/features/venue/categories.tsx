@@ -8,7 +8,7 @@ import { SvgXml } from 'react-native-svg';
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
 import { Colors } from '@/constants/theme';
 
-import { venueT, type VenueT } from './labels';
+import { echoQuery, venueT, type VenueT } from './labels';
 import type { FacilityCategory } from './types';
 
 /** Header chip order; labels come from venue:category.<value> (categoryLabel in ./labels). */
@@ -17,7 +17,7 @@ export const CATEGORIES: FacilityCategory[] = ['gate', 'restroom', 'food', 'firs
 /** The facility list's empty line: `No restrooms match "xyz"`, or `No parking lots at SoFi Stadium yet`. */
 export function emptyFacilitiesMessage(category: FacilityCategory | null, query: string, venueName: string, t: VenueT = venueT()): string {
   const kind = category ?? 'all';
-  const q = query.trim();
+  const q = echoQuery(query);
   return q ? t(`emptyMatch.${kind}`, { query: q }) : t(`emptyNone.${kind}`, { venue: venueName });
 }
 

@@ -6,7 +6,7 @@ import { formatDate, formatNumber, formatTime } from '../format';
 import { formatDistance } from '@/features/volunteer/format';
 
 import i18n, { languageOf } from '../index';
-import { accountLanguageStep, isRtl, isUiLanguage, pickFor, pickUiLanguage, resolveUiLanguage, setupAppLanguage, setupPrimaryLanguage, UNTRANSLATED } from '../languages';
+import { accountLanguageStep, isRtl, isUiLanguage, languagesFollowingPill, pickFor, pickUiLanguage, resolveUiLanguage, setupAppLanguage, setupPrimaryLanguage, UNTRANSLATED } from '../languages';
 
 const rosa = (language: string) => ({ id: 'rosa', language });
 
@@ -73,6 +73,16 @@ describe('picking the UI language', () => {
     expect(setupAppLanguage('ko', null, 'es')).toBe('ko');
     expect(setupAppLanguage('hi', null, 'es')).toBe('es');
     expect(setupAppLanguage('hi', 'de', 'en')).toBe('en'); // untranslated pick from an older build
+  });
+
+  it('lets the setup primary language follow the pill only until it is changed by hand', () => {
+    const start = { languages: ['en'], mainLanguage: 'en' };
+    expect(languagesFollowingPill(start, 'en', 'ja', false)).toEqual({ languages: ['ja'], mainLanguage: 'ja' });
+    expect(languagesFollowingPill(start, 'en', 'en', false)).toBeNull();
+    // Picked English as primary by hand (it was French, then English again): the pill leaves it.
+    expect(languagesFollowingPill(start, 'en', 'ja', true)).toBeNull();
+    expect(languagesFollowingPill({ languages: ['en', 'es'], mainLanguage: 'en' }, 'en', 'ja', false)).toBeNull();
+    expect(languagesFollowingPill({ languages: ['fr'], mainLanguage: 'fr' }, 'en', 'ja', false)).toBeNull();
   });
 
   it('lists every untranslated language for the pills to leave out', () => {

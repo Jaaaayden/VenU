@@ -51,7 +51,7 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
       </View>
       <View style={styles.rowText}>
         <Text style={styles.rowTitle} numberOfLines={2}>{name}</Text>
-        <Text style={venueText.caption} numberOfLines={1}>{meta}</Text>
+        <Text style={venueText.caption} numberOfLines={2}>{meta}</Text>
       </View>
       {facility.accessible ? <FigmaIcon name="wheelchair-6dc801" size={22} color={Colors.primary} /> : null}
       <View style={rtl && styles.flip}>

@@ -96,6 +96,9 @@
     "message": "Escribir al voluntario",
     "done": "Marcar ayuda como terminada",
     "doneHint": "Termina la solicitud y te pide valorar a {{name}}",
+    "confirmDone": "¿{{name}} terminó de ayudarte? Esto cierra el chat.",
+    "notYet": "Todavía no",
+    "yesDone": "Sí, terminado",
     "confirmCancel": "¿Cancelar tu solicitud? {{name}} dejará de venir.",
     "keep": "Mantener solicitud",
     "yesCancel": "Sí, cancelar"

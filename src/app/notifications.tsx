@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
@@ -13,12 +13,13 @@ import {
   type NotificationKind,
   type NotificationPrefs,
 } from '@/features/settings/notification-prefs';
-import { useT } from '@/i18n';
+import { useLayoutRtl, useT } from '@/i18n';
 
 /** Profile → Notifications: which alerts to get, saved on this device (no push yet). */
 export default function NotificationsScreen() {
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const t = useT('profile');
+  const webRtl = useLayoutRtl() && Platform.OS === 'web';
 
   useEffect(() => {
     let live = true;
@@ -59,9 +60,15 @@ export default function NotificationsScreen() {
                       <Text style={styles.label}>{label}</Text>
                       <Text style={styles.hint}>{hint}</Text>
                     </View>
-                    <View pointerEvents="none" aria-hidden>
+                    {/* react-native-web lays its Switch out wrong in RTL (the thumb lands outside the
+                        track), so draw it LTR and mirror it: "on" still puts the thumb at the end. */}
+                    <View pointerEvents="none" aria-hidden style={webRtl && styles.mirror} {...(webRtl ? ({ dir: 'ltr' } as object) : {})}>
                       <Switch
                         value={prefs[kind]}
+                        // Web renders a real checkbox that Tab would still reach inside aria-hidden (and
+                        // Space would flip without saving). Disabled takes it out of the tab order; the
+                        // colors are all set below, so it looks the same.
+                        disabled={Platform.OS === 'web'}
                         trackColor={{ false: Colors.controlBorder, true: Colors.primary }}
                         thumbColor={Colors.surface}
                         // react-native-web's prop for the "on" thumb color.
@@ -97,4 +104,5 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: Colors.divider, marginStart: Spacing.lg },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm, marginTop: Spacing.lg, padding: Spacing.md, borderRadius: Radius.md, backgroundColor: Colors.surfaceAlt },
   noteText: { ...Type.caption, flex: 1, paddingTop: 1 },
+  mirror: { transform: [{ scaleX: -1 }] },
 });

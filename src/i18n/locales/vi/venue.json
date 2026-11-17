@@ -450,7 +450,7 @@
   "report": {
     "notFound": "Không tìm thấy báo cáo",
     "kind": "Báo cáo",
-    "authorFallback": "Khán giả VenU",
+    "authorFallback": "Khách tham quan VenU",
     "submitted": "Gửi ngày {{date}}",
     "originalLanguage": "Ngôn ngữ gốc: {{language}}",
     "noBody": "Không có chi tiết."

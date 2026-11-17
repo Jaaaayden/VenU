@@ -272,6 +272,20 @@ export function useFacilityReports(venueId: string, facilityId: string): Facilit
   return state && state.key.startsWith(`${venueId}/${facilityId}/`) ? state.reports : null;
 }
 
+/**
+ * The report only if it belongs to that facility: a hand-edited link such as
+ * /venue/sofi/entry-4/reports/seed-restroom must not show Crypto.com Arena's report under Entry 4.
+ * `undefined` (still loading) passes through.
+ */
+export function reportAt<R extends Pick<FacilityReport, 'venueId' | 'facilityId'>>(
+  report: R | null | undefined,
+  venueId: string,
+  facilityId: string,
+): R | null | undefined {
+  if (!report) return report;
+  return report.venueId === venueId && report.facilityId === facilityId ? report : null;
+}
+
 /** One report; `undefined` while loading, `null` if it doesn't exist. */
 export function useReport(id: string | undefined): FacilityReport | null | undefined {
   const version = useStoreVersion();

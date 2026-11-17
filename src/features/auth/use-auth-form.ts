@@ -9,7 +9,7 @@ import { homeFor } from '@/features/profile/types';
 import * as auth from '@/lib/auth';
 import { friendlyError } from '@/lib/errors';
 
-import { forgetPendingNameUnlessFor, rememberPendingName } from './pending-setup';
+import { clearPendingName, forgetPendingNameUnlessFor, rememberPendingName } from './pending-setup';
 import { validateAuth, type AuthError, type AuthField, type AuthMode, type AuthValues } from './validate';
 
 export type { AuthError, AuthField, AuthMode, AuthValues };
@@ -59,7 +59,11 @@ export function useAuthForm(mode: AuthMode) {
       if (result.needsConfirmation) return 'confirm';
       // No navigation here: once the provider is 'ready' (from this load or the auth listener's,
       // whichever lands last), the screen's redirect sends the user on.
-      await refresh();
+      const profile = await refresh();
+      // Already set up: the account keeps its own role, so the first screen's visitor/volunteer
+      // choice (and any Create Account name) is spent. Left stored, it came back ticked on the
+      // first screen after signing out, e.g. picked "volunteer", signed in to a visitor account.
+      if (profile) await clearPendingName();
       return 'done';
     } catch (e) {
       setError({ field: null, message: friendlyError(e) });

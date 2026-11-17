@@ -96,6 +96,9 @@
     "message": "자원봉사자에게 메시지",
     "done": "도움 완료로 표시",
     "doneHint": "요청을 종료하고 {{name}} 님을 평가합니다",
+    "confirmDone": "{{name}} 님의 도움이 끝났나요? 채팅이 종료됩니다.",
+    "notYet": "아직이요",
+    "yesDone": "네, 끝났어요",
     "confirmCancel": "요청을 취소할까요? {{name}} 님이 더 이상 오지 않아요.",
     "keep": "요청 유지",
     "yesCancel": "네, 취소할게요"

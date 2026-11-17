@@ -68,11 +68,12 @@
   "steps": {
     "languagesTitle": "Piliin ang mga wika mo",
     "languagesSubtitle": "Para madali kang makipag-usap sa mga volunteer.",
+    "languagesSubtitleVolunteer": "Para madali kang makipag-usap sa mga bisita.",
     "preferencesTitle": "Gustong tutulong",
     "preferencesSubtitle": "Para mahanap namin ang tamang tutulong sa iyo. Mababago mo ito anumang oras sa settings.",
     "photoTitle": "Pumili ng profile picture",
-    "photoSubtitle": "Para mas madali kang mahanap ng mga volunteer. Mababago mo ito anumang oras sa settings.",
-    "photoSubtitleVolunteer": "Para makilala ka ng mga bisita. Mababago mo ito anumang oras sa settings.",
+    "photoSubtitle": "Para mas madali kang mahanap ng mga volunteer. Mababago mo ito anumang oras sa iyong profile.",
+    "photoSubtitleVolunteer": "Para makilala ka ng mga bisita. Mababago mo ito anumang oras sa iyong profile.",
     "finish": "Tapusin"
   },
   "setup": {

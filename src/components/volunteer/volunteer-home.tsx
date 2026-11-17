@@ -3,7 +3,7 @@
  * can help with, then nearby requests while Free.
  */
 import { router } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View, type TextStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
@@ -14,11 +14,12 @@ import { useWhereAmI } from '@/features/venue/current';
 import { getVenue } from '@/features/venue/mock';
 import { meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
 import { useAvailability } from '@/features/volunteer/availability';
-import { useLayoutRtl, useT } from '@/i18n';
+import { useT } from '@/i18n';
 
 import { AppLanguagePill } from './app-language-pill';
 import { EmergencyCard } from './emergency-card';
 import { IncomingRequests } from './incoming-requests';
+import { useStartAligned } from './start-aligned';
 import { StatusCard } from './status-card';
 
 type HomeProfile = Pick<Profile, 'id' | 'firstName' | 'languages' | 'mainLanguage' | 'trainings'>;
@@ -54,16 +55,6 @@ export function VolunteerHome({ profile }: { profile: HomeProfile }) {
       <EmergencyCard />
     </View>
   );
-}
-
-/**
- * Venue names stay in English, so in Arabic "SoFi Stadium" would align left by its own script.
- * This keeps it on the start edge, as the language picker does: web sets `direction`, native reads 'left' as start.
- */
-function useStartAligned(): TextStyle {
-  const rtl = useLayoutRtl();
-  const writingDirection = rtl ? 'rtl' : 'ltr';
-  return Platform.OS === 'web' ? { writingDirection } : { writingDirection, textAlign: 'left' };
 }
 
 /** Solid map pin from the Figma card. */
