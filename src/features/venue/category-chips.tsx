@@ -1,12 +1,14 @@
 /**
- * The venue header's category chips: one row that scrolls sideways, starting and ending on the
- * page gutter, with a soft fade on whichever edge has more chips behind it.
+ * The venue header's category chips: one row that scrolls sideways (by touch, or by mouse drag and
+ * wheel on web), starting and ending on the page gutter, with a soft fade on whichever edge has
+ * more chips behind it.
  */
 import { useCallback, useRef, useState } from 'react';
-import { Platform, ScrollView, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Platform, StyleSheet, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Chip } from '@/components/chip';
+import { DragScrollView } from '@/components/drag-scroll-view';
 import { Colors, Spacing } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
@@ -59,8 +61,7 @@ export function CategoryChips({ value, onChange }: {
 
   return (
     <View>
-      <ScrollView
-        horizontal
+      <DragScrollView
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.row}
         onLayout={(e: LayoutChangeEvent) => { size.current.view = e.nativeEvent.layout.width; update(); }}
@@ -73,7 +74,7 @@ export function CategoryChips({ value, onChange }: {
         {CATEGORIES.map(c => (
           <Chip key={c} label={categoryLabel(c, t)} role="radio" selected={value === c} onPress={() => onChange(value === c ? null : c)} />
         ))}
-      </ScrollView>
+      </DragScrollView>
       {edges.start ? <EdgeFade side="start" rtl={rtl} /> : null}
       {edges.end ? <EdgeFade side="end" rtl={rtl} /> : null}
     </View>
