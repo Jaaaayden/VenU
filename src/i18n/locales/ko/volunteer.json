@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "자원봉사자와 연결하지 못했어요. 연결 상태를 확인하고 다시 시도하세요.",
-    "thanks": "감사합니다! 의견은 {{name}} 님과 LA28 팀에 도움이 돼요."
+    "thanks": "감사합니다! 의견은 {{name}} 님과 LA28 팀에 도움이 돼요.",
+    "volunteerLeft": "자원봉사자가 자리를 떠나야 했어요. 다른 분을 찾고 있어요."
   },
   "searching": {
     "title": "자원봉사자를 찾는 중",
@@ -156,7 +157,10 @@
     "listen": "듣기",
     "listenLabel": "이 메시지 듣기",
     "from": "{{name}}, {{time}}: {{text}}",
-    "fromTranslated": "{{name}}, {{time}}: {{text}} ({{language}}에서 번역됨)"
+    "fromTranslated": "{{name}}, {{time}}: {{text}} ({{language}}에서 번역됨)",
+    "notSent": "전송되지 않음",
+    "retry": "탭하여 다시 시도",
+    "retryLabel": "전송되지 않음. 이 메시지를 다시 보내기"
   },
   "feedback": {
     "skip": "건너뛰기",
@@ -228,7 +232,8 @@
     "acceptFailed": "요청을 수락하지 못했어요. 연결을 확인하고 다시 시도해 주세요.",
     "cancelled": "{{name}} 님이 요청을 취소했어요.",
     "done": "{{name}} 님이 도움을 완료로 표시했어요. 감사합니다!",
-    "ended": "채팅이 종료됐어요. {{name}} 님을 도와주셔서 감사합니다!"
+    "ended": "채팅이 종료됐어요. {{name}} 님을 도와주셔서 감사합니다!",
+    "withdrawn": "이 요청은 철회되었어요."
   },
   "home": {
     "greeting": "안녕하세요, {{name}}님",

@@ -24,9 +24,11 @@ export interface VolunteerBackend {
   resume?(requestId: string, match: Match): void;
   /**
    * The other person's messages for a request, as they arrive (a live service also sends the ones
-   * already there when you subscribe; the store skips ids it has). Returns an unsubscribe function.
+   * already there when you subscribe; the store skips ids it has). `since` (ms, the newest message
+   * the caller already has): only messages from then on, so a resubscribe doesn't fetch the whole
+   * chat again. Returns an unsubscribe function.
    */
-  onMessage(requestId: string, listener: (message: ChatMessage) => void): () => void;
+  onMessage(requestId: string, listener: (message: ChatMessage) => void, since?: number): () => void;
   /**
    * Whether the volunteer is typing, called with the current value on subscribing and on each
    * change. Optional: a service without typing events just never shows the line.
@@ -37,6 +39,11 @@ export interface VolunteerBackend {
    * visitor cancelled. Optional: in the mock nobody else can close it.
    */
   onClosed?(requestId: string, listener: (closed: RequestClosed) => void): () => void;
+  /**
+   * Called once when the matched volunteer (`volunteerId`) hands the request back (e.g. they signed
+   * out): it's open again, or another volunteer already took it. Optional: the mock volunteer never leaves.
+   */
+  onReleased?(requestId: string, volunteerId: string, listener: () => void): () => void;
   endHelp(requestId: string): Promise<void>;
   submitFeedback(feedback: Feedback): Promise<void>;
   reportProblem(report: ProblemReport): Promise<void>;
@@ -44,19 +51,41 @@ export interface VolunteerBackend {
   // ---- the volunteer's side (live matching only)
   /** Open requests, newest first, called on subscribing and on each change. Returns an unsubscribe function. */
   watchOpenRequests?(listener: (requests: IncomingRequest[]) => void): () => void;
-  /** Takes an open request. Rejects with AlreadyTakenError when another volunteer got it first. */
+  /**
+   * Takes an open request. Rejects with AlreadyTakenError when another volunteer got it first,
+   * RequestClosedError when the visitor withdrew it, AlreadyHelpingError when this volunteer
+   * already has one.
+   */
   acceptRequest?(requestId: string): Promise<Assignment>;
+  /** The volunteer leaves without finishing (signing out): the request opens again for someone else. */
+  releaseRequest?(requestId: string): Promise<void>;
   /** The request this volunteer accepted and hasn't finished, e.g. after an app restart. */
   currentAssignment?(): Promise<Assignment | null>;
   /** Every message on a request so far, both people's, oldest first. */
   loadMessages?(requestId: string): Promise<ChatMessage[]>;
 }
 
-/** Accept lost the race: the request was taken (or closed) before this volunteer got it. */
+/** Accept lost the race: another volunteer took the request first. */
 export class AlreadyTakenError extends Error {
   constructor() {
     super('Someone else already took this request');
     this.name = 'AlreadyTakenError';
+  }
+}
+
+/** Accept came too late: the visitor cancelled the request (or it was finished). */
+export class RequestClosedError extends Error {
+  constructor() {
+    super('This request was withdrawn');
+    this.name = 'RequestClosedError';
+  }
+}
+
+/** Accept refused: this volunteer is already helping someone (e.g. accepted on another device). */
+export class AlreadyHelpingError extends Error {
+  constructor() {
+    super('Already helping someone');
+    this.name = 'AlreadyHelpingError';
   }
 }
 

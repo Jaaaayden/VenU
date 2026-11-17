@@ -65,6 +65,8 @@ export interface ChatMessage {
   sentAt: number;
   /** Language the sender wrote in, when known (e.g. 'en'). Lets the reader skip translating their own language. */
   lang?: string;
+  /** Yours, and the service refused it (e.g. offline): "Not sent · Tap to retry" shows under it. */
+  failed?: boolean;
 }
 
 export type FeedbackTag = 'language' | 'venue' | 'patient' | 'fast' | 'helpful' | 'other';
@@ -104,7 +106,7 @@ export interface RequestDraft {
 export type RequestStatus = 'idle' | 'searching' | 'notFound' | 'matched' | 'done';
 
 /** volunteer:notice.<key>. */
-export type NoticeKey = 'thanks' | 'searchFailed';
+export type NoticeKey = 'thanks' | 'searchFailed' | 'volunteerLeft';
 
 export interface Notice {
   tone: 'success' | 'error';

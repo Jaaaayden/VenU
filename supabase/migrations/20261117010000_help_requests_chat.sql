@@ -4,10 +4,14 @@
 --
 -- A minimal stand-in for matching, on its own tables so the real matching service can replace it:
 --   1. A visitor inserts a help_requests row (status 'open').
---   2. Volunteers see open requests (RLS) and call accept_help_request(id). It succeeds only while the
---      request is still open, so two volunteers can't both get it; the loser gets 'already_taken'.
+--   2. Volunteers list open requests with open_help_requests() (the last 5 minutes, by the server's
+--      clock) and call accept_help_request(id). It succeeds only while the request is still open, so
+--      two volunteers can't both get it; the loser gets 'already_taken' ('request_closed' if the
+--      visitor withdrew it). A volunteer helps one visitor at a time ('already_helping').
 --   3. The visitor and the volunteer exchange messages; each app translates what it reads.
---   4. close_help_request(id, 'cancelled' | 'done') ends it, for either of them.
+--   4. close_help_request(id, 'cancelled' | 'done') ends it, for either of them. A volunteer who has
+--      to leave (signing out) calls release_help_request(id) instead: the request opens again for
+--      the next volunteer, who can't read the earlier chat.
 -- Matches src/features/volunteer/supabase-backend.ts and the mock in scripts/mock-supabase.mjs.
 -- Reads the volunteer's profile (public.profiles), but none of the matching team's tables.
 
@@ -37,15 +41,20 @@ create table public.help_requests (
 
   closed_by           uuid references auth.users (id) on delete set null,
   created_at          timestamptz not null default now(),
+  -- When it last opened: created_at, or when a volunteer handed it back. The open list counts from it.
+  opened_at           timestamptz not null default now(),
+  -- When the current volunteer accepted; that volunteer reads only the messages from then on.
   matched_at          timestamptz,
   closed_at           timestamptz,
 
   constraint matched_has_volunteer check (status in ('open', 'cancelled') or volunteer_id is not null)
 );
 
-create index help_requests_open on public.help_requests (created_at desc) where status = 'open';
+create index help_requests_open on public.help_requests (opened_at desc) where status = 'open';
 create index help_requests_visitor on public.help_requests (visitor_id);
 create index help_requests_volunteer on public.help_requests (volunteer_id);
+-- One visitor at a time per volunteer, even for two Accepts at the same moment (accept_help_request).
+create unique index help_requests_one_per_volunteer on public.help_requests (volunteer_id) where status = 'matched';
 
 create table public.messages (
   id          uuid primary key default gen_random_uuid(),
@@ -75,10 +84,27 @@ create function public.is_help_party(p_request_id uuid) returns boolean
   );
 $$;
 
+-- True when the signed-in user may read a message: they're the visitor or the current volunteer,
+-- the sender is one of those two, and it was sent after that volunteer accepted. So a volunteer who
+-- takes over a handed-back request (release_help_request) never sees the previous volunteer's chat,
+-- and the previous volunteer can't read the new one.
+create function public.can_read_message(p_request_id uuid, p_sender_id uuid, p_created_at timestamptz) returns boolean
+  language sql stable security definer set search_path = '' as $$
+  select exists (
+    select 1 from public.help_requests r
+    where r.id = p_request_id
+      and (select auth.uid()) in (r.visitor_id, r.volunteer_id)
+      and p_sender_id in (r.visitor_id, r.volunteer_id)
+      and p_created_at >= r.matched_at
+  );
+$$;
+
 revoke all on function public.is_volunteer() from public;
 revoke all on function public.is_help_party(uuid) from public;
+revoke all on function public.can_read_message(uuid, uuid, timestamptz) from public;
 grant execute on function public.is_volunteer() to authenticated;
 grant execute on function public.is_help_party(uuid) to authenticated;
+grant execute on function public.can_read_message(uuid, uuid, timestamptz) to authenticated;
 
 -- Row-level security. Visitors read their own requests; volunteers read open requests and the ones
 -- they accepted. Status changes only go through the functions below, so no one updates rows directly.
@@ -103,11 +129,12 @@ create policy "visitors open requests" on public.help_requests
 revoke all on public.help_requests from anon, authenticated;
 grant select, insert on public.help_requests to authenticated;
 
--- Messages: only the two people on a matched request read them and write them, as themselves.
+-- Messages: only the two people on a matched request read them and write them, as themselves; a
+-- volunteer reads only what was said since they accepted (can_read_message).
 alter table public.messages enable row level security;
 
 create policy "parties read messages" on public.messages
-  for select to authenticated using ((select public.is_help_party(request_id)));
+  for select to authenticated using (public.can_read_message(request_id, sender_id, created_at));
 
 create policy "parties send messages" on public.messages
   for insert to authenticated with check (
@@ -120,8 +147,12 @@ revoke all on public.messages from anon, authenticated;
 grant select, insert on public.messages to authenticated;
 
 -- Accept: atomic. The update only matches a row that is still open, and a second volunteer's update
--- waits for the first to commit, then finds it matched and changes nothing. Raises 'already_taken'
--- (the app says "Someone else already took this request"), or 'not_a_volunteer'.
+-- waits for the first to commit, then finds it matched and changes nothing. Raises (the app's
+-- message in brackets):
+--   'already_taken'    another volunteer has it ("Someone else already took this request")
+--   'request_closed'   the visitor cancelled it, or it's finished ("This request was withdrawn")
+--   'already_helping'  this volunteer already has a matched request (the app opens that one)
+--   'not_a_volunteer'
 create function public.accept_help_request(p_request_id uuid) returns public.help_requests
   language plpgsql security definer set search_path = '' as $$
 declare
@@ -134,21 +165,72 @@ begin
     raise exception 'not_a_volunteer' using errcode = '42501';
   end if;
 
-  update public.help_requests r
-     set status = 'matched',
-         volunteer_id = me,
-         volunteer_name = vol.first_name,
-         volunteer_languages = array[vol.main_language] || array_remove(vol.languages, vol.main_language),
-         volunteer_trainings = vol.trainings,
-         matched_at = now()
-   where r.id = p_request_id and r.status = 'open' and r.visitor_id <> me
-   returning * into accepted;
+  if exists (select 1 from public.help_requests r where r.volunteer_id = me and r.status = 'matched') then
+    raise exception 'already_helping' using errcode = 'P0001';
+  end if;
 
-  if not found then
-    raise exception 'already_taken' using errcode = 'P0001';
+  begin
+    update public.help_requests r
+       set status = 'matched',
+           volunteer_id = me,
+           volunteer_name = vol.first_name,
+           volunteer_languages = array[vol.main_language] || array_remove(vol.languages, vol.main_language),
+           volunteer_trainings = vol.trainings,
+           matched_at = now()
+     where r.id = p_request_id and r.status = 'open' and r.visitor_id <> me
+     returning * into accepted;
+  exception when unique_violation then
+    -- help_requests_one_per_volunteer: this volunteer's other Accept landed first.
+    raise exception 'already_helping' using errcode = 'P0001';
+  end;
+
+  if accepted.id is null then
+    if exists (select 1 from public.help_requests r where r.id = p_request_id and r.status in ('open', 'matched')) then
+      raise exception 'already_taken' using errcode = 'P0001';
+    end if;
+    raise exception 'request_closed' using errcode = 'P0001';
   end if;
   return accepted;
 end;
+$$;
+
+-- Release: the matched volunteer has to leave without finishing (the app calls it as they sign out).
+-- The request opens again with a fresh opened_at, so it's back on every volunteer's list, and the
+-- visitor's app goes back to searching. Does nothing for anyone else, so a retry is harmless.
+create function public.release_help_request(p_request_id uuid) returns void
+  language plpgsql security definer set search_path = '' as $$
+begin
+  update public.help_requests r
+     set status = 'open',
+         volunteer_id = null,
+         volunteer_name = null,
+         volunteer_languages = null,
+         volunteer_trainings = null,
+         matched_at = null,
+         opened_at = now()
+   where r.id = p_request_id and r.status = 'matched' and r.volunteer_id = auth.uid();
+end;
+$$;
+
+-- The open list: requests opened in the last 5 minutes by the database's clock (a phone's clock can
+-- be off by minutes or years), newest first, with their age in seconds for "3 min ago". Security
+-- invoker, so the table's policies decide which rows each caller sees.
+create function public.open_help_requests()
+  returns table (
+    id uuid, visitor_id uuid, visitor_name text, venue_id text, spot text, help_types text[], note text,
+    "language" text, status text, volunteer_id uuid, volunteer_name text, volunteer_languages text[],
+    volunteer_trainings text[], closed_by uuid, created_at timestamptz, opened_at timestamptz,
+    matched_at timestamptz, closed_at timestamptz, age_seconds integer
+  )
+  language sql stable security invoker set search_path = '' as $$
+  select r.id, r.visitor_id, r.visitor_name, r.venue_id, r.spot, r.help_types, r.note, r.language, r.status,
+         r.volunteer_id, r.volunteer_name, r.volunteer_languages, r.volunteer_trainings, r.closed_by,
+         r.created_at, r.opened_at, r.matched_at, r.closed_at,
+         floor(extract(epoch from now() - r.opened_at))::integer
+    from public.help_requests r
+   where r.status = 'open' and r.opened_at between now() - interval '5 minutes' and now()
+   order by r.opened_at desc
+   limit 20;
 $$;
 
 -- Close: the visitor cancels or marks help as done; the volunteer ends the chat ('done'). Does
@@ -171,8 +253,12 @@ $$;
 
 revoke all on function public.accept_help_request(uuid) from public;
 revoke all on function public.close_help_request(uuid, text) from public;
+revoke all on function public.release_help_request(uuid) from public;
+revoke all on function public.open_help_requests() from public;
 grant execute on function public.accept_help_request(uuid) to authenticated;
 grant execute on function public.close_help_request(uuid, text) to authenticated;
+grant execute on function public.release_help_request(uuid) to authenticated;
+grant execute on function public.open_help_requests() to authenticated;
 
 -- Realtime: both apps listen for request status changes and new messages (RLS still applies).
 alter publication supabase_realtime add table public.help_requests, public.messages;

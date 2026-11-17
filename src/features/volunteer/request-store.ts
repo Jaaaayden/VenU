@@ -38,7 +38,9 @@ export type RequestAction =
   | { type: 'searchTimedOut'; requestId: string }
   | { type: 'keepSearching'; request: HelpRequest }
   | { type: 'cancel' }
+  | { type: 'released'; requestId: string }
   | { type: 'send'; message: ChatMessage }
+  | { type: 'sendFailed'; messageId: string; failed: boolean }
   | { type: 'receive'; requestId: string; message: ChatMessage }
   | { type: 'typing'; requestId: string; typing: boolean }
   | { type: 'read' }
@@ -56,7 +58,13 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
       return state.status === 'idle' ? { ...INITIAL_STATE, status: 'searching', request: action.request, draft: state.draft } : state;
     case 'matched':
       return state.status === 'searching' && state.request?.id === action.requestId
-        ? { ...state, status: 'matched', match: action.match }
+        ? { ...state, status: 'matched', match: action.match, notice: null }
+        : state;
+    case 'released':
+      // The volunteer left (e.g. signed out) and the request is open again: search on, with a note,
+      // and start the next chat empty (the next volunteer can't read this one either).
+      return state.status === 'matched' && state.request?.id === action.requestId
+        ? { ...state, status: 'searching', match: null, messages: [], unread: 0, typing: false, notice: { tone: 'error', key: 'volunteerLeft' } }
         : state;
     case 'searchFailed':
       return state.status === 'searching' && state.request?.id === action.requestId
@@ -73,6 +81,10 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
         : state;
     case 'send':
       return state.status === 'matched' ? { ...state, messages: [...state.messages, action.message] } : state;
+    case 'sendFailed':
+      return state.messages.some(m => m.id === action.messageId && !!m.failed !== action.failed)
+        ? { ...state, messages: state.messages.map(m => (m.id === action.messageId ? { ...m, failed: action.failed } : m)) }
+        : state;
     case 'receive':
       // A live service resends the chat so far on (re)subscribing: skip messages already here.
       return state.status === 'matched' && state.request?.id === action.requestId && !state.messages.some(m => m.id === action.message.id)
@@ -218,9 +230,13 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     unsubscribe = null;
   }
 
+  /** Follows the matched request's chat and status, until it ends or the volunteer leaves. */
   function listen(requestId: string) {
     stopListening();
-    const offMessage = backend.onMessage(requestId, message => dispatch({ type: 'receive', requestId, message }));
+    // Only the volunteer's messages newer than the newest one already here (e.g. after a restart).
+    const theirs = state.messages.filter(m => m.from === 'them').map(m => m.sentAt);
+    const since = theirs.length ? Math.max(...theirs) : undefined;
+    const offMessage = backend.onMessage(requestId, message => dispatch({ type: 'receive', requestId, message }), since);
     const offTyping = backend.onTyping?.(requestId, typing => dispatch({ type: 'typing', requestId, typing }));
     // The volunteer ended the chat: ask for feedback, as after "Mark help as done". Closed on our
     // side (or called off by the service): back to the form, keeping the draft.
@@ -229,11 +245,31 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       stopListening();
       dispatch(closed.status === 'done' ? { type: 'end' } : { type: 'cancel' });
     });
+    // The volunteer left without finishing (signed out): the request is open again, so wait for the next one.
+    const volunteerId = state.match?.volunteer.id;
+    const offReleased = volunteerId
+      ? backend.onReleased?.(requestId, volunteerId, () => {
+          const request = state.request;
+          if (state.status !== 'matched' || request?.id !== requestId) return;
+          stopListening();
+          searchSince = Date.now();
+          dispatch({ type: 'released', requestId });
+          void runSearch(request);
+        })
+      : undefined;
     unsubscribe = () => {
       offMessage();
       offTyping?.();
       offClosed?.();
+      offReleased?.();
     };
+  }
+
+  /** Sends one of the visitor's messages; if the service refuses it, it's marked "Not sent". */
+  function deliver(requestId: string, message: ChatMessage) {
+    backend.sendMessage(requestId, message.text, message.lang ?? null).catch(() => {
+      if (state.request?.id === requestId) dispatch({ type: 'sendFailed', messageId: message.id, failed: true });
+    });
   }
 
   /** Waits for a volunteer for a request that is already in the 'searching' state, until the wait runs out. */
@@ -357,8 +393,18 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const id = state.request?.id;
       if (!body || !id || state.status !== 'matched') return;
       const lang = senderLanguage ? { lang: senderLanguage } : {};
-      dispatch({ type: 'send', message: { id: newId('msg'), from: 'me', text: body, sentAt: Date.now(), ...lang } });
-      backend.sendMessage(id, body, senderLanguage).catch(() => {});
+      const message: ChatMessage = { id: newId('msg'), from: 'me', text: body, sentAt: Date.now(), ...lang };
+      dispatch({ type: 'send', message });
+      deliver(id, message);
+    },
+
+    /** "Tap to retry" on a message that wasn't sent: sends it again. */
+    retryMessage(messageId: string) {
+      const id = state.request?.id;
+      const message = state.messages.find(m => m.id === messageId && m.failed);
+      if (!id || state.status !== 'matched' || !message) return;
+      dispatch({ type: 'sendFailed', messageId, failed: false });
+      deliver(id, message);
     },
 
     markRead() {

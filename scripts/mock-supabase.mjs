@@ -331,13 +331,20 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   });
 }
 
-// ---- help requests and chat: the help_requests and messages tables and their two functions, with
-// the rules of supabase/migrations/20261117010000_help_requests_chat.sql. One store per server (keyed
+// ---- help requests and chat: the help_requests and messages tables and their functions, with the
+// rules of supabase/migrations/20261117010000_help_requests_chat.sql. One store per server (keyed
 // by its profiles map), kept in memory only. There's no Realtime here: the app sees its channels fail
 // and polls instead (src/features/volunteer/supabase-backend.ts).
-// Test hook: GET /__help (every request and message).
+// Test hooks: GET /__help (every request and message); POST /__help { rejectSends: true } makes
+// message inserts fail (as RLS would), to try "Not sent · Tap to retry"; false turns that off.
 const helpStores = new WeakMap();
 const HELP_TYPE_IDS = ['physical', 'directions', 'language', 'quiet', 'lost', 'other'];
+const HELP_ROUTES = new Set([
+  '/__help', '/rest/v1/help_requests', '/rest/v1/messages', '/rest/v1/rpc/accept_help_request',
+  '/rest/v1/rpc/close_help_request', '/rest/v1/rpc/release_help_request', '/rest/v1/rpc/open_help_requests',
+]);
+/** open_help_requests(): requests opened within this long are listed. */
+const OPEN_WINDOW_MS = 5 * 60 * 1000;
 
 /** PostgREST-style filters from the query string, e.g. status=eq.open&created_at=gte.2026-11-17T18:00:00Z. */
 function rowFilter(url) {
@@ -374,21 +381,29 @@ function orderAndLimit(rows, url) {
 
 /** Handles the help request routes; false for anything else. */
 function handleHelpRequests({ req, res, p, url, body, uid, profiles, send, pgErr }) {
-  const isHelp = p === '/__help' || p === '/rest/v1/help_requests' || p === '/rest/v1/messages'
-    || p === '/rest/v1/rpc/accept_help_request' || p === '/rest/v1/rpc/close_help_request';
-  if (!isHelp) return false;
-  if (!helpStores.has(profiles)) helpStores.set(profiles, { requests: new Map(), messages: [] });
+  if (!HELP_ROUTES.has(p)) return false;
+  if (!helpStores.has(profiles)) helpStores.set(profiles, { requests: new Map(), messages: [], rejectSends: false });
   helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, helpStores.get(profiles));
   return true;
 }
 
 function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store) {
-  if (p === '/__help') return send(res, 200, { requests: [...store.requests.values()], messages: store.messages });
+  if (p === '/__help') {
+    if (req.method === 'POST') store.rejectSends = !!body()?.rejectSends;
+    return send(res, 200, { requests: [...store.requests.values()], messages: store.messages, rejectSends: store.rejectSends });
+  }
   if (!uid) return pgErr(res, 401, 'PGRST301', 'JWT expired');
 
   const isVolunteer = profiles.get(uid)?.role === 'volunteer';
   const canSee = r => r.visitor_id === uid || r.volunteer_id === uid || (r.status === 'open' && isVolunteer);
   const isParty = id => { const r = store.requests.get(id); return !!r && (r.visitor_id === uid || r.volunteer_id === uid); };
+  // can_read_message: the visitor or the current volunteer, a message from one of them, sent since that volunteer accepted.
+  const canRead = m => {
+    const r = store.requests.get(m.request_id);
+    if (!r || !r.matched_at || m.created_at < r.matched_at) return false;
+    const parties = [r.visitor_id, r.volunteer_id];
+    return parties.includes(uid) && parties.includes(m.sender_id);
+  };
   const wantsRows = (req.headers.prefer ?? '').includes('return=representation');
   const wantsObject = (req.headers.accept ?? '').includes('vnd.pgrst.object');
   const rls = table => pgErr(res, 403, '42501', `new row violates row-level security policy for table "${table}"`);
@@ -413,11 +428,12 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
         return pgErr(res, 400, '23514', 'new row for relation "help_requests" violates check constraint');
       const id = row.id ?? randomUUID();
       if (store.requests.has(id)) return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "help_requests_pkey"');
+      const at = now();
       const full = {
         id, visitor_id: uid, visitor_name: String(row.visitor_name ?? '').slice(0, 40), venue_id: row.venue_id, spot: row.spot ?? null,
         help_types: types, note: String(row.note ?? '').slice(0, 500), language: row.language, status: 'open',
         volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
-        closed_by: null, created_at: now(), matched_at: null, closed_at: null,
+        closed_by: null, created_at: at, opened_at: at, matched_at: null, closed_at: null,
       };
       store.requests.set(id, full);
       return wantsRows ? reply([full], 201) : send(res, 201);
@@ -427,13 +443,13 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
 
   if (p === '/rest/v1/messages') {
     if (req.method === 'GET') {
-      const rows = store.messages.filter(m => isParty(m.request_id)).filter(rowFilter(url));
+      const rows = store.messages.filter(canRead).filter(rowFilter(url));
       return reply(orderAndLimit(rows, url));
     }
     if (req.method === 'POST') {
       const row = Array.isArray(input) ? input[0] : input;
       const r = row && store.requests.get(row.request_id);
-      if (!row || (row.sender_id ?? uid) !== uid || !isParty(row.request_id) || r?.status !== 'matched') return rls('messages');
+      if (store.rejectSends || !row || (row.sender_id ?? uid) !== uid || !isParty(row.request_id) || r?.status !== 'matched') return rls('messages');
       const text = String(row.text ?? '');
       if (text.length < 1 || text.length > 1000) return pgErr(res, 400, '23514', 'new row for relation "messages" violates check constraint');
       const full = { id: randomUUID(), request_id: row.request_id, sender_id: uid, text, language: row.language ?? null, created_at: now() };
@@ -443,13 +459,25 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
     return pgErr(res, 403, '42501', 'permission denied for table messages');
   }
 
+  if (p === '/rest/v1/rpc/open_help_requests' && (req.method === 'GET' || req.method === 'POST')) {
+    const nowMs = Date.now();
+    const rows = [...store.requests.values()]
+      .filter(r => r.status === 'open' && canSee(r))
+      .map(r => ({ ...r, age_seconds: Math.floor((nowMs - Date.parse(r.opened_at)) / 1000) }))
+      .filter(r => r.age_seconds >= 0 && r.age_seconds * 1000 <= OPEN_WINDOW_MS)
+      .sort((a, b) => (a.opened_at < b.opened_at ? 1 : a.opened_at > b.opened_at ? -1 : 0))
+      .slice(0, 20);
+    return send(res, 200, rows);
+  }
   if (req.method !== 'POST') return pgErr(res, 405, 'PGRST117', 'Unsupported HTTP method');
   if (p === '/rest/v1/rpc/accept_help_request') {
     const me = profiles.get(uid);
     if (me?.role !== 'volunteer') return pgErr(res, 403, '42501', 'not_a_volunteer');
+    if ([...store.requests.values()].some(x => x.volunteer_id === uid && x.status === 'matched')) return pgErr(res, 400, 'P0001', 'already_helping');
     const r = store.requests.get(input?.p_request_id);
     // Node runs one request at a time, so check-and-set here is as atomic as the SQL update.
-    if (!r || r.status !== 'open' || r.visitor_id === uid) return pgErr(res, 400, 'P0001', 'already_taken');
+    if (!r || r.status === 'cancelled' || r.status === 'done') return pgErr(res, 400, 'P0001', 'request_closed');
+    if (r.status !== 'open' || r.visitor_id === uid) return pgErr(res, 400, 'P0001', 'already_taken');
     Object.assign(r, {
       status: 'matched', volunteer_id: uid, volunteer_name: me.first_name,
       volunteer_languages: [me.main_language, ...me.languages.filter(l => l !== me.main_language)],
@@ -464,6 +492,16 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
     const allowed = r && (r.status === 'open' || r.status === 'matched')
       && (r.visitor_id === uid || (r.volunteer_id === uid && r.status === 'matched' && status === 'done'));
     if (allowed) Object.assign(r, { status, closed_by: uid, closed_at: now() });
+    return send(res, 204);
+  }
+  if (p === '/rest/v1/rpc/release_help_request') {
+    const r = store.requests.get(input?.p_request_id);
+    if (r && r.status === 'matched' && r.volunteer_id === uid) {
+      Object.assign(r, {
+        status: 'open', volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
+        matched_at: null, opened_at: now(),
+      });
+    }
     return send(res, 204);
   }
 }

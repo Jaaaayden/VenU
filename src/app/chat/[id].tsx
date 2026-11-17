@@ -119,6 +119,7 @@ export default function ChatScreen() {
                   recipient={m.from === 'me' && !all.slice(i + 1).some(n => n.from === 'me') ? { name: peer.firstName, language: peer.language } : null}
                   senderName={peer.name}
                   onListen={() => show(t('chat.listenSoon'))}
+                  onRetry={() => c.retry(m.id)}
                 />
               </Fragment>
             ))

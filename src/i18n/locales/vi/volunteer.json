@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Không liên lạc được với tình nguyện viên. Hãy kiểm tra kết nối và thử lại.",
-    "thanks": "Cảm ơn bạn! Góp ý của bạn giúp {{name}} và đội LA28."
+    "thanks": "Cảm ơn bạn! Góp ý của bạn giúp {{name}} và đội LA28.",
+    "volunteerLeft": "Tình nguyện viên của bạn phải rời đi. Đang tìm người khác."
   },
   "searching": {
     "title": "Đang tìm tình nguyện viên",
@@ -156,7 +157,10 @@
     "listen": "nghe",
     "listenLabel": "Nghe tin nhắn này",
     "from": "{{name}}, {{time}}: {{text}}",
-    "fromTranslated": "{{name}}, {{time}}: {{text}} (dịch từ {{language}})"
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (dịch từ {{language}})",
+    "notSent": "Chưa gửi",
+    "retry": "Nhấn để thử lại",
+    "retryLabel": "Chưa gửi. Gửi lại tin nhắn này"
   },
   "feedback": {
     "skip": "Bỏ qua",
@@ -228,7 +232,8 @@
     "acceptFailed": "Không thể nhận yêu cầu. Hãy kiểm tra kết nối và thử lại.",
     "cancelled": "{{name}} đã hủy yêu cầu.",
     "done": "{{name}} đã đánh dấu là đã được giúp xong. Cảm ơn bạn!",
-    "ended": "Đã kết thúc trò chuyện. Cảm ơn bạn đã giúp {{name}}!"
+    "ended": "Đã kết thúc trò chuyện. Cảm ơn bạn đã giúp {{name}}!",
+    "withdrawn": "Yêu cầu này đã được rút lại."
   },
   "home": {
     "greeting": "Xin chào, {{name}}",

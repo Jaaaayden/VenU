@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Hindi makakonekta sa volunteer. Tingnan ang koneksyon mo at subukan ulit.",
-    "thanks": "Salamat! Nakakatulong ang feedback mo kay {{name}} at sa LA28 team."
+    "thanks": "Salamat! Nakakatulong ang feedback mo kay {{name}} at sa LA28 team.",
+    "volunteerLeft": "Kinailangang umalis ng iyong volunteer. Naghahanap ng iba."
   },
   "searching": {
     "title": "Naghahanap ng volunteer",
@@ -157,7 +158,10 @@
     "listen": "pakinggan",
     "listenLabel": "Pakinggan ang mensaheng ito",
     "from": "{{name}}, {{time}}: {{text}}",
-    "fromTranslated": "{{name}}, {{time}}: {{text}} (isinalin mula sa {{language}})"
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (isinalin mula sa {{language}})",
+    "notSent": "Hindi naipadala",
+    "retry": "I-tap para subukang muli",
+    "retryLabel": "Hindi naipadala. Ipadala ulit ang mensaheng ito"
   },
   "feedback": {
     "skip": "Laktawan",
@@ -230,7 +234,8 @@
     "acceptFailed": "Hindi matanggap ang request. Tingnan ang koneksyon mo at subukan ulit.",
     "cancelled": "Kinansela ni {{name}} ang request.",
     "done": "Minarkahan ni {{name}} na tapos na ang tulong. Salamat!",
-    "ended": "Tapos na ang chat. Salamat sa pagtulong kay {{name}}!"
+    "ended": "Tapos na ang chat. Salamat sa pagtulong kay {{name}}!",
+    "withdrawn": "Binawi na ang request na ito."
   },
   "home": {
     "greeting": "Kumusta, {{name}}",

@@ -11,7 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { chatLanguage } from '@/features/translate/languages';
 import { languageName } from '@/features/profile/options';
 
-import { abortError, AlreadyTakenError, type VolunteerBackend } from './backend';
+import { abortError, AlreadyHelpingError, AlreadyTakenError, RequestClosedError, type VolunteerBackend } from './backend';
 import { HELP_TYPES } from './mock';
 import type { Assignment, ChatMessage, ClosedStatus, HelpRequest, HelpTypeId, IncomingRequest, Match, SkillCode, Volunteer } from './types';
 
@@ -34,9 +34,14 @@ export interface RequestRow {
   volunteer_trainings: string[] | null;
   closed_by: string | null;
   created_at: string;
+  /** When it last opened: created_at, or when a volunteer handed it back. The open list's window counts from it. */
+  opened_at: string;
   matched_at: string | null;
   closed_at: string | null;
 }
+
+/** A row from open_help_requests(): an open request and its age by the server's clock, e.g. 210 (3½ min). */
+export type OpenRequestRow = RequestRow & { age_seconds: number };
 
 /** What the visitor's app inserts; the database fills in the rest (visitor_id from the session). */
 export type NewRequestRow = Pick<RequestRow, 'id' | 'visitor_name' | 'venue_id' | 'spot' | 'help_types' | 'note' | 'language'>;
@@ -61,14 +66,20 @@ export interface HelpDb {
   /** Inserts a request; an id that's already there (a search resumed after a restart) is fine. */
   insertRequest(row: NewRequestRow): Promise<void>;
   getRequest(id: string): Promise<RequestRow | null>;
-  /** Open requests created at or after `sinceIso`, newest first. */
-  openRequests(sinceIso: string): Promise<RequestRow[]>;
+  /** open_help_requests(): requests opened in the last 5 minutes by the server's clock, newest first. */
+  openRequests(): Promise<OpenRequestRow[]>;
   /** The matched request `volunteerId` accepted most recently, if any. */
   activeAssignment(volunteerId: string): Promise<RequestRow | null>;
-  /** accept_help_request; rejects with AlreadyTakenError when it isn't open any more. */
+  /**
+   * accept_help_request; rejects with AlreadyTakenError (another volunteer has it), RequestClosedError
+   * (cancelled or finished) or AlreadyHelpingError (this volunteer already has a matched request).
+   */
   accept(id: string): Promise<RequestRow>;
   close(id: string, status: ClosedStatus): Promise<void>;
-  messages(requestId: string): Promise<MessageRow[]>;
+  /** release_help_request: the matched volunteer hands the request back, and it's open again. */
+  release(id: string): Promise<void>;
+  /** The messages on a request you may read, oldest first; with `sinceIso`, only those created at or after it. */
+  messages(requestId: string, sinceIso?: string): Promise<MessageRow[]>;
   sendMessage(row: NewMessageRow): Promise<void>;
   /**
    * Realtime changes to `spec`'s rows: `onRow` gets the new row (null for a delete), `onLive` whether
@@ -86,8 +97,13 @@ export const CONNECT_GRACE_MS = 3000;
  * being visible to other volunteers (RLS), so Realtime never tells them; this also keeps "3 min ago" fresh.
  */
 export const OPEN_REFRESH_MS = 5000;
-/** Requests older than this aren't shown: the visitor's app gives up after 2 minutes (SEARCH_TIMEOUT_MS). */
-export const OPEN_WINDOW_MS = 5 * 60 * 1000;
+/**
+ * Changes to help_requests within this long refresh the open list once, so a burst of requests
+ * (or a busy venue) costs one fetch instead of one each.
+ */
+export const CHANGE_BATCH_MS = 300;
+// Requests opened more than 5 minutes ago aren't listed (the visitor's app gives up after 2:
+// SEARCH_TIMEOUT_MS). The server applies that window by its own clock: open_help_requests().
 
 // ---- mapping
 
@@ -151,14 +167,15 @@ export function rowToMatch(row: RequestRow): Match {
   return { volunteer, language: chatLanguage(volunteer.languages), etaMinutes: null, distanceFeet: null };
 }
 
-export function rowToIncoming(row: RequestRow, now = Date.now()): IncomingRequest {
+/** "3 min ago" comes from the server's count of seconds, so a phone with its clock off still shows it right. */
+export function rowToIncoming(row: OpenRequestRow): IncomingRequest {
   return {
     id: row.id,
     visitorName: row.visitor_name,
     helpType: helpTypes(row.help_types)[0]!,
     location: { venueId: row.venue_id, facilityId: row.spot },
     language: row.language,
-    minutesAgo: Math.max(0, Math.floor((now - Date.parse(row.created_at)) / 60000)),
+    minutesAgo: Math.max(0, Math.floor(row.age_seconds / 60)),
     distanceFeet: null,
     note: row.note,
   };
@@ -257,6 +274,36 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
     };
   }
 
+  /** One watch per request row, shared by onClosed and onReleased: one channel and one poll, not two. */
+  const rowWatches = new Map<string, { listeners: Set<(row: RequestRow) => void>; stop: () => void }>();
+
+  function watchRow(requestId: string, listener: (row: RequestRow) => void): () => void {
+    let entry = rowWatches.get(requestId);
+    if (entry) {
+      // Joining a watch that's already running: catch up on the row now, not at the next change.
+      const joined = entry;
+      db.getRequest(requestId).then(row => { if (row && joined.listeners.has(listener)) listener(row); }, () => {});
+    } else {
+      const listeners = new Set<(row: RequestRow) => void>();
+      const deliver = (row: RequestRow | null) => {
+        if (row?.id === requestId) listeners.forEach(l => l(row));
+      };
+      const stop = watch<RequestRow>(db, { table: 'help_requests', filter: `id=eq.${requestId}` }, deliver, () => {
+        db.getRequest(requestId).then(deliver, () => {});
+      });
+      entry = { listeners, stop };
+      rowWatches.set(requestId, entry);
+    }
+    const mine = entry;
+    mine.listeners.add(listener);
+    return () => {
+      mine.listeners.delete(listener);
+      if (mine.listeners.size || rowWatches.get(requestId) !== mine) return;
+      rowWatches.delete(requestId);
+      mine.stop();
+    };
+  }
+
   return {
     newRequestId: randomUuid,
 
@@ -303,18 +350,27 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
       await db.sendMessage({ request_id: requestId, text, language: lang ?? null });
     },
 
-    onMessage(requestId, listener) {
+    onMessage(requestId, listener, since) {
       return withMe(me => {
         const seen = new Set<string>();
+        // Each fetch asks only for messages from the newest one seen on (inclusive, as several can
+        // share a timestamp; `seen` drops the repeats), as the server wrote its time.
+        let cursor = since != null ? new Date(since).toISOString() : undefined;
+        let cursorMs = since ?? -Infinity;
         const deliver = (rows: MessageRow[]) => {
           for (const row of rows) {
             if (row.request_id !== requestId || seen.has(row.id)) continue;
             seen.add(row.id);
+            const at = Date.parse(row.created_at);
+            if (at >= cursorMs) {
+              cursorMs = at;
+              cursor = row.created_at;
+            }
             if (row.sender_id !== me) listener(rowToMessage(row, me));
           }
         };
         return watch<MessageRow>(db, { table: 'messages', filter: `request_id=eq.${requestId}` }, row => row && deliver([row]), () => {
-          db.messages(requestId).then(deliver, () => {});
+          db.messages(requestId, cursor).then(deliver, () => {});
         });
       });
     },
@@ -322,14 +378,22 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
     onClosed(requestId, listener) {
       return withMe(me => {
         let told = false;
-        const check = (row: RequestRow | null) => {
-          if (told || !row || row.id !== requestId || !isClosed(row.status)) return;
+        return watchRow(requestId, row => {
+          if (told || !isClosed(row.status)) return;
           told = true;
           listener({ status: row.status, byMe: row.closed_by === me });
-        };
-        return watch<RequestRow>(db, { table: 'help_requests', filter: `id=eq.${requestId}` }, check, () => {
-          db.getRequest(requestId).then(check, () => {});
         });
+      });
+    },
+
+    onReleased(requestId, volunteerId, listener) {
+      let told = false;
+      return watchRow(requestId, row => {
+        // Open again, or (handed back while this app was closed) someone else already took it.
+        const released = row.status === 'open' || (row.status === 'matched' && row.volunteer_id !== volunteerId);
+        if (told || !released) return;
+        told = true;
+        listener();
       });
     },
 
@@ -339,20 +403,31 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
 
     watchOpenRequests(listener) {
       let latest = 0;
+      let batch: ReturnType<typeof setTimeout> | null = null;
       const refresh = () => {
+        if (batch) clearTimeout(batch);
+        batch = null;
         const call = ++latest;
-        const since = new Date(Date.now() - OPEN_WINDOW_MS).toISOString();
-        db.openRequests(since).then(
-          rows => { if (call === latest) listener(rows.filter(r => r.status === 'open').map(r => rowToIncoming(r))); },
+        db.openRequests().then(
+          rows => { if (call === latest) listener(rows.filter(r => r.status === 'open').map(rowToIncoming)); },
           () => {},
         );
       };
-      return watch<RequestRow>(db, { table: 'help_requests' }, () => refresh(), refresh, OPEN_REFRESH_MS);
+      // A change only schedules a refresh; the ones that follow within CHANGE_BATCH_MS share it.
+      const soon = () => { batch ??= setTimeout(refresh, CHANGE_BATCH_MS); };
+      const stop = watch<RequestRow>(db, { table: 'help_requests' }, soon, refresh, OPEN_REFRESH_MS);
+      return () => {
+        if (batch) clearTimeout(batch);
+        latest += 1;
+        stop();
+      };
     },
 
     async acceptRequest(requestId) {
       return rowToAssignment(await db.accept(requestId));
     },
+
+    releaseRequest: requestId => db.release(requestId),
 
     async currentAssignment() {
       const row = await db.activeAssignment(await db.me());
@@ -388,16 +463,10 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
       if (error) fail(error);
       return (data as RequestRow | null) ?? null;
     },
-    async openRequests(sinceIso) {
-      const { data, error } = await client
-        .from('help_requests')
-        .select('*')
-        .eq('status', 'open')
-        .gte('created_at', sinceIso)
-        .order('created_at', { ascending: false })
-        .limit(20);
+    async openRequests() {
+      const { data, error } = await client.rpc('open_help_requests');
       if (error) fail(error);
-      return (data as RequestRow[] | null) ?? [];
+      return (data as OpenRequestRow[] | null) ?? [];
     },
     async activeAssignment(volunteerId) {
       const { data, error } = await client
@@ -413,6 +482,8 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
     async accept(id) {
       const { data, error } = await client.rpc('accept_help_request', { p_request_id: id });
       if (error) {
+        if (/already_helping/.test(error.message)) throw new AlreadyHelpingError();
+        if (/request_closed/.test(error.message)) throw new RequestClosedError();
         if (/already_taken/.test(error.message)) throw new AlreadyTakenError();
         fail(error);
       }
@@ -422,8 +493,14 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
       const { error } = await client.rpc('close_help_request', { p_request_id: id, p_status: status });
       if (error) fail(error);
     },
-    async messages(requestId) {
-      const { data, error } = await client.from('messages').select('*').eq('request_id', requestId).order('created_at', { ascending: true });
+    async release(id) {
+      const { error } = await client.rpc('release_help_request', { p_request_id: id });
+      if (error) fail(error);
+    },
+    async messages(requestId, sinceIso) {
+      let query = client.from('messages').select('*').eq('request_id', requestId);
+      if (sinceIso) query = query.gte('created_at', sinceIso);
+      const { data, error } = await query.order('created_at', { ascending: true });
       if (error) fail(error);
       return (data as MessageRow[] | null) ?? [];
     },

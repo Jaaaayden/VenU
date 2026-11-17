@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Impossible de joindre un bénévole. Vérifiez votre connexion et réessayez.",
-    "thanks": "Merci ! Votre avis aide {{name}} et l’équipe LA28."
+    "thanks": "Merci ! Votre avis aide {{name}} et l’équipe LA28.",
+    "volunteerLeft": "Votre bénévole a dû partir. Nous cherchons quelqu’un d’autre."
   },
   "searching": {
     "title": "Recherche d’un bénévole",
@@ -158,7 +159,10 @@
     "listen": "écouter",
     "listenLabel": "Écouter ce message",
     "from": "{{name}}, {{time}} : {{text}}",
-    "fromTranslated": "{{name}}, {{time}} : {{text}} (traduit, original : {{language}})"
+    "fromTranslated": "{{name}}, {{time}} : {{text}} (traduit, original : {{language}})",
+    "notSent": "Non envoyé",
+    "retry": "Touchez pour réessayer",
+    "retryLabel": "Non envoyé. Renvoyer ce message"
   },
   "feedback": {
     "skip": "Passer",
@@ -232,7 +236,8 @@
     "acceptFailed": "Impossible d’accepter la demande. Vérifiez votre connexion et réessayez.",
     "cancelled": "{{name}} a annulé la demande.",
     "done": "{{name}} a indiqué que l’aide est terminée. Merci !",
-    "ended": "Conversation terminée. Merci d’avoir aidé {{name}} !"
+    "ended": "Conversation terminée. Merci d’avoir aidé {{name}} !",
+    "withdrawn": "Cette demande a été retirée."
   },
   "home": {
     "greeting": "Bonjour, {{name}}",
