@@ -20,6 +20,8 @@ export interface Conversation {
   /** For the volunteer: where the visitor is waiting. */
   meetPoint: MeetPoint | null;
   send(text: string): void;
+  /** Sends a message that failed ("Not sent · Tap to retry") again, by id. */
+  retry(messageId: string): void;
   markRead(): void;
 }
 
@@ -48,6 +50,7 @@ export function useConversation(id: string | undefined): { conversation: Convers
         etaMinutes: match.etaMinutes,
         meetPoint: null,
         send: volunteerRequests.sendMessage,
+        retry: volunteerRequests.retryMessage,
         markRead: volunteerRequests.markRead,
       },
     };
@@ -66,6 +69,7 @@ export function useConversation(id: string | undefined): { conversation: Convers
         etaMinutes: null,
         meetPoint: a.location,
         send: volunteerDesk.sendMessage,
+        retry: volunteerDesk.retryMessage,
         markRead: volunteerDesk.markRead,
       },
     };

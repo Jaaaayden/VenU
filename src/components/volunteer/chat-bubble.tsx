@@ -8,7 +8,8 @@
  * "Translated from English · Show original" under it (a button that flips between the two). While it
  * translates, or if it can't, the original shows with a short note ("Couldn't translate · Try again").
  * Yours show what you typed; the last one can name who reads it: "Daniel will see this translated
- * into English" once a real translator has answered, else just "Daniel reads English".
+ * into English" once a real translator has answered, else just "Daniel reads English". One the
+ * service refused says "Not sent · Tap to retry" under it instead, and tapping sends it again.
  */
 import { useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
@@ -55,10 +56,13 @@ interface Props {
   /** Who wrote an incoming message, for screen readers, e.g. 'Daniel K.' or 'Rosa'. */
   senderName: string;
   onListen?: () => void;
+  /** Sends a message of yours that failed again ("Tap to retry"). */
+  onRetry?: () => void;
 }
 
-export function ChatBubble({ message, recipient, senderName, onListen }: Props) {
+export function ChatBubble({ message, recipient, senderName, onListen, onRetry }: Props) {
   const mine = message.from === 'me';
+  const failed = mine && !!message.failed;
   const t = useT('volunteer');
   const tp = useT('profile'); // language names in the UI language
   const rtl = useLayoutRtl();
@@ -75,7 +79,7 @@ export function ChatBubble({ message, recipient, senderName, onListen }: Props) 
   const translated = translation.kind === 'translated' && !original ? translation : null;
   const text = translated ? (translated.partial ? `${translated.text}…` : translated.text) : message.text;
   const recipientLanguage = recipient && recipient.language !== reader ? uiLanguageName(recipient.language, tp) : null;
-  const hint = !mine || !recipient || !recipientLanguage
+  const hint = !mine || failed || !recipient || !recipientLanguage
     ? null
     : isRealProvider(provider)
       ? t('translation.willSeeIn', { name: recipient.name, language: recipientLanguage })
@@ -83,7 +87,7 @@ export function ChatBubble({ message, recipient, senderName, onListen }: Props) 
   const source = translated?.source ? uiLanguageName(translated.source, tp) : null;
   // Screen readers get the text on screen, then where it was translated from.
   const label = mine
-    ? t('bubble.mine', { time, text })
+    ? failed ? `${t('bubble.mine', { time, text })}. ${t('bubble.notSent')}` : t('bubble.mine', { time, text })
     : source
       ? t('bubble.fromTranslated', { name: senderName, time, text, language: source })
       : t('bubble.from', { name: senderName, time, text });
@@ -109,11 +113,26 @@ export function ChatBubble({ message, recipient, senderName, onListen }: Props) 
           <Text style={[styles.text, mine && styles.textMine]}>{text}</Text>
           <View style={styles.meta}>
             <Text style={[styles.time, mine && styles.timeMine]}>{time}</Text>
-            {mine ? <FigmaIcon name="read" size={16} color={Colors.onPrimary} /> : null}
+            {mine && !failed ? <FigmaIcon name="read" size={16} color={Colors.onPrimary} /> : null}
           </View>
         </View>
       </View>
       {hint ? <Text style={styles.hint}>{hint}</Text> : null}
+      {failed ? (
+        <Pressable
+          onPress={onRetry}
+          disabled={!onRetry}
+          accessibilityRole="button"
+          accessibilityLabel={t('bubble.retryLabel')}
+          hitSlop={6}
+          style={({ pressed }) => [styles.toggle, styles.failed, pressed && styles.pressed]}>
+          <Text style={[styles.note, styles.notSent]}>
+            {t('bubble.notSent')}
+            {' · '}
+            <Text style={styles.noteLink}>{t('bubble.retry')}</Text>
+          </Text>
+        </Pressable>
+      ) : null}
       {!mine ? (
         <View style={styles.footer}>
           <TranslationNote translation={translation} reader={reader} original={original} onToggle={() => setOriginal(o => !o)} onRetry={retry} />
@@ -221,4 +240,7 @@ const styles = StyleSheet.create({
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted },
   noteLink: { fontFamily: Fonts.textSemiBold, color: Colors.primary },
   hint: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, alignSelf: 'flex-end', marginTop: 6, paddingEnd: TAIL + 2 },
+  // Under your bubble, on the same edge as the hint it replaces.
+  failed: { alignSelf: 'flex-end', paddingEnd: TAIL + 2 },
+  notSent: { color: Colors.danger },
 });

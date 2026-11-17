@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Não conseguimos falar com um voluntário. Verifique sua conexão e tente de novo.",
-    "thanks": "Obrigado! Sua avaliação ajuda {{name}} e a equipe LA28."
+    "thanks": "Obrigado! Sua avaliação ajuda {{name}} e a equipe LA28.",
+    "volunteerLeft": "Seu voluntário precisou sair. Estamos procurando outra pessoa."
   },
   "searching": {
     "title": "Procurando um voluntário",
@@ -158,7 +159,10 @@
     "listen": "ouvir",
     "listenLabel": "Ouvir esta mensagem",
     "from": "{{name}}, {{time}}: {{text}}",
-    "fromTranslated": "{{name}}, {{time}}: {{text}} (traduzido do {{language}})"
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (traduzido do {{language}})",
+    "notSent": "Não enviada",
+    "retry": "Toque para tentar de novo",
+    "retryLabel": "Não enviada. Enviar esta mensagem de novo"
   },
   "feedback": {
     "skip": "Pular",
@@ -232,7 +236,8 @@
     "acceptFailed": "Não foi possível aceitar o pedido. Verifique sua conexão e tente de novo.",
     "cancelled": "{{name}} cancelou o pedido.",
     "done": "{{name}} marcou a ajuda como concluída. Obrigado!",
-    "ended": "Conversa encerrada. Obrigado por ajudar {{name}}!"
+    "ended": "Conversa encerrada. Obrigado por ajudar {{name}}!",
+    "withdrawn": "Este pedido foi retirado."
   },
   "home": {
     "greeting": "Oi, {{name}}",

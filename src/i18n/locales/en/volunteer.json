@@ -68,7 +68,8 @@
   },
   "notice": {
     "searchFailed": "Couldn't reach a volunteer. Check your connection and try again.",
-    "thanks": "Thanks! Your feedback helps {{name}} and the LA28 team."
+    "thanks": "Thanks! Your feedback helps {{name}} and the LA28 team.",
+    "volunteerLeft": "Your volunteer had to leave. Finding someone else."
   },
   "searching": {
     "title": "Finding a volunteer",
@@ -157,7 +158,10 @@
     "listen": "listen",
     "listenLabel": "Listen to this message",
     "from": "{{name}}, {{time}}: {{text}}",
-    "fromTranslated": "{{name}}, {{time}}: {{text}} (translated from {{language}})"
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (translated from {{language}})",
+    "notSent": "Not sent",
+    "retry": "Tap to retry",
+    "retryLabel": "Not sent. Send this message again"
   },
   "feedback": {
     "skip": "Skip",
@@ -230,7 +234,8 @@
     "acceptFailed": "Couldn't accept the request. Check your connection and try again.",
     "cancelled": "{{name}} cancelled the request.",
     "done": "{{name}} marked the help as done. Thank you!",
-    "ended": "Chat ended. Thanks for helping {{name}}!"
+    "ended": "Chat ended. Thanks for helping {{name}}!",
+    "withdrawn": "This request was withdrawn."
   },
   "home": {
     "greeting": "Hi, {{name}}",

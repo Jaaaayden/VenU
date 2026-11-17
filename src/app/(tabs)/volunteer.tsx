@@ -33,7 +33,7 @@ export default function VolunteerScreen() {
   // Figma 492:8829 puts Find a Volunteer (only) on the cream-to-blue page gradient.
   let onForm = false;
   if (isVolunteer) body = <VolunteerHome profile={profile} />;
-  else if (status === 'searching' && request) body = <SearchingView request={request} />;
+  else if (status === 'searching' && request) body = <SearchingView request={request} notice={state.notice} />;
   else if (status === 'notFound' && request) body = <NotFoundView request={request} />;
   else if (status === 'matched' && request && match) body = <MatchView request={request} match={match} unread={state.unread} />;
   else if (status === 'done' && match) body = <FeedbackView match={match} />;

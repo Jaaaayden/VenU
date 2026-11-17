@@ -47,7 +47,10 @@ function LiveRequests() {
   useEffect(() => volunteerDesk.watchOpen(), []);
 
   async function accept(id: string) {
-    if (await volunteerDesk.accept(id)) router.push({ pathname: '/chat/[id]', params: { id } });
+    await volunteerDesk.accept(id);
+    // The chat it got, or (already helping someone, from another device) the one it already had.
+    const current = volunteerDesk.getState().assignment?.id;
+    if (current) router.push({ pathname: '/chat/[id]', params: { id: current } });
   }
 
   return (
