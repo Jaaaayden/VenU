@@ -7,6 +7,8 @@
 // volunteer accepted and loads its chat again.
 import { useSyncExternalStore } from 'react';
 
+import { onBeforeSignOut } from '@/lib/before-sign-out';
+
 import { appBackend } from './app-backend';
 import { AlreadyTakenError, newId, type VolunteerBackend } from './backend';
 import type { Assignment, ChatMessage, IncomingRequest, RequestClosed } from './types';
@@ -171,6 +173,12 @@ export function createDeskStore(backend: VolunteerBackend) {
       backend.endHelp(id).catch(() => {});
     },
 
+    /** Ends the volunteer's chat on the server while still signed in (runs just before sign-out). */
+    async endSession(): Promise<void> {
+      const id = state.assignment?.id;
+      if (id) await backend.endHelp(id);
+    },
+
     dismissNotice() {
       if (state.notice) set({ notice: null });
     },
@@ -209,6 +217,8 @@ export type DeskStore = ReturnType<typeof createDeskStore>;
 
 /** The app's volunteer desk, on the same backend as the visitor's requests. */
 export const volunteerDesk: DeskStore = createDeskStore(appBackend);
+
+onBeforeSignOut(() => volunteerDesk.endSession());
 
 export function useVolunteerDesk(store: DeskStore = volunteerDesk): DeskState {
   return useSyncExternalStore(store.subscribe, store.getState, store.getState);

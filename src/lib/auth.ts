@@ -3,6 +3,7 @@ import { isAuthRetryableFetchError, type SupabaseClient } from '@supabase/supaba
 
 import { isEmailLike, normalizeUsername } from '@/features/auth/username';
 import { clearSavedDraft } from '@/features/profile/setup-draft-storage';
+import { runBeforeSignOut } from '@/lib/before-sign-out';
 import { codedError, friendlyError } from '@/lib/errors';
 import { supabase } from '@/lib/supabase';
 
@@ -105,6 +106,8 @@ export async function signUp(email: string, password: string, username: string):
 export async function signOut(): Promise<void> {
   // Half-finished setup answers (name, access needs) shouldn't stay on a shared device.
   await clearSavedDraft();
+  // While still signed in: e.g. close an open help request, which the server refuses once signed out.
+  await runBeforeSignOut();
   if (!supabase) {
     await AsyncStorage.removeItem(LOCAL_SESSION_KEY);
     return;
