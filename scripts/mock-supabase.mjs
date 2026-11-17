@@ -385,7 +385,7 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
       const row = Array.isArray(input) ? input[0] : input;
       const visitorId = row?.visitor_id ?? uid;
       const opensClean = (row?.status ?? 'open') === 'open'
-        && ['volunteer_id', 'volunteer_name', 'volunteer_languages', 'volunteer_trainings', 'volunteer_gender', 'closed_by', 'matched_at', 'closed_at'].every(k => row?.[k] == null);
+        && ['volunteer_id', 'volunteer_name', 'volunteer_languages', 'volunteer_trainings', 'closed_by', 'matched_at', 'closed_at'].every(k => row?.[k] == null);
       if (!row || visitorId !== uid || !opensClean) return rls('help_requests');
       const types = row.help_types;
       if (!Array.isArray(types) || types.length < 1 || types.length > 6 || !types.every(t => HELP_TYPE_IDS.includes(t)) || !row.venue_id || !row.language)
@@ -395,7 +395,7 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
       const full = {
         id, visitor_id: uid, visitor_name: String(row.visitor_name ?? '').slice(0, 40), venue_id: row.venue_id, spot: row.spot ?? null,
         help_types: types, note: String(row.note ?? '').slice(0, 500), language: row.language, status: 'open',
-        volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null, volunteer_gender: null,
+        volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
         closed_by: null, created_at: now(), matched_at: null, closed_at: null,
       };
       store.requests.set(id, full);
@@ -432,7 +432,7 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
     Object.assign(r, {
       status: 'matched', volunteer_id: uid, volunteer_name: me.first_name,
       volunteer_languages: [me.main_language, ...me.languages.filter(l => l !== me.main_language)],
-      volunteer_trainings: me.trainings ?? [], volunteer_gender: me.gender ?? null, matched_at: now(),
+      volunteer_trainings: me.trainings ?? [], matched_at: now(),
     });
     return send(res, 200, r);
   }

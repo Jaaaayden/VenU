@@ -85,7 +85,7 @@ function fakeServer({ realtime = true } = {}) {
         if (requests.has(row.id)) return;
         const full: RequestRow = {
           ...row, visitor_id: who, status: 'open', volunteer_id: null, volunteer_name: null, volunteer_languages: null,
-          volunteer_trainings: null, volunteer_gender: null, closed_by: null, created_at: now(), matched_at: null, closed_at: null,
+          volunteer_trainings: null, closed_by: null, created_at: now(), matched_at: null, closed_at: null,
         };
         requests.set(row.id, full);
         changed(full);
@@ -105,7 +105,7 @@ function fakeServer({ realtime = true } = {}) {
         const next: RequestRow = {
           ...r, status: 'matched', volunteer_id: who, volunteer_name: p.first_name,
           volunteer_languages: [p.main_language, ...p.languages.filter(l => l !== p.main_language)],
-          volunteer_trainings: p.trainings, volunteer_gender: p.gender, matched_at: now(),
+          volunteer_trainings: p.trainings, matched_at: now(),
         };
         requests.set(id, next);
         changed(next);
@@ -179,7 +179,7 @@ describe('mapping rows', () => {
   const row: RequestRow = {
     id: 'r1', visitor_id: 'rosa', visitor_name: 'Rosa', venue_id: 'sofi', spot: 'entry-4', help_types: ['quiet', 'nonsense'],
     note: 'Too loud', language: 'es', status: 'matched', volunteer_id: 'sam', volunteer_name: 'Sam',
-    volunteer_languages: ['en', 'es'], volunteer_trainings: ['first_aid', 'sighted_guide'], volunteer_gender: 'man',
+    volunteer_languages: ['en', 'es'], volunteer_trainings: ['first_aid', 'sighted_guide'],
     closed_by: null, created_at: '2026-11-17T18:00:00Z', matched_at: '2026-11-17T18:01:00Z', closed_at: null,
   };
 
@@ -189,17 +189,17 @@ describe('mapping rows', () => {
     });
   });
 
-  it('turns the accepted volunteer into a match: name, pronoun, trainings it knows, languages, no rating or ETA', () => {
+  it('turns the accepted volunteer into a match: name, trainings it knows, languages, no rating or ETA', () => {
     const m = rowToMatch(row);
-    expect(m.volunteer).toMatchObject({ id: 'sam', name: 'Sam', firstName: 'Sam', possessive: 'his', languages: ['en', 'es'], rating: null });
+    expect(m.volunteer).toMatchObject({ id: 'sam', name: 'Sam', firstName: 'Sam', possessive: 'their', languages: ['en', 'es'], rating: null });
     expect(m.volunteer.tags).toEqual([
       { label: 'first_aid', skill: 'first_aid', tone: 'success' },
       { label: 'English', tone: 'warning' },
       { label: 'Español', tone: 'warning' },
     ]);
     expect(m).toMatchObject({ language: 'en', etaMinutes: null, distanceFeet: null });
-    expect(rowToMatch({ ...row, volunteer_gender: 'woman' }).volunteer.possessive).toBe('her');
-    expect(rowToMatch({ ...row, volunteer_gender: null }).volunteer.possessive).toBe('their');
+    // Gender is never shown, so a live match is always "on their way".
+    expect(m.volunteer.possessive).toBe('their');
   });
 
   it('shows an open request with how long ago it came in, skipping help types it does not know', () => {

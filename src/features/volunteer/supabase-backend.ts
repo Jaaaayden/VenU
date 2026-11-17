@@ -32,7 +32,6 @@ export interface RequestRow {
   volunteer_name: string | null;
   volunteer_languages: string[] | null;
   volunteer_trainings: string[] | null;
-  volunteer_gender: string | null;
   closed_by: string | null;
   created_at: string;
   matched_at: string | null;
@@ -123,11 +122,6 @@ function helpTypes(values: string[]): HelpTypeId[] {
   return known.length ? known : ['other'];
 }
 
-/** "on his / her / their way", from the gender on the volunteer's profile. */
-function possessive(gender: string | null): Volunteer['possessive'] {
-  return gender === 'man' ? 'his' : gender === 'woman' ? 'her' : 'their';
-}
-
 /**
  * The volunteer on an accepted request, from the snapshot accept_help_request took of their profile.
  * e.g. { volunteer_name: 'Sam', volunteer_languages: ['en','es'], volunteer_trainings: ['first_aid'] }
@@ -141,7 +135,8 @@ export function rowToVolunteer(row: RequestRow): Volunteer {
     id: row.volunteer_id ?? '',
     name,
     firstName: name,
-    possessive: possessive(row.volunteer_gender),
+    // The profile promises gender is never shown, so a live match never says his or her.
+    possessive: 'their',
     languages,
     rating: null,
     tags: [
