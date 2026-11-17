@@ -88,6 +88,13 @@ describe('normalized positions on screen', () => {
     expect(toScreen({ x: 0.8, y: 0.7 }, content, view).x).toBeLessThanOrEqual(viewport.w - 52 - 24 + 1e-6);
   });
 
+  it('zooms a whole square map out a little, so pins on its east edge clear the zoom buttons', () => {
+    const square = contentSize(1, 390); // Crypto.com Arena's schematic
+    const view = fitRect([0, 0, 1, 1], square, { w: 390, h: 430 }, 24, 6, { top: 52, right: 52 });
+    expect(view.s).toBeLessThan(1);
+    expect(toScreen({ x: 0.95, y: 0.5 }, square, view).x).toBeLessThan(390 - 52);
+  });
+
   it('caps how far a fit zooms in, so one pin still shows its surroundings', () => {
     expect(fitRect([0.4, 0.4, 0.4, 0.4], content, viewport, 28, 3).s).toBe(3);
   });

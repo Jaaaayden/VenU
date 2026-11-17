@@ -41,11 +41,13 @@ const PIN_BIG = 40;
 const HIT = 44;
 /** The zoom buttons' column at the right edge. */
 const HIT_BUTTONS = 44 + 8;
+/** The source bar across the map's top edge. */
+const SOURCE_BAR = 40;
 const ZOOM_STEP = 1.6;
 const DOUBLE_TAP_ZOOM = 2;
 const TIMING = { duration: 320 };
 /** Fits keep pins below the source bar and left of the zoom buttons. */
-const FIT_INSETS = { top: 52, right: HIT_BUTTONS };
+const FIT_INSETS = { top: SOURCE_BAR + Spacing.sm, right: HIT_BUTTONS };
 /** Room the bottom overlays (pin card, zoom buttons) keep clear above the sheet. */
 export const MAP_CARD_SPACE = 104;
 
@@ -90,6 +92,8 @@ export function VenueMapView(props: VenueMapViewProps) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
   const dims = useSharedValue({ content, viewport });
+  // Whether the visitor moved the map since the last fit: then a sheet change keeps their view.
+  const moved = useSharedValue(false);
   // A React copy of the scale, for line widths: updated when a gesture or animation ends.
   const [zoom, setZoom] = useState(1);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(map.image ? 'loading' : 'ready');
@@ -103,14 +107,16 @@ export function VenueMapView(props: VenueMapViewProps) {
     setZoom(v.s);
   };
 
-  // Fit on a new key; follow the sheet otherwise (keep what was in the middle of the visible part
-  // in the middle); bring a revealed pin on screen if it's hidden.
+  // Fit on a new key. When the sheet moves, fit again if the visitor left the fitted view alone,
+  // else keep what was in the middle of the visible part in the middle. Bring a revealed pin on
+  // screen if it's hidden.
   const last = useRef<{ key: string; vh: number; w: number; reveal: string | null | undefined } | null>(null);
   useEffect(() => {
     dims.set({ content, viewport });
     const prev = last.current;
     last.current = { key: fitKey, vh: viewport.h, w: width, reveal: revealId };
-    if (!prev || prev.key !== fitKey || prev.w !== width) {
+    if (!prev || prev.key !== fitKey || prev.w !== width || (prev.vh !== viewport.h && !moved.get())) {
+      moved.set(false);
       go(fitRect(rect, content, viewport, 24, fitMax, FIT_INSETS), !!prev);
       return;
     }
@@ -127,7 +133,10 @@ export function VenueMapView(props: VenueMapViewProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs on these inputs only; the rest is read fresh
   }, [fitKey, viewport.h, width, revealId]);
 
-  const zoomBy = (factor: number) => go(zoomAt(current(), factor, { x: width / 2, y: viewport.h / 2 }, content, viewport));
+  const zoomBy = (factor: number) => {
+    moved.set(true);
+    go(zoomAt(current(), factor, { x: width / 2, y: viewport.h / 2 }, content, viewport));
+  };
 
   const pan = usePanGesture({
     minDistance: 6,
@@ -135,6 +144,7 @@ export function VenueMapView(props: VenueMapViewProps) {
       'worklet';
       const d = dims.get();
       const v = clampView({ s: s.get(), x: x.get() + e.changeX, y: y.get() + e.changeY }, d.content, d.viewport);
+      moved.set(true);
       x.set(v.x);
       y.set(v.y);
     },
@@ -145,6 +155,7 @@ export function VenueMapView(props: VenueMapViewProps) {
       'worklet';
       const d = dims.get();
       const v = zoomAt({ s: s.get(), x: x.get(), y: y.get() }, e.scaleChange, { x: e.focalX, y: e.focalY }, d.content, d.viewport);
+      moved.set(true);
       s.set(v.s);
       x.set(v.x);
       y.set(v.y);
@@ -161,6 +172,7 @@ export function VenueMapView(props: VenueMapViewProps) {
       'worklet';
       const d = dims.get();
       const v = zoomAt({ s: s.get(), x: x.get(), y: y.get() }, DOUBLE_TAP_ZOOM, { x: e.x, y: e.y }, d.content, d.viewport);
+      moved.set(true);
       s.set(withTiming(v.s, TIMING));
       x.set(withTiming(v.x, TIMING));
       y.set(withTiming(v.y, TIMING));
@@ -183,6 +195,7 @@ export function VenueMapView(props: VenueMapViewProps) {
       const d = dims.get();
       const factor = Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015));
       const v = zoomAt({ s: s.get(), x: x.get(), y: y.get() }, factor, { x: e.clientX - box.left, y: e.clientY - box.top }, d.content, d.viewport);
+      moved.set(true);
       s.set(v.s);
       x.set(v.x);
       y.set(v.y);
@@ -194,7 +207,7 @@ export function VenueMapView(props: VenueMapViewProps) {
       node.removeEventListener('wheel', onWheel);
       clearTimeout(settle);
     };
-  }, [dims, s, x, y]);
+  }, [dims, moved, s, x, y]);
 
   const contentStyle = useAnimatedStyle(() => {
     const { w, h } = dims.get().content;
@@ -268,7 +281,7 @@ export function VenueMapView(props: VenueMapViewProps) {
 
       <SourceBar map={map} />
 
-      <View style={[styles.zoomButtons, { top: Math.max(viewport.h - MAP_CARD_SPACE - 2 * HIT - Spacing.sm, 52) }]} pointerEvents="box-none">
+      <View style={[styles.zoomButtons, { top: Math.max(viewport.h - MAP_CARD_SPACE - 2 * HIT - Spacing.sm, SOURCE_BAR + Spacing.sm) }]} pointerEvents="box-none">
         <ZoomButton glyph="+" label={t('officialMap.zoomIn')} onPress={() => zoomBy(ZOOM_STEP)} />
         <ZoomButton glyph="−" label={t('officialMap.zoomOut')} onPress={() => zoomBy(1 / ZOOM_STEP)} />
       </View>
@@ -377,17 +390,17 @@ const styles = StyleSheet.create({
   },
   sourceBar: {
     position: 'absolute',
-    top: Spacing.sm,
-    left: Spacing.sm,
-    right: Spacing.sm,
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
-    minHeight: 36,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radius.pill,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    ...Shadow.card,
+    height: SOURCE_BAR,
+    paddingHorizontal: Spacing.gutter,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.border,
   },
   source: { flex: 1, fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.textMuted },
   openLink: { minHeight: 36, justifyContent: 'center' },

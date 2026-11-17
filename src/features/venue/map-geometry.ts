@@ -52,10 +52,13 @@ export function toMap(screen: MapPoint, content: Box, view: MapView): MapPoint {
   return { x: (screen.x - view.x) / (view.s * content.w), y: (screen.y - view.y) / (view.s * content.h) };
 }
 
-/** Smallest scale: the whole image fits in the viewport. */
+/** How far past "the whole image fits" the map zooms out, so pins at its edges clear the buttons. */
+const ZOOM_OUT_SLACK = 0.75;
+
+/** Smallest scale: the whole image fits in the viewport, with some room around it. */
 export function minScale(content: Box, viewport: Box): number {
   'worklet';
-  return Math.min(viewport.w / content.w, viewport.h / content.h, 1);
+  return Math.min(viewport.w / content.w, viewport.h / content.h, 1) * ZOOM_OUT_SLACK;
 }
 
 /**

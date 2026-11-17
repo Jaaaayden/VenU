@@ -23,13 +23,14 @@ import { routeFor, type Route } from './directions';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { facilitiesFor } from './mock';
 import { PinCard } from './pin-card';
+import { snapPositions, type SheetSnap } from './sheet';
 import { MAP_BACKGROUND, SHEET_HANDLE } from './stadium-map';
 import type { Facility, FacilityCategory, Venue } from './types';
 import { BackArrow, venueText } from './ui';
 import { venueMapFor, type VenueMap } from './venue-maps';
 import { MAP_CARD_SPACE, VenueMapView } from './venue-map-view';
 
-export type SheetSnap = 'down' | 'mid' | 'up';
+export type { SheetSnap };
 
 interface VenueScreenState {
   venue: Venue;
@@ -84,18 +85,9 @@ export function SheetScroll({ children, contentContainerStyle, scrollRef, ...res
   );
 }
 
-/** Raised sheet's gap below the header, and how much of the lowered sheet shows above the tab bar. */
-const UP_GAP = 48;
-const PEEK = 132;
 const NEXT: Record<SheetSnap, SheetSnap> = { down: 'mid', mid: 'up', up: 'down' };
 const SNAP_NAMES: SheetSnap[] = ['up', 'mid', 'down'];
 const SPRING = { damping: 26, stiffness: 260, mass: 0.9 };
-
-/** Sheet tops for each snap, in the map area's coordinates, for a map area `h` tall. */
-function snapPositions(h: number, tabClearance: number): Record<SheetSnap, number> {
-  const down = Math.max(h - PEEK - tabClearance, UP_GAP);
-  return { up: UP_GAP, mid: Math.min(Math.round(h * 0.5), down), down };
-}
 
 export function VenueMapScreen({ venue }: { venue: Venue }) {
   const t = useT('venue');
@@ -104,7 +96,10 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
   const map = venueMapFor(venue); // the same object per venue
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  const [snap, setSnap] = useState<SheetSnap>('mid');
+  // Start low, so most of the map shows; the map fits its view into the part the sheet leaves.
+  // Opening a facility or searching raises it to mid. Chosen once per mount (the route keys this
+  // screen by venue, so a new venue starts low again).
+  const [snap, setSnap] = useState<SheetSnap>('down');
   const [box, setBox] = useState({ w: 0, h: 0 });
   // Set by the facility card after a submit; the list and other facilities clear it.
   const [freshReport, setFreshReport] = useState<FreshReport | null>(null);
