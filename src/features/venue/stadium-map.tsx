@@ -1,18 +1,14 @@
 /**
- * Stylized top-down venue map (the Figma map is a placeholder image): an open bowl or an indoor
- * arena drawn in a 400×400 space, with a tappable pin per facility laid over it.
- * Picking a category fills its pins blue and fades the rest; the open facility's pin turns dark.
+ * Stylized top-down venue drawing (the Figma map is a placeholder image): an open bowl or an indoor
+ * arena in a 400×400 space. It's the map for a venue without a usable published image (pins are laid
+ * over it by ./venue-map-view.tsx) and the tile on the "Choose Your Venue" cards.
  */
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
-import { Colors, Fonts, Shadow } from '@/constants/theme';
-import { useLayoutRtl, useT } from '@/i18n';
+import { Colors, Fonts } from '@/constants/theme';
+import { useT } from '@/i18n';
 
-import { FacilityIcon } from './categories';
-import { facilityName } from './labels';
-import { matchesCategory } from './mock';
-import type { Facility, FacilityCategory, VenueShape } from './types';
+import type { VenueShape } from './types';
 
 export const MAP_SIZE = 400;
 
@@ -97,121 +93,3 @@ export function VenueDrawing({ shape, width, height }: { shape: VenueShape; widt
     </Svg>
   );
 }
-
-interface StadiumMapProps {
-  shape: VenueShape;
-  facilities: Facility[];
-  width: number;
-  height: number;
-  category: FacilityCategory | null;
-  selectedId?: string;
-  onPinPress: (facility: Facility) => void;
-}
-
-// Not in a StyleSheet: react-native-web rejects the `direction` style.
-const NATIVE_LTR = Platform.OS === 'web' ? null : ({ direction: 'ltr' } as const);
-
-const PIN = 34;
-const PIN_SELECTED = 42;
-const LABEL_WIDTH = 140;
-const LABEL_HEIGHT = 21;
-/** Pins this far south (map units) are labelled above: the sheet slides up over the space below them. */
-const LABEL_ABOVE_FROM_Y = 300;
-
-/**
- * Where the open facility's name label goes, in the map's pixels: centred under its pin, or above it
- * near the bottom, and kept inside the map so a pin on the edge (Parking Lot C) doesn't cut it off;
- * a label pushed in from an edge hugs that edge, so the name stays next to its pin.
- * e.g. a pin at (380, 120) on a 390-wide map → { left: 246, top: 143, alignItems: 'flex-end' }
- */
-export function pinLabelPosition(pinX: number, pinY: number, mapY: number, width: number) {
-  const centred = pinX - LABEL_WIDTH / 2;
-  const max = Math.max(width - LABEL_WIDTH - 4, 4);
-  const left = Math.min(Math.max(centred, 4), max);
-  const alignItems: 'center' | 'flex-start' | 'flex-end' = left > centred ? 'flex-start' : left < centred ? 'flex-end' : 'center';
-  const top = mapY >= LABEL_ABOVE_FROM_Y ? pinY - PIN_SELECTED / 2 - 2 - LABEL_HEIGHT : pinY + PIN_SELECTED / 2 + 2;
-  return { left, top, alignItems };
-}
-
-export function StadiumMap({ shape, facilities, width, height, category, selectedId, onPinPress }: StadiumMapProps) {
-  const t = useT('venue');
-  const scale = Math.min(width / MAP_SIZE, height / MAP_SIZE);
-  const ox = (width - MAP_SIZE * scale) / 2;
-  const oy = (height - MAP_SIZE * scale) / 2;
-  const selected = facilities.find(f => f.id === selectedId);
-  const label = selected ? pinLabelPosition(ox + selected.x * scale, oy + selected.y * scale, selected.y, width) : null;
-  // Web lays the map out right-to-left in Arabic (only native forces LTR): flex-start is the right edge there.
-  const flipAlign = useLayoutRtl() && Platform.OS === 'web';
-  if (label && flipAlign && label.alignItems !== 'center') label.alignItems = label.alignItems === 'flex-start' ? 'flex-end' : 'flex-start';
-
-  return (
-    // The map is geographic: east stays on the right in right-to-left languages. Web keeps `left`
-    // physical already; native swaps left/right in RTL unless this subtree is laid out LTR.
-    <View style={[NATIVE_LTR, { width, height }]}>
-      <VenueDrawing shape={shape} width={width} height={height} />
-      {facilities.map(f => {
-        const isSelected = f.id === selectedId;
-        const match = category ? matchesCategory(f, category) : false;
-        const dim = !!category && !match && !isSelected;
-        const size = isSelected ? PIN_SELECTED : PIN;
-        return (
-          <Pressable
-            key={f.id}
-            onPress={() => onPinPress(f)}
-            accessibilityRole="button"
-            accessibilityLabel={t('map.pin', { name: facilityName(f, t) })}
-            accessibilityState={{ selected: isSelected }}
-            style={[styles.target, { left: ox + f.x * scale - 22, top: oy + f.y * scale - 22 }, isSelected && styles.onTop]}>
-            <View
-              style={[
-                styles.pin,
-                { width: size, height: size, borderRadius: size / 2 },
-                match && styles.pinMatch,
-                isSelected && styles.pinSelected,
-                dim && styles.pinDim,
-              ]}>
-              <FacilityIcon category={f.category} size={isSelected ? 22 : 18} color={match || isSelected ? Colors.onPrimary : Colors.ink}
-                background={isSelected ? Colors.inkDeep : match ? Colors.primary : Colors.surface}
-              />
-            </View>
-          </Pressable>
-        );
-      })}
-      {selected ? (
-        <View
-          pointerEvents="none"
-          style={[styles.label, label]}>
-          <Text style={styles.labelText} numberOfLines={1}>{facilityName(selected, t)}</Text>
-        </View>
-      ) : null}
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  target: { position: 'absolute', width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  onTop: { zIndex: 2 },
-  pin: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surface,
-    borderWidth: 1.5,
-    borderColor: Colors.ink,
-    ...Shadow.card,
-  },
-  pinMatch: { backgroundColor: Colors.primary, borderColor: Colors.surface, borderWidth: 2, transform: [{ scale: 1.08 }] },
-  pinSelected: { backgroundColor: Colors.inkDeep, borderColor: Colors.surface, borderWidth: 2.5 },
-  pinDim: { opacity: 0.3 },
-  label: { position: 'absolute', width: LABEL_WIDTH, alignItems: 'center', zIndex: 3 },
-  labelText: {
-    fontFamily: Fonts.textBold,
-    fontSize: 13,
-    lineHeight: 17,
-    color: Colors.ink,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-});

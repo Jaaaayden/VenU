@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Lễ khai mạc",
     "swimming": "Bơi lội",
-    "athletics": "Điền kinh",
-    "soccer": "Bóng đá",
     "gymnastics": "Thể dục dụng cụ",
     "basketball": "Bóng rổ"
   },
@@ -78,29 +76,20 @@
   },
   "map": {
     "pin": "{{name}} trên bản đồ",
-    "north": "B"
+    "north": "B",
+    "label": "Bản đồ {{venue}} có ghim các tiện ích. Kéo để di chuyển, chụm ngón tay hoặc dùng nút để phóng to, thu nhỏ.",
+    "you": "Bạn",
+    "cardHint": "Mở trong bảng bên dưới"
   },
   "officialMap": {
     "attribution": "Bản đồ: {{source}}",
-    "open": "Mở trong trình duyệt",
     "openLabel": "Mở bản đồ chính thức của {{source}} trong trình duyệt",
-    "frameLabel": "Bản đồ chính thức của {{source}}. Nếu dùng trình đọc màn hình, hãy dùng danh sách Tiện ích gần bạn bên dưới.",
-    "loading": "Đang tải bản đồ {{source}}…",
     "error": "Không tải được bản đồ. Hãy mở trong trình duyệt.",
     "retry": "Thử lại",
-    "viewsLabel": "Chế độ xem bản đồ",
-    "views": {
-      "exterior": "Bên ngoài",
-      "east_garage": "Nhà xe phía đông",
-      "west_garage": "Nhà xe phía tây"
-    },
-    "imageLabel": "Bản đồ {{source}}: {{view}}",
-    "imageLabelZoom": "Bản đồ {{source}}: {{view}}. Chụm hai ngón tay hoặc dùng nút thu phóng để phóng to.",
-    "enlarge": "Chạm để phóng to",
-    "enlargeHint": "Mở bản đồ toàn màn hình để phóng to",
-    "close": "Đóng bản đồ",
     "zoomIn": "Phóng to",
-    "zoomOut": "Thu nhỏ"
+    "zoomOut": "Thu nhỏ",
+    "openInteractive": "Mở bản đồ tương tác",
+    "schematic": "Bản đồ giản lược"
   },
   "walk_other": "{{number}} phút đi bộ",
   "wait": {
@@ -135,69 +124,6 @@
     "changing_table": "Bàn thay tã"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Cổng 1",
-      "description": "Lối vào phía bắc, gần trạm xe đưa đón Metro nhất.",
-      "location": "Phía bắc, tại trạm xe đưa đón"
-    },
-    "gate-2": {
-      "name": "Cổng 2",
-      "description": "Lối vào phía đông có lối dốc, cạnh chỗ đỗ xe hỗ trợ tiếp cận ở Bãi C.",
-      "location": "Phía đông, cạnh Bãi C"
-    },
-    "gate-3": {
-      "name": "Cổng 3",
-      "description": "Lối vào phía nam để lên xuống xe công nghệ.",
-      "location": "Phía nam, tại khu xe công nghệ"
-    },
-    "gate-4": {
-      "name": "Cổng 4",
-      "description": "Lối vào phía tây cho người có vé khu 200 đến 240.",
-      "location": "Phía tây, gần quảng trường chính"
-    },
-    "info-desk": {
-      "name": "Quầy dịch vụ khán giả",
-      "description": "Giải đáp thắc mắc, vé thất lạc, bộ dụng cụ giác quan và chụp tai chống ồn.",
-      "location": "Hành lang, khu 105"
-    },
-    "first-aid": {
-      "name": "Trạm sơ cứu",
-      "description": "Y tá và nhân viên cấp cứu trực từ khi mở cổng đến khi khán giả ra về hết.",
-      "location": "Hành lang, khu 112"
-    },
-    "restroom-east": {
-      "name": "Nhà vệ sinh phía Đông",
-      "description": "Nhà vệ sinh nam, nữ và phòng gia đình cho mọi giới tính có bàn thay tã.",
-      "location": "Hành lang, khu 118"
-    },
-    "food-south": {
-      "description": "Taco, burrito và agua fresca. Có món chay.",
-      "location": "Hành lang, khu 124"
-    },
-    "lost-found": {
-      "name": "Quầy đồ thất lạc",
-      "description": "Gửi hoặc nhận lại đồ thất lạc. Trẻ đi lạc cũng được đưa đến đây.",
-      "location": "Hành lang, khu 131"
-    },
-    "accessible-seating": {
-      "name": "Dịch vụ hỗ trợ tiếp cận",
-      "description": "Cho mượn xe lăn, ghế cho người đi kèm và thiết bị hỗ trợ nghe.",
-      "location": "Hành lang, khu 136"
-    },
-    "food-west": {
-      "description": "Burger, khoai tây chiên và nước ngọt. Có thịt halal.",
-      "location": "Hành lang, khu 140"
-    },
-    "restroom-west": {
-      "name": "Nhà vệ sinh phía Tây",
-      "description": "Nhà vệ sinh nam và nữ. Buồng hỗ trợ tiếp cận ở bên trái.",
-      "location": "Hành lang, khu 145"
-    },
-    "parking-c": {
-      "name": "Bãi đỗ xe C",
-      "description": "Bãi đỗ xe hỗ trợ tiếp cận, có lối đi ngắn và bằng phẳng đến Cổng 2.",
-      "location": "Bãi phía đông nam"
-    },
     "entry-3": {
       "name": "Lối vào 3",
       "description": "Lối vào phía bắc. Mọi lối vào đều có lối đi hỗ trợ tiếp cận và người hỗ trợ xe lăn miễn phí.",
@@ -418,7 +344,6 @@
     "notFound": "Không tìm thấy tiện ích",
     "wheelchair": "Xe lăn vào được",
     "directions": "Chỉ đường",
-    "directionsSoon": "Chỉ đường từng bước sắp ra mắt. {{name}}: {{location}}.",
     "imHere": "Tôi ở đây",
     "imHereHint": "Dùng chỗ này làm vị trí của bạn khi nhờ giúp đỡ",
     "isHere": "Vị trí của bạn",
@@ -472,5 +397,26 @@
     "titleTooLong": "Tiêu đề phải dưới {{max}} ký tự.",
     "topicRequired": "Chọn chủ đề phù hợp nhất.",
     "bodyTooLong": "Báo cáo phải dưới {{max}} ký tự."
+  },
+  "directions": {
+    "title": "Lộ trình đi bộ",
+    "from": "Từ {{from}}",
+    "fromArrival": "Từ {{from}}, lối vào chính. Bạn đang ở chỗ khác? Mở địa điểm đó và nhấn “Tôi ở đây”.",
+    "steps_other": "khoảng {{number}} bước",
+    "stepStart": "Bắt đầu tại {{from}}.",
+    "stepHead": "Đi về hướng {{direction}} khoảng {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Bạn đã ở đây rồi.",
+    "end": "Kết thúc lộ trình",
+    "dir": {
+      "n": "bắc",
+      "ne": "đông bắc",
+      "e": "đông",
+      "se": "đông nam",
+      "s": "nam",
+      "sw": "tây nam",
+      "w": "tây",
+      "nw": "tây bắc"
+    }
   }
 }

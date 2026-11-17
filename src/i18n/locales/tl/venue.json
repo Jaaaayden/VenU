@@ -24,8 +24,6 @@
   "events": {
     "opening_ceremony": "Seremonya ng Pagbubukas",
     "swimming": "Paglangoy",
-    "athletics": "Atletiks",
-    "soccer": "Putbol",
     "gymnastics": "Himnastiko",
     "basketball": "Basketbol"
   },
@@ -78,29 +76,20 @@
   },
   "map": {
     "pin": "{{name}} sa mapa",
-    "north": "H"
+    "north": "H",
+    "label": "Mapa ng {{venue}} na may mga pin ng pasilidad. I-drag para ilipat; i-pinch o gamitin ang mga button para mag-zoom.",
+    "you": "Ikaw",
+    "cardHint": "Binubuksan ito sa panel sa ibaba"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",
-    "open": "Buksan sa browser",
     "openLabel": "Buksan ang opisyal na mapa ng {{source}} sa iyong browser",
-    "frameLabel": "Opisyal na mapa ng {{source}}. Kung gumagamit ng screen reader, gamitin ang listahang Mga Pasilidad na Malapit sa Iyo sa ibaba.",
-    "loading": "Nilo-load ang mapa ng {{source}}…",
     "error": "Hindi ma-load ang mapa. Buksan ito sa iyong browser.",
     "retry": "Subukan ulit",
-    "viewsLabel": "View ng mapa",
-    "views": {
-      "exterior": "Labas",
-      "east_garage": "Silangang garahe",
-      "west_garage": "Kanlurang garahe"
-    },
-    "imageLabel": "Mapa ng {{source}}: {{view}}",
-    "imageLabelZoom": "Mapa ng {{source}}: {{view}}. I-pinch o gamitin ang mga zoom button para mag-zoom.",
-    "enlarge": "I-tap para palakihin",
-    "enlargeHint": "Binubuksan ang mapa nang full screen para ma-zoom",
-    "close": "Isara ang mapa",
     "zoomIn": "Mag-zoom in",
-    "zoomOut": "Mag-zoom out"
+    "zoomOut": "Mag-zoom out",
+    "openInteractive": "Buksan ang interactive na mapa",
+    "schematic": "Pinasimpleng mapa"
   },
   "walk_one": "{{number}} minutong lakad",
   "walk_other": "{{number}} minutong lakad",
@@ -136,69 +125,6 @@
     "changing_table": "Palitan ng lampin"
   },
   "facilityText": {
-    "gate-1": {
-      "name": "Pasukan 1",
-      "description": "Hilagang pasukan, pinakamalapit sa hintuan ng Metro shuttle.",
-      "location": "Hilagang bahagi, sa hintuan ng shuttle"
-    },
-    "gate-2": {
-      "name": "Pasukan 2",
-      "description": "Silangang pasukan na may rampa, katabi ng accessible na paradahan sa Paradahan C.",
-      "location": "Silangang bahagi, malapit sa Paradahan C"
-    },
-    "gate-3": {
-      "name": "Pasukan 3",
-      "description": "Timog na pasukan para sa pagbaba at pagsakay sa rideshare.",
-      "location": "Timog na bahagi, sa rideshare zone"
-    },
-    "gate-4": {
-      "name": "Pasukan 4",
-      "description": "Kanlurang pasukan para sa may tiket sa mga seksyon 200 hanggang 240.",
-      "location": "Kanlurang bahagi, malapit sa pangunahing plaza"
-    },
-    "info-desk": {
-      "name": "Serbisyo sa Bisita",
-      "description": "Mga tanong, nawawalang tiket, sensory kit at ear defender.",
-      "location": "Concourse, seksyon 105"
-    },
-    "first-aid": {
-      "name": "Pangunang Lunas",
-      "description": "May nurse at EMT mula pagbukas ng gate hanggang makaalis ang lahat.",
-      "location": "Concourse, seksyon 112"
-    },
-    "restroom-east": {
-      "name": "Mga CR sa Silangan",
-      "description": "CR ng lalaki, babae, at all-gender na family room na may changing table.",
-      "location": "Concourse, seksyon 118"
-    },
-    "food-south": {
-      "description": "Tacos, burrito at agua fresca. May vegetarian na pagpipilian.",
-      "location": "Concourse, seksyon 124"
-    },
-    "lost-found": {
-      "name": "Mga Nawawalang Gamit",
-      "description": "Mag-iwan o kumuha ng nawawalang gamit. Dito rin dinadala ang mga batang nawawala.",
-      "location": "Concourse, seksyon 131"
-    },
-    "accessible-seating": {
-      "name": "Serbisyo para sa May Kapansanan",
-      "description": "Pahiram ng wheelchair, upuan para sa kasama, at assistive listening device.",
-      "location": "Concourse, seksyon 136"
-    },
-    "food-west": {
-      "description": "Burger, fries at soft drinks. May halal na patty.",
-      "location": "Concourse, seksyon 140"
-    },
-    "restroom-west": {
-      "name": "Mga CR sa Kanluran",
-      "description": "CR ng lalaki at babae. Nasa kaliwa ang accessible na cubicle.",
-      "location": "Concourse, seksyon 145"
-    },
-    "parking-c": {
-      "name": "Paradahan C",
-      "description": "Accessible na paradahan na may maikli at patag na daan papuntang Pasukan 2.",
-      "location": "Timog-silangang lote"
-    },
     "entry-3": {
       "name": "Pasukan 3",
       "description": "Hilagang pasukan. May accessible na daan at libreng wheelchair escort sa bawat pasukan.",
@@ -419,7 +345,6 @@
     "notFound": "Hindi nakita ang pasilidad",
     "wheelchair": "Accessible sa wheelchair",
     "directions": "Direksyon",
-    "directionsSoon": "Malapit na ang sunud-sunod na direksyon. {{name}}: {{location}}.",
     "imHere": "Nandito ako",
     "imHereHint": "Gagamitin ang lugar na ito bilang lokasyon mo kapag humingi ka ng tulong",
     "isHere": "Lokasyon mo",
@@ -474,5 +399,27 @@
     "titleTooLong": "Dapat wala pang {{max}} character ang pamagat.",
     "topicRequired": "Piliin ang pinakaangkop na paksa.",
     "bodyTooLong": "Dapat wala pang {{max}} character ang ulat."
+  },
+  "directions": {
+    "title": "Ruta sa paglalakad",
+    "from": "Mula sa {{from}}",
+    "fromArrival": "Mula sa {{from}}, ang pangunahing pasukan. Nasa ibang lugar ka? Buksan ang lugar na iyon at i-tap ang “Nandito ako”.",
+    "steps_one": "mga {{number}} hakbang",
+    "steps_other": "mga {{number}} hakbang",
+    "stepStart": "Magsimula sa {{from}}.",
+    "stepHead": "Pumunta sa {{direction}} nang mga {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Nandito ka na.",
+    "end": "Tapusin ang ruta",
+    "dir": {
+      "n": "hilaga",
+      "ne": "hilagang-silangan",
+      "e": "silangan",
+      "se": "timog-silangan",
+      "s": "timog",
+      "sw": "timog-kanluran",
+      "w": "kanluran",
+      "nw": "hilagang-kanluran"
+    }
   }
 }

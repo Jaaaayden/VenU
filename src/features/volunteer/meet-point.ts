@@ -36,7 +36,7 @@ export function restoreMeetPoint(value: unknown): MeetPoint {
 
 /**
  * The "Where are you?" list: facilities matching the search and chip, in chip order (gates first),
- * keeping the venue's own order within a type. e.g. "puerta" in Spanish at the Coliseum → Gates 1–4.
+ * keeping the venue's own order within a type. e.g. "entrada" in Spanish at SoFi Stadium → its Entries.
  */
 export function spotChoices(facilities: Facility[], query: string, category: FacilityCategory | null, tv?: VenueT): Facility[] {
   const order = (f: Facility) => CATEGORIES.indexOf(f.category);

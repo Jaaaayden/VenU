@@ -1,12 +1,12 @@
 /**
  * One venue: header with category chips, the map, and the "Facility Search" bottom sheet.
- * The map is the venue's own official one where it publishes one (./official-maps.ts), else the
- * schematic stadium map with facility pins.
+ * The map is the venue's own published map image where it has one (./venue-maps.ts), else the
+ * schematic drawing, with a pin per facility; a chip filters the pins and the sheet's list alike.
  * The sheet snaps to three heights (down / mid / up) by dragging or tapping its handle; its content
  * is the current child route (facility list, facility card, report, add report).
  */
 import { router, Slot, useGlobalSearchParams } from 'expo-router';
-import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode, type Ref } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent, type ScrollViewProps } from 'react-native';
 import { GestureDetector, GestureHandlerRootView, usePanGesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -18,17 +18,23 @@ import { Colors, Shadow, Spacing } from '@/constants/theme';
 import { useT } from '@/i18n';
 
 import { CategoryChips } from './category-chips';
+import { useWhereAmI } from './current';
+import { routeFor, type Route } from './directions';
+import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { facilitiesFor } from './mock';
-import { OfficialMapPanel } from './official-map';
-import { officialMapFor } from './official-maps';
-import { MAP_BACKGROUND, SHEET_HANDLE, StadiumMap } from './stadium-map';
+import { PinCard } from './pin-card';
+import { snapPositions, type SheetSnap } from './sheet';
+import { MAP_BACKGROUND, SHEET_HANDLE } from './stadium-map';
 import type { Facility, FacilityCategory, Venue } from './types';
 import { BackArrow, venueText } from './ui';
+import { venueMapFor, type VenueMap } from './venue-maps';
+import { MAP_CARD_SPACE, VenueMapView } from './venue-map-view';
 
-export type SheetSnap = 'down' | 'mid' | 'up';
+export type { SheetSnap };
 
 interface VenueScreenState {
   venue: Venue;
+  map: VenueMap;
   facilities: Facility[];
   category: FacilityCategory | null;
   setCategory: (c: FacilityCategory | null) => void;
@@ -39,6 +45,10 @@ interface VenueScreenState {
   /** The report just submitted here, highlighted as "New" until the user leaves its facility. */
   freshReport: FreshReport | null;
   setFreshReport: (r: FreshReport | null) => void;
+  /** The route drawn on the map, to the open facility (null when none or after leaving it). */
+  route: Route | null;
+  /** Directions to a facility (the open one), or null to end them. */
+  setRouteTo: (facilityId: string | null) => void;
 }
 
 export interface FreshReport {
@@ -56,11 +66,16 @@ export function useVenueScreen(): VenueScreenState {
 }
 
 /** Scroll view for sheet content: pads the bottom so the last item clears the tab bar. */
-export function SheetScroll({ children, contentContainerStyle, ...rest }: ScrollViewProps & { children: ReactNode }) {
+export function SheetScroll({ children, contentContainerStyle, scrollRef, ...rest }: ScrollViewProps & {
+  children: ReactNode;
+  /** For scrolling the sheet to a part of its content (the directions). */
+  scrollRef?: Ref<ComponentRef<typeof ScrollView>>;
+}) {
   const { contentInset } = useVenueScreen();
   return (
     <ScrollView
       {...rest}
+      ref={scrollRef}
       keyboardShouldPersistTaps="handled"
       automaticallyAdjustKeyboardInsets
       showsVerticalScrollIndicator={false}
@@ -70,32 +85,38 @@ export function SheetScroll({ children, contentContainerStyle, ...rest }: Scroll
   );
 }
 
-/** Raised sheet's gap below the header, and how much of the lowered sheet shows above the tab bar. */
-const UP_GAP = 48;
-const PEEK = 132;
 const NEXT: Record<SheetSnap, SheetSnap> = { down: 'mid', mid: 'up', up: 'down' };
 const SNAP_NAMES: SheetSnap[] = ['up', 'mid', 'down'];
 const SPRING = { damping: 26, stiffness: 260, mass: 0.9 };
-
-/** Sheet tops for each snap, in the map area's coordinates, for a map area `h` tall. */
-function snapPositions(h: number, tabClearance: number): Record<SheetSnap, number> {
-  const down = Math.max(h - PEEK - tabClearance, UP_GAP);
-  return { up: UP_GAP, mid: Math.min(Math.round(h * 0.5), down), down };
-}
 
 export function VenueMapScreen({ venue }: { venue: Venue }) {
   const t = useT('venue');
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
   const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
-  const official = officialMapFor(venue.id); // the same object per venue
+  const map = venueMapFor(venue); // the same object per venue
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  // An interactive official map needs the room: start with the sheet lowered to its peek. Chosen
-  // once per mount; the route keys this screen by venue, so a new venue starts fresh.
-  const [snap, setSnap] = useState<SheetSnap>(official?.kind === 'embed' ? 'down' : 'mid');
+  // Start low, so most of the map shows; the map fits its view into the part the sheet leaves.
+  // Opening a facility or searching raises it to mid. Chosen once per mount (the route keys this
+  // screen by venue, so a new venue starts low again).
+  const [snap, setSnap] = useState<SheetSnap>('down');
   const [box, setBox] = useState({ w: 0, h: 0 });
   // Set by the facility card after a submit; the list and other facilities clear it.
   const [freshReport, setFreshReport] = useState<FreshReport | null>(null);
+  // The pin whose photo card shows over the map. It belongs to the facility open when it was
+  // tapped: opening another one (from the list, a deep link) drops it.
+  const [cardState, setCardState] = useState<{ id: string; at: string | undefined } | null>(null);
+  const cardId = cardState && cardState.at === facilityId ? cardState.id : null;
+  const setCardId = (id: string | null) => setCardState(id ? { id, at: facilityId } : null);
+  // Directions shown for a facility. They last while it stays open in the sheet, so backing out to
+  // the list or opening another facility ends them.
+  const [routeTo, setRouteState] = useState<string | null>(null);
+  const where = useWhereAmI();
+  const route = routeTo && routeTo === facilityId ? routeFor(map, facilities, where, venue.id, routeTo) : null;
+  const setRouteTo = (id: string | null) => {
+    setRouteState(id);
+    if (id) setCardState(null);
+  };
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
   const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
@@ -160,25 +181,42 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   });
 
   const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: top.get() }] }));
-  // Keep the stadium centred in the strip of map above the sheet.
-  const mapStyle = useAnimatedStyle(() => ({ transform: [{ translateY: Math.min((top.get() - snaps.get()[2]) / 2, 0) }] }));
-  // An official map fills the strip above the sheet, following it frame by frame while dragged.
-  const officialStyle = useAnimatedStyle(() => ({ height: Math.max(top.get(), 0) }));
 
-  const pickCategory = useCallback((c: FacilityCategory | null) => {
+  const pickCategory = (c: FacilityCategory | null) => {
     setCategory(c);
-    // Schematic map: show the highlighted pins. Official map has no pins: show the filtered list.
-    setSnap(s => (official ? (s === 'down' ? 'mid' : s) : s === 'up' ? 'mid' : s));
-  }, [official]);
+    setCardState(null);
+    // The chip's pins need the map in view.
+    setSnap(s => (s === 'up' ? 'mid' : s));
+  };
 
-  const openFromMap = useCallback((f: Facility) => {
+
+  // Pins for the chip (the open facility always stays), and what the map fits into view: the
+  // chip's pins, or the venue's own starting region for "All".
+  const pins = pinsFor(facilities, category, [facilityId, cardId, route?.from.id, route?.to.id]);
+  const card = cardId ? facilities.find(f => f.id === cardId) : undefined;
+  const chipBounds = category ? boundsOf(pinsFor(facilities, category)) : null;
+  // A route wins: both its ends in view above the sheet.
+  const fit: { key: string; rect: MapRect; max: number } = route
+    ? { key: `route:${route.from.id}>${route.to.id}`, rect: boundsOf([route.from, route.to])!, max: FIT_MAX_SCALE }
+    : chipBounds
+      ? { key: `chip:${category}`, rect: chipBounds, max: FIT_MAX_SCALE }
+      : { key: 'focus', rect: map.focus, max: MAX_SCALE };
+
+  // A pin shows its card; the card opens the facility in the sheet.
+  const showCard = (f: Facility) => {
+    setCardId(f.id);
+    setSnap(s => (s === 'up' ? 'mid' : s)); // room above the sheet for the card
+  };
+  const openFacility = (f: Facility) => {
+    setCardId(null);
     setSnap('mid');
     router.navigate({ pathname: '/venue/[venueId]/[facilityId]', params: { venueId: venue.id, facilityId: f.id } });
-  }, [venue.id]);
+  };
 
   const sheetHeight = Math.max(box.h - positions.up, 0);
   const ctx: VenueScreenState = {
     venue,
+    map,
     facilities,
     category,
     setCategory: pickCategory,
@@ -187,6 +225,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     contentInset: positions[snap] - positions.up + tabClearance + Spacing.xl,
     freshReport,
     setFreshReport,
+    route,
+    setRouteTo,
   };
 
   return (
@@ -203,26 +243,27 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
           <CategoryChips value={category} onChange={pickCategory} />
         </SafeAreaView>
 
-        <View style={[styles.area, official && styles.areaOfficial]} onLayout={onAreaLayout}>
+        <View style={[styles.area, map.image && styles.areaImage]} onLayout={onAreaLayout}>
           {box.w > 0 ? (
             <>
-              {official ? (
-                <Animated.View style={[styles.map, officialStyle]}>
-                  <OfficialMapPanel map={official} />
-                </Animated.View>
-              ) : (
-                <Animated.View style={[styles.map, mapStyle]}>
-                  <StadiumMap
-                    shape={venue.shape}
-                    facilities={facilities}
-                    width={box.w}
-                    height={positions.down}
-                    category={category}
-                    selectedId={facilityId}
-                    onPinPress={openFromMap}
-                  />
-                </Animated.View>
-              )}
+              <VenueMapView
+                map={map}
+                venueName={venue.name}
+                pins={pins}
+                width={box.w}
+                height={box.h}
+                viewportHeight={positions[snap]}
+                highlightIds={[facilityId, cardId, route?.to.id]}
+                tinted={!!category}
+                route={route}
+                fitKey={fit.key}
+                fitRect={fit.rect}
+                fitMax={fit.max}
+                revealId={cardId ?? facilityId}
+                revealInset={card ? MAP_CARD_SPACE : 0}
+                onPinPress={showCard}>
+                {card ? <PinCard facility={card} onOpen={() => openFacility(card)} onClose={() => setCardId(null)} /> : null}
+              </VenueMapView>
 
               <Animated.View style={[styles.sheet, { height: sheetHeight }, sheetStyle]}>
                 <GestureDetector gesture={pan}>
@@ -257,8 +298,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, paddingHorizontal: Spacing.gutter, paddingTop: Spacing.md },
   titleText: { flex: 1, gap: 4 },
   area: { flex: 1, overflow: 'hidden', backgroundColor: MAP_BACKGROUND, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
-  areaOfficial: { backgroundColor: Colors.surfaceAlt },
-  map: { position: 'absolute', left: 0, right: 0, top: 0 },
+  areaImage: { backgroundColor: Colors.surfaceAlt },
   sheet: {
     position: 'absolute',
     left: 0,

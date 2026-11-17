@@ -8,8 +8,6 @@ const OFFICIAL_HOSTS: Record<string, string> = {
   sofi: 'www.sofistadium.com',
   'crypto-arena': 'www.cryptoarena.com',
   'intuit-dome': 'www.intuitdome.com',
-  coliseum: 'www.lacoliseum.com',
-  'rose-bowl': 'rosebowlstadium.com',
 };
 
 describe('venue contacts', () => {
