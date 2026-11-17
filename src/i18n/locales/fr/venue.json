@@ -79,6 +79,7 @@
     "north": "N",
     "label": "Carte de {{venue}} avec les services épinglés. Faites glisser pour la déplacer, pincez ou utilisez les boutons pour zoomer.",
     "you": "Vous",
+    "start": "Départ",
     "cardHint": "L’ouvre dans le panneau ci-dessous"
   },
   "officialMap": {

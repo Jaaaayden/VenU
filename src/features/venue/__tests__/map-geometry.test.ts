@@ -7,6 +7,7 @@ import {
   contentSize,
   fitRect,
   isVisible,
+  mapUpdate,
   MAX_SCALE,
   minScale,
   pinsFor,
@@ -14,6 +15,7 @@ import {
   toScreen,
   walkBetween,
   zoomAt,
+  type MapRect,
   type MapView,
 } from '../map-geometry';
 import { facilitiesFor, getFacility } from '../mock';
@@ -172,5 +174,54 @@ describe('walkBetween', () => {
 
   it('gives at least a minute and ten steps for the shortest walk', () => {
     expect(walkBetween({ x: 0.5, y: 0.5 }, { x: 0.5001, y: 0.5 }, { w: 100, h: 100 }, 100)).toMatchObject({ minutes: 1, steps: 10 });
+  });
+});
+
+describe('mapUpdate', () => {
+  // Sheet down leaves 600 px of map; mid leaves 420. The fit zooms into the middle of the bowl.
+  const down = { w: 390, h: 600 };
+  const mid = { w: 390, h: 420 };
+  const fit = { rect: [0.35, 0.35, 0.65, 0.6] as MapRect, max: MAX_SCALE, pad: 24, insets: { top: 48, right: 52 } };
+  const far = { x: 0.06, y: 0.93 };
+  const layout = (vh: number, reveal: string | null = null) => ({ key: 'focus', vh, w: 390, reveal });
+  const fitted = (vp: { w: number; h: number }) => fitRect(fit.rect, content, vp, fit.pad, fit.max, fit.insets);
+  const base = { content, fit, revealInset: 0, moved: false };
+
+  it('fits on first layout and on a new key', () => {
+    expect(mapUpdate({ ...base, prev: null, next: layout(600), view: { s: 1, x: 0, y: 0 }, viewport: down })).toEqual({ view: fitted(down), refit: true });
+    expect(mapUpdate({ ...base, prev: layout(600), next: { ...layout(600), key: 'chip:food' }, view: fitted(down), viewport: down })?.refit).toBe(true);
+  });
+
+  it('stays put when nothing it watches changed', () => {
+    expect(mapUpdate({ ...base, prev: layout(600, 'x'), next: layout(600, 'x'), view: fitted(down), viewport: down, revealPin: far })).toBeNull();
+  });
+
+  it('brings a pin revealed in the same render as a sheet move on screen, after the refit', () => {
+    // Tapping a far-off facility in the list: the sheet rises down → mid and it opens, at once.
+    expect(isVisible(far, content, fitted(mid), mid, 32)).toBe(false);
+    const update = mapUpdate({ ...base, prev: layout(600), next: layout(420, 'far'), view: fitted(down), viewport: mid, revealPin: far })!;
+    expect(update.refit).toBe(true);
+    expect(update.view.s).toBeCloseTo(fitted(mid).s, 6); // the refit's zoom, moved over to the pin
+    expect(isVisible(far, content, update.view, mid, 32)).toBe(true);
+  });
+
+  it('reveals after keeping the middle when the visitor had moved the map', () => {
+    const update = mapUpdate({ ...base, moved: true, prev: layout(600), next: layout(420, 'far'), view: { s: 3, x: -300, y: -300 }, viewport: mid, revealPin: far })!;
+    expect(update.refit).toBe(false);
+    expect(update.view.s).toBe(3);
+    expect(isVisible(far, content, update.view, mid, 32)).toBe(true);
+  });
+
+  it('keeps the revealed pin above the card', () => {
+    const pin = { x: 0.5, y: 0.6 };
+    const room = { w: 390, h: 420 - 104 };
+    expect(isVisible(pin, content, fitted(mid), room, 32)).toBe(false);
+    const update = mapUpdate({ ...base, revealInset: 104, prev: layout(420), next: layout(420, 'p'), view: fitted(mid), viewport: mid, revealPin: pin })!;
+    expect(isVisible(pin, content, update.view, room, 32)).toBe(true);
+  });
+
+  it('leaves a revealed pin that is already on screen where it is', () => {
+    const update = mapUpdate({ ...base, prev: layout(600), next: layout(420, 'c'), view: fitted(down), viewport: mid, revealPin: { x: 0.5, y: 0.47 } });
+    expect(update).toEqual({ view: fitted(mid), refit: true });
   });
 });

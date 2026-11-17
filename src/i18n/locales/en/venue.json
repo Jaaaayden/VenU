@@ -79,6 +79,7 @@
     "north": "N",
     "label": "{{venue}} map with facility pins. Drag to move, pinch or use the zoom buttons to zoom.",
     "you": "You",
+    "start": "Start",
     "cardHint": "Opens it in the panel below"
   },
   "officialMap": {

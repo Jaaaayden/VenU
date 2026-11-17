@@ -3,9 +3,13 @@
 //   supabase functions deploy username-sign-in --no-verify-jwt
 // --no-verify-jwt: callers are signed out by definition, and a publishable key is not a JWT.
 // Secrets: none to set. Supabase gives every function SUPABASE_URL and its keys.
-// Rate limits: Auth limits sign-ins per IP. To count each caller's IP rather than the function's,
-// turn on IP Address Forwarding (Authentication > Rate Limits); it needs a secret key (sb_secret_…),
-// which this uses when the project has one. Contract: handler.ts.
+// Rate limits: Auth limits sign-ins per IP. The function forwards a caller's IP only from
+// Cf-Connecting-Ip (Cloudflare overwrites it), never from X-Forwarded-For (callers write that
+// themselves); without it, Auth counts the function's own IP. For Auth to use the forwarded IP, turn
+// on IP Address Forwarding (Authentication > Rate Limits); it needs a secret key (sb_secret_…),
+// which this uses when the project has one. After deploying, check the function's logs: once per
+// cold start it says which source it used ("…caller's Cf-Connecting-Ip" or "no Cf-Connecting-Ip…").
+// Contract: handler.ts.
 import { createClient } from '@supabase/supabase-js';
 
 import { createHandler, httpPasswordGrant } from './handler.ts';

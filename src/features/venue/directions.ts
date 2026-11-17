@@ -30,6 +30,16 @@ export function routeStart(map: VenueMap, facilities: Facility[], where: WhereAm
   return arrival ? { from: arrival, mine: false } : null;
 }
 
+/**
+ * How the map marks where a walk starts: "you" (a dot in place of the pin) only when the visitor set
+ * that spot with "I'm here"; otherwise "start", a tag on the way in's own pin, which stays drawn.
+ * Nothing when already there.
+ */
+export function startMarker(route: Route | null): { kind: 'you' | 'start'; at: Facility } | null {
+  if (!route || route.here) return null;
+  return { kind: route.fromIsMine ? 'you' : 'start', at: route.from };
+}
+
 /** The route to `toId`, with the line in `content` px (any width works for the sheet's numbers). */
 export function routeFor(
   map: VenueMap,

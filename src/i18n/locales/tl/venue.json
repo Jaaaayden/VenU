@@ -79,6 +79,7 @@
     "north": "H",
     "label": "Mapa ng {{venue}} na may mga pin ng pasilidad. I-drag para ilipat; i-pinch o gamitin ang mga button para mag-zoom.",
     "you": "Ikaw",
+    "start": "Simula",
     "cardHint": "Binubuksan ito sa panel sa ibaba"
   },
   "officialMap": {
