@@ -126,7 +126,9 @@ create policy "visitors open requests" on public.help_requests
   );
 
 revoke all on public.help_requests from anon, authenticated;
-grant select, insert on public.help_requests to authenticated;
+-- Insert only the visitor's own fields: the server sets the times, status and volunteer columns.
+grant select on public.help_requests to authenticated;
+grant insert (id, visitor_name, venue_id, spot, help_types, note, language) on public.help_requests to authenticated;
 
 -- Messages: only the two people on a matched request read them and write them, as themselves; a
 -- volunteer reads only what was said since they accepted (can_read_message).
@@ -143,7 +145,9 @@ create policy "parties send messages" on public.messages
   );
 
 revoke all on public.messages from anon, authenticated;
-grant select, insert on public.messages to authenticated;
+-- created_at and sender_id come from the server, so no one can backdate a message or send as someone else.
+grant select on public.messages to authenticated;
+grant insert (request_id, text, language) on public.messages to authenticated;
 
 -- Accept: atomic. The update only matches a row that is still open, and a second volunteer's update
 -- waits for the first to commit, then finds it matched and changes nothing. Raises (the app's
