@@ -3,14 +3,24 @@
 // and change only their own row, can't change role or verified, and keep photos in their own folder.
 // Started by `npm run dev:mock`; see scripts/dev.mjs.
 //
+// It also serves the `translate` Edge Function (POST /functions/v1/translate), running the same code
+// as supabase/functions/translate. Without keys it uses the offline stub; with TRANSLATE_PROVIDER and
+// a key in .env.server.local (git-ignored, never bundled into the app) it calls the real provider:
+//   TRANSLATE_PROVIDER=anthropic            or   TRANSLATE_PROVIDER=deepl
+//   ANTHROPIC_API_KEY=sk-ant-...                 DEEPL_API_KEY=...:fx
+//
 // Test hooks: GET /__state (everything stored), POST /__control { dropNextProfileWrite: n }
-// (drop the next n profile-save responses, to test lost connections), GET /__confirm?email=...
+// (drop the next n profile-save responses, to test lost connections), { failTranslate: n } (the next
+// n translate calls fail), { translateDelayMs: ms } (slow translations), GET /__confirm?email=...
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { dirname } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+export const SERVER_ENV_FILE = join(ROOT, '.env.server.local');
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
@@ -29,7 +39,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const files = new Map(); // path -> { bytes: Buffer, type }
   const refreshTokens = new Map(); // token -> user id
   const requests = [];
-  const control = { dropNextProfileWrite: 0 };
+  const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0 };
 
   if (stateFile && existsSync(stateFile)) {
     try {
@@ -72,9 +82,11 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   /** The signed-in user's id, or null. Tokens for users that no longer exist don't count. */
   function userIdOf(req) {
     const m = /^Bearer (.+)$/.exec(req.headers.authorization ?? '');
-    if (!m) return null;
+    return m ? userIdOfToken(m[1]) : null;
+  }
+  function userIdOfToken(token) {
     try {
-      const claims = JSON.parse(Buffer.from(m[1].split('.')[1], 'base64url').toString());
+      const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
       if (claims.exp * 1000 < Date.now()) return null;
       return [...users.values()].some(u => u.id === claims.sub) ? claims.sub : null;
     } catch {
@@ -114,6 +126,16 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       if (user) { user.confirmed = true; persist(); }
       res.writeHead(user ? 200 : 404, { 'content-type': 'text/html; charset=utf-8' });
       return res.end(user ? `<p style="font:16px system-ui">Email confirmed for ${user.email}. Go back to VenU and sign in.</p>` : 'No account with that email.');
+    }
+
+    // ---- the translate Edge Function
+    if (p === '/functions/v1/translate') {
+      const handle = await translate;
+      if (!handle) return send(res, 503, { error: 'Translation needs Node 22.18 or newer in mock mode.' });
+      const headers = Object.entries(req.headers).filter(([, v]) => typeof v === 'string');
+      const reply = await handle(new Request(`http://mock${req.url}`, { method: req.method, headers, body: req.method === 'POST' ? raw : undefined }));
+      res.writeHead(reply.status, Object.fromEntries(reply.headers));
+      return res.end(Buffer.from(await reply.arrayBuffer()));
     }
 
     // ---- auth
@@ -256,10 +278,90 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     send(res, 404, { message: `mock supabase: no route for ${req.method} ${p}` });
   });
 
+  const translate = createTranslate({ verifyUser: async token => userIdOfToken(token), control, log }).catch(e => {
+    log(`mock supabase: translate is off (${e.message}). It needs Node 22.18+, which loads the shared .ts files.`);
+    return null;
+  });
+
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, () => resolve(server));
   });
+}
+
+/** KEY=value lines from .env.server.local (git-ignored), or {} when there's no such file. */
+export function readServerEnv(file = SERVER_ENV_FILE) {
+  if (!existsSync(file)) return {};
+  const out = {};
+  for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
+    if (m) out[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+  return out;
+}
+
+/**
+ * Imports a TypeScript module shared with the Edge Function or the app. Node 22.18+ strips the types;
+ * its "module type not specified" warning for these files is expected and silenced.
+ */
+async function importShared(relativePath) {
+  const emit = process.emitWarning;
+  process.emitWarning = function (warning, ...rest) {
+    const code = typeof rest[0] === 'object' ? rest[0]?.code : rest[1];
+    if (code === 'MODULE_TYPELESS_PACKAGE_JSON') return;
+    return emit.call(this, warning, ...rest);
+  };
+  try {
+    return await import(pathToFileURL(join(ROOT, relativePath)).href);
+  } finally {
+    process.emitWarning = emit;
+  }
+}
+
+/** The stub's string tables: volunteer `mock.*` and facility names from every locale, as the app has them. */
+function stubCatalog(flattenStrings, placeNames) {
+  const dir = join(ROOT, 'src', 'i18n', 'locales');
+  const catalog = {};
+  for (const lang of readdirSync(dir)) {
+    const file = join(dir, lang, 'volunteer.json');
+    if (!existsSync(file)) continue;
+    const venueFile = join(dir, lang, 'venue.json');
+    const places = existsSync(venueFile) ? placeNames(JSON.parse(readFileSync(venueFile, 'utf8')).facilityText ?? {}) : {};
+    catalog[lang] = { ...flattenStrings(JSON.parse(readFileSync(file, 'utf8')).mock ?? {}), ...places };
+  }
+  return catalog;
+}
+
+/** The translate function's handler with the provider from .env.server.local, else the stub. */
+async function createTranslate({ verifyUser, control, log }) {
+  const { chooseProvider, createHandler } = await importShared('supabase/functions/translate/handler.ts');
+  const { createStub, flattenStrings, placeNames } = await importShared('src/features/translate/stub.ts');
+  const env = readServerEnv();
+  let translator = null;
+  if (env.TRANSLATE_PROVIDER) {
+    const Anthropic = env.TRANSLATE_PROVIDER.trim().toLowerCase() === 'anthropic' ? (await import('@anthropic-ai/sdk')).default : null;
+    const choice = chooseProvider(env, apiKey => new Anthropic({ apiKey, timeout: 20_000, maxRetries: 2 }));
+    if (choice.ok) translator = choice.translator;
+    else log(`mock supabase: ${choice.reason} in .env.server.local; using the stub translator`);
+  }
+  translator ??= createStub(stubCatalog(flattenStrings, placeNames)).translator;
+  log(translator.name === 'stub'
+    ? 'Translate: offline stub (knows the mock volunteer lines). Real provider: see README "Chat translation".'
+    : `Translate: ${translator.name}, keys from .env.server.local`);
+
+  const real = translator;
+  const controlled = {
+    name: real.name,
+    async translate(batch) {
+      if (control.translateDelayMs > 0) await new Promise(r => setTimeout(r, control.translateDelayMs));
+      if (control.failTranslate > 0) {
+        control.failTranslate -= 1;
+        throw new Error('failed on purpose (/__control failTranslate)');
+      }
+      return real.translate(batch);
+    },
+  };
+  return createHandler({ verifyUser, translator: controlled, log: line => log(`mock supabase: ${line}`) });
 }
 
 // Run on its own: node scripts/mock-supabase.mjs [port] [--confirm-email]

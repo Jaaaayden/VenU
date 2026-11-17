@@ -7,9 +7,10 @@ import { Button } from '@/components/button';
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { formatDistance } from '@/features/volunteer/format';
+import { meetSpotName, meetVenueName } from '@/features/volunteer/meet-point';
 import { volunteerRequests } from '@/features/volunteer/request-store';
 import type { HelpRequest, Match } from '@/features/volunteer/types';
-import { useT } from '@/i18n';
+import { languageOf, useT } from '@/i18n';
 import { formatNumber } from '@/i18n/format';
 
 import { MeetMap } from './meet-map';
@@ -18,6 +19,7 @@ import { MessageButton } from './message-button';
 export function MatchView({ request, match, unread }: { request: HelpRequest; match: Match; unread: number }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const t = useT('volunteer');
+  const tv = useT('venue');
   const v = match.volunteer;
   const onTheWay = {
     his: t('match.onTheWay.his', { name: v.firstName }),
@@ -25,7 +27,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
     their: t('match.onTheWay.their', { name: v.firstName }),
   }[v.possessive];
   const openChat = () => router.push({ pathname: '/chat/[id]', params: { id: request.id } });
-  const distance = formatDistance(match.distanceFeet);
+  const distance = formatDistance(match.distanceFeet, languageOf(t));
 
   return (
     <View style={styles.page}>
@@ -44,7 +46,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         </View>
       </View>
 
-      <MeetMap volunteerName={v.name} distanceLabel={distance} />
+      <MeetMap volunteerName={v.name} distanceLabel={distance} place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
 
       <View style={[styles.gutter, styles.card]}>
         <View style={styles.who}>
@@ -53,9 +55,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
             <Text style={styles.name}>{v.name}</Text>
             <Text style={styles.role}>{t('role')}</Text>
           </View>
-          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating) })}>
+          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating, undefined, languageOf(t)) })}>
             <FigmaIcon name="star" size={18} color={Colors.warning} />
-            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</Text>
+            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, languageOf(t))}</Text>
           </View>
         </View>
 
@@ -73,9 +75,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         <View style={styles.infoRow}>
           <InfoTile
             icon="clock"
-            main={t('match.etaMain', { minutes: match.etaMinutes })}
+            main={t('match.etaMain', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
             sub={t('match.etaSub')}
-            label={t('match.etaLabel', { minutes: match.etaMinutes })}
+            label={t('match.etaLabel', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
           />
           <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
         </View>

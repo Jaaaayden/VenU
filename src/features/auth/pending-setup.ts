@@ -11,7 +11,15 @@ import { isKnownLanguage } from '@/features/profile/options';
 const KEY = 'venu.setup.pending';
 
 export interface PendingSetup {
+  /** This device's app language while signed out: the welcome pill's pick, or the last account's. */
   language?: string;
+  /** True when `language` was picked on a language pill and no account has taken it yet. */
+  languagePicked?: boolean;
+  /**
+   * The account a pick was made for (the venue pill, signed in). Unset for a welcome pick made while
+   * signed out, the only kind the next account to sign in takes on.
+   */
+  languagePickedBy?: string;
   firstName?: string;
   /** The account `firstName` was typed for (trimmed, lower case). */
   email?: string;
@@ -23,6 +31,8 @@ export async function readPendingSetup(): Promise<PendingSetup> {
     const v = raw ? (JSON.parse(raw) as PendingSetup) : {};
     return {
       language: isKnownLanguage(v.language) ? v.language : undefined,
+      languagePicked: v.languagePicked === true ? true : undefined,
+      languagePickedBy: v.languagePicked === true && typeof v.languagePickedBy === 'string' ? v.languagePickedBy : undefined,
       firstName: typeof v.firstName === 'string' ? v.firstName : undefined,
       email: typeof v.email === 'string' ? v.email : undefined,
     };
@@ -31,14 +41,30 @@ export async function readPendingSetup(): Promise<PendingSetup> {
   }
 }
 
+// Writes run one at a time: each reads what's stored and merges into it, so two at once (e.g.
+// forgetting a pick while remembering the account's language) would otherwise drop one.
+let writes: Promise<void> = Promise.resolve();
+function queued(write: () => Promise<void>): Promise<void> {
+  const run = writes.then(write).catch(() => {
+    // Storage full or blocked (private browsing): setup just starts blank.
+  });
+  writes = run;
+  return run;
+}
+
+/** Reads after every write already queued, so it never sees storage from before one of them. */
+export function readPendingSetupAfterWrites(): Promise<PendingSetup> {
+  const read = writes.then(readPendingSetup); // readPendingSetup never rejects
+  writes = read.then(() => {});
+  return read;
+}
+
 /** Merges into what's stored: keys left out are kept, a key set to `undefined` is cleared. */
-export async function writePendingSetup(patch: PendingSetup): Promise<void> {
-  try {
+export function writePendingSetup(patch: PendingSetup): Promise<void> {
+  return queued(async () => {
     const next = { ...(await readPendingSetup()), ...patch };
     await AsyncStorage.setItem(KEY, JSON.stringify(next));
-  } catch {
-    // Storage full or blocked (private browsing): setup just starts blank.
-  }
+  });
 }
 
 const normalEmail = (email: string) => email.trim().toLowerCase();
@@ -60,9 +86,9 @@ export async function forgetPendingNameUnlessFor(email: string): Promise<void> {
 }
 
 /** After setup saves: the name now lives in the profile. The language stays as this device's choice. */
-export async function clearPendingName(): Promise<void> {
-  const { language } = await readPendingSetup();
-  try {
-    await AsyncStorage.setItem(KEY, JSON.stringify({ language }));
-  } catch {}
+export function clearPendingName(): Promise<void> {
+  return queued(async () => {
+    const { language, languagePicked, languagePickedBy } = await readPendingSetup();
+    await AsyncStorage.setItem(KEY, JSON.stringify({ language, languagePicked, languagePickedBy }));
+  });
 }

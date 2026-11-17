@@ -15,7 +15,6 @@
     "languageLabel": "Langue de l’app : {{language}}",
     "languageHint": "Change la langue de toute l’app",
     "languageTitle": "Langue de l’app",
-    "languageConsent": "Consultez d’abord la politique de confidentialité mise à jour dans Profil, puis changez de langue.",
     "assistTitle": "Besoin d’aide ?",
     "assistBody": "Contactez un bénévole",
     "assistLabel": "Besoin d’aide ? Contactez un bénévole",
@@ -26,7 +25,7 @@
     "opening_ceremony": "Cérémonie d’ouverture",
     "swimming": "Natation",
     "athletics": "Athlétisme",
-    "football": "Football",
+    "soccer": "Football",
     "gymnastics": "Gymnastique",
     "basketball": "Basketball"
   },
@@ -81,9 +80,31 @@
     "pin": "{{name}} sur le plan",
     "north": "N"
   },
-  "walk_one": "{{count}} min à pied",
-  "walk_many": "{{count}} min à pied",
-  "walk_other": "{{count}} min à pied",
+  "officialMap": {
+    "attribution": "Plan : {{source}}",
+    "open": "Ouvrir dans le navigateur",
+    "openLabel": "Ouvrir le plan officiel de {{source}} dans votre navigateur",
+    "frameLabel": "Plan officiel de {{source}}. Avec un lecteur d’écran, utilisez plutôt la liste Services à proximité ci-dessous.",
+    "loading": "Chargement du plan de {{source}}…",
+    "error": "Impossible de charger le plan. Ouvrez-le dans votre navigateur.",
+    "retry": "Réessayer",
+    "viewsLabel": "Vue du plan",
+    "views": {
+      "exterior": "Extérieur",
+      "east_garage": "Parking est",
+      "west_garage": "Parking ouest"
+    },
+    "imageLabel": "Plan de {{source}} : {{view}}",
+    "imageLabelZoom": "Plan de {{source}} : {{view}}. Pincez ou utilisez les boutons pour zoomer.",
+    "enlarge": "Touchez pour agrandir",
+    "enlargeHint": "Ouvre le plan en plein écran pour zoomer",
+    "close": "Fermer le plan",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière"
+  },
+  "walk_one": "{{number}} min à pied",
+  "walk_many": "{{number}} min à pied",
+  "walk_other": "{{number}} min à pied",
   "wait": {
     "none": "Pas d’attente",
     "short": "Attente courte",
@@ -107,34 +128,47 @@
     "family_room": "Espace famille",
     "long_lines_halftime": "Longues files à la mi-temps",
     "wheelchair_loans": "Prêt de fauteuils roulants",
-    "permit_needed": "Permis requis"
+    "permit_needed": "Permis requis",
+    "wheelchair_escort": "Accompagnement fauteuil",
+    "premium_access": "VIP et premium",
+    "sensory_room": "Salle sensorielle",
+    "assistive_listening": "Aide à l’écoute",
+    "lost_items": "Objets trouvés",
+    "changing_table": "Table à langer"
   },
   "facilityText": {
     "gate-1": {
+      "name": "Porte 1",
       "description": "Entrée nord, la plus proche de l’arrêt de la navette Metro.",
       "location": "Côté nord, à l’arrêt de la navette"
     },
     "gate-2": {
+      "name": "Porte 2",
       "description": "Entrée est avec rampe, à côté du parking accessible du parc C.",
       "location": "Côté est, près du parc C"
     },
     "gate-3": {
+      "name": "Porte 3",
       "description": "Entrée sud pour la dépose et la prise en charge en VTC.",
       "location": "Côté sud, à la zone VTC"
     },
     "gate-4": {
+      "name": "Porte 4",
       "description": "Entrée ouest pour les billets des sections 200 à 240.",
       "location": "Côté ouest, près de la place principale"
     },
     "info-desk": {
+      "name": "Accueil des spectateurs",
       "description": "Questions, billets perdus, kits sensoriels et casques anti-bruit.",
       "location": "Promenade, section 105"
     },
     "first-aid": {
+      "name": "Poste de secours",
       "description": "Infirmiers et secouristes présents de l’ouverture des portes jusqu’à l’évacuation du site.",
       "location": "Promenade, section 112"
     },
     "restroom-east": {
+      "name": "Toilettes est",
       "description": "Toilettes hommes, femmes et un espace famille mixte avec table à langer.",
       "location": "Promenade, section 118"
     },
@@ -143,10 +177,12 @@
       "location": "Promenade, section 124"
     },
     "lost-found": {
+      "name": "Objets trouvés",
       "description": "Déposez ou récupérez des objets perdus. Les enfants perdus sont aussi accompagnés ici.",
       "location": "Promenade, section 131"
     },
     "accessible-seating": {
+      "name": "Services d’accessibilité",
       "description": "Prêt de fauteuils roulants, places accompagnateur et aides à l’écoute.",
       "location": "Promenade, section 136"
     },
@@ -155,12 +191,229 @@
       "location": "Promenade, section 140"
     },
     "restroom-west": {
+      "name": "Toilettes ouest",
       "description": "Toilettes hommes et femmes. La cabine accessible est à gauche.",
       "location": "Promenade, section 145"
     },
     "parking-c": {
-      "description": "Parking accessible avec un chemin court et plat jusqu’à Gate 2.",
+      "name": "Parking C",
+      "description": "Parking accessible avec un chemin court et plat jusqu’à la Porte 2.",
       "location": "Parc sud-est"
+    },
+    "entry-3": {
+      "name": "Entrée 3",
+      "description": "Entrée nord. Chaque entrée a un accès adapté et un accompagnement gratuit en fauteuil roulant.",
+      "location": "Côté nord"
+    },
+    "entry-4": {
+      "name": "Entrée 4",
+      "description": "Entrée nord avec un comptoir accessibilité et des chaises d’attente à l’intérieur.",
+      "location": "Côté nord"
+    },
+    "entry-6": {
+      "name": "Entrée 6",
+      "description": "Entrée ouest pour les billets VIP et premium.",
+      "location": "Côté ouest"
+    },
+    "entry-8": {
+      "name": "Entrée 8",
+      "description": "Entrée sud avec un comptoir accessibilité et des chaises d’attente à l’intérieur.",
+      "location": "Côté sud"
+    },
+    "entry-10": {
+      "name": "Entrée 10",
+      "description": "Entrée sud avec un comptoir accessibilité et des chaises d’attente à l’intérieur.",
+      "location": "Côté sud"
+    },
+    "entry-11": {
+      "name": "Entrée 11",
+      "description": "Entrée est pour les billets VIP et premium.",
+      "location": "Côté est"
+    },
+    "guest-services-ne": {
+      "name": "Accueil NE",
+      "description": "Questions, objets trouvés, aide à l’écoute, kits sensoriels gratuits et salle sensorielle.",
+      "location": "Niveau 3, coursive nord-est"
+    },
+    "guest-services-sw": {
+      "name": "Accueil SO",
+      "description": "Dans le Corona Beach Club. Objets trouvés, aide à l’écoute, kits sensoriels gratuits et salle sensorielle.",
+      "location": "Niveau 3, coursive sud-ouest"
+    },
+    "first-aid-se": {
+      "name": "Poste de secours SE",
+      "description": "Secouristes sur place. Tout placeur ou membre du personnel peut les appeler.",
+      "location": "Niveau 1, coursive sud-est"
+    },
+    "first-aid-nw": {
+      "name": "Poste de secours NO",
+      "description": "Secouristes sur place. Tout placeur ou membre du personnel peut les appeler.",
+      "location": "Niveau 3, coursive nord-ouest"
+    },
+    "pedestrian-ramp": {
+      "name": "Rampe piétonne",
+      "description": "La seule rampe piétonne du stade. Elle dessert tous les niveaux sauf le niveau 7.",
+      "location": "Côté sud-est, derrière l’en-but"
+    },
+    "lactation-suite": {
+      "name": "Espace allaitement",
+      "description": "Cabine d’allaitement privée Mamava. Toilettes familiales à chaque niveau.",
+      "location": "Niveau 4, sud"
+    },
+    "rideshare-kareem": {
+      "name": "Dépose VTC",
+      "description": "Dépose Uber, Lyft et taxis. La prise en charge se fait à l’angle de Kareem Court et Manchester Boulevard.",
+      "location": "Kareem Court, entre Pincay Drive et Manchester Boulevard"
+    },
+    "accessible-drop-off": {
+      "name": "Dépose accessible",
+      "description": "Dépose et prise en charge des personnes handicapées. Arrivez par Prairie Avenue vers le nord, puis Arbor Vitae Street.",
+      "location": "District Drive, entre Champions Way et Touchdown Drive"
+    },
+    "brown-zone": {
+      "name": "Zone marron",
+      "description": "Parking le plus proche des entrées 1 à 5 et 12. Places ADA dans chaque parc, selon les arrivées.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "Zone bleue",
+      "description": "Parking le plus proche des entrées 7 et 8. Places ADA dans chaque parc, selon les arrivées.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "Zone orange",
+      "description": "Parking le plus proche des entrées 10, 11 et 12. Places ADA dans chaque parc, selon les arrivées.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Entrée Kobe Bryant",
+      "description": "Entrée principale pour tous les billets. Les billets fosse GA entrent ici.",
+      "location": "Angle Chick Hearn Ct. (11th St.) et Georgia St."
+    },
+    "star-plaza-entrance": {
+      "name": "Entrée Star Plaza",
+      "description": "Entrée principale pour tous les billets, entre la billetterie et la boutique Team LA.",
+      "location": "Angle Chick Hearn Ct. (11th St.) et Figueroa St."
+    },
+    "figueroa-entrance": {
+      "name": "Entrée Figueroa",
+      "description": "Entrée principale pour tous les billets. Demandez ici un accompagnement gratuit en fauteuil roulant.",
+      "location": "Angle 12th St. et Figueroa St."
+    },
+    "guest-services-m12": {
+      "name": "Accueil M12",
+      "description": "Questions, objets trouvés, aide à l’écoute, sacs sensoriels et coussins lestés (pièce d’identité demandée).",
+      "location": "Coursive principale, face à l’allée M12"
+    },
+    "guest-services-u6": {
+      "name": "Accueil U6",
+      "description": "Questions, objets trouvés, sacs sensoriels et coussins lestés. Demandez ici le code de la cabine sensorielle.",
+      "location": "Coursive supérieure, face à l’allée U6"
+    },
+    "first-aid-m3": {
+      "name": "Poste de secours M3",
+      "description": "Secouristes à chaque événement, avec un coin calme à l’intérieur.",
+      "location": "Coursive principale, face à l’allée M3"
+    },
+    "first-aid-u22": {
+      "name": "Poste de secours U22",
+      "description": "Secouristes à chaque événement, avec un coin calme à l’intérieur.",
+      "location": "Coursive supérieure, face à l’allée U22"
+    },
+    "sensory-pod": {
+      "name": "Cabine sensorielle",
+      "description": "Cabine calme pour une ou deux personnes, ouverte pendant chaque événement. L’accueil a le code.",
+      "location": "Coursive supérieure, face à l’allée 3"
+    },
+    "restroom-m23": {
+      "name": "Toilettes M23",
+      "description": "Toilettes non genrées avec table à langer. Toutes les toilettes sont accessibles en fauteuil.",
+      "location": "Coursive principale, face à l’allée M23"
+    },
+    "restroom-u31": {
+      "name": "Toilettes U31",
+      "description": "Toilettes non genrées avec table à langer. Toutes les toilettes sont accessibles en fauteuil.",
+      "location": "Coursive supérieure, face à l’allée U31"
+    },
+    "rideshare-chick-hearn": {
+      "name": "VTC Chick Hearn",
+      "description": "Prise en charge et dépose VTC dans la zone blanche (direction est).",
+      "location": "Chick Hearn Ct., entre L.A. Live Way et Georgia St."
+    },
+    "rideshare-figueroa": {
+      "name": "VTC Figueroa",
+      "description": "Prise en charge et dépose VTC dans la zone blanche (direction sud).",
+      "location": "Figueroa St., entre 12th St. et Pico Blvd."
+    },
+    "west-garage-lot-w": {
+      "name": "Parking ouest (Lot W)",
+      "description": "Parking couvert de l’aréna, accès par Chick Hearn Ct. et Georgia St.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "Entrée principale",
+      "description": "File GameFace ID à gauche, file Identity Pass à droite. Aide gratuite à la mobilité du contrôle de sécurité à votre place.",
+      "location": "Sur la place, près de Century Blvd. et Prairie Ave."
+    },
+    "vip-entrance": {
+      "name": "Entrée VIP",
+      "description": "Pour les billets suite, club et parquet.",
+      "location": "À gauche de l’entrée principale"
+    },
+    "wall-entrance": {
+      "name": "Entrée The Wall",
+      "description": "Entrée réservée à The Wall.",
+      "location": "À gauche de l’entrée principale, après l’entrée VIP"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal (Main)",
+      "description": "Accueil : objets trouvés, aide à l’écoute gratuite (pièce d’identité avec photo conservée) et appareils OneCourt.",
+      "location": "Niveau Main, près de la section Main 6"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal (Terrace)",
+      "description": "Accueil : objets trouvés et aide à l’écoute gratuite (pièce d’identité avec photo conservée).",
+      "location": "Niveau Terrace, près de la section Terrace 18"
+    },
+    "first-aid-main": {
+      "name": "Poste de secours (Main)",
+      "description": "Secouristes formés à chaque événement.",
+      "location": "Coursive du niveau Main, Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "Poste de secours (Terrace)",
+      "description": "Secouristes formés à chaque événement.",
+      "location": "Coursive du niveau Terrace, Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "Poste de secours (parquet)",
+      "description": "Secouristes formés à chaque événement.",
+      "location": "Niveau parquet, sous Wall 19 près du tunnel est"
+    },
+    "sensory-room": {
+      "name": "Salle sensorielle",
+      "description": "La salle sensorielle privée Kaiser Permanente. Sacs sensoriels sur demande.",
+      "location": "Demandez le chemin à un hôte de l’aréna"
+    },
+    "infant-care-room": {
+      "name": "Espace bébé",
+      "description": "Pièce privée pour s’occuper des bébés. Toilettes universelles dans toute l’aréna.",
+      "location": "Niveau Main, Main 6"
+    },
+    "mobility-hub": {
+      "name": "Pôle mobilité",
+      "description": "Prise en charge et dépose VTC et taxis, dépose des familles et navettes.",
+      "location": "Parking est, niveau 1"
+    },
+    "east-garage": {
+      "name": "Parking est",
+      "description": "Parking standard ; achetez votre pass à l’avance. Places accessibles vendues selon les arrivées.",
+      "location": "Entrée par 102nd St."
+    },
+    "west-garage": {
+      "name": "Parking ouest",
+      "description": "Parking VIP de l’autre côté de Prairie Ave. ; achetez votre pass à l’avance.",
+      "location": "Entrée par Prairie Ave."
     }
   },
   "facility": {
@@ -168,10 +421,13 @@
     "wheelchair": "Accessible en fauteuil roulant",
     "directions": "Itinéraire",
     "directionsSoon": "L’itinéraire pas à pas arrive bientôt. {{name}} : {{location}}.",
+    "imHere": "Je suis ici",
+    "imHereHint": "Utilise cet endroit comme votre position quand vous demandez de l’aide",
+    "isHere": "Votre position",
     "reports": "Signalements",
-    "results_one": "{{count}} résultat",
-    "results_many": "{{count}} de résultats",
-    "results_other": "{{count}} résultats",
+    "results_one": "{{number}} résultat",
+    "results_many": "{{number}} de résultats",
+    "results_other": "{{number}} résultats",
     "noReports": "Aucun signalement pour l’instant. Soyez le premier à partager ce que vous avez vu.",
     "addReport": "Ajouter un signalement"
   },
@@ -198,7 +454,9 @@
   "report": {
     "notFound": "Signalement introuvable",
     "kind": "Signalement",
+    "authorFallback": "Spectateur VenU",
     "submitted": "Envoyé le {{date}}",
+    "originalLanguage": "Langue d’origine : {{language}}",
     "noBody": "Aucun détail ajouté."
   },
   "form": {
@@ -211,11 +469,10 @@
     "bodyPlaceholder": "Saisissez le texte",
     "bodyHint": "Facultatif. Que s’est-il passé, où et quand ?",
     "pictureSoon": "L’ajout de photos arrive bientôt.",
-    "speakSoon": "Les signalements vocaux arrivent bientôt. Écrivez votre signalement pour l’instant.",
     "topic": "Sujet",
     "submit": "Envoyer",
     "sendFailed": "Impossible d’envoyer le signalement. Vérifiez votre connexion et réessayez.",
-    "titleRequired": "Ajoutez un titre, par ex. « La rampe de la Gate 2 est fissurée ».",
+    "titleRequired": "Ajoutez un titre, par ex. « La rampe de la Porte 2 est fissurée ».",
     "titleTooLong": "Le titre doit faire moins de {{max}} caractères.",
     "topicRequired": "Choisissez le sujet le plus adapté.",
     "bodyTooLong": "Le signalement doit faire moins de {{max}} caractères."

@@ -1,13 +1,13 @@
 {
   "tab": {
-    "title": "Profile",
+    "title": "Profile ko",
     "visitor": "Bisita",
-    "volunteer": "Volunteer",
+    "volunteer": "Boluntaryo",
     "verified": "✓ Verified ng LA28",
     "unverified": "Hindi pa verified",
     "sharedVisitor": "Ibinabahagi sa tutulong sa iyo",
     "sharedVolunteer": "Nakikita ng mga bisita",
-    "account": "Account",
+    "account": "Iyong account",
     "support": "Suporta",
     "editProfile": "I-edit ang profile",
     "notifications": "Mga notification",
@@ -74,7 +74,7 @@
     "communication": {
       "speaking": "Pagsasalita",
       "text": "Text / pagsusulat",
-      "sign_language": "Sign language"
+      "sign_language": "Wikang pasenyas"
     },
     "helperGender": {
       "none": "Kahit sino",
@@ -89,14 +89,14 @@
     "training": {
       "wheelchair": "Sanay sa wheelchair",
       "asl": "ASL",
-      "first_aid": "First aid",
-      "sighted_guide": "Sighted guide",
-      "mental_health": "Mental health first aid"
+      "first_aid": "Pangunang lunas",
+      "sighted_guide": "Paggabay sa may kapansanan sa paningin",
+      "mental_health": "Pangunang lunas sa kalusugang pangkaisipan"
     },
     "gender": {
       "woman": "Babae",
       "man": "Lalaki",
-      "nonbinary": "Non-binary",
+      "nonbinary": "Di-binary",
       "prefer_not": "Ayokong sabihin"
     },
     "ageBand": {
@@ -116,27 +116,27 @@
     }
   },
   "languageNames": {
-    "en": "English",
+    "en": "Ingles",
     "es": "Espanyol",
-    "zh": "Chinese",
-    "ko": "Korean",
+    "zh": "Tsino",
+    "ko": "Koreano",
     "tl": "Tagalog",
-    "vi": "Vietnamese",
-    "hy": "Armenian",
-    "fa": "Persian",
-    "ja": "Japanese",
-    "ru": "Russian",
-    "ar": "Arabic",
-    "fr": "French",
-    "pt": "Portuguese",
-    "de": "German",
-    "it": "Italian",
+    "vi": "Bietnamita",
+    "hy": "Armenyo",
+    "fa": "Persiyano",
+    "ja": "Hapones",
+    "ru": "Ruso",
+    "ar": "Arabe",
+    "fr": "Pranses",
+    "pt": "Portuges",
+    "de": "Aleman",
+    "it": "Italyano",
     "hi": "Hindi",
     "pa": "Punjabi",
     "th": "Thai",
     "km": "Khmer",
-    "he": "Hebrew",
-    "ase": "American Sign Language"
+    "he": "Hebreo",
+    "ase": "Wikang Pasenyas ng Amerika"
   },
   "privacy": {
     "title": "Ang iyong privacy",

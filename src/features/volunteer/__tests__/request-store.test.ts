@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals
 
 import i18n from '@/i18n';
 
-import { createMockBackend } from '../backend';
-import { mockLocation } from '../mock';
-import { createRequestStore, INITIAL_STATE, parseSaved, reduce, type KeyValueStorage, type NewRequest } from '../request-store';
+import { createMockBackend, mockVolunteerFor } from '../backend';
+import { createRequestStore, INITIAL_STATE, parseSaved, reduce, SEARCH_TIMEOUT_MS, type KeyValueStorage, type NewRequest } from '../request-store';
+import type { HelpRequest, MeetPoint, RequestState } from '../types';
 import { formatClock, formatDayTime, formatDistance, needsSeparator } from '../format';
 
 // The app's store (created when the module loads) saves to AsyncStorage; tests pass their own.
@@ -23,6 +23,9 @@ function memoryStorage(): KeyValueStorage & { data: Map<string, string> } {
   };
 }
 
+/** Waiting at SoFi's Entry 4. */
+const AT_ENTRY_4: MeetPoint = { venueId: 'sofi', facilityId: 'entry-4' };
+
 const TIMING = { search: 1000, greeting: 500, reply: 800 };
 
 const rosaNeedsHelp: NewRequest = {
@@ -31,7 +34,7 @@ const rosaNeedsHelp: NewRequest = {
   note: 'Stuck near ramp 2',
   photoUri: null,
   language: 'en',
-  location: mockLocation(),
+  location: AT_ENTRY_4,
 };
 
 function setup() {
@@ -63,7 +66,7 @@ describe('volunteer request store', () => {
     await advance(TIMING.greeting);
     expect(store.getState().messages.map(m => m.from)).toEqual(['volunteer']);
     expect(store.getState().messages[0]!.text).toBe(
-      "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Near Gate 2 Ramp.",
+      "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4.",
     );
     expect(store.getState().unread).toBe(1);
 
@@ -149,8 +152,8 @@ describe('volunteer request store', () => {
 
     await store.submitFeedback(5, ['patient', 'helpful'], ' Thank you ');
     expect(store.getState().status).toBe('idle');
-    expect(store.getState().notice).toMatchObject({ tone: 'success' });
-    expect(store.getState().notice?.text).toContain('Daniel');
+    // Kept as a key + values, so the banner words it in whatever language is on screen when it shows.
+    expect(store.getState().notice).toEqual({ tone: 'success', key: 'thanks', params: { name: 'Daniel' } });
 
     store.dismissNotice();
     expect(store.getState().notice).toBeNull();
@@ -162,7 +165,7 @@ describe('volunteer request store', () => {
     const store = createRequestStore(backend);
     await store.sendRequest(rosaNeedsHelp);
     expect(store.getState().status).toBe('idle');
-    expect(store.getState().notice?.tone).toBe('error');
+    expect(store.getState().notice).toEqual({ tone: 'error', key: 'searchFailed' });
   });
 
   it('keeps the form draft through a failed search and a cancel, and clears it once help ends', async () => {
@@ -257,6 +260,70 @@ describe('volunteer request store', () => {
       expect(after.getState().messages.map(m => m.from)).toEqual(['volunteer', 'me', 'me', 'volunteer']);
     });
 
+    it('keeps the volunteer writing in their language, tagged, after a restart in another UI language', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest({ ...rosaNeedsHelp, language: 'es' });
+      await advance(TIMING.search + TIMING.greeting);
+      await done;
+      expect(before.getState().match?.language).toBe('en');
+
+      await i18n.changeLanguage('es');
+      try {
+        const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+        await after.setUser('rosa');
+        expect(after.getState().match?.language).toBe('en');
+        after.sendMessage('¿Estás cerca?');
+        await advance(TIMING.reply);
+        expect(after.getState().messages.at(-1)).toMatchObject({ from: 'volunteer', text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+      } finally {
+        await i18n.changeLanguage('en');
+      }
+    });
+
+    it('fills in the volunteer’s language for a request saved before it was stored', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      const raw = JSON.parse(storage.data.get(KEY)!);
+      delete raw.state.match.language;
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.match?.language).toBe('en');
+    });
+
+    it('turns a meet point saved as translated text into ids, keeping the venue', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const done = before.sendRequest(rosaNeedsHelp);
+      await advance(TIMING.search);
+      await done;
+      const raw = JSON.parse(storage.data.get(KEY)!);
+
+      // How the request was saved before meet points were ids (text in the language of the day).
+      raw.state.request.location = { spot: 'Cerca de la rampa de la Puerta 2', venue: 'Crypto.com Arena' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'crypto-arena', facilityId: null });
+      raw.state.request.location = { spot: 'Near Gate 2 Ramp', venue: 'Somewhere else' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+      // Ids that no longer exist fall back the same way; good ids come back as they were.
+      raw.state.request.location = { venueId: 'sofi', facilityId: 'gate-2' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+      raw.state.request.location = { venueId: 'intuit-dome', facilityId: 'main-entrance' };
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'intuit-dome', facilityId: 'main-entrance' });
+      delete raw.state.request.location;
+      expect(parseSaved(JSON.stringify(raw), 'rosa')?.request?.location).toEqual({ venueId: 'sofi', facilityId: null });
+
+      // The restored request still works: a reloaded store shows it and keeps matching.
+      raw.state.request.location = { spot: 'Near Gate 2 Ramp', venue: 'SoFi Stadium' };
+      storage.data.set(KEY, JSON.stringify(raw));
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await after.setUser('rosa');
+      expect(after.getState()).toMatchObject({ status: 'matched', request: { location: { venueId: 'sofi', facilityId: null } } });
+    });
+
     it('resumes a search that was in progress', async () => {
       const storage = memoryStorage();
       const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
@@ -319,6 +386,147 @@ describe('volunteer request store', () => {
   });
 });
 
+describe('no volunteer free in time', () => {
+  beforeEach(() => { jest.useFakeTimers(); });
+  afterEach(() => { jest.useRealTimers(); });
+
+  // German: no mock volunteer speaks it and chat translation doesn't cover it, so nobody matches.
+  const nobodySpeaks: NewRequest = { ...rosaNeedsHelp, language: 'de' };
+  const request: HelpRequest = { ...rosaNeedsHelp, id: 'req-1', createdAt: 0 };
+  const draft = { helpTypes: ['physical' as const], note: 'By the ramp', photoUri: null, language: 'de' };
+  const searching: RequestState = { ...INITIAL_STATE, status: 'searching', request, draft };
+
+  it('moves searching → notFound → searching, and cancels back to the form with the draft', () => {
+    const notFound = reduce(searching, { type: 'searchTimedOut', requestId: 'req-1' });
+    expect(notFound).toEqual({ ...searching, status: 'notFound' });
+    expect(reduce(searching, { type: 'searchTimedOut', requestId: 'req-other' })).toBe(searching);
+    expect(reduce(INITIAL_STATE, { type: 'searchTimedOut', requestId: 'req-1' })).toBe(INITIAL_STATE);
+
+    const again = { ...request, id: 'req-2' };
+    expect(reduce(notFound, { type: 'keepSearching', request: again })).toEqual({ ...searching, request: again });
+    expect(reduce(searching, { type: 'keepSearching', request: again })).toBe(searching);
+    expect(reduce(notFound, { type: 'matched', requestId: 'req-1', match: {} as never })).toBe(notFound);
+
+    expect(reduce(notFound, { type: 'cancel' })).toEqual({ ...INITIAL_STATE, draft });
+  });
+
+  it('the mock matches nobody only for a language no one speaks and the app can’t translate', () => {
+    expect(mockVolunteerFor('de')).toBeNull();
+    expect(mockVolunteerFor('ko')?.firstName).toBe('Min-ji');
+    expect(mockVolunteerFor('ja')?.firstName).toBe('Daniel'); // through chat translation, as before
+  });
+
+  it('gives up after SEARCH_TIMEOUT_MS, keeping the request and draft, and withdraws it', async () => {
+    const backend = createMockBackend(TIMING);
+    const cancelRequest = jest.spyOn(backend, 'cancelRequest');
+    const store = createRequestStore(backend);
+    store.editDraft(draft);
+    let settled = false;
+    void store.sendRequest(nobodySpeaks).then(() => { settled = true; });
+
+    await advance(SEARCH_TIMEOUT_MS - 1);
+    expect(store.getState().status).toBe('searching');
+    expect(settled).toBe(false);
+
+    await advance(1);
+    const state = store.getState();
+    expect(state.status).toBe('notFound');
+    expect(state.request?.language).toBe('de');
+    expect(state.draft).toEqual(draft);
+    expect(settled).toBe(true);
+    expect(cancelRequest).toHaveBeenCalledWith(state.request!.id);
+  });
+
+  it('a match before the timeout stays matched', async () => {
+    const store = setup();
+    void store.sendRequest(rosaNeedsHelp);
+    await advance(SEARCH_TIMEOUT_MS * 2);
+    expect(store.getState().status).toBe('matched');
+  });
+
+  it('keep searching sends the request again under a new id and waits the full time again', async () => {
+    const store = setup();
+    void store.sendRequest(nobodySpeaks);
+    await advance(SEARCH_TIMEOUT_MS);
+    const id = store.getState().request?.id;
+    expect(store.getState().status).toBe('notFound');
+
+    void store.keepSearching();
+    expect(store.getState().status).toBe('searching');
+    expect(store.getState().request?.id).not.toBe(id);
+    expect(store.getState().request).toMatchObject({ helpTypes: nobodySpeaks.helpTypes, language: nobodySpeaks.language });
+    await advance(SEARCH_TIMEOUT_MS - 1);
+    expect(store.getState().status).toBe('searching');
+    await advance(1);
+    expect(store.getState().status).toBe('notFound');
+  });
+
+  it('cancel from notFound goes back to the form with the draft', async () => {
+    const store = setup();
+    store.editDraft(draft);
+    void store.sendRequest(nobodySpeaks);
+    await advance(SEARCH_TIMEOUT_MS);
+    store.cancel();
+    expect(store.getState()).toEqual({ ...INITIAL_STATE, draft });
+  });
+
+  describe('after a restart', () => {
+    function saved(state: RequestState, extra: object = {}) {
+      return JSON.stringify({ v: 1, owner: 'rosa', state, ...extra });
+    }
+
+    async function restart(raw: string) {
+      const storage = memoryStorage();
+      storage.data.set(KEY, raw);
+      const store = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await store.setUser('rosa');
+      return store;
+    }
+
+    it('shows notFound again for a saved notFound request, without searching', async () => {
+      const store = await restart(saved({ ...searching, status: 'notFound', request: { ...request, createdAt: Date.now() } }));
+      expect(store.getState().status).toBe('notFound');
+      expect(store.getState().draft).toEqual(draft);
+      await advance(SEARCH_TIMEOUT_MS * 2);
+      expect(store.getState().status).toBe('notFound');
+    });
+
+    it('shows notFound for an old-shape save (no since) whose wait already ran out', async () => {
+      const store = await restart(saved({ ...searching, request: { ...request, createdAt: Date.now() - SEARCH_TIMEOUT_MS - 1000 } }));
+      expect(store.getState().status).toBe('notFound');
+    });
+
+    it('resumes an old-shape save that still has time, and matches as before', async () => {
+      const store = await restart(saved({ ...searching, request: { ...request, language: 'en', createdAt: Date.now() } }));
+      expect(store.getState().status).toBe('searching');
+      await advance(TIMING.search);
+      expect(store.getState().status).toBe('matched');
+    });
+
+    it('saves when the wait began and gives up on time after a restart', async () => {
+      const storage = memoryStorage();
+      const before = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await before.setUser('rosa');
+      const started = Date.now();
+      void before.sendRequest(nobodySpeaks);
+      await advance(0);
+      expect(JSON.parse(storage.data.get(KEY)!).since).toBe(started);
+
+      await advance(SEARCH_TIMEOUT_MS / 2);
+      const after = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+      await after.setUser('rosa');
+      expect(after.getState().status).toBe('searching');
+      await advance(SEARCH_TIMEOUT_MS / 2);
+      expect(after.getState().status).toBe('notFound');
+    });
+
+    it('parses a saved notFound request', () => {
+      expect(parseSaved(saved({ ...searching, status: 'notFound' }), 'rosa')?.status).toBe('notFound');
+      expect(parseSaved(saved({ ...searching, status: 'notFound', request: null }), 'rosa')).toBeNull();
+    });
+  });
+});
+
 describe('the mock volunteer in another language', () => {
   beforeEach(() => { jest.useFakeTimers(); });
   afterEach(async () => {
@@ -326,17 +534,42 @@ describe('the mock volunteer in another language', () => {
     await i18n.changeLanguage('en');
   });
 
-  it('greets and replies in the UI language', async () => {
+  // The chat translates for the reader; the volunteer writes as they would, in their main language.
+  it('greets and replies in the volunteer’s own language, tagged with it', async () => {
     await i18n.changeLanguage('es');
     const store = setup();
-    void store.sendRequest({ ...rosaNeedsHelp, location: mockLocation() });
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es', location: AT_ENTRY_4 });
     await advance(TIMING.search + TIMING.greeting);
-    expect(store.getState().messages[0]!.text).toBe(
-      '¡Hola, Rosa! Soy Daniel, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: Cerca de la rampa de la Puerta 2.',
-    );
+    expect(store.getState().match?.volunteer.firstName).toBe('Daniel');
+    expect(store.getState().messages[0]).toMatchObject({
+      text: "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4.",
+      lang: 'en',
+    });
     store.sendMessage('Gracias');
     await advance(TIMING.reply);
-    expect(store.getState().messages.at(-1)!.text).toBe('¡Entendido, gracias! Llego en un par de minutos.');
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+  });
+
+  it('tags your messages with your chat language once it is known', async () => {
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'es' });
+    await advance(TIMING.search);
+    store.sendMessage('Hola');
+    expect(store.getState().messages.at(-1)).not.toHaveProperty('lang');
+    store.setLanguage('es');
+    store.sendMessage('Estoy aquí');
+    expect(store.getState().messages.at(-1)).toMatchObject({ from: 'me', text: 'Estoy aquí', lang: 'es' });
+  });
+
+  it('has a Korean-speaking volunteer write in Korean', async () => {
+    await i18n.changeLanguage('ko');
+    const store = setup();
+    void store.sendRequest({ ...rosaNeedsHelp, language: 'ko', location: AT_ENTRY_4 });
+    await advance(TIMING.search + TIMING.greeting);
+    expect(store.getState().match?.volunteer.firstName).toBe('Min-ji');
+    store.sendMessage('감사합니다');
+    await advance(TIMING.reply);
+    expect(store.getState().messages.at(-1)).toMatchObject({ text: '알겠어요, 감사합니다! 몇 분 안에 도착해요.', lang: 'ko' });
   });
 });
 

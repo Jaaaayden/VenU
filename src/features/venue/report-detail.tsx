@@ -5,16 +5,19 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
-import { useT } from '@/i18n';
+import { uiLanguageName } from '@/features/profile/summary';
+import { useT, useUiLanguage } from '@/i18n';
 import { formatDate } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
-import { topicLabel, useReport } from './reports';
+import { reportAuthor, topicLabel, useReport } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
 export function ReportDetail() {
   const t = useT('venue');
+  const tp = useT('profile');
+  const { language: onScreen } = useUiLanguage();
   const { venue, setSnap } = useVenueScreen();
   const { facilityId, reportId } = useLocalSearchParams<{ facilityId: string; reportId: string }>();
   const report = useReport(reportId);
@@ -36,10 +39,14 @@ export function ReportDetail() {
           </View>
           <TagRow tags={[{ label: topicLabel(report.topic, t), tone: report.topic === 'accessibility' ? 'good' : 'note' }]} />
           <View style={styles.author}>
-            <Avatar name={report.authorName} uri={null} size={44} />
+            <Avatar name={reportAuthor(report, t)} uri={null} size={44} />
             <View style={styles.authorText}>
-              <Text style={venueText.label}>{report.authorName}</Text>
+              <Text style={venueText.label}>{reportAuthor(report, t)}</Text>
               <Text style={venueText.caption}>{t('report.submitted', { date: formatDate(report.createdAt) })}</Text>
+              {/* Visitors' words are shown as written; say which language when it isn't the one on screen. */}
+              {report.language && report.language !== onScreen ? (
+                <Text style={venueText.caption}>{t('report.originalLanguage', { language: uiLanguageName(report.language, tp) })}</Text>
+              ) : null}
             </View>
           </View>
           {report.body ? <Text style={styles.body}>{report.body}</Text> : <Text style={styles.noBody}>{t('report.noBody')}</Text>}

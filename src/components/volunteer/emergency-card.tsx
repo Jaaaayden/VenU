@@ -1,29 +1,36 @@
-/** The pink "Emergency? Call 911 now" card; opens the phone dialer. */
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+/** The pink "Emergency? Call 911 now" card; opens "Need emergency help?" (Call 911 or venue staff). */
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
+import { EmergencyDialog } from './emergency-dialog';
+
 export function EmergencyCard() {
   const t = useT('volunteer');
   const rtl = useLayoutRtl();
+  const [open, setOpen] = useState(false);
   return (
-    <Pressable
-      onPress={() => Linking.openURL('tel:911').catch(() => {})}
-      accessibilityRole="button"
-      accessibilityLabel={t('emergency.label')}
-      accessibilityHint={t('emergency.hint')}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-      <FigmaIcon name="alert-triangle" size={44} color={Colors.danger} />
-      <View style={styles.text}>
-        <Text style={styles.title}>{t('emergency.title')}</Text>
-        <Text style={styles.sub}>{t('emergency.call')}</Text>
-      </View>
-      <View style={rtl && styles.flip}>
-        <FigmaIcon name="group-2-77b14c" size={36} color={Colors.danger} />
-      </View>
-    </Pressable>
+    <>
+      <Pressable
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel={t('emergency.label')}
+        accessibilityHint={t('emergency.hint')}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
+        <FigmaIcon name="alert-triangle" size={44} color={Colors.danger} />
+        <View style={styles.text}>
+          <Text style={styles.title}>{t('emergency.title')}</Text>
+          <Text style={styles.sub}>{t('emergency.call')}</Text>
+        </View>
+        <View style={rtl && styles.flip}>
+          <FigmaIcon name="group-2-77b14c" size={36} color={Colors.danger} />
+        </View>
+      </Pressable>
+      <EmergencyDialog visible={open} onClose={() => setOpen(false)} />
+    </>
   );
 }
 

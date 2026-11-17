@@ -1,5 +1,7 @@
 /**
- * One venue: header with category chips, the stadium map, and the "Facility Search" bottom sheet.
+ * One venue: header with category chips, the map, and the "Facility Search" bottom sheet.
+ * The map is the venue's own official one where it publishes one (./official-maps.ts), else the
+ * schematic stadium map with facility pins.
  * The sheet snaps to three heights (down / mid / up) by dragging or tapping its handle; its content
  * is the current child route (facility list, facility card, report, add report).
  */
@@ -17,6 +19,8 @@ import { useT } from '@/i18n';
 
 import { CategoryChips } from './category-chips';
 import { facilitiesFor } from './mock';
+import { OfficialMapPanel } from './official-map';
+import { officialMapFor } from './official-maps';
 import { MAP_BACKGROUND, SHEET_HANDLE, StadiumMap } from './stadium-map';
 import type { Facility, FacilityCategory, Venue } from './types';
 import { BackArrow, venueText } from './ui';
@@ -84,8 +88,11 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
   const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
+  const official = officialMapFor(venue.id); // the same object per venue
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  const [snap, setSnap] = useState<SheetSnap>('mid');
+  // An interactive official map needs the room: start with the sheet lowered to its peek. Chosen
+  // once per mount; the route keys this screen by venue, so a new venue starts fresh.
+  const [snap, setSnap] = useState<SheetSnap>(official?.kind === 'embed' ? 'down' : 'mid');
   const [box, setBox] = useState({ w: 0, h: 0 });
   // Set by the facility card after a submit; the list and other facilities clear it.
   const [freshReport, setFreshReport] = useState<FreshReport | null>(null);
@@ -155,11 +162,14 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: top.get() }] }));
   // Keep the stadium centred in the strip of map above the sheet.
   const mapStyle = useAnimatedStyle(() => ({ transform: [{ translateY: Math.min((top.get() - snaps.get()[2]) / 2, 0) }] }));
+  // An official map fills the strip above the sheet, following it frame by frame while dragged.
+  const officialStyle = useAnimatedStyle(() => ({ height: Math.max(top.get(), 0) }));
 
   const pickCategory = useCallback((c: FacilityCategory | null) => {
     setCategory(c);
-    setSnap(s => (s === 'up' ? 'mid' : s)); // show the highlighted pins
-  }, []);
+    // Schematic map: show the highlighted pins. Official map has no pins: show the filtered list.
+    setSnap(s => (official ? (s === 'down' ? 'mid' : s) : s === 'up' ? 'mid' : s));
+  }, [official]);
 
   const openFromMap = useCallback((f: Facility) => {
     setSnap('mid');
@@ -193,20 +203,26 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
           <CategoryChips value={category} onChange={pickCategory} />
         </SafeAreaView>
 
-        <View style={styles.area} onLayout={onAreaLayout}>
+        <View style={[styles.area, official && styles.areaOfficial]} onLayout={onAreaLayout}>
           {box.w > 0 ? (
             <>
-              <Animated.View style={[styles.map, mapStyle]}>
-                <StadiumMap
-                  shape={venue.shape}
-                  facilities={facilities}
-                  width={box.w}
-                  height={positions.down}
-                  category={category}
-                  selectedId={facilityId}
-                  onPinPress={openFromMap}
-                />
-              </Animated.View>
+              {official ? (
+                <Animated.View style={[styles.map, officialStyle]}>
+                  <OfficialMapPanel map={official} />
+                </Animated.View>
+              ) : (
+                <Animated.View style={[styles.map, mapStyle]}>
+                  <StadiumMap
+                    shape={venue.shape}
+                    facilities={facilities}
+                    width={box.w}
+                    height={positions.down}
+                    category={category}
+                    selectedId={facilityId}
+                    onPinPress={openFromMap}
+                  />
+                </Animated.View>
+              )}
 
               <Animated.View style={[styles.sheet, { height: sheetHeight }, sheetStyle]}>
                 <GestureDetector gesture={pan}>
@@ -241,6 +257,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, paddingHorizontal: Spacing.gutter, paddingTop: Spacing.md },
   titleText: { flex: 1, gap: 4 },
   area: { flex: 1, overflow: 'hidden', backgroundColor: MAP_BACKGROUND, borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+  areaOfficial: { backgroundColor: Colors.surfaceAlt },
   map: { position: 'absolute', left: 0, right: 0, top: 0 },
   sheet: {
     position: 'absolute',

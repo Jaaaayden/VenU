@@ -4,11 +4,12 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { draftToWrite, rowToProfile, type ProfileRow } from '../mapping';
 import { isKnownLanguage, isolatedLanguageName, searchLanguages } from '../options';
 import { PRIVACY_VERSION } from '../privacy';
-import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
-import { helperSummary, initials } from '../summary';
+import { base64ToArrayBuffer, checkPhoto, createLocalStore, createSupabaseStore, saveWithAvatar, setAppLanguageIfCurrent, type KeyValueStorage, type PendingUpload, type ProfileStore } from '../store';
+import { helperSummary, initials, uiLanguageName } from '../summary';
 import { draftFromProfile, emptyDraft, homeFor, type ProfileDraft } from '../types';
 import { isValid, validateDraft } from '../validate';
-import { friendlyError } from '@/lib/errors';
+import i18n from '@/i18n';
+import { codedError, friendlyError } from '@/lib/errors';
 
 const rosa: ProfileDraft = {
   ...emptyDraft('visitor', 'es'),
@@ -89,6 +90,20 @@ describe('draftToWrite / rowToProfile', () => {
   });
 });
 
+describe('saving the profile form', () => {
+  it('never changes the app language of an existing profile (local store)', async () => {
+    // Edit profile opened in Arabic; the venue pill then saved 한국어; the form saves with its old draft.
+    const storage = memoryStorage();
+    const store = createLocalStore(storage);
+    const created = await store.save('u1', { ...rosa, appLanguage: 'ar' }, null);
+    expect(created.appLanguage).toBe('ar'); // a new profile takes the draft's
+    await store.setAppLanguage('u1', 'ko');
+    const edited = await store.save('u1', { ...rosa, languages: ['es', 'en', 'fr'], appLanguage: 'ar' }, created);
+    expect(edited.appLanguage).toBe('ko');
+    expect(edited.languages).toEqual(['es', 'en', 'fr']);
+  });
+});
+
 describe('local store', () => {
   it('saves, reads back, keeps role and consent time on edit, and deletes', async () => {
     const storage = memoryStorage();
@@ -107,6 +122,18 @@ describe('local store', () => {
     await store.deleteAll('u1');
     expect(await store.get('u1')).toBeNull();
     expect(storage.data.size).toBe(0);
+  });
+
+  it('changes only the app language, leaving an old consent as it was', async () => {
+    const storage = memoryStorage();
+    const store = createLocalStore(storage);
+    const created = await store.save('u1', rosa, null);
+    const old = { ...JSON.parse(storage.data.get('venu.profile.u1')!), privacy_version: '2020-01', privacy_accepted_at: '2020-01-01T00:00:00.000Z' };
+    storage.data.set('venu.profile.u1', JSON.stringify(old));
+    const saved = await store.setAppLanguage('u1', 'ko');
+    expect(saved).toEqual({ ...created, appLanguage: 'ko', privacyVersion: '2020-01', privacyAcceptedAt: '2020-01-01T00:00:00.000Z' });
+    expect(await store.get('u1')).toEqual(saved);
+    await expect(store.setAppLanguage('nobody', 'ko')).rejects.toThrow();
   });
 
   it('drops unreadable saved data instead of failing every launch', async () => {
@@ -131,8 +158,9 @@ describe('local store', () => {
 });
 
 describe('helperSummary', () => {
+  const t = i18n.getFixedT('en', 'profile');
   it('lists main language first, then needs (visitor)', () => {
-    expect(helperSummary({ ...rosa, communication: ['speaking', 'text'] })).toEqual([
+    expect(helperSummary({ ...rosa, communication: ['speaking', 'text'] }, t)).toEqual([
       'Speaks Spanish, English',
       'Wheelchair user',
       'Prefers text / writing',
@@ -140,7 +168,7 @@ describe('helperSummary', () => {
   });
 
   it('lists languages and training (volunteer)', () => {
-    expect(helperSummary(daniel)).toEqual(['Speaks English, Spanish', 'Wheelchair trained']);
+    expect(helperSummary(daniel, t)).toEqual(['Speaks English, Spanish', 'Wheelchair trained']);
   });
 });
 
@@ -162,6 +190,12 @@ describe('small helpers', () => {
     expect(searchLanguages('espanol').map(l => l.code)).toEqual(['es']);
     expect(searchLanguages('KOREAN').map(l => l.code)).toEqual(['ko']);
     expect(searchLanguages('sign').map(l => l.code)).toEqual(['ase']);
+    // The name in the UI language matches too (Korean UI: 스페인어 = Spanish), without losing English.
+    const ko = i18n.getFixedT('ko', 'profile');
+    const koName = (code: string) => uiLanguageName(code, ko);
+    expect(searchLanguages('스페인어', koName).map(l => l.code)).toEqual(['es']);
+    expect(searchLanguages('스페인어').map(l => l.code)).toEqual([]);
+    expect(searchLanguages('spanish', koName).map(l => l.code)).toEqual(['es']);
   });
 });
 
@@ -182,7 +216,9 @@ describe('review fixes', () => {
   it('turns a storage quota error on a photo into a readable message', async () => {
     const full: KeyValueStorage = { ...memoryStorage(), setItem: async () => { throw new Error('QuotaExceededError'); } };
     const store = createLocalStore(full);
-    await expect(store.save('u1', { ...rosa, avatarPath: 'data:image/png;base64,AAA' }, null)).rejects.toThrow('too big');
+    const tooBig = store.save('u1', { ...rosa, avatarPath: 'data:image/png;base64,AAA' }, null);
+    await expect(tooBig).rejects.toMatchObject({ code: 'VENU_PHOTO_TOO_BIG_LOCAL' });
+    await tooBig.catch(e => expect(friendlyError(e)).toBe('That photo is too big to keep on this device. Try a smaller one.'));
     await expect(store.save('u1', rosa, null)).rejects.toThrow('QuotaExceededError');
   });
 });
@@ -229,6 +265,21 @@ describe('supabase store', () => {
     }
   });
 
+  it('a picked photo that can no longer be read is its own error, not "offline"', async () => {
+    const { client, calls } = fakeClient();
+    const realFetch = globalThis.fetch;
+    // What a web blob: URL does after a reload.
+    globalThis.fetch = (async () => { throw new TypeError('Failed to fetch'); }) as unknown as typeof fetch;
+    try {
+      const upload = createSupabaseStore(client, 'avatars').uploadAvatar('u1', { uri: 'blob:http://localhost/dead', mimeType: 'image/png' });
+      await expect(upload).rejects.toMatchObject({ code: 'VENU_PHOTO_UNREADABLE' });
+      await upload.catch(e => expect(friendlyError(e)).toBe("Couldn't read that photo. Pick it again."));
+      expect(calls).toEqual([]); // nothing uploaded
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
   it('uploads each photo to a fresh path in the user folder', async () => {
     const { client, calls } = fakeClient();
     const store = createSupabaseStore(client, 'avatars');
@@ -245,6 +296,18 @@ describe('supabase store', () => {
     } finally {
       globalThis.fetch = realFetch;
     }
+  });
+});
+
+describe('setAppLanguageIfCurrent', () => {
+  it('reports a save that finished after another account signed in as stale (null)', async () => {
+    let current: string | null = 'rosa';
+    const store = createLocalStore(memoryStorage());
+    await store.save('rosa', rosa, null);
+    const wrapped: ProfileStore = { ...store, setAppLanguage: async (u, c) => { current = 'daniel'; return store.setAppLanguage(u, c); } };
+    expect(await setAppLanguageIfCurrent(wrapped, 'rosa', 'ko', () => current)).toBeNull();
+    current = 'rosa';
+    expect((await setAppLanguageIfCurrent(store, 'rosa', 'ja', () => current))?.appLanguage).toBe('ja');
   });
 });
 
@@ -267,6 +330,7 @@ describe('saveWithAvatar', () => {
       removeAvatar: async p => { calls.push(`remove ${p}`); if (removeFails) throw new Error('remove failed'); },
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     return { store, calls };
   }
@@ -294,6 +358,7 @@ describe('saveWithAvatar', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     await expect(saveWithAvatar(store, 'u1', rosa, pick, existing)).rejects.toMatchObject({ code: '' });
     expect(calls).toEqual(['upload', 'save']);
@@ -338,8 +403,8 @@ describe('friendlyError', () => {
     expect(friendlyError({ message: 'mime type image/gif is not supported' })).toBe('Use a JPG, PNG, WebP or HEIC photo.');
   });
 
-  it('keeps unknown messages and falls back when there is none', () => {
-    expect(friendlyError(new Error('That photo is too big'))).toBe('That photo is too big');
+  it('never shows an unrecognised raw message, and falls back when there is none', () => {
+    expect(friendlyError(new Error('Some English message from a library'))).toBe('Something went wrong. Try again.');
     expect(friendlyError(undefined)).toBe('Something went wrong. Try again.');
     expect(friendlyError({}, 'Custom fallback')).toBe('Custom fallback');
   });
@@ -376,6 +441,20 @@ describe('supabase store save', () => {
   }
   const duplicate: Result = { data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } };
 
+  it('an update leaves app_language out (the pills own it); an insert includes it', async () => {
+    const writes: Record<string, unknown>[] = [];
+    const client = {
+      from: () => ({
+        update: (r: Record<string, unknown>) => (writes.push(r), { eq: () => ({ select: () => ({ single: async () => ({ data: row, error: null }) }) }) }),
+        insert: (r: Record<string, unknown>) => (writes.push(r), { select: () => ({ single: async () => ({ data: row, error: null }) }) }),
+      }),
+    };
+    const store = createSupabaseStore(client as unknown as SupabaseClient, 'avatars');
+    await store.save('u1', { ...rosa, appLanguage: 'ar' }, rowToProfile(row));
+    await store.save('u1', { ...rosa, appLanguage: 'ar' }, null);
+    expect(writes.map(w => 'app_language' in w)).toEqual([false, true]);
+  });
+
   it('first save inserts with the role', async () => {
     const { client, calls } = tableClient();
     await createSupabaseStore(client, 'avatars').save('u1', rosa, null);
@@ -391,7 +470,7 @@ describe('supabase store save', () => {
 
   it('duplicate key with a different role stops instead of merging two roles', async () => {
     const { client, calls } = tableClient({ insert: duplicate, storedRole: 'volunteer' });
-    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toThrow('already set up as a volunteer');
+    await expect(createSupabaseStore(client, 'avatars').save('u1', rosa, null)).rejects.toMatchObject({ code: 'VENU_ROLE_MISMATCH', role: 'volunteer' });
     expect(calls).toEqual(['insert role=visitor', 'read role']); // no update
   });
 
@@ -400,6 +479,18 @@ describe('supabase store save', () => {
     const { client, calls } = tableClient({ update: { data: null, error: { code: 'PGRST116', message: 'JSON object requested, multiple (or no) rows returned' } } });
     await createSupabaseStore(client, 'avatars').save('u1', rosa, existing);
     expect(calls).toEqual(['update role=omitted', 'insert role=visitor']);
+  });
+
+  it('a language change updates only app_language (no consent re-stamp)', async () => {
+    const writes: unknown[] = [];
+    const client = {
+      from: () => ({
+        update: (r: unknown) => (writes.push(r), { eq: () => ({ select: () => ({ single: async () => ({ data: { ...row, app_language: 'ko' }, error: null, status: 200 }) }) }) }),
+      }),
+    };
+    const saved = await createSupabaseStore(client as unknown as SupabaseClient, 'avatars').setAppLanguage('u1', 'ko');
+    expect(writes).toEqual([{ app_language: 'ko' }]);
+    expect(saved.appLanguage).toBe('ko');
   });
 
   it('other insert errors still throw', async () => {
@@ -427,6 +518,7 @@ describe('saveWithAvatar retries after a network failure', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     return { store, calls };
   }
@@ -485,6 +577,7 @@ describe('saveWithAvatar retries after a network failure', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toThrow();
@@ -520,13 +613,36 @@ describe('round six details', () => {
     const generic = 'Something went wrong. Try again.';
     expect(friendlyError({ code: '23514', message: 'new row violates check constraint "main_language_listed" for relation "profiles"', details: null, hint: null })).toBe(generic);
     expect(friendlyError(Object.assign(new Error('The resource already exists'), { name: 'StorageApiError' }))).toBe(generic);
-    // Our own coded error and Supabase auth messages are written for people.
-    expect(friendlyError(Object.assign(new Error('This account is already set up as a volunteer. Reload the app to continue.'), { code: 'VENU_ROLE_MISMATCH' }))).toBe(
-      'This account is already set up as a volunteer. Reload the app to continue.',
-    );
+    // Our own coded errors and known Supabase Auth errors get a sentence from the string table.
+    expect(friendlyError(codedError('roleMismatch', { role: 'volunteer' }))).toBe('This account is already set up as a volunteer. Reload the app to continue.');
+    expect(friendlyError(codedError('roleMismatch', { role: 'visitor' }))).toBe('This account is already set up as a visitor. Reload the app to continue.');
+    expect(friendlyError(codedError('photoTooBigLocal'))).toBe('That photo is too big to keep on this device. Try a smaller one.');
     expect(friendlyError(Object.assign(new Error('Password should be at least 6 characters.'), { name: 'AuthApiError', code: 'weak_password' }))).toBe(
-      'Password should be at least 6 characters.',
+      'That password is too easy to guess. Try a longer one.',
     );
+    // Same messages without a code (older servers), and an unknown auth message.
+    expect(friendlyError(Object.assign(new Error('Password should contain at least one character of each: abc'), { name: 'AuthApiError' }))).toBe('That password is too easy to guess. Try a longer one.');
+    expect(friendlyError({ name: 'AuthApiError', message: 'For security purposes, you can only request this after 42 seconds.' })).toBe('Too many tries. Wait a minute and try again.');
+    expect(friendlyError({ name: 'AuthApiError', code: 'email_address_invalid', message: 'Email address "x@y" is invalid' })).toBe("That email address doesn't look right. Check it and try again.");
+    expect(friendlyError({ name: 'AuthApiError', message: 'Some brand new auth failure' })).toBe(generic); // only truly unknown ones
+  });
+
+  it('words the readable Supabase Auth errors instead of "Something went wrong"', () => {
+    const auth = (code: string | undefined, message: string) => friendlyError(Object.assign(new Error(message), { name: 'AuthApiError', code }));
+    const cases: [string | undefined, string, string][] = [
+      ['signup_disabled', 'Signups not allowed for this instance', "New accounts can't be created right now. Try again later."],
+      [undefined, 'Signups not allowed for this instance', "New accounts can't be created right now. Try again later."],
+      ['same_password', 'New password should be different from the old password.', 'Choose a password different from your current one.'],
+      [undefined, 'New password should be different from the old password.', 'Choose a password different from your current one.'],
+      ['otp_expired', 'Email link is invalid or has expired', 'That link has expired or was already used. Ask for a new one.'],
+      [undefined, 'Token has expired or is invalid', 'That link has expired or was already used. Ask for a new one.'],
+      ['user_banned', 'User is banned', "This account can't sign in right now. Contact LA28 support."],
+      ['over_email_send_rate_limit', 'Email rate limit exceeded', 'Too many tries. Wait a minute and try again.'],
+      ['weak_password', 'Password should be at least 6 characters.', 'That password is too easy to guess. Try a longer one.'],
+      ['email_not_confirmed', 'Email not confirmed', 'Confirm your email first. Check your inbox for the link.'],
+      ['session_not_found', 'Session from session_id claim in JWT does not exist', 'Your session expired. Please sign in again.'],
+    ];
+    for (const [code, message, expected] of cases) expect({ code, message, text: auth(code, message) }).toEqual({ code, message, text: expected });
   });
 
   it('decodes picker base64 into the bytes that get uploaded', () => {
@@ -554,6 +670,7 @@ describe('what counts as a definite rejection', () => {
       removeAvatar: async p => void calls.push(`remove ${p}`),
       avatarUrl: async p => p,
       deleteAll: async () => {},
+      setAppLanguage: async () => { throw new Error('not used'); },
     };
     const pending = { current: [] as PendingUpload[] };
     await expect(saveWithAvatar(store, 'u1', rosa, photo, existing, pending)).rejects.toBe(error);

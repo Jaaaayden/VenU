@@ -27,12 +27,24 @@
     "subtitle": "가까운 분과 연결해 드릴게요",
     "languageLabel": "도움 언어: {{language}}. 언어 변경",
     "locationLabel": "내 위치: {{spot}}, {{venue}}",
+    "near": "{{place}} 근처",
+    "locationUnset": "내 위치: 아직 선택 안 함, {{venue}}",
+    "whereAreYou": "어디에 계세요?",
+    "tapToChoose": "눌러서 장소 선택",
+    "locationHint": "{{venue}}의 장소 목록을 엽니다",
     "question": "어떤 도움이 필요하세요?",
     "notePlaceholder": "예: 2번 경사로 근처에서 못 움직여요",
     "photoOff": "사진 접근이 꺼져 있어요. 설정에서 켜 주세요.",
-    "voiceSoon": "음성 메모는 곧 지원돼요. 지금은 메모를 입력해 주세요.",
     "pickOne": "필요한 도움을 하나 이상 선택하세요.",
     "send": "요청 보내기"
+  },
+  "where": {
+    "title": "어디에 계세요?",
+    "subtitle": "{{venue}}에서 가장 가까운 장소를 고르세요.",
+    "search": "장소 검색",
+    "notSure": "잘 모르겠어요",
+    "notSureHint": "자원봉사자가 만날 곳을 물어볼 거예요",
+    "changeVenue": "경기장 변경"
   },
   "note": {
     "label": "메모 추가 <muted>(선택)</muted>",
@@ -45,7 +57,14 @@
     "title": "긴급 상황인가요?",
     "call": "지금 911에 전화하세요",
     "label": "긴급 상황인가요? 지금 911에 전화하세요",
-    "hint": "911에 전화하도록 전화 앱을 엽니다"
+    "hint": "911과 행사장 직원 중 어디에 전화할지 묻습니다",
+    "dialogTitle": "긴급 도움이 필요하세요?",
+    "dialogBody": "위험하거나 다쳤거나 응급 의료 상황이면 먼저 911에 전화하세요.",
+    "call911": "911에 전화",
+    "callStaff": "행사장 직원에게 전화",
+    "textStaff": "행사장 직원에게 문자",
+    "notEmergency": "긴급 상황이 아니에요",
+    "close": "닫기"
   },
   "notice": {
     "searchFailed": "자원봉사자와 연결하지 못했어요. 연결 상태를 확인하고 다시 시도하세요.",
@@ -54,7 +73,10 @@
   "searching": {
     "title": "자원봉사자를 찾는 중",
     "subtitle": "보통 1분 이내 · 그 자리에 계세요",
-    "askedFor": "요청한 도움"
+    "askedFor": "요청한 도움",
+    "notFoundTitle": "지금은 도와드릴 수 있는 자원봉사자가 없어요",
+    "notFoundBody": "요청은 저장되어 있어요. 계속 찾거나 행사장 직원에게 전화해 도움을 받으세요.",
+    "keepSearching": "계속 찾기"
   },
   "match": {
     "title": "자원봉사자를 찾았어요",
@@ -79,13 +101,12 @@
     "yesCancel": "네, 취소할게요"
   },
   "map": {
-    "label": "지도: {{name}} 님이 {{distance}} 거리에 있으며 2번 게이트로 오고 있어요.",
-    "gate": "2번 게이트",
+    "label": "지도: {{name}} 님이 {{distance}} 거리에 있으며 {{place}}(으)로 오고 있어요.",
     "you": "나"
   },
   "messages": {
     "label": "메시지",
-    "unread_other": "메시지, 읽지 않음 {{count}}개"
+    "unread_other": "메시지, 읽지 않음 {{number}}개"
   },
   "chat": {
     "away": "{{minutes}}분 거리",
@@ -104,12 +125,31 @@
     "messageTo": "{{name}} 님에게 메시지",
     "stickers": "스티커",
     "stickersSoon": "스티커는 곧 지원돼요.",
-    "record": "음성 메시지 녹음",
-    "voiceSoon": "음성 메시지는 곧 지원돼요."
+    "record": "음성으로 메시지 입력"
+  },
+  "translation": {
+    "translatedFrom": "{{language}}에서 번역됨",
+    "translated": "번역됨",
+    "partial": "앞부분만 {{language}}에서 번역됨",
+    "originalIn": "원문({{language}})",
+    "original": "원문",
+    "showOriginal": "원문 보기",
+    "showOriginalLabel": "원래 메시지 보기",
+    "showTranslation": "번역 보기",
+    "showTranslationLabel": "번역된 메시지 보기",
+    "translating": "번역 중…",
+    "failed": "번역하지 못했어요",
+    "tryAgain": "다시 시도",
+    "tryAgainLabel": "이 메시지 다시 번역하기",
+    "unsupported": "{{language}} 번역은 아직 지원되지 않아요",
+    "notSetUp": "번역이 아직 설정되지 않았어요",
+    "willSeeIn": "{{name}} 님에게는 {{language}}로 번역되어 보여요",
+    "readsLanguage": "{{name}} 님은 {{language}}를 사용해요"
   },
   "bubble": {
     "mine": "나, {{time}}: {{text}}",
     "theirs": "자원봉사자, {{time}}: {{text}}",
+    "theirsTranslated": "자원봉사자, {{time}}: {{text}} ({{language}}에서 번역됨)",
     "listen": "듣기",
     "listenLabel": "이 메시지 듣기"
   },
@@ -133,7 +173,7 @@
   },
   "rating": {
     "label": "평점",
-    "star_other": "별 {{count}}개, {{word}}",
+    "star_other": "별 {{number}}개, {{word}}",
     "words": {
       "poor": "나쁨",
       "notGreat": "별로",
@@ -168,16 +208,36 @@
     "accept": "수락",
     "acceptSoon": "매칭이 시작되면 요청을 수락할 수 있어요."
   },
-  "mock": {
-    "spots": {
-      "gate2Ramp": "2번 게이트 경사로 근처",
-      "section214": "214구역 통로",
-      "mainPlaza": "정문 광장"
+  "home": {
+    "greeting": "안녕하세요, {{name}}님",
+    "languageLabel": "앱 언어: {{language}}",
+    "languageHint": "앱 전체의 언어를 바꿉니다",
+    "languageTitle": "앱 언어",
+    "locationLabel": "내 위치: {{place}}, {{venue}}",
+    "locationHint": "장소 지도를 열어요",
+    "statusTitle": "내 상태",
+    "status": {
+      "free": "가능",
+      "busy": "바쁨",
+      "off": "휴무"
     },
+    "statusLine": {
+      "free": "근처 요청을 받아요. 쉬는 동안 바쁨이나 휴무로 바꾸면 요청이 오지 않아요.",
+      "busy": "지금은 바쁨 상태예요. 다시 가능으로 바꿀 때까지 새 요청이 오지 않아요.",
+      "off": "휴무 중이에요. 가능으로 바꿀 때까지 요청이 오지 않아요."
+    },
+    "helpTitle": "도울 수 있는 일",
+    "editLabel": "도울 수 있는 일 수정",
+    "languages": "유창한 언어",
+    "training": "교육",
+    "noTraining": "아직 추가한 교육이 없어요",
+    "paused": "쉬는 동안에는 요청이 잠시 멈춰요. 가능으로 바꾸면 근처에서 도움이 필요한 사람을 볼 수 있어요."
+  },
+  "mock": {
     "greeting": "{{name}} 님, 안녕하세요! LA28 자원봉사자 {{volunteer}}입니다. 지금 가고 있어요. 만날 곳: {{spot}}.",
     "greetingNoName": "안녕하세요! LA28 자원봉사자 {{volunteer}}입니다. 지금 가고 있어요. 만날 곳: {{spot}}.",
     "reply1": "알겠어요, 감사합니다! 몇 분 안에 도착해요.",
-    "reply2": "이제 2번 게이트가 보여요. 분홍색 LA28 조끼를 입고 있어요.",
+    "reply2": "거의 다 왔어요. 분홍색 LA28 조끼를 입고 있어요.",
     "reply3": "괜찮아요, 천천히 하세요. 함께 기다릴게요."
   }
 }

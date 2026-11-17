@@ -15,7 +15,6 @@
     "languageLabel": "لغة التطبيق: {{language}}",
     "languageHint": "يغيّر لغة التطبيق بالكامل",
     "languageTitle": "لغة التطبيق",
-    "languageConsent": "راجع سياسة الخصوصية المحدّثة في الملف الشخصي أولًا، ثم غيّر اللغة.",
     "assistTitle": "تحتاج إلى مساعدة؟",
     "assistBody": "تواصل مع متطوع",
     "assistLabel": "تحتاج إلى مساعدة؟ تواصل مع متطوع",
@@ -26,7 +25,7 @@
     "opening_ceremony": "حفل الافتتاح",
     "swimming": "السباحة",
     "athletics": "ألعاب القوى",
-    "football": "كرة القدم الأمريكية",
+    "soccer": "كرة القدم",
     "gymnastics": "الجمباز",
     "basketball": "كرة السلة"
   },
@@ -81,12 +80,34 @@
     "pin": "{{name}} على الخريطة",
     "north": "ش"
   },
-  "walk_zero": "{{count}} دقيقة سيرًا",
+  "officialMap": {
+    "attribution": "الخريطة: {{source}}",
+    "open": "فتح في المتصفح",
+    "openLabel": "فتح خريطة {{source}} الرسمية في المتصفح",
+    "frameLabel": "خريطة {{source}} الرسمية. إذا كنت تستخدم قارئ الشاشة، فاستخدم قائمة «مرافق قريبة منك» في الأسفل.",
+    "loading": "جارٍ تحميل خريطة {{source}}…",
+    "error": "تعذّر تحميل الخريطة. افتحها في المتصفح.",
+    "retry": "إعادة المحاولة",
+    "viewsLabel": "عرض الخريطة",
+    "views": {
+      "exterior": "الخارج",
+      "east_garage": "المرآب الشرقي",
+      "west_garage": "المرآب الغربي"
+    },
+    "imageLabel": "خريطة {{source}}: {{view}}",
+    "imageLabelZoom": "خريطة {{source}}: {{view}}. باعد بين إصبعيك أو استخدم أزرار التكبير.",
+    "enlarge": "انقر للتكبير",
+    "enlargeHint": "يفتح الخريطة بملء الشاشة لتكبيرها",
+    "close": "إغلاق الخريطة",
+    "zoomIn": "تكبير",
+    "zoomOut": "تصغير"
+  },
+  "walk_zero": "{{number}} دقيقة سيرًا",
   "walk_one": "دقيقة واحدة سيرًا",
   "walk_two": "دقيقتان سيرًا",
-  "walk_few": "{{count}} دقائق سيرًا",
-  "walk_many": "{{count}} دقيقة سيرًا",
-  "walk_other": "{{count}} دقيقة سيرًا",
+  "walk_few": "{{number}} دقائق سيرًا",
+  "walk_many": "{{number}} دقيقة سيرًا",
+  "walk_other": "{{number}} دقيقة سيرًا",
   "wait": {
     "none": "بلا انتظار",
     "short": "انتظار قصير",
@@ -110,34 +131,47 @@
     "family_room": "غرفة عائلية",
     "long_lines_halftime": "طوابير طويلة بين الشوطين",
     "wheelchair_loans": "إعارة كراسي متحركة",
-    "permit_needed": "يلزم تصريح"
+    "permit_needed": "يلزم تصريح",
+    "wheelchair_escort": "مرافقة بالكرسي المتحرك",
+    "premium_access": "VIP والمميزة",
+    "sensory_room": "غرفة حسية",
+    "assistive_listening": "مساعدة السمع",
+    "lost_items": "المفقودات",
+    "changing_table": "طاولة تغيير الحفاضات"
   },
   "facilityText": {
     "gate-1": {
+      "name": "البوابة 1",
       "description": "المدخل الشمالي، الأقرب إلى محطة حافلة المترو.",
       "location": "الجهة الشمالية، عند محطة الحافلة"
     },
     "gate-2": {
+      "name": "البوابة 2",
       "description": "المدخل الشرقي مع منحدر، بجوار المواقف المهيأة في الموقف C.",
       "location": "الجهة الشرقية، قرب الموقف C"
     },
     "gate-3": {
+      "name": "البوابة 3",
       "description": "المدخل الجنوبي لنزول وركوب سيارات الأجرة عبر التطبيقات.",
       "location": "الجهة الجنوبية، في منطقة سيارات الأجرة"
     },
     "gate-4": {
+      "name": "البوابة 4",
       "description": "المدخل الغربي لحاملي تذاكر الأقسام من 200 إلى 240.",
       "location": "الجهة الغربية، قرب الساحة الرئيسية"
     },
     "info-desk": {
+      "name": "خدمة الزوار",
       "description": "الأسئلة، والتذاكر المفقودة، والحقائب الحسية، وواقيات الأذن.",
       "location": "الممر، القسم 105"
     },
     "first-aid": {
+      "name": "الإسعافات الأولية",
       "description": "ممرضون ومسعفون مناوبون من فتح البوابات حتى خلو المكان.",
       "location": "الممر، القسم 112"
     },
     "restroom-east": {
+      "name": "دورات المياه الشرقية",
       "description": "دورات مياه للرجال وللنساء وغرفة عائلية للجميع مع طاولة لتغيير الحفاضات.",
       "location": "الممر، القسم 118"
     },
@@ -146,10 +180,12 @@
       "location": "الممر، القسم 124"
     },
     "lost-found": {
+      "name": "المفقودات",
       "description": "سلّم أو استلم الأغراض المفقودة. يُحضَر الأطفال التائهون إلى هنا أيضًا.",
       "location": "الممر، القسم 131"
     },
     "accessible-seating": {
+      "name": "خدمات إمكانية الوصول",
       "description": "إعارة كراسي متحركة، ومقاعد للمرافقين، وأجهزة مساعدة على السمع.",
       "location": "الممر، القسم 136"
     },
@@ -158,12 +194,229 @@
       "location": "الممر، القسم 140"
     },
     "restroom-west": {
+      "name": "دورات المياه الغربية",
       "description": "دورات مياه للرجال وللنساء. الحجرة المهيأة على اليسار.",
       "location": "الممر، القسم 145"
     },
     "parking-c": {
-      "description": "مواقف مهيأة مع ممر قصير ومستوٍ إلى Gate 2.",
+      "name": "موقف السيارات C",
+      "description": "مواقف مهيأة مع ممر قصير ومستوٍ إلى البوابة 2.",
       "location": "الموقف الجنوبي الشرقي"
+    },
+    "entry-3": {
+      "name": "المدخل 3",
+      "description": "المدخل الشمالي. لكل مدخل مسار مهيأ ومرافقة مجانية بالكرسي المتحرك.",
+      "location": "الجهة الشمالية"
+    },
+    "entry-4": {
+      "name": "المدخل 4",
+      "description": "المدخل الشمالي، وفي داخله منصة لخدمات ذوي الإعاقة وكراسٍ للانتظار.",
+      "location": "الجهة الشمالية"
+    },
+    "entry-6": {
+      "name": "المدخل 6",
+      "description": "المدخل الغربي لحاملي تذاكر VIP والتذاكر المميزة.",
+      "location": "الجهة الغربية"
+    },
+    "entry-8": {
+      "name": "المدخل 8",
+      "description": "المدخل الجنوبي، وفي داخله منصة لخدمات ذوي الإعاقة وكراسٍ للانتظار.",
+      "location": "الجهة الجنوبية"
+    },
+    "entry-10": {
+      "name": "المدخل 10",
+      "description": "المدخل الجنوبي، وفي داخله منصة لخدمات ذوي الإعاقة وكراسٍ للانتظار.",
+      "location": "الجهة الجنوبية"
+    },
+    "entry-11": {
+      "name": "المدخل 11",
+      "description": "المدخل الشرقي لحاملي تذاكر VIP والتذاكر المميزة.",
+      "location": "الجهة الشرقية"
+    },
+    "guest-services-ne": {
+      "name": "خدمة الزوار الشمالية الشرقية",
+      "description": "الاستفسارات والمفقودات وأجهزة مساعدة السمع وحقائب حسية مجانية وغرفة حسية.",
+      "location": "المستوى 3، الردهة الشمالية الشرقية"
+    },
+    "guest-services-sw": {
+      "name": "خدمة الزوار الجنوبية الغربية",
+      "description": "داخل Corona Beach Club. المفقودات وأجهزة مساعدة السمع وحقائب حسية مجانية وغرفة حسية.",
+      "location": "المستوى 3، الردهة الجنوبية الغربية"
+    },
+    "first-aid-se": {
+      "name": "الإسعافات الأولية الجنوبية الشرقية",
+      "description": "مسعفون في الموقع. يمكن لأي مرشد أو موظف استدعاؤهم إليك.",
+      "location": "المستوى 1، الردهة الجنوبية الشرقية"
+    },
+    "first-aid-nw": {
+      "name": "الإسعافات الأولية الشمالية الغربية",
+      "description": "مسعفون في الموقع. يمكن لأي مرشد أو موظف استدعاؤهم إليك.",
+      "location": "المستوى 3، الردهة الشمالية الغربية"
+    },
+    "pedestrian-ramp": {
+      "name": "منحدر المشاة",
+      "description": "منحدر المشاة الوحيد في الملعب، ويصل إلى كل المستويات عدا المستوى 7.",
+      "location": "الجهة الجنوبية الشرقية، خلف منطقة النهاية"
+    },
+    "lactation-suite": {
+      "name": "غرفة الرضاعة",
+      "description": "كبسولة رضاعة خاصة من Mamava. توجد دورات مياه عائلية في كل مستوى.",
+      "location": "المستوى 4، الجنوب"
+    },
+    "rideshare-kareem": {
+      "name": "نزول سيارات التطبيقات",
+      "description": "نزول ركاب Uber وLyft وسيارات الأجرة. الصعود عند تقاطع Kareem Court وManchester Boulevard.",
+      "location": "Kareem Court، بين Pincay Drive وManchester Boulevard"
+    },
+    "accessible-drop-off": {
+      "name": "منطقة نزول مهيأة",
+      "description": "لإنزال الضيوف من ذوي الإعاقة واصطحابهم. ادخل من Prairie Avenue باتجاه الشمال ثم Arbor Vitae Street.",
+      "location": "District Drive، بين Champions Way وTouchdown Drive"
+    },
+    "brown-zone": {
+      "name": "المنطقة البنية",
+      "description": "أقرب مواقف إلى المداخل 1–5 و12. في كل موقف أماكن ADA، بالأسبقية.",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "المنطقة الزرقاء",
+      "description": "أقرب مواقف إلى المدخلين 7 و8. في كل موقف أماكن ADA، بالأسبقية.",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "المنطقة البرتقالية",
+      "description": "أقرب مواقف إلى المداخل 10 و11 و12. في كل موقف أماكن ADA، بالأسبقية.",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "مدخل Kobe Bryant",
+      "description": "المدخل الرئيسي لجميع التذاكر. يدخل منه حاملو تذاكر GA الأرضية.",
+      "location": "زاوية Chick Hearn Ct. (11th St.) وGeorgia St."
+    },
+    "star-plaza-entrance": {
+      "name": "مدخل Star Plaza",
+      "description": "المدخل الرئيسي لجميع التذاكر، بين شباك التذاكر ومتجر Team LA.",
+      "location": "زاوية Chick Hearn Ct. (11th St.) وFigueroa St."
+    },
+    "figueroa-entrance": {
+      "name": "مدخل Figueroa",
+      "description": "المدخل الرئيسي لجميع التذاكر. اطلب هنا مرافقة مجانية بالكرسي المتحرك.",
+      "location": "زاوية 12th St. وFigueroa St."
+    },
+    "guest-services-m12": {
+      "name": "خدمة الزوار M12",
+      "description": "الاستفسارات والمفقودات وأجهزة مساعدة السمع والحقائب الحسية ووسائد الحضن المثقلة (تلزم بطاقة هوية).",
+      "location": "الردهة الرئيسية، مقابل الممر M12"
+    },
+    "guest-services-u6": {
+      "name": "خدمة الزوار U6",
+      "description": "الاستفسارات والمفقودات والحقائب الحسية ووسائد الحضن. اطلب هنا رمز الكبسولة الحسية.",
+      "location": "الردهة العلوية، مقابل الممر U6"
+    },
+    "first-aid-m3": {
+      "name": "الإسعافات الأولية M3",
+      "description": "مسعفون في كل فعالية، وفي الداخل ركن هادئ.",
+      "location": "الردهة الرئيسية، مقابل الممر M3"
+    },
+    "first-aid-u22": {
+      "name": "الإسعافات الأولية U22",
+      "description": "مسعفون في كل فعالية، وفي الداخل ركن هادئ.",
+      "location": "الردهة العلوية، مقابل الممر U22"
+    },
+    "sensory-pod": {
+      "name": "الكبسولة الحسية",
+      "description": "كبسولة هادئة لشخص أو اثنين، مفتوحة في كل الفعاليات. الرمز لدى خدمة الزوار.",
+      "location": "الردهة العلوية، مقابل الممر 3"
+    },
+    "restroom-m23": {
+      "name": "دورة المياه M23",
+      "description": "دورة مياه لجميع الأجناس مع طاولة لتغيير الحفاضات. كل دورات المياه مهيأة للكراسي المتحركة.",
+      "location": "الردهة الرئيسية، مقابل الممر M23"
+    },
+    "restroom-u31": {
+      "name": "دورة المياه U31",
+      "description": "دورة مياه لجميع الأجناس مع طاولة لتغيير الحفاضات. كل دورات المياه مهيأة للكراسي المتحركة.",
+      "location": "الردهة العلوية، مقابل الممر U31"
+    },
+    "rideshare-chick-hearn": {
+      "name": "سيارات التطبيقات Chick Hearn",
+      "description": "صعود ونزول ركاب سيارات الأجرة عبر التطبيقات في المنطقة البيضاء (باتجاه الشرق).",
+      "location": "Chick Hearn Ct.، بين L.A. Live Way وGeorgia St."
+    },
+    "rideshare-figueroa": {
+      "name": "سيارات التطبيقات Figueroa",
+      "description": "صعود ونزول ركاب سيارات الأجرة عبر التطبيقات في المنطقة البيضاء (باتجاه الجنوب).",
+      "location": "Figueroa St.، بين 12th St. وPico Blvd."
+    },
+    "west-garage-lot-w": {
+      "name": "المرآب الغربي (Lot W)",
+      "description": "مرآب الساحة، بمدخلين من Chick Hearn Ct. وGeorgia St.",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "المدخل الرئيسي",
+      "description": "مسار GameFace ID على اليسار ومسار Identity Pass على اليمين. مساعدة مجانية في التنقل من التفتيش الأمني إلى مقعدك.",
+      "location": "في الساحة، قرب Century Blvd. وPrairie Ave."
+    },
+    "vip-entrance": {
+      "name": "مدخل VIP",
+      "description": "لحاملي تذاكر الأجنحة والنادي والأرضية.",
+      "location": "يسار المدخل الرئيسي"
+    },
+    "wall-entrance": {
+      "name": "مدخل The Wall",
+      "description": "مدخل مخصص لـ The Wall.",
+      "location": "يسار المدخل الرئيسي، بعد مدخل VIP"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal مستوى Main",
+      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة) وأجهزة OneCourt.",
+      "location": "مستوى Main، قرب القسم Main 6"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal مستوى Terrace",
+      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة).",
+      "location": "مستوى Terrace، قرب القسم Terrace 18"
+    },
+    "first-aid-main": {
+      "name": "الإسعافات الأولية مستوى Main",
+      "description": "مسعفون مدرَّبون في كل الفعاليات.",
+      "location": "ردهة مستوى Main، Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "الإسعافات الأولية مستوى Terrace",
+      "description": "مسعفون مدرَّبون في كل الفعاليات.",
+      "location": "ردهة مستوى Terrace، Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "الإسعافات الأولية مستوى الأرضية",
+      "description": "مسعفون مدرَّبون في كل الفعاليات.",
+      "location": "مستوى الأرضية، تحت Wall 19 قرب النفق الشرقي"
+    },
+    "sensory-room": {
+      "name": "الغرفة الحسية",
+      "description": "غرفة Kaiser Permanente الحسية الخاصة. الحقائب الحسية متاحة عند الطلب.",
+      "location": "اسأل أحد مضيفي الساحة عن الطريق"
+    },
+    "infant-care-room": {
+      "name": "غرفة رعاية الرضع",
+      "description": "غرفة خاصة لرعاية الرضع. توجد دورات مياه للجميع في أنحاء الساحة.",
+      "location": "مستوى Main، Main 6"
+    },
+    "mobility-hub": {
+      "name": "مركز التنقل",
+      "description": "صعود ونزول ركاب سيارات التطبيقات والأجرة، ومنطقة إنزال العائلات، والحافلات المكوكية.",
+      "location": "المرآب الشرقي، المستوى 1"
+    },
+    "east-garage": {
+      "name": "المرآب الشرقي",
+      "description": "مواقف عادية؛ اشترِ تصريح الوقوف مسبقًا. تُباع الأماكن المهيأة بالأسبقية.",
+      "location": "المدخل من 102nd St."
+    },
+    "west-garage": {
+      "name": "المرآب الغربي",
+      "description": "مواقف VIP مقابل Prairie Ave.؛ اشترِ تصريح الوقوف مسبقًا.",
+      "location": "المدخل من Prairie Ave."
     }
   },
   "facility": {
@@ -171,13 +424,16 @@
     "wheelchair": "مهيأ للكراسي المتحركة",
     "directions": "الاتجاهات",
     "directionsSoon": "الاتجاهات خطوة بخطوة قريبًا. {{name}}: {{location}}.",
+    "imHere": "أنا هنا",
+    "imHereHint": "يُستخدم هذا المكان موقعًا لك عند طلب المساعدة",
+    "isHere": "موقعك",
     "reports": "البلاغات",
     "results_zero": "لا توجد نتائج",
     "results_one": "نتيجة واحدة",
     "results_two": "نتيجتان",
-    "results_few": "{{count}} نتائج",
-    "results_many": "{{count}} نتيجة",
-    "results_other": "{{count}} نتيجة",
+    "results_few": "{{number}} نتائج",
+    "results_many": "{{number}} نتيجة",
+    "results_other": "{{number}} نتيجة",
     "noReports": "لا توجد بلاغات بعد. كن أول من يشارك ما وجده.",
     "addReport": "أضف بلاغك"
   },
@@ -204,7 +460,9 @@
   "report": {
     "notFound": "البلاغ غير موجود",
     "kind": "بلاغ",
+    "authorFallback": "زائر VenU",
     "submitted": "أُرسل في {{date}}",
+    "originalLanguage": "اللغة الأصلية: {{language}}",
     "noBody": "لا توجد تفاصيل."
   },
   "form": {
@@ -217,11 +475,10 @@
     "bodyPlaceholder": "اكتب هنا",
     "bodyHint": "اختياري. ماذا حدث، وأين، ومتى؟",
     "pictureSoon": "إضافة الصور قريبًا.",
-    "speakSoon": "البلاغات الصوتية قريبًا. اكتب بلاغك الآن.",
     "topic": "الموضوع",
     "submit": "إرسال البلاغ",
     "sendFailed": "تعذّر إرسال البلاغ. تحقق من اتصالك وحاول مرة أخرى.",
-    "titleRequired": "أضف عنوانًا، مثل «منحدر Gate 2 متشقق».",
+    "titleRequired": "أضف عنوانًا، مثل «منحدر البوابة 2 متشقق».",
     "titleTooLong": "اجعل العنوان أقل من {{max}} حرفًا.",
     "topicRequired": "اختر الموضوع الأنسب.",
     "bodyTooLong": "اجعل البلاغ أقل من {{max}} حرف."

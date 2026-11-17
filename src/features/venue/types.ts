@@ -10,7 +10,7 @@ export type FacilityCategory =
   | 'accessible'
   | 'parking';
 
-export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'football' | 'gymnastics' | 'basketball';
+export type VenueEvent = 'opening_ceremony' | 'swimming' | 'athletics' | 'soccer' | 'gymnastics' | 'basketball';
 
 /** How the venue is drawn on the map: an open-air bowl or an indoor arena. */
 export type VenueShape = 'bowl' | 'arena';
@@ -38,7 +38,13 @@ export type FacilityTagId =
   | 'family_room'
   | 'long_lines_halftime'
   | 'wheelchair_loans'
-  | 'permit_needed';
+  | 'permit_needed'
+  | 'wheelchair_escort'
+  | 'premium_access'
+  | 'sensory_room'
+  | 'assistive_listening'
+  | 'lost_items'
+  | 'changing_table';
 
 /** Green "Accessible"-style tag, or an orange heads-up ("Busy before events"). */
 export interface FacilityTag {
@@ -49,7 +55,7 @@ export interface FacilityTag {
 export type WaitLevel = 'none' | 'short' | 'long';
 
 export interface Facility {
-  /** Unique within its venue; used in the URL (/venue/sofi/gate-2). */
+  /** Unique within its venue; used in the URL (/venue/sofi/entry-4). */
   id: string;
   venueId: string;
   name: string;

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { PHOTO_MAX_BYTES, PHOTO_TOO_BIG, PHOTO_TYPES, PHOTO_WRONG_TYPE } from '@/constants/photo';
+import { codedError } from '@/lib/errors';
 
 import { draftToWrite, rowToProfile, type ProfileRow } from './mapping';
 import { PRIVACY_VERSION } from './privacy';
@@ -39,8 +40,17 @@ function isServerRejection(e: unknown): boolean {
 /** Persistence for the signed-in user's own profile. Swap implementations without touching screens. */
 export interface ProfileStore {
   get(userId: string): Promise<Profile | null>;
-  /** Creates or updates. `existing` keeps the original consent time unless the policy version changed. */
+  /**
+   * Creates or updates. `existing` keeps the original consent time unless the policy version changed.
+   * An update never writes the app language: the language pills own it (setAppLanguage), and a form
+   * opened before a pill switch would otherwise put the old language back.
+   */
   save(userId: string, draft: ProfileDraft, existing: Profile | null): Promise<Profile>;
+  /**
+   * Changes only the app language of an existing profile. Leaves privacy consent alone, so a pill
+   * pick never records agreement to a newer policy, e.g. setAppLanguage('u1', 'ko').
+   */
+  setAppLanguage(userId: string, code: string): Promise<Profile>;
   /** Stores the picked image and returns the value to keep in `avatarPath`. */
   uploadAvatar(userId: string, image: PickedImage): Promise<string>;
   removeAvatar(path: string): Promise<void>;
@@ -96,21 +106,40 @@ export function createLocalStore(storage: KeyValueStorage): ProfileStore {
       return null;
     },
     async save(userId, draft, existing) {
+      // The stored app language, read now (not from `existing`, which a pill save may have outdated).
+      let storedLanguage: string | undefined;
+      if (existing) {
+        try {
+          const stored: unknown = JSON.parse((await storage.getItem(localKey(userId))) ?? 'null');
+          if (isProfileRowShape(stored)) storedLanguage = stored.app_language;
+        } catch {}
+      }
       const row: ProfileRow = {
         id: userId,
         verified: existing?.verified ?? false,
         ...draftToWrite(draft, consentTime(existing)),
         // Role is fixed once the profile exists, same as the DB rule.
-        ...(existing ? { role: existing.role } : {}),
+        ...(existing ? { role: existing.role, app_language: storedLanguage ?? existing.appLanguage } : {}),
       };
       try {
         await storage.setItem(localKey(userId), JSON.stringify(row));
       } catch (e) {
         // Web localStorage caps at ~5 MB; a base64 photo is the only thing big enough to hit it.
-        if (row.avatar_path?.startsWith('data:')) throw new Error('That photo is too big to keep in local dev mode. Try a smaller one.');
+        if (row.avatar_path?.startsWith('data:')) throw codedError('photoTooBigLocal');
         throw e;
       }
       return rowToProfile(row);
+    },
+    async setAppLanguage(userId, code) {
+      const raw = await storage.getItem(localKey(userId));
+      let row: unknown = null;
+      try {
+        row = raw ? JSON.parse(raw) : null;
+      } catch {}
+      if (!isProfileRowShape(row)) throw new Error('No profile to update');
+      const next: ProfileRow = { ...row, app_language: code };
+      await storage.setItem(localKey(userId), JSON.stringify(next));
+      return rowToProfile(next);
     },
     async uploadAvatar(_userId, image) {
       // Native keeps the picker's cache URI, which the OS may clear. Fine for this dev-only fallback.
@@ -143,8 +172,9 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
     },
     async save(userId, draft, existing) {
       const write = draftToWrite(draft, consentTime(existing));
-      // Role can't change after creation; the column isn't updatable for users.
-      const { role: _role, ...updatable } = write;
+      // Role can't change after creation; the column isn't updatable for users. The app language is
+      // left as stored: only setAppLanguage (the language pills) changes it.
+      const { role: _role, app_language: _appLanguage, ...updatable } = write;
       const update = () => table().update(updatable).eq('id', userId).select('*').single<ProfileRow>();
       const insert = () => table().insert({ id: userId, ...write }).select('*').single<ProfileRow>();
       let result = existing ? await update() : await insert();
@@ -156,9 +186,7 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
         if (current.error) throw current.error;
         if (current.data.role !== write.role) {
           // A coded error counts as a definite rejection, so saveWithAvatar cleans up the new upload.
-          throw Object.assign(new Error(`This account is already set up as a ${current.data.role}. Reload the app to continue.`), {
-            code: 'VENU_ROLE_MISMATCH',
-          });
+          throw codedError('roleMismatch', { role: current.data.role });
         }
         result = await update();
       } else if (existing && result.error?.code === 'PGRST116') {
@@ -169,6 +197,11 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       if (result.error) throw Object.assign(result.error, { status: result.status });
       return rowToProfile(result.data);
     },
+    async setAppLanguage(userId, code) {
+      const { data, error, status } = await table().update({ app_language: code }).eq('id', userId).select('*').single<ProfileRow>();
+      if (error) throw Object.assign(error, { status });
+      return rowToProfile(data);
+    },
     async uploadAvatar(userId, image) {
       const contentType = image.mimeType ?? 'image/jpeg';
       // A fresh name per upload (`<uid>/avatar-<ms>`), so the live photo is never overwritten
@@ -176,7 +209,13 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       const path = `${userId}/avatar-${Date.now()}`;
       // Prefer the picker's base64 (requested on native): fetch() on a local file:// URI isn't
       // reliable in React Native. Web blob: URIs fetch fine.
-      const body = image.base64 ? base64ToArrayBuffer(image.base64) : await (await fetch(image.uri)).arrayBuffer();
+      let body: ArrayBuffer;
+      try {
+        body = image.base64 ? base64ToArrayBuffer(image.base64) : await (await fetch(image.uri)).arrayBuffer();
+      } catch {
+        // A local file, so not a network problem: e.g. a web blob: URL that died with a reload.
+        throw codedError('photoUnreadable');
+      }
       // No upsert: paths are never reused, so storage never needs to overwrite (and no UPDATE policy).
       const { error } = await client.storage.from(bucket).upload(path, body, { contentType });
       if (error) throw error;
@@ -212,6 +251,16 @@ export function createSupabaseStore(client: SupabaseClient, bucket: string): Pro
       if (error) throw error;
     },
   };
+}
+
+/**
+ * Saves `userId`'s app language, then checks that they're still the one signed in. null means
+ * another account signed in while it saved, so the caller mustn't treat it as done for the current
+ * account (e.g. LanguageSync keeps the pick and decides again for the new account).
+ */
+export async function setAppLanguageIfCurrent(store: ProfileStore, userId: string, code: string, current: () => string | null): Promise<Profile | null> {
+  const saved = await store.setAppLanguage(userId, code);
+  return current() === userId ? saved : null;
 }
 
 /** `PickedImage` replaces the photo, `'remove'` clears it, `null` leaves it as is. */

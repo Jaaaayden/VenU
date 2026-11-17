@@ -27,12 +27,24 @@
     "subtitle": "Vamos conectar você a alguém por perto",
     "languageLabel": "Ajuda em {{language}}. Mudar idioma",
     "locationLabel": "Sua localização: {{spot}}, {{venue}}",
+    "near": "Perto de {{place}}",
+    "locationUnset": "Sua localização: ainda não escolhida, {{venue}}",
+    "whereAreYou": "Onde você está?",
+    "tapToChoose": "Toque para escolher um lugar",
+    "locationHint": "Abre a lista de lugares de {{venue}}",
     "question": "Com o que você precisa de ajuda?",
     "notePlaceholder": "ex.: Preciso de ajuda perto da rampa 2",
     "photoOff": "O acesso às fotos está desativado. Ative em Ajustes.",
-    "voiceSoon": "Notas de voz em breve. Por enquanto, escreva uma nota.",
     "pickOne": "Escolha pelo menos um tipo de ajuda.",
     "send": "Enviar pedido"
+  },
+  "where": {
+    "title": "Onde você está?",
+    "subtitle": "Escolha o lugar mais perto de você em {{venue}}.",
+    "search": "Buscar lugares",
+    "notSure": "Não sei",
+    "notSureHint": "O voluntário vai perguntar onde vocês se encontram",
+    "changeVenue": "Trocar de local"
   },
   "note": {
     "label": "Adicionar nota <muted>(opcional)</muted>",
@@ -45,7 +57,14 @@
     "title": "Emergência?",
     "call": "Ligue para o 911 agora",
     "label": "Emergência? Ligue para o 911 agora",
-    "hint": "Abre o telefone para ligar para o 911"
+    "hint": "Pergunta se você quer ligar para o 911 ou para a equipe do local",
+    "dialogTitle": "Precisa de ajuda de emergência?",
+    "dialogBody": "Em caso de perigo, ferimento ou emergência médica, ligue primeiro para o 911.",
+    "call911": "Ligar para o 911",
+    "callStaff": "Ligar para a equipe do local",
+    "textStaff": "Enviar mensagem para a equipe do local",
+    "notEmergency": "não é uma emergência",
+    "close": "Fechar"
   },
   "notice": {
     "searchFailed": "Não conseguimos falar com um voluntário. Verifique sua conexão e tente de novo.",
@@ -54,7 +73,10 @@
   "searching": {
     "title": "Procurando um voluntário",
     "subtitle": "Geralmente menos de um minuto · Fique onde está",
-    "askedFor": "Você pediu"
+    "askedFor": "Você pediu",
+    "notFoundTitle": "Nenhum voluntário está livre agora",
+    "notFoundBody": "Seu pedido foi guardado. Continue procurando ou ligue para a equipe do local para pedir ajuda.",
+    "keepSearching": "Continuar procurando"
   },
   "match": {
     "title": "Voluntário encontrado",
@@ -79,15 +101,14 @@
     "yesCancel": "Sim, cancelar"
   },
   "map": {
-    "label": "Mapa: {{name}} está a {{distance}}, indo até você no Portão 2.",
-    "gate": "Portão 2",
+    "label": "Mapa: {{name}} está a {{distance}}, indo até você em {{place}}.",
     "you": "Você"
   },
   "messages": {
     "label": "Mensagens",
-    "unread_one": "Mensagens, {{count}} não lida",
-    "unread_many": "Mensagens, {{count}} não lidas",
-    "unread_other": "Mensagens, {{count}} não lidas"
+    "unread_one": "Mensagens, {{number}} não lida",
+    "unread_many": "Mensagens, {{number}} não lidas",
+    "unread_other": "Mensagens, {{number}} não lidas"
   },
   "chat": {
     "away": "A {{minutes}} min",
@@ -106,12 +127,31 @@
     "messageTo": "Mensagem para {{name}}",
     "stickers": "Figurinhas",
     "stickersSoon": "Figurinhas em breve.",
-    "record": "Gravar mensagem de voz",
-    "voiceSoon": "Mensagens de voz em breve."
+    "record": "Ditar uma mensagem"
+  },
+  "translation": {
+    "translatedFrom": "Traduzido do {{language}}",
+    "translated": "Traduzido",
+    "partial": "Primeira parte traduzida do {{language}}",
+    "originalIn": "Original em {{language}}",
+    "original": "Original",
+    "showOriginal": "Ver original",
+    "showOriginalLabel": "Ver a mensagem original",
+    "showTranslation": "Ver tradução",
+    "showTranslationLabel": "Ver a mensagem traduzida",
+    "translating": "Traduzindo…",
+    "failed": "Não foi possível traduzir",
+    "tryAgain": "Tentar de novo",
+    "tryAgainLabel": "Tentar traduzir esta mensagem de novo",
+    "unsupported": "A tradução para {{language}} ainda não está disponível",
+    "notSetUp": "A tradução ainda não está configurada",
+    "willSeeIn": "{{name}} verá isto traduzido para o {{language}}",
+    "readsLanguage": "{{name}} lê em {{language}}"
   },
   "bubble": {
     "mine": "Você, {{time}}: {{text}}",
     "theirs": "Voluntário, {{time}}: {{text}}",
+    "theirsTranslated": "Voluntário, {{time}}: {{text}} (traduzido do {{language}})",
     "listen": "ouvir",
     "listenLabel": "Ouvir esta mensagem"
   },
@@ -135,9 +175,9 @@
   },
   "rating": {
     "label": "Avaliação",
-    "star_one": "{{count}} estrela, {{word}}",
-    "star_many": "{{count}} de estrelas, {{word}}",
-    "star_other": "{{count}} estrelas, {{word}}",
+    "star_one": "{{number}} estrela, {{word}}",
+    "star_many": "{{number}} de estrelas, {{word}}",
+    "star_other": "{{number}} estrelas, {{word}}",
     "words": {
       "poor": "Ruim",
       "notGreat": "Não muito boa",
@@ -172,16 +212,36 @@
     "accept": "Aceitar",
     "acceptSoon": "Você poderá aceitar pedidos quando a conexão for ativada."
   },
-  "mock": {
-    "spots": {
-      "gate2Ramp": "Perto da rampa do Portão 2",
-      "section214": "Corredor da seção 214",
-      "mainPlaza": "Praça da entrada principal"
+  "home": {
+    "greeting": "Oi, {{name}}",
+    "languageLabel": "Idioma do app: {{language}}",
+    "languageHint": "Muda o idioma de todo o app",
+    "languageTitle": "Idioma do app",
+    "locationLabel": "Sua localização: {{place}}, {{venue}}",
+    "locationHint": "Abre o mapa do local",
+    "statusTitle": "Seu status",
+    "status": {
+      "free": "Livre",
+      "busy": "Ocupado",
+      "off": "Ausente"
     },
+    "statusLine": {
+      "free": "Você vai receber pedidos por perto. Numa pausa, mude para Ocupado ou Ausente e os pedidos vão pular você.",
+      "busy": "Você está ocupado agora. Novos pedidos pulam você até você voltar para Livre.",
+      "off": "Você está fora do turno. Os pedidos pulam você até você mudar para Livre."
+    },
+    "helpTitle": "Como você pode ajudar",
+    "editLabel": "Editar como você pode ajudar",
+    "languages": "Idiomas fluentes",
+    "training": "Treinamento",
+    "noTraining": "Nenhum treinamento adicionado ainda",
+    "paused": "Os pedidos ficam pausados enquanto você descansa. Mude para Livre para ver quem precisa de ajuda por perto."
+  },
+  "mock": {
     "greeting": "Oi, {{name}}! Aqui é {{volunteer}}, da equipe de voluntários do LA28. Estou indo até você agora. Ponto de encontro: {{spot}}.",
     "greetingNoName": "Oi! Aqui é {{volunteer}}, da equipe de voluntários do LA28. Estou indo até você agora. Ponto de encontro: {{spot}}.",
     "reply1": "Entendi, valeu! Chego em uns dois minutos.",
-    "reply2": "Já estou vendo o Portão 2. Estou com um colete rosa do LA28.",
+    "reply2": "Estou quase chegando. Estou com um colete rosa do LA28.",
     "reply3": "Sem problema, sem pressa. Vou esperar com você."
   }
 }

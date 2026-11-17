@@ -3,12 +3,12 @@ import { afterEach, describe, expect, it } from '@jest/globals';
 import i18n from '@/i18n';
 
 import { emptyFacilitiesMessage } from '../categories';
-import { eventsLabel, facilityDescription, facilityLocation, facilityMeta, tagLabel } from '../labels';
+import { eventsLabel, facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from '../labels';
 import { facilitiesFor, getVenue, searchFacilities, searchVenues } from '../mock';
 import type { Facility } from '../types';
 
 const sofi = getVenue('sofi')!;
-const gate2 = facilitiesFor('sofi').find(f => f.id === 'gate-2')!;
+const gate2 = facilitiesFor('coliseum').find(f => f.id === 'gate-2')!;
 
 afterEach(async () => { await i18n.changeLanguage('en'); });
 
@@ -37,6 +37,43 @@ describe('venue labels', () => {
     expect(facilityMeta({ ...gate2, walkMinutes: 3 })).toBe('3 دقائق سيرًا · انتظار قصير');
   });
 
+  it('writes numbers in the language\'s digits, still choosing the plural by count', () => {
+    const fa = i18n.getFixedT('fa', 'venue');
+    expect(facilityMeta(gate2, fa)).toMatch(/^۳ /); // not "3 دقیقه" next to Persian digits elsewhere
+    expect(fa('facility.results', { count: 12, number: '۱۲' })).toContain('۱۲');
+    expect(facilityMeta({ ...gate2, walkMinutes: 1 }, i18n.getFixedT('ru', 'venue'))).toMatch(/^1 /);
+  });
+
+  it('calls the Rose Bowl event soccer in every language (LA28 plays soccer there)', () => {
+    const roseBowl = getVenue('rose-bowl')!;
+    const label = (lng: string) => eventsLabel(roseBowl, i18n.getFixedT(lng, 'venue'), lng);
+    expect(['en', 'es', 'ja', 'ko', 'zh', 'ar', 'pt'].map(label)).toEqual(['Soccer', 'Fútbol', 'サッカー', '축구', '足球', 'كرة القدم', 'Futebol']);
+    expect(searchVenues('soccer').map(v => v.id)).toEqual(['rose-bowl']);
+  });
+
+  it('translates facility names, keeping proper nouns', () => {
+    const t = (lng: string) => i18n.getFixedT(lng, 'venue');
+    const byId = (id: string) => facilitiesFor('coliseum').find(f => f.id === id)!;
+    expect(facilityName(gate2, t('en'))).toBe('Gate 2');
+    expect(facilityName(gate2, t('es'))).toBe('Puerta 2');
+    expect(facilityName(gate2, t('fa'))).toBe('دروازه ۲');
+    expect(facilityName(byId('first-aid'), t('es'))).toBe('Primeros auxilios');
+    expect(facilityName(byId('food-south'), t('es'))).toBe('Taco Corner');
+    expect(facilityName(byId('food-west'), t('ja'))).toBe('Burger Stand');
+    expect(facilityName({ ...gate2, id: 'gate-99', name: 'Gate 99' }, t('es'))).toBe('Gate 99');
+    // Every other mock facility reads differently from English in each language.
+    for (const lng of ['es', 'zh', 'ko', 'tl', 'vi', 'hy', 'fa', 'ja', 'ru', 'ar', 'fr', 'pt']) {
+      for (const f of facilitiesFor('coliseum').filter(f => !f.id.startsWith('food-'))) {
+        expect({ lng, id: f.id, name: facilityName(f, t(lng)) }).not.toEqual({ lng, id: f.id, name: f.name });
+      }
+    }
+  });
+
+  it('finds a facility by its translated name', () => {
+    expect(searchFacilities(facilitiesFor('coliseum'), 'objetos perdidos', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(['lost-found']);
+    expect(searchFacilities(facilitiesFor('coliseum'), 'puerta', null, i18n.getFixedT('es', 'venue')).map(f => f.id)).toEqual(expect.arrayContaining(['gate-1', 'gate-2', 'gate-3', 'gate-4']));
+  });
+
   it('keeps a facility\'s own text when there is no translation for it', async () => {
     await i18n.changeLanguage('es');
     const other: Facility = { ...gate2, id: 'gate-99', description: 'From the backend', location: 'Somewhere' };
@@ -50,7 +87,7 @@ describe('search in the app language', () => {
     await i18n.changeLanguage('es');
     expect(searchVenues('natación').map(v => v.id)).toEqual(['sofi']);
     expect(searchVenues('swimming').map(v => v.id)).toEqual(['sofi']);
-    const all = facilitiesFor('sofi');
+    const all = facilitiesFor('coliseum');
     expect(searchFacilities(all, 'rampa', null).map(f => f.id)).toEqual(['gate-2']);
     expect(searchFacilities(all, 'ramp', 'gate').map(f => f.id)).toEqual(['gate-2']);
   });

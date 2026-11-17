@@ -27,12 +27,24 @@
     "subtitle": "سنوصلك بشخص قريب منك",
     "languageLabel": "لغة المساعدة: {{language}}. تغيير اللغة",
     "locationLabel": "موقعك: {{spot}}، {{venue}}",
+    "near": "قرب {{place}}",
+    "locationUnset": "موقعك: لم يُحدَّد بعد، {{venue}}",
+    "whereAreYou": "أين أنت؟",
+    "tapToChoose": "انقر لاختيار مكان",
+    "locationHint": "يفتح قائمة بالأماكن في {{venue}}",
     "question": "بماذا تحتاج المساعدة؟",
     "notePlaceholder": "مثال: أحتاج مساعدة قرب المنحدر 2",
     "photoOff": "الوصول إلى الصور متوقف. فعّله من الإعدادات.",
-    "voiceSoon": "الملاحظات الصوتية قريبًا. اكتب ملاحظة الآن.",
     "pickOne": "اختر نوع مساعدة واحدًا على الأقل.",
     "send": "إرسال الطلب"
+  },
+  "where": {
+    "title": "أين أنت؟",
+    "subtitle": "اختر أقرب مكان إليك في {{venue}}.",
+    "search": "ابحث عن مكان",
+    "notSure": "لست متأكدًا",
+    "notSureHint": "سيسألك المتطوع أين تلتقيان",
+    "changeVenue": "تغيير الملعب"
   },
   "note": {
     "label": "أضف ملاحظة <muted>(اختياري)</muted>",
@@ -45,7 +57,14 @@
     "title": "حالة طارئة؟",
     "call": "اتصل بـ 911 الآن",
     "label": "حالة طارئة؟ اتصل بـ 911 الآن",
-    "hint": "يفتح الهاتف للاتصال بـ 911"
+    "hint": "يسألك هل تتصل بـ 911 أم بموظفي المكان",
+    "dialogTitle": "هل تحتاج إلى مساعدة طارئة؟",
+    "dialogBody": "في حالة الخطر أو الإصابة أو الطوارئ الطبية، اتصل بـ 911 أولًا.",
+    "call911": "اتصل بـ 911",
+    "callStaff": "اتصل بموظفي المكان",
+    "textStaff": "راسل موظفي المكان",
+    "notEmergency": "ليست حالة طارئة",
+    "close": "إغلاق"
   },
   "notice": {
     "searchFailed": "تعذّر الوصول إلى متطوع. تحقق من اتصالك وحاول مرة أخرى.",
@@ -54,7 +73,10 @@
   "searching": {
     "title": "جارٍ البحث عن متطوع",
     "subtitle": "عادةً أقل من دقيقة · ابقَ في مكانك",
-    "askedFor": "طلبت"
+    "askedFor": "طلبت",
+    "notFoundTitle": "لا يوجد متطوع متاح الآن",
+    "notFoundBody": "حفظنا طلبك. واصل البحث، أو اتصل بموظفي المكان للمساعدة.",
+    "keepSearching": "واصل البحث"
   },
   "match": {
     "title": "تم العثور على متطوع",
@@ -79,18 +101,17 @@
     "yesCancel": "نعم، إلغاء"
   },
   "map": {
-    "label": "خريطة: {{name}} على بُعد {{distance}}، في الطريق إليك عند البوابة 2.",
-    "gate": "البوابة 2",
+    "label": "خريطة: {{name}} على بُعد {{distance}}، في الطريق إليك عند {{place}}.",
     "you": "أنت"
   },
   "messages": {
     "label": "الرسائل",
-    "unread_zero": "الرسائل، {{count}} غير مقروءة",
-    "unread_one": "الرسائل، {{count}} غير مقروءة",
-    "unread_two": "الرسائل، {{count}} غير مقروءة",
-    "unread_few": "الرسائل، {{count}} غير مقروءة",
-    "unread_many": "الرسائل، {{count}} غير مقروءة",
-    "unread_other": "الرسائل، {{count}} غير مقروءة"
+    "unread_zero": "الرسائل، {{number}} غير مقروءة",
+    "unread_one": "الرسائل، {{number}} غير مقروءة",
+    "unread_two": "الرسائل، {{number}} غير مقروءة",
+    "unread_few": "الرسائل، {{number}} غير مقروءة",
+    "unread_many": "الرسائل، {{number}} غير مقروءة",
+    "unread_other": "الرسائل، {{number}} غير مقروءة"
   },
   "chat": {
     "away": "على بُعد {{minutes}} دقيقة",
@@ -109,12 +130,31 @@
     "messageTo": "رسالة إلى {{name}}",
     "stickers": "الملصقات",
     "stickersSoon": "الملصقات قريبًا.",
-    "record": "تسجيل رسالة صوتية",
-    "voiceSoon": "الرسائل الصوتية قريبًا."
+    "record": "إملاء رسالة"
+  },
+  "translation": {
+    "translatedFrom": "مترجمة من {{language}}",
+    "translated": "مترجمة",
+    "partial": "تُرجم الجزء الأول فقط من {{language}}",
+    "originalIn": "الأصل باللغة {{language}}",
+    "original": "الأصل",
+    "showOriginal": "عرض الأصل",
+    "showOriginalLabel": "عرض الرسالة الأصلية",
+    "showTranslation": "عرض الترجمة",
+    "showTranslationLabel": "عرض الرسالة المترجمة",
+    "translating": "جارٍ الترجمة…",
+    "failed": "تعذّرت الترجمة",
+    "tryAgain": "أعد المحاولة",
+    "tryAgainLabel": "أعد محاولة ترجمة هذه الرسالة",
+    "unsupported": "الترجمة إلى {{language}} غير متاحة بعد",
+    "notSetUp": "لم يتم إعداد الترجمة بعد",
+    "willSeeIn": "سيرى {{name}} هذه الرسالة مترجمة إلى {{language}}",
+    "readsLanguage": "يقرأ {{name}} باللغة {{language}}"
   },
   "bubble": {
     "mine": "أنت، {{time}}: {{text}}",
     "theirs": "المتطوع، {{time}}: {{text}}",
+    "theirsTranslated": "المتطوع، {{time}}: {{text}} (مترجمة من {{language}})",
     "listen": "استمع",
     "listenLabel": "استمع إلى هذه الرسالة"
   },
@@ -138,12 +178,12 @@
   },
   "rating": {
     "label": "التقييم",
-    "star_zero": "{{count}} نجوم، {{word}}",
-    "star_one": "{{count}} نجمة، {{word}}",
-    "star_two": "{{count}} نجمتان، {{word}}",
-    "star_few": "{{count}} نجوم، {{word}}",
-    "star_many": "{{count}} نجمة، {{word}}",
-    "star_other": "{{count}} نجمة، {{word}}",
+    "star_zero": "{{number}} نجوم، {{word}}",
+    "star_one": "{{number}} نجمة، {{word}}",
+    "star_two": "{{number}} نجمتان، {{word}}",
+    "star_few": "{{number}} نجوم، {{word}}",
+    "star_many": "{{number}} نجمة، {{word}}",
+    "star_other": "{{number}} نجمة، {{word}}",
     "words": {
       "poor": "ضعيفة",
       "notGreat": "ليست جيدة",
@@ -178,16 +218,36 @@
     "accept": "قبول",
     "acceptSoon": "سيُتاح قبول الطلبات عند تفعيل المطابقة."
   },
-  "mock": {
-    "spots": {
-      "gate2Ramp": "قرب منحدر البوابة 2",
-      "section214": "ممر القسم 214",
-      "mainPlaza": "ساحة المدخل الرئيسي"
+  "home": {
+    "greeting": "مرحبًا، {{name}}",
+    "languageLabel": "لغة التطبيق: {{language}}",
+    "languageHint": "يغيّر لغة التطبيق بالكامل",
+    "languageTitle": "لغة التطبيق",
+    "locationLabel": "موقعك: {{place}}، {{venue}}",
+    "locationHint": "يفتح خريطة المكان",
+    "statusTitle": "حالتك",
+    "status": {
+      "free": "متاح",
+      "busy": "مشغول",
+      "off": "خارج الخدمة"
     },
+    "statusLine": {
+      "free": "ستصلك الطلبات القريبة. أثناء الاستراحة، بدّل إلى مشغول أو خارج الخدمة ولن تصلك الطلبات.",
+      "busy": "أنت مشغول الآن. لن تصلك الطلبات الجديدة حتى تعود إلى متاح.",
+      "off": "أنت خارج الخدمة. لن تصلك الطلبات حتى تبدّل إلى متاح."
+    },
+    "helpTitle": "ما يمكنك المساعدة فيه",
+    "editLabel": "تعديل ما يمكنك المساعدة فيه",
+    "languages": "اللغات التي تجيدها",
+    "training": "التدريب",
+    "noTraining": "لم تُضف أي تدريب بعد",
+    "paused": "الطلبات متوقفة أثناء استراحتك. بدّل إلى متاح لترى من يحتاج المساعدة بالقرب منك."
+  },
+  "mock": {
     "greeting": "مرحبًا {{name}}! أنا {{volunteer}} من فريق متطوعي LA28. أنا في الطريق إليك الآن. نقطة اللقاء: {{spot}}.",
     "greetingNoName": "مرحبًا! أنا {{volunteer}} من فريق متطوعي LA28. أنا في الطريق إليك الآن. نقطة اللقاء: {{spot}}.",
     "reply1": "تمام، شكرًا! سأصل خلال دقيقتين.",
-    "reply2": "أرى البوابة 2 الآن. أرتدي سترة LA28 وردية.",
+    "reply2": "أوشكت على الوصول. أرتدي سترة LA28 وردية.",
     "reply3": "لا مشكلة، خذ وقتك. سأنتظر معك."
   }
 }

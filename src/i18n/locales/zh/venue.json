@@ -15,7 +15,6 @@
     "languageLabel": "应用语言：{{language}}",
     "languageHint": "更改整个应用的语言",
     "languageTitle": "应用语言",
-    "languageConsent": "请先在“个人资料”中查看更新后的隐私政策，再更改语言。",
     "assistTitle": "需要帮助？",
     "assistBody": "联系志愿者",
     "assistLabel": "需要帮助？联系志愿者",
@@ -26,7 +25,7 @@
     "opening_ceremony": "开幕式",
     "swimming": "游泳",
     "athletics": "田径",
-    "football": "美式橄榄球",
+    "soccer": "足球",
     "gymnastics": "体操",
     "basketball": "篮球"
   },
@@ -81,7 +80,29 @@
     "pin": "地图上的{{name}}",
     "north": "北"
   },
-  "walk_other": "步行 {{count}} 分钟",
+  "officialMap": {
+    "attribution": "地图：{{source}}",
+    "open": "在浏览器中打开",
+    "openLabel": "在浏览器中打开 {{source}} 官方地图",
+    "frameLabel": "{{source}} 官方地图。使用读屏软件时，请改用下方的“附近设施”列表。",
+    "loading": "正在加载 {{source}} 地图…",
+    "error": "地图加载失败。请在浏览器中打开。",
+    "retry": "重试",
+    "viewsLabel": "地图视图",
+    "views": {
+      "exterior": "外部",
+      "east_garage": "东停车楼",
+      "west_garage": "西停车楼"
+    },
+    "imageLabel": "{{source}}地图：{{view}}",
+    "imageLabelZoom": "{{source}}地图：{{view}}。双指缩放或使用缩放按钮。",
+    "enlarge": "点按放大",
+    "enlargeHint": "全屏打开地图以便放大",
+    "close": "关闭地图",
+    "zoomIn": "放大",
+    "zoomOut": "缩小"
+  },
+  "walk_other": "步行 {{number}} 分钟",
   "wait": {
     "none": "无需排队",
     "short": "排队较短",
@@ -105,34 +126,47 @@
     "family_room": "家庭间",
     "long_lines_halftime": "中场排长队",
     "wheelchair_loans": "轮椅借用",
-    "permit_needed": "需要许可证"
+    "permit_needed": "需要许可证",
+    "wheelchair_escort": "轮椅陪同",
+    "premium_access": "VIP 和高级票",
+    "sensory_room": "感官室",
+    "assistive_listening": "辅助听音",
+    "lost_items": "失物招领",
+    "changing_table": "尿布台"
   },
   "facilityText": {
     "gate-1": {
+      "name": "1 号门",
       "description": "北入口，离 Metro 接驳车站最近。",
       "location": "北侧，接驳车站旁"
     },
     "gate-2": {
+      "name": "2 号门",
       "description": "东入口，设有坡道，紧邻 C 停车场的无障碍车位。",
       "location": "东侧，C 停车场旁"
     },
     "gate-3": {
+      "name": "3 号门",
       "description": "南入口，供网约车上下客。",
       "location": "南侧，网约车区"
     },
     "gate-4": {
+      "name": "4 号门",
       "description": "西入口，供 200 至 240 区持票观众使用。",
       "location": "西侧，主广场旁"
     },
     "info-desk": {
+      "name": "观众服务处",
       "description": "咨询、遗失门票、感官工具包和降噪耳罩。",
       "location": "环廊，105 区"
     },
     "first-aid": {
+      "name": "急救站",
       "description": "从开门到观众全部离场，护士和急救员全程值守。",
       "location": "环廊，112 区"
     },
     "restroom-east": {
+      "name": "东侧洗手间",
       "description": "男洗手间、女洗手间，以及带尿布台的全性别家庭间。",
       "location": "环廊，118 区"
     },
@@ -141,10 +175,12 @@
       "location": "环廊，124 区"
     },
     "lost-found": {
+      "name": "失物招领处",
       "description": "交还或领取遗失物品。走失儿童也会被带到这里。",
       "location": "环廊，131 区"
     },
     "accessible-seating": {
+      "name": "无障碍服务处",
       "description": "轮椅借用、陪同座位和助听设备。",
       "location": "环廊，136 区"
     },
@@ -153,12 +189,229 @@
       "location": "环廊，140 区"
     },
     "restroom-west": {
+      "name": "西侧洗手间",
       "description": "男女洗手间。无障碍隔间在左侧。",
       "location": "环廊，145 区"
     },
     "parking-c": {
-      "description": "无障碍停车场，有一条平坦的短路通往 Gate 2。",
+      "name": "C 停车场",
+      "description": "无障碍停车场，有一条平坦的短路通往2 号门。",
       "location": "东南停车场"
+    },
+    "entry-3": {
+      "name": "3 号入口",
+      "description": "北入口。每个入口都有无障碍通道，并提供免费轮椅陪同服务。",
+      "location": "北侧"
+    },
+    "entry-4": {
+      "name": "4 号入口",
+      "description": "北入口，内设无障碍服务台和候场座椅。",
+      "location": "北侧"
+    },
+    "entry-6": {
+      "name": "6 号入口",
+      "description": "西入口，供 VIP 和高级票持票人使用。",
+      "location": "西侧"
+    },
+    "entry-8": {
+      "name": "8 号入口",
+      "description": "南入口，内设无障碍服务台和候场座椅。",
+      "location": "南侧"
+    },
+    "entry-10": {
+      "name": "10 号入口",
+      "description": "南入口，内设无障碍服务台和候场座椅。",
+      "location": "南侧"
+    },
+    "entry-11": {
+      "name": "11 号入口",
+      "description": "东入口，供 VIP 和高级票持票人使用。",
+      "location": "东侧"
+    },
+    "guest-services-ne": {
+      "name": "观众服务处（东北）",
+      "description": "咨询、失物招领、辅助听音设备、免费感官工具包和感官室。",
+      "location": "3 层，东北大厅"
+    },
+    "guest-services-sw": {
+      "name": "观众服务处（西南）",
+      "description": "位于 Corona Beach Club 内。失物招领、辅助听音设备、免费感官工具包和感官室。",
+      "location": "3 层，西南大厅"
+    },
+    "first-aid-se": {
+      "name": "急救站（东南）",
+      "description": "现场有急救人员。任何引座员或工作人员都可以帮你呼叫。",
+      "location": "1 层，东南大厅"
+    },
+    "first-aid-nw": {
+      "name": "急救站（西北）",
+      "description": "现场有急救人员。任何引座员或工作人员都可以帮你呼叫。",
+      "location": "3 层，西北大厅"
+    },
+    "pedestrian-ramp": {
+      "name": "人行坡道",
+      "description": "体育场唯一的人行坡道，可到达除 7 层以外的所有楼层。",
+      "location": "东南侧，端区后方"
+    },
+    "lactation-suite": {
+      "name": "哺乳室",
+      "description": "Mamava 私密哺乳舱。每层都有家庭洗手间。",
+      "location": "4 层，南侧"
+    },
+    "rideshare-kareem": {
+      "name": "网约车下车点",
+      "description": "Uber、Lyft 和出租车下车点。上车点在 Kareem Court 与 Manchester Boulevard 路口。",
+      "location": "Kareem Court，Pincay Drive 与 Manchester Boulevard 之间"
+    },
+    "accessible-drop-off": {
+      "name": "无障碍上下车点",
+      "description": "供残障人士上下车。从 Prairie Avenue 北行，经 Arbor Vitae Street 进入。",
+      "location": "District Drive，Champions Way 与 Touchdown Drive 之间"
+    },
+    "brown-zone": {
+      "name": "棕色停车区",
+      "description": "离 1–5 号和 12 号入口最近的停车区。每个停车场都有 ADA 车位，先到先得。",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "蓝色停车区",
+      "description": "离 7 号和 8 号入口最近的停车区。每个停车场都有 ADA 车位，先到先得。",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "橙色停车区",
+      "description": "离 10、11 和 12 号入口最近的停车区。每个停车场都有 ADA 车位，先到先得。",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Kobe Bryant 入口",
+      "description": "所有门票的主入口。GA 场地票须从这里进场。",
+      "location": "Chick Hearn Ct.（11th St.）与 Georgia St. 路口"
+    },
+    "star-plaza-entrance": {
+      "name": "Star Plaza 入口",
+      "description": "所有门票的主入口，位于售票处和 Team LA 商店之间。",
+      "location": "Chick Hearn Ct.（11th St.）与 Figueroa St. 路口"
+    },
+    "figueroa-entrance": {
+      "name": "Figueroa 入口",
+      "description": "所有门票的主入口。可在此申请免费轮椅陪同。",
+      "location": "12th St. 与 Figueroa St. 路口"
+    },
+    "guest-services-m12": {
+      "name": "观众服务处 M12",
+      "description": "咨询、失物招领、辅助听音设备、感官包和加重腿垫（需押证件）。",
+      "location": "主大厅，M12 通道对面"
+    },
+    "guest-services-u6": {
+      "name": "观众服务处 U6",
+      "description": "咨询、失物招领、感官包和加重腿垫。可在此获取感官舱密码。",
+      "location": "上层大厅，U6 通道对面"
+    },
+    "first-aid-m3": {
+      "name": "急救站 M3",
+      "description": "每场活动都有急救人员，内设安静区。",
+      "location": "主大厅，M3 通道对面"
+    },
+    "first-aid-u22": {
+      "name": "急救站 U22",
+      "description": "每场活动都有急救人员，内设安静区。",
+      "location": "上层大厅，U22 通道对面"
+    },
+    "sensory-pod": {
+      "name": "感官舱",
+      "description": "可容纳一到两人的安静舱，所有活动期间开放。密码请向观众服务处索取。",
+      "location": "上层大厅，3 号通道对面"
+    },
+    "restroom-m23": {
+      "name": "洗手间 M23",
+      "description": "全性别洗手间，配有尿布台。所有洗手间均可供轮椅使用。",
+      "location": "主大厅，M23 通道对面"
+    },
+    "restroom-u31": {
+      "name": "洗手间 U31",
+      "description": "全性别洗手间，配有尿布台。所有洗手间均可供轮椅使用。",
+      "location": "上层大厅，U31 通道对面"
+    },
+    "rideshare-chick-hearn": {
+      "name": "Chick Hearn 网约车点",
+      "description": "在白色区域上下网约车（东行方向）。",
+      "location": "Chick Hearn Ct.，L.A. Live Way 与 Georgia St. 之间"
+    },
+    "rideshare-figueroa": {
+      "name": "Figueroa 网约车点",
+      "description": "在白色区域上下网约车（南行方向）。",
+      "location": "Figueroa St.，12th St. 与 Pico Blvd. 之间"
+    },
+    "west-garage-lot-w": {
+      "name": "西停车楼（W 停车场）",
+      "description": "场馆停车楼，入口在 Chick Hearn Ct. 和 Georgia St.。",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "主入口",
+      "description": "GameFace ID 通道在左侧，Identity Pass 通道在右侧。从安检口到座位可提供免费行动协助。",
+      "location": "广场上，靠近 Century Blvd. 和 Prairie Ave."
+    },
+    "vip-entrance": {
+      "name": "VIP 入口",
+      "description": "供包厢、俱乐部和场地票持票人使用。",
+      "location": "主入口左侧"
+    },
+    "wall-entrance": {
+      "name": "The Wall 入口",
+      "description": "The Wall 专用入口。",
+      "location": "主入口左侧，经过 VIP 入口"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal（Main 层）",
+      "description": "观众服务：失物招领、免费辅助听音设备（需押带照片的证件）和 OneCourt 设备。",
+      "location": "Main 层，Main 6 区附近"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal（Terrace 层）",
+      "description": "观众服务：失物招领和免费辅助听音设备（需押带照片的证件）。",
+      "location": "Terrace 层，Terrace 18 区附近"
+    },
+    "first-aid-main": {
+      "name": "急救站（Main 层）",
+      "description": "所有活动均有受过培训的急救人员。",
+      "location": "Main 层大厅，Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "急救站（Terrace 层）",
+      "description": "所有活动均有受过培训的急救人员。",
+      "location": "Terrace 层大厅，Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "急救站（场地层）",
+      "description": "所有活动均有受过培训的急救人员。",
+      "location": "场地层，Wall 19 下方，东侧通道旁"
+    },
+    "sensory-room": {
+      "name": "感官室",
+      "description": "私密的 Kaiser Permanente 感官室。可按需领取感官包。",
+      "location": "请向场馆接待员问路"
+    },
+    "infant-care-room": {
+      "name": "婴儿护理室",
+      "description": "私密的婴儿护理室。场馆各处都有通用洗手间。",
+      "location": "Main 层，Main 6"
+    },
+    "mobility-hub": {
+      "name": "出行枢纽",
+      "description": "网约车和出租车上下客、家庭接送区和接驳车。",
+      "location": "东停车楼 1 层"
+    },
+    "east-garage": {
+      "name": "东停车楼",
+      "description": "普通停车，请提前购买停车证。无障碍车位先到先得出售。",
+      "location": "入口在 102nd St."
+    },
+    "west-garage": {
+      "name": "西停车楼",
+      "description": "VIP 停车，位于 Prairie Ave. 对面。请提前购买停车证。",
+      "location": "入口在 Prairie Ave."
     }
   },
   "facility": {
@@ -166,8 +419,11 @@
     "wheelchair": "轮椅可通行",
     "directions": "路线",
     "directionsSoon": "分步导航即将推出。{{name}}：{{location}}。",
+    "imHere": "我在这里",
+    "imHereHint": "请求帮助时将此处作为你的位置",
+    "isHere": "你的位置",
     "reports": "反馈",
-    "results_other": "{{count}} 条结果",
+    "results_other": "{{number}} 条结果",
     "noReports": "还没有反馈。来分享你的发现吧。",
     "addReport": "添加你的反馈"
   },
@@ -194,7 +450,9 @@
   "report": {
     "notFound": "未找到该反馈",
     "kind": "反馈",
+    "authorFallback": "VenU 观众",
     "submitted": "提交于 {{date}}",
+    "originalLanguage": "原文语言：{{language}}",
     "noBody": "未添加详情。"
   },
   "form": {
@@ -207,11 +465,10 @@
     "bodyPlaceholder": "输入内容",
     "bodyHint": "选填。发生了什么、在哪里、什么时候？",
     "pictureSoon": "添加照片功能即将推出。",
-    "speakSoon": "语音反馈即将推出，请先输入文字。",
     "topic": "主题",
     "submit": "提交反馈",
     "sendFailed": "反馈发送失败。请检查网络后重试。",
-    "titleRequired": "请添加标题，例如“Gate 2 坡道有裂缝”。",
+    "titleRequired": "请添加标题，例如“2 号门坡道有裂缝”。",
     "titleTooLong": "标题请少于 {{max}} 个字符。",
     "topicRequired": "请选择最合适的主题。",
     "bodyTooLong": "反馈请少于 {{max}} 个字符。"

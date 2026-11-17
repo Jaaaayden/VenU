@@ -10,6 +10,7 @@ import { Colors, Fonts, Shadow } from '@/constants/theme';
 import { useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
+import { facilityName } from './labels';
 import { matchesCategory } from './mock';
 import type { Facility, FacilityCategory, VenueShape } from './types';
 
@@ -135,7 +136,7 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
             key={f.id}
             onPress={() => onPinPress(f)}
             accessibilityRole="button"
-            accessibilityLabel={t('map.pin', { name: f.name })}
+            accessibilityLabel={t('map.pin', { name: facilityName(f, t) })}
             accessibilityState={{ selected: isSelected }}
             style={[styles.target, { left: ox + f.x * scale - 22, top: oy + f.y * scale - 22 }, isSelected && styles.onTop]}>
             <View
@@ -157,7 +158,7 @@ export function StadiumMap({ shape, facilities, width, height, category, selecte
         <View
           pointerEvents="none"
           style={[styles.label, { left: ox + selected.x * scale - 70, top: oy + selected.y * scale + PIN_SELECTED / 2 + 2 }]}>
-          <Text style={styles.labelText} numberOfLines={1}>{selected.name}</Text>
+          <Text style={styles.labelText} numberOfLines={1}>{facilityName(selected, t)}</Text>
         </View>
       ) : null}
     </View>

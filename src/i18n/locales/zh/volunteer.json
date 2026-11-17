@@ -27,12 +27,24 @@
     "subtitle": "我们会为你匹配附近的人",
     "languageLabel": "帮助语言：{{language}}。更改语言",
     "locationLabel": "你的位置：{{spot}}，{{venue}}",
+    "near": "{{place}}附近",
+    "locationUnset": "你的位置：尚未选择，{{venue}}",
+    "whereAreYou": "你在哪里？",
+    "tapToChoose": "点按选择地点",
+    "locationHint": "打开 {{venue}} 的地点列表",
     "question": "你需要什么帮助？",
     "notePlaceholder": "例如：我在 2 号坡道附近过不去",
     "photoOff": "照片访问已关闭。请在“设置”中开启。",
-    "voiceSoon": "语音备注即将推出。请先输入文字备注。",
     "pickOne": "请至少选择一项需要的帮助。",
     "send": "发送请求"
+  },
+  "where": {
+    "title": "你在哪里？",
+    "subtitle": "选择 {{venue}} 中离你最近的地点。",
+    "search": "搜索地点",
+    "notSure": "我不确定",
+    "notSureHint": "志愿者会问你在哪里见面",
+    "changeVenue": "更换场馆"
   },
   "note": {
     "label": "添加备注<muted>（可选）</muted>",
@@ -45,7 +57,14 @@
     "title": "紧急情况？",
     "call": "立即拨打 911",
     "label": "紧急情况？立即拨打 911",
-    "hint": "打开电话拨打 911"
+    "hint": "询问你要拨打 911 还是联系场馆工作人员",
+    "dialogTitle": "需要紧急帮助吗？",
+    "dialogBody": "如遇危险、受伤或医疗紧急情况，请先拨打 911。",
+    "call911": "拨打 911",
+    "callStaff": "致电场馆工作人员",
+    "textStaff": "给场馆工作人员发短信",
+    "notEmergency": "不是紧急情况",
+    "close": "关闭"
   },
   "notice": {
     "searchFailed": "无法联系到志愿者。请检查网络连接后重试。",
@@ -54,7 +73,10 @@
   "searching": {
     "title": "正在寻找志愿者",
     "subtitle": "通常不到一分钟 · 请留在原地",
-    "askedFor": "你请求的帮助"
+    "askedFor": "你请求的帮助",
+    "notFoundTitle": "目前没有空闲的志愿者",
+    "notFoundBody": "你的请求已保存。可以继续寻找，或致电场馆工作人员寻求帮助。",
+    "keepSearching": "继续寻找"
   },
   "match": {
     "title": "已找到志愿者",
@@ -79,13 +101,12 @@
     "yesCancel": "是，取消"
   },
   "map": {
-    "label": "地图：{{name}} 距你 {{distance}}，正前往 2 号门与你会合。",
-    "gate": "2 号门",
+    "label": "地图：{{name}} 距你 {{distance}}，正前往{{place}}与你会合。",
     "you": "你"
   },
   "messages": {
     "label": "消息",
-    "unread_other": "消息，{{count}} 条未读"
+    "unread_other": "消息，{{number}} 条未读"
   },
   "chat": {
     "away": "{{minutes}} 分钟路程",
@@ -104,12 +125,31 @@
     "messageTo": "给 {{name}} 发消息",
     "stickers": "贴纸",
     "stickersSoon": "贴纸即将推出。",
-    "record": "录制语音消息",
-    "voiceSoon": "语音消息即将推出。"
+    "record": "语音输入消息"
+  },
+  "translation": {
+    "translatedFrom": "译自{{language}}",
+    "translated": "已翻译",
+    "partial": "前半部分译自{{language}}",
+    "originalIn": "原文（{{language}}）",
+    "original": "原文",
+    "showOriginal": "查看原文",
+    "showOriginalLabel": "查看原始消息",
+    "showTranslation": "查看译文",
+    "showTranslationLabel": "查看翻译后的消息",
+    "translating": "正在翻译…",
+    "failed": "无法翻译",
+    "tryAgain": "重试",
+    "tryAgainLabel": "重新翻译这条消息",
+    "unsupported": "暂不支持翻译成{{language}}",
+    "notSetUp": "翻译功能尚未设置",
+    "willSeeIn": "{{name}} 将看到译成{{language}}的版本",
+    "readsLanguage": "{{name}} 使用{{language}}"
   },
   "bubble": {
     "mine": "你，{{time}}：{{text}}",
     "theirs": "志愿者，{{time}}：{{text}}",
+    "theirsTranslated": "志愿者，{{time}}：{{text}}（译自{{language}}）",
     "listen": "收听",
     "listenLabel": "收听这条消息"
   },
@@ -133,7 +173,7 @@
   },
   "rating": {
     "label": "评分",
-    "star_other": "{{count}} 星，{{word}}",
+    "star_other": "{{number}} 星，{{word}}",
     "words": {
       "poor": "差",
       "notGreat": "不太好",
@@ -168,16 +208,36 @@
     "accept": "接受",
     "acceptSoon": "匹配功能上线后即可接受请求。"
   },
-  "mock": {
-    "spots": {
-      "gate2Ramp": "2 号门坡道附近",
-      "section214": "214 区走廊",
-      "mainPlaza": "主入口广场"
+  "home": {
+    "greeting": "你好，{{name}}",
+    "languageLabel": "应用语言：{{language}}",
+    "languageHint": "更改整个应用的语言",
+    "languageTitle": "应用语言",
+    "locationLabel": "你的位置：{{place}}，{{venue}}",
+    "locationHint": "打开场馆地图",
+    "statusTitle": "你的状态",
+    "status": {
+      "free": "空闲",
+      "busy": "忙碌",
+      "off": "离线"
     },
+    "statusLine": {
+      "free": "你会收到附近的请求。休息时切换到“忙碌”或“离线”，请求就会跳过你。",
+      "busy": "你现在正忙。切换回“空闲”之前，新请求会跳过你。",
+      "off": "你已离线。切换到“空闲”之前，请求会跳过你。"
+    },
+    "helpTitle": "你能提供的帮助",
+    "editLabel": "编辑你能提供的帮助",
+    "languages": "流利的语言",
+    "training": "培训",
+    "noTraining": "尚未添加培训",
+    "paused": "休息期间请求已暂停。切换到“空闲”即可查看附近需要帮助的人。"
+  },
+  "mock": {
     "greeting": "{{name}}，你好！我是 {{volunteer}}，LA28 志愿者。我现在就过去找你。会合地点：{{spot}}。",
     "greetingNoName": "你好！我是 {{volunteer}}，LA28 志愿者。我现在就过去找你。会合地点：{{spot}}。",
     "reply1": "收到，谢谢！我几分钟后到。",
-    "reply2": "我已经看到 2 号门了。我穿着粉色的 LA28 背心。",
+    "reply2": "我快到了。我穿着粉色的 LA28 背心。",
     "reply3": "没问题，不着急。我会陪你一起等。"
   }
 }

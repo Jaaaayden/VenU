@@ -3,7 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 import Svg, { Circle, Line } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
-import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { Colors, Fonts, Radius, Spacing, webNoOutline } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
 /** A tag as shown: its translated label and tone (green good news, orange heads-up). */
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.controlBorder,
     backgroundColor: Colors.surface,
   },
-  searchInput: { flex: 1, fontFamily: Fonts.display, fontSize: 15, color: Colors.text, paddingVertical: 10, outlineStyle: 'none' } as object,
+  searchInput: { flex: 1, fontFamily: Fonts.display, fontSize: 15, color: Colors.text, paddingVertical: 10, ...webNoOutline },
   clear: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
 
   tagBlock: { gap: 6 },

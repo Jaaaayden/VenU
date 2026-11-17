@@ -39,6 +39,13 @@ describe('pending setup name', () => {
     expect((await readPendingSetup()).firstName).toBeUndefined();
   });
 
+  it('applies writes started together one after another, so neither is lost', async () => {
+    await writePendingSetup({ language: 'es', languagePicked: true });
+    // Remembering the account's language while forgetting the pick (LanguageSync can start both at once).
+    await Promise.all([writePendingSetup({ language: 'ko', languagePicked: undefined }), writePendingSetup({ languagePicked: undefined })]);
+    expect(await readPendingSetup()).toEqual({ language: 'ko' });
+  });
+
   it('clearPendingName keeps only the language', async () => {
     await writePendingSetup({ language: 'ko' });
     await rememberPendingName('rosa@example.com', 'Rosa');

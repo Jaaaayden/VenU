@@ -25,6 +25,7 @@ export default function EditProfileScreen() {
         savedAvatarUrl={avatarUrl}
         submitLabel={t('edit.submit')}
         onSubmit={async (draft, avatar) => {
+          // Saving never changes the app language (the store leaves it as stored; the pills own it).
           await save(draft, avatar);
           goBack('/profile');
         }}

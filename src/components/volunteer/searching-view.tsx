@@ -15,6 +15,7 @@ import type { HelpRequest } from '@/features/volunteer/types';
 import { useT } from '@/i18n';
 
 import { HelpIcon } from './help-icon';
+import { MeetPlaceText } from './meet-place';
 
 export function SearchingView({ request }: { request: HelpRequest }) {
   const t = useT('volunteer');
@@ -26,8 +27,6 @@ export function SearchingView({ request }: { request: HelpRequest }) {
     loop.start();
     return () => loop.stop();
   }, [pulse]);
-
-  const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
 
   return (
     <View style={styles.page}>
@@ -51,7 +50,20 @@ export function SearchingView({ request }: { request: HelpRequest }) {
         </View>
       </View>
 
-      <Text style={styles.where}>{t('place', { spot: request.location.spot, venue: request.location.venue })}</Text>
+      <RequestSummary request={request} />
+
+      <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
+    </View>
+  );
+}
+
+/** Where they are and what they asked for; also under "No volunteer is free right now". */
+export function RequestSummary({ request }: { request: HelpRequest }) {
+  const t = useT('volunteer');
+  const asked = HELP_TYPES.filter(id => request.helpTypes.includes(id));
+  return (
+    <>
+      <MeetPlaceText point={request.location} style={styles.where} />
 
       <View style={styles.summary}>
         <Text style={styles.summaryLabel}>{t('searching.askedFor')}</Text>
@@ -64,9 +76,7 @@ export function SearchingView({ request }: { request: HelpRequest }) {
         <Text style={styles.meta}>{t('helpIn', { language: isolatedLanguageName(request.language) })}</Text>
         {request.note ? <Text style={styles.note}>{t('quoted', { text: request.note })}</Text> : null}
       </View>
-
-      <Button label={t('cancelRequest')} variant="link" onPress={volunteerRequests.cancel} style={styles.cancel} />
-    </View>
+    </>
   );
 }
 

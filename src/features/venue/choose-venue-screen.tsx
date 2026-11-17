@@ -1,6 +1,7 @@
 /**
  * "Choose Your Venue": search LA28 venues, ask for a volunteer, or open a venue's map.
- * The language pill sets the app language (the profile's appLanguage), offering only translated languages.
+ * The language pill switches the app now and saves it as the profile's appLanguage (through
+ * <LanguageSync />, which retries if offline), offering only translated languages.
  */
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -11,47 +12,37 @@ import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
-import { isolatedLanguageName, LANGUAGES } from '@/features/profile/options';
-import { PRIVACY_VERSION } from '@/features/profile/privacy';
+import { isolatedLanguageName } from '@/features/profile/options';
 import { useProfile } from '@/features/profile/profile-context';
-import { draftFromProfile } from '@/features/profile/types';
-import { isUiLanguage, useLayoutRtl, useT } from '@/i18n';
-import { choosePendingLanguage } from '@/i18n/pending-language';
-import { friendlyError } from '@/lib/errors';
+import { UNTRANSLATED, useLayoutRtl, useT, useUiLanguage } from '@/i18n';
+import { choosePendingLanguage, usePendingLanguage } from '@/i18n/pending-language';
+import { errorText } from '@/lib/errors';
 
 import { StadiumCard } from './cards';
 import { searchVenues } from './mock';
 import { InlineNote, SearchField, venueText } from './ui';
 
-/** Languages without string tables would show English, so the picker leaves them out. */
-const UNTRANSLATED = LANGUAGES.filter(l => !isUiLanguage(l.code)).map(l => l.code);
-
 export function ChooseVenueScreen() {
   const t = useT('venue');
+  const tc = useT('common');
   const rtl = useLayoutRtl();
-  const { profile, save } = useProfile();
+  // The language on screen, not the stored one: a profile can hold an untranslated language (shown in
+  // English), and an unsaved pick shows over the profile's.
+  const { language } = useUiLanguage();
+  const pending = usePendingLanguage();
+  const { userId } = useProfile();
   const [query, setQuery] = useState('');
   const [picking, setPicking] = useState(false);
-  const [saving, setSaving] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
   const venues = searchVenues(query, undefined, t);
-  const language = saving ?? (profile?.appLanguage || 'en');
+  // A pick that couldn't be saved yet (e.g. offline) stays on screen; LanguageSync retries it.
+  const note = pending.picked && pending.saveError ? errorText(pending.saveError, tc) : null;
 
-  async function pickLanguage(code: string) {
+  function pickLanguage(code: string) {
     setPicking(false);
-    setNote(null);
-    if (!profile) return void choosePendingLanguage(code);
-    if (code === profile.appLanguage) return;
-    // Saving stamps privacy consent again when the policy changed since they agreed; that needs Profile.
-    if (profile.privacyVersion !== PRIVACY_VERSION) return setNote(t('choose.languageConsent'));
-    setSaving(code);
-    try {
-      await save({ ...draftFromProfile(profile), appLanguage: code }, null);
-    } catch (e) {
-      setNote(friendlyError(e));
-    } finally {
-      setSaving(null);
-    }
+    // Same language again: nothing to switch, but a failed save gets another try.
+    // Back to the account's own language: LanguageSync drops the unsaved pick instead of saving.
+    // Signed in, the pick belongs to this account: it's never saved to whoever signs in next.
+    if (code !== language || pending.saveError) choosePendingLanguage(code, userId ?? undefined);
   }
 
   return (
@@ -63,9 +54,7 @@ export function ChooseVenueScreen() {
             style={({ pressed }) => [styles.langButton, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel={t('choose.languageLabel', { language: isolatedLanguageName(language) })}
-            accessibilityHint={t('choose.languageHint')}
-            accessibilityState={{ busy: !!saving }}
-            disabled={!!saving}>
+            accessibilityHint={t('choose.languageHint')}>
             <FigmaIcon name="icon-c513eb" size={20} color={Colors.ink} />
             <Text style={styles.langText}>{isolatedLanguageName(language)}</Text>
           </Pressable>
@@ -110,6 +99,7 @@ export function ChooseVenueScreen() {
         visible={picking}
         title={t('choose.languageTitle')}
         exclude={UNTRANSLATED}
+        appLanguage
         onSelect={pickLanguage}
         onClose={() => setPicking(false)}
       />

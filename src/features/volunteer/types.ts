@@ -4,10 +4,14 @@
 export type HelpTypeId = 'physical' | 'directions' | 'language' | 'quiet' | 'lost' | 'other';
 
 
-/** Where the visitor is waiting, e.g. "Near Gate 2 Ramp" at "SoFi Stadium". */
+/**
+ * Where the visitor is waiting, as ids so it's worded in the language on screen (meet-point.ts).
+ * e.g. { venueId: 'sofi', facilityId: 'entry-4' } = "Near Entry 4 · SoFi Stadium".
+ */
 export interface MeetPoint {
-  spot: string;
-  venue: string;
+  venueId: string;
+  /** A facility in that venue, or null when the visitor isn't sure. */
+  facilityId: string | null;
 }
 
 export interface HelpRequest {
@@ -45,6 +49,8 @@ export interface Volunteer {
 /** What the backend returns once someone accepts the request. */
 export interface Match {
   volunteer: Volunteer;
+  /** The language the volunteer reads and writes chat in, e.g. 'en' (chatLanguage of their languages). */
+  language: string;
   etaMinutes: number;
   distanceFeet: number;
 }
@@ -54,6 +60,8 @@ export interface ChatMessage {
   from: 'me' | 'volunteer';
   text: string;
   sentAt: number;
+  /** Language the sender wrote in, when known (e.g. 'en'). Lets the reader skip translating their own language. */
+  lang?: string;
 }
 
 export type FeedbackTag = 'language' | 'venue' | 'patient' | 'fast' | 'helpful' | 'other';
@@ -86,10 +94,20 @@ export interface RequestDraft {
 }
 
 /**
- * idle: the request form. searching: waiting for a match. matched: a volunteer is on the way.
+ * idle: the request form. searching: waiting for a match. notFound: the wait ran out with nobody
+ * free; the request is kept so they can search again. matched: a volunteer is on the way.
  * done: the help ended; the visitor is asked for feedback.
  */
-export type RequestStatus = 'idle' | 'searching' | 'matched' | 'done';
+export type RequestStatus = 'idle' | 'searching' | 'notFound' | 'matched' | 'done';
+
+/** volunteer:notice.<key>. */
+export type NoticeKey = 'thanks' | 'searchFailed';
+
+export interface Notice {
+  tone: 'success' | 'error';
+  key: NoticeKey;
+  params?: { name?: string };
+}
 
 export interface RequestState {
   status: RequestStatus;
@@ -98,8 +116,11 @@ export interface RequestState {
   messages: ChatMessage[];
   /** Volunteer messages the visitor hasn't seen (drives the dot on the message icon). */
   unread: number;
-  /** One-off note for the home screen, e.g. "Thanks for your feedback" or "Couldn't find anyone". */
-  notice: { tone: 'success' | 'error'; text: string } | null;
+  /**
+   * One-off note for the home screen, as a string key and its values so the banner words it in the
+   * language on screen when it shows, e.g. { tone: 'success', key: 'thanks', params: { name: 'Daniel' } }.
+   */
+  notice: Notice | null;
   /** The form's contents; survives a failed search or a cancel, cleared once the help ends. */
   draft: RequestDraft | null;
   /** The volunteer is writing a reply ("Daniel is typing…"). */
@@ -111,8 +132,7 @@ export interface IncomingRequest {
   id: string;
   visitorName: string;
   helpType: HelpTypeId;
-  spot: string;
-  venue: string;
+  location: MeetPoint;
   language: string;
   minutesAgo: number;
   distanceFeet: number;

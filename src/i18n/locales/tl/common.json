@@ -2,7 +2,7 @@
   "tabs": {
     "volunteer": "Boluntaryo",
     "venue": "Lugar",
-    "profile": "Profile"
+    "profile": "Profile ko"
   },
   "actions": {
     "save": "I-save",
@@ -32,12 +32,22 @@
     "offline": "Hindi maabot ang VenU. Tingnan ang iyong koneksyon at subukan muli.",
     "wrongLogin": "Mali ang email o password.",
     "confirmEmail": "Kumpirmahin muna ang iyong email. Hanapin ang link sa iyong inbox.",
+    "linkExpired": "Expired na o nagamit na ang link na iyan. Humingi ng bago.",
     "alreadyRegistered": "May account na ang email na iyan. Subukang mag-sign in.",
+    "signupDisabled": "Hindi pa puwedeng gumawa ng bagong account ngayon. Subukan ulit mamaya.",
+    "accountBlocked": "Hindi makakapag-sign in ang account na ito ngayon. Makipag-ugnayan sa suporta ng LA28.",
+    "weakPassword": "Masyadong madaling hulaan ang password na iyan. Subukan ang mas mahaba.",
+    "samePassword": "Pumili ng password na iba sa kasalukuyan mo.",
+    "invalidEmail": "Mukhang mali ang email address na iyan. Suriin ito at subukang muli.",
     "rateLimit": "Napakaraming pagsubok. Maghintay ng isang minuto at subukan muli.",
     "sessionExpired": "Nag-expire ang iyong session. Mag-sign in muli.",
     "cantSave": "Hindi ma-save ng VenU ang pagbabagong iyan. Kung patuloy itong mangyari, mag-sign out at mag-sign in muli.",
+    "roleMismatchVisitor": "Naka-set up na bilang bisita ang account na ito. I-reload ang app para magpatuloy.",
+    "roleMismatchVolunteer": "Naka-set up na bilang boluntaryo ang account na ito. I-reload ang app para magpatuloy.",
     "photoTooBig": "Lampas sa {{size}} MB ang larawang iyan. Pumili ng mas maliit.",
+    "photoTooBigLocal": "Masyadong malaki ang larawang iyan para itago sa device na ito. Subukan ang mas maliit.",
     "photoWrongType": "Gumamit ng larawang JPG, PNG, WebP o HEIC.",
+    "photoUnreadable": "Hindi mabasa ang larawang iyan. Piliin itong muli.",
     "generic": "May nangyaring mali. Subukan muli."
   },
   "direction": {
@@ -54,7 +64,18 @@
   "media": {
     "addPicture": "Magdagdag ng larawan",
     "changePicture": "Palitan ang larawan",
-    "holdToSpeak": "Pindutin at magsalita"
+    "holdToSpeak": "Pindutin at magsalita",
+    "tapToSpeak": "O i-tap para magsalita",
+    "listening": "Nakikinig… i-tap para huminto",
+    "voiceStarted": "Nakikinig. Magsalita na.",
+    "voiceStopped": "Huminto na sa pakikinig.",
+    "voiceEnglish": "Hindi available dito ang voice input sa {{language}}. Nakikinig sa English.",
+    "voiceUnavailable": "Hindi available dito ang voice input. Mag-type na lang.",
+    "voiceDeniedIos": "Naka-off ang mikropono. I-on ang Microphone at Speech Recognition sa Settings > VenU.",
+    "voiceDeniedAndroid": "Naka-off ang mikropono. I-on ito sa Settings > Apps > VenU > Permissions.",
+    "voiceDeniedWeb": "Naka-block ang mikropono. Payagan ito sa site settings ng browser mo, saka subukan ulit.",
+    "voiceNoSpeech": "Hindi ko narinig. I-tap at magsalita ulit.",
+    "voiceFailed": "Huminto ang voice input. Subukan ulit, o mag-type na lang."
   },
   "form": {
     "optionalTitle": "{{title}} <muted>(opsyonal)</muted>",
@@ -88,6 +109,7 @@
     "searchFor": "Maghanap ng wika para sa {{field}}",
     "examples": "hal. Tagalog, Español, ASL",
     "searchExamples": "Maghanap, hal. Tagalog, Español, ASL",
+    "searchExamplesApp": "Maghanap, hal. Tagalog, Español",
     "field": "{{field}}: {{language}}",
     "fieldEmpty": "{{field}}: wala",
     "openHint": "Binubuksan ang paghahanap ng wika",

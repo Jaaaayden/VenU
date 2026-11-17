@@ -1,4 +1,5 @@
 import i18n from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 
 import type { ProfileDraft } from './types';
 
@@ -21,7 +22,7 @@ export function validateDraft(d: ProfileDraft): DraftErrors {
   const name = d.firstName.trim();
 
   if (!name) errors.firstName = i18n.t('profile:validate.firstName');
-  else if (name.length > FIRST_NAME_MAX) errors.firstName = i18n.t('profile:validate.tooLong', { max: FIRST_NAME_MAX });
+  else if (name.length > FIRST_NAME_MAX) errors.firstName = i18n.t('profile:validate.tooLong', { max: formatNumber(FIRST_NAME_MAX) });
 
   if (d.languages.length === 0) errors.languages = i18n.t('profile:validate.noLanguage');
   else if (!d.languages.includes(d.mainLanguage)) errors.languages = i18n.t('profile:validate.mainLanguage');
@@ -29,7 +30,7 @@ export function validateDraft(d: ProfileDraft): DraftErrors {
   if (d.role === 'visitor') {
     const note = d.accessNeedsNote.trim();
     if (d.accessNeeds.includes('other') && !note) errors.accessNeedsNote = i18n.t('profile:validate.otherNote');
-    else if (note.length > NOTE_MAX) errors.accessNeedsNote = i18n.t('profile:validate.tooLong', { max: NOTE_MAX });
+    else if (note.length > NOTE_MAX) errors.accessNeedsNote = i18n.t('profile:validate.tooLong', { max: formatNumber(NOTE_MAX) });
   } else {
     // Needed so visitors' "I'd prefer help from" choices can be honoured.
     if (!d.gender) errors.gender = i18n.t('profile:validate.pickOne');

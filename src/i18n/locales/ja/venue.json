@@ -15,7 +15,6 @@
     "languageLabel": "アプリの言語：{{language}}",
     "languageHint": "アプリ全体の言語を変更します",
     "languageTitle": "アプリの言語",
-    "languageConsent": "先にプロフィールで更新されたプライバシーポリシーを確認してから、言語を変更してください。",
     "assistTitle": "お困りですか？",
     "assistBody": "ボランティアに相談する",
     "assistLabel": "お困りですか？ボランティアに相談する",
@@ -26,7 +25,7 @@
     "opening_ceremony": "開会式",
     "swimming": "競泳",
     "athletics": "陸上競技",
-    "football": "アメリカンフットボール",
+    "soccer": "サッカー",
     "gymnastics": "体操",
     "basketball": "バスケットボール"
   },
@@ -81,7 +80,29 @@
     "pin": "地図上の{{name}}",
     "north": "北"
   },
-  "walk_other": "徒歩{{count}}分",
+  "officialMap": {
+    "attribution": "地図：{{source}}",
+    "open": "ブラウザで開く",
+    "openLabel": "{{source}}の公式マップをブラウザで開く",
+    "frameLabel": "{{source}}の公式マップ。スクリーンリーダーをお使いの場合は、下の「近くの施設」リストをご利用ください。",
+    "loading": "{{source}}のマップを読み込み中…",
+    "error": "マップを読み込めませんでした。ブラウザで開いてください。",
+    "retry": "再試行",
+    "viewsLabel": "マップの表示",
+    "views": {
+      "exterior": "外観",
+      "east_garage": "東ガレージ",
+      "west_garage": "西ガレージ"
+    },
+    "imageLabel": "{{source}}のマップ：{{view}}",
+    "imageLabelZoom": "{{source}}のマップ：{{view}}。ピンチ操作かズームボタンで拡大できます。",
+    "enlarge": "タップして拡大",
+    "enlargeHint": "マップを全画面で開いて拡大します",
+    "close": "マップを閉じる",
+    "zoomIn": "拡大",
+    "zoomOut": "縮小"
+  },
+  "walk_other": "徒歩{{number}}分",
   "wait": {
     "none": "待ち時間なし",
     "short": "待ち時間短め",
@@ -105,34 +126,47 @@
     "family_room": "ファミリールーム",
     "long_lines_halftime": "ハーフタイムは行列",
     "wheelchair_loans": "車いす貸出",
-    "permit_needed": "許可証が必要"
+    "permit_needed": "許可証が必要",
+    "wheelchair_escort": "車いす介助",
+    "premium_access": "VIP・プレミアム",
+    "sensory_room": "センサリールーム",
+    "assistive_listening": "補聴支援",
+    "lost_items": "落とし物",
+    "changing_table": "おむつ交換台"
   },
   "facilityText": {
     "gate-1": {
+      "name": "1番ゲート",
       "description": "北口。Metro シャトル乗り場から最も近い入口です。",
       "location": "北側、シャトル乗り場前"
     },
     "gate-2": {
+      "name": "2番ゲート",
       "description": "スロープのある東口。C 駐車場のバリアフリー区画の隣です。",
       "location": "東側、C 駐車場そば"
     },
     "gate-3": {
+      "name": "3番ゲート",
       "description": "配車サービスの乗降用の南口です。",
       "location": "南側、配車サービス乗り場"
     },
     "gate-4": {
+      "name": "4番ゲート",
       "description": "200〜240 セクションのチケットをお持ちの方向けの西口です。",
       "location": "西側、メイン広場そば"
     },
     "info-desk": {
+      "name": "ゲストサービス",
       "description": "お問い合わせ、チケット紛失、感覚過敏キット、イヤーマフ。",
       "location": "コンコース、105 セクション"
     },
     "first-aid": {
+      "name": "救護室",
       "description": "開門から観客の退場まで、看護師と救急隊員が待機しています。",
       "location": "コンコース、112 セクション"
     },
     "restroom-east": {
+      "name": "東側トイレ",
       "description": "男性用、女性用、おむつ交換台のある誰でも使えるファミリールーム。",
       "location": "コンコース、118 セクション"
     },
@@ -141,10 +175,12 @@
       "location": "コンコース、124 セクション"
     },
     "lost-found": {
+      "name": "落とし物センター",
       "description": "落とし物の届け出と受け取り。迷子のお子さまもこちらでお預かりします。",
       "location": "コンコース、131 セクション"
     },
     "accessible-seating": {
+      "name": "バリアフリーサービス",
       "description": "車いす貸出、同伴者席、補聴支援機器。",
       "location": "コンコース、136 セクション"
     },
@@ -153,12 +189,229 @@
       "location": "コンコース、140 セクション"
     },
     "restroom-west": {
+      "name": "西側トイレ",
       "description": "男性用・女性用トイレ。バリアフリー個室は左側です。",
       "location": "コンコース、145 セクション"
     },
     "parking-c": {
-      "description": "Gate 2 まで短く平らな通路があるバリアフリー駐車場です。",
+      "name": "C駐車場",
+      "description": "2番ゲートまで短く平らな通路があるバリアフリー駐車場です。",
       "location": "南東の駐車場"
+    },
+    "entry-3": {
+      "name": "3番入口",
+      "description": "北側の入口。すべての入口にバリアフリーの通路があり、無料の車いす介助を受けられます。",
+      "location": "北側"
+    },
+    "entry-4": {
+      "name": "4番入口",
+      "description": "中にアクセシビリティ案内台と待合椅子がある北側の入口です。",
+      "location": "北側"
+    },
+    "entry-6": {
+      "name": "6番入口",
+      "description": "VIP・プレミアムチケットをお持ちの方向けの西側の入口です。",
+      "location": "西側"
+    },
+    "entry-8": {
+      "name": "8番入口",
+      "description": "中にアクセシビリティ案内台と待合椅子がある南側の入口です。",
+      "location": "南側"
+    },
+    "entry-10": {
+      "name": "10番入口",
+      "description": "中にアクセシビリティ案内台と待合椅子がある南側の入口です。",
+      "location": "南側"
+    },
+    "entry-11": {
+      "name": "11番入口",
+      "description": "VIP・プレミアムチケットをお持ちの方向けの東側の入口です。",
+      "location": "東側"
+    },
+    "guest-services-ne": {
+      "name": "ゲストサービス（北東）",
+      "description": "お問い合わせ、落とし物、補聴支援機器、無料の感覚過敏キット、センサリールーム。",
+      "location": "3階、北東コンコース"
+    },
+    "guest-services-sw": {
+      "name": "ゲストサービス（南西）",
+      "description": "Corona Beach Club 内。落とし物、補聴支援機器、無料の感覚過敏キット、センサリールーム。",
+      "location": "3階、南西コンコース"
+    },
+    "first-aid-se": {
+      "name": "救護室（南東）",
+      "description": "救急隊員が常駐。案内係やスタッフに声をかければ呼んでもらえます。",
+      "location": "1階、南東コンコース"
+    },
+    "first-aid-nw": {
+      "name": "救護室（北西）",
+      "description": "救急隊員が常駐。案内係やスタッフに声をかければ呼んでもらえます。",
+      "location": "3階、北西コンコース"
+    },
+    "pedestrian-ramp": {
+      "name": "歩行者用スロープ",
+      "description": "スタジアム唯一の歩行者用スロープ。7階を除く全フロアにつながっています。",
+      "location": "南東側、エンドゾーンの裏"
+    },
+    "lactation-suite": {
+      "name": "授乳室",
+      "description": "Mamava の個室授乳ポッド。家族用トイレは各階にあります。",
+      "location": "4階、南側"
+    },
+    "rideshare-kareem": {
+      "name": "配車サービス降車場",
+      "description": "Uber、Lyft、タクシーの降車場。乗車は Kareem Court と Manchester Boulevard の交差点です。",
+      "location": "Kareem Court（Pincay Drive と Manchester Boulevard の間）"
+    },
+    "accessible-drop-off": {
+      "name": "バリアフリー乗降場",
+      "description": "障がいのある方の乗り降り用。Prairie Avenue を北へ進み、Arbor Vitae Street から入ります。",
+      "location": "District Drive（Champions Way と Touchdown Drive の間）"
+    },
+    "brown-zone": {
+      "name": "ブラウンゾーン",
+      "description": "1〜5番・12番入口に最も近い駐車エリア。どの駐車場にも ADA 区画があり、先着順です。",
+      "location": "3919 Pincay Drive"
+    },
+    "blue-zone": {
+      "name": "ブルーゾーン",
+      "description": "7番・8番入口に最も近い駐車エリア。どの駐車場にも ADA 区画があり、先着順です。",
+      "location": "1100 Prairie Avenue"
+    },
+    "orange-zone": {
+      "name": "オレンジゾーン",
+      "description": "10・11・12番入口に最も近い駐車エリア。どの駐車場にも ADA 区画があり、先着順です。",
+      "location": "3695 Pincay Drive"
+    },
+    "kobe-bryant-entrance": {
+      "name": "Kobe Bryant 入口",
+      "description": "すべてのチケット用のメイン入口。GA フロアチケットはここから入場します。",
+      "location": "Chick Hearn Ct.（11th St.）と Georgia St. の角"
+    },
+    "star-plaza-entrance": {
+      "name": "Star Plaza 入口",
+      "description": "すべてのチケット用のメイン入口。ボックスオフィスと Team LA ストアの間です。",
+      "location": "Chick Hearn Ct.（11th St.）と Figueroa St. の角"
+    },
+    "figueroa-entrance": {
+      "name": "Figueroa 入口",
+      "description": "すべてのチケット用のメイン入口。無料の車いす介助はここで頼めます。",
+      "location": "12th St. と Figueroa St. の角"
+    },
+    "guest-services-m12": {
+      "name": "ゲストサービス M12",
+      "description": "お問い合わせ、落とし物、補聴支援機器、センサリーバッグ、重みのあるひざ掛けパッド（身分証が必要）。",
+      "location": "メインコンコース、M12 通路の向かい"
+    },
+    "guest-services-u6": {
+      "name": "ゲストサービス U6",
+      "description": "お問い合わせ、落とし物、センサリーバッグとひざ掛けパッド。センサリーポッドの暗証番号もここで。",
+      "location": "アッパーコンコース、U6 通路の向かい"
+    },
+    "first-aid-m3": {
+      "name": "救護室 M3",
+      "description": "全イベントで救急隊員が待機。中に静かなスペースがあります。",
+      "location": "メインコンコース、M3 通路の向かい"
+    },
+    "first-aid-u22": {
+      "name": "救護室 U22",
+      "description": "全イベントで救急隊員が待機。中に静かなスペースがあります。",
+      "location": "アッパーコンコース、U22 通路の向かい"
+    },
+    "sensory-pod": {
+      "name": "センサリーポッド",
+      "description": "1〜2人用の静かなポッド。全イベント中に利用できます。暗証番号はゲストサービスへ。",
+      "location": "アッパーコンコース、3番通路の向かい"
+    },
+    "restroom-m23": {
+      "name": "トイレ M23",
+      "description": "おむつ交換台のあるオールジェンダートイレ。すべてのトイレが車いすで使えます。",
+      "location": "メインコンコース、M23 通路の向かい"
+    },
+    "restroom-u31": {
+      "name": "トイレ U31",
+      "description": "おむつ交換台のあるオールジェンダートイレ。すべてのトイレが車いすで使えます。",
+      "location": "アッパーコンコース、U31 通路の向かい"
+    },
+    "rideshare-chick-hearn": {
+      "name": "Chick Hearn 配車乗降場",
+      "description": "ホワイトゾーンで配車サービスの乗り降り（東行き）。",
+      "location": "Chick Hearn Ct.（L.A. Live Way と Georgia St. の間）"
+    },
+    "rideshare-figueroa": {
+      "name": "Figueroa 配車乗降場",
+      "description": "ホワイトゾーンで配車サービスの乗り降り（南行き）。",
+      "location": "Figueroa St.（12th St. と Pico Blvd. の間）"
+    },
+    "west-garage-lot-w": {
+      "name": "西ガレージ（Lot W）",
+      "description": "アリーナの立体駐車場。入口は Chick Hearn Ct. と Georgia St.。",
+      "location": "1005 Chick Hearn Ct."
+    },
+    "main-entrance": {
+      "name": "メインエントランス",
+      "description": "左が GameFace ID レーン、右が Identity Pass レーン。保安検査から座席まで無料で移動をサポートします。",
+      "location": "プラザ内、Century Blvd. と Prairie Ave. のそば"
+    },
+    "vip-entrance": {
+      "name": "VIP 入口",
+      "description": "スイート・クラブ・フロアのチケットをお持ちの方向け。",
+      "location": "メインエントランスの左"
+    },
+    "wall-entrance": {
+      "name": "The Wall 入口",
+      "description": "The Wall 専用の入口。",
+      "location": "メインエントランスの左、VIP 入口の先"
+    },
+    "answers-portal-main": {
+      "name": "Answers Portal（Main 階）",
+      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）、OneCourt 機器。",
+      "location": "Main 階、Main 6 セクション付近"
+    },
+    "answers-portal-terrace": {
+      "name": "Answers Portal（Terrace 階）",
+      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）。",
+      "location": "Terrace 階、Terrace 18 セクション付近"
+    },
+    "first-aid-main": {
+      "name": "救護室（Main 階）",
+      "description": "全イベントで訓練を受けた救急隊員が待機しています。",
+      "location": "Main 階コンコース、Main 6"
+    },
+    "first-aid-terrace": {
+      "name": "救護室（Terrace 階）",
+      "description": "全イベントで訓練を受けた救急隊員が待機しています。",
+      "location": "Terrace 階コンコース、Terrace 27"
+    },
+    "first-aid-floor": {
+      "name": "救護室（フロア階）",
+      "description": "全イベントで訓練を受けた救急隊員が待機しています。",
+      "location": "フロア階、Wall 19 の下、東トンネルのそば"
+    },
+    "sensory-room": {
+      "name": "センサリールーム",
+      "description": "個室の Kaiser Permanente センサリールーム。センサリーバッグも頼めば借りられます。",
+      "location": "アリーナホストに道を聞いてください"
+    },
+    "infant-care-room": {
+      "name": "ベビーケアルーム",
+      "description": "赤ちゃんのお世話ができる個室。館内各所にユニバーサルトイレがあります。",
+      "location": "Main 階、Main 6"
+    },
+    "mobility-hub": {
+      "name": "モビリティハブ",
+      "description": "配車サービスとタクシーの乗降、家族の送迎エリア、シャトル。",
+      "location": "東ガレージ1階"
+    },
+    "east-garage": {
+      "name": "東ガレージ",
+      "description": "一般駐車場。駐車券は事前購入を。バリアフリー区画は先着順で販売します。",
+      "location": "102nd St. 側の入口"
+    },
+    "west-garage": {
+      "name": "西ガレージ",
+      "description": "Prairie Ave. の向かいの VIP 駐車場。駐車券は事前購入を。",
+      "location": "Prairie Ave. 側の入口"
     }
   },
   "facility": {
@@ -166,8 +419,11 @@
     "wheelchair": "車いす対応",
     "directions": "経路",
     "directionsSoon": "ステップごとの経路案内はまもなく対応します。{{name}}：{{location}}。",
+    "imHere": "ここにいます",
+    "imHereHint": "助けを求めるときに、ここを現在地として使います",
+    "isHere": "現在地",
     "reports": "レポート",
-    "results_other": "{{count}}件",
+    "results_other": "{{number}}件",
     "noReports": "レポートはまだありません。最初に気づいたことを共有しましょう。",
     "addReport": "レポートを追加"
   },
@@ -194,7 +450,9 @@
   "report": {
     "notFound": "レポートが見つかりません",
     "kind": "レポート",
+    "authorFallback": "VenUの来場者",
     "submitted": "{{date}} に送信",
+    "originalLanguage": "原文の言語：{{language}}",
     "noBody": "詳細はありません。"
   },
   "form": {
@@ -207,11 +465,10 @@
     "bodyPlaceholder": "テキストを入力",
     "bodyHint": "任意。何が、どこで、いつ起きましたか？",
     "pictureSoon": "写真の追加はまもなく対応します。",
-    "speakSoon": "音声レポートはまもなく対応します。今はテキストで入力してください。",
     "topic": "トピック",
     "submit": "レポートを送信",
     "sendFailed": "レポートを送信できませんでした。接続を確認してもう一度お試しください。",
-    "titleRequired": "タイトルを入力してください（例：「Gate 2 のスロープにひび割れ」）。",
+    "titleRequired": "タイトルを入力してください（例：「2番ゲートのスロープにひび割れ」）。",
     "titleTooLong": "タイトルは {{max}} 文字未満にしてください。",
     "topicRequired": "最も近いトピックを選んでください。",
     "bodyTooLong": "レポートは {{max}} 文字未満にしてください。"
