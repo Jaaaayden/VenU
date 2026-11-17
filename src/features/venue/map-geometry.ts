@@ -126,6 +126,56 @@ export function isVisible(p: MapPoint, content: Box, view: MapView, viewport: Bo
   return q.x >= margin && q.x <= viewport.w - margin && q.y >= margin && q.y <= viewport.h - margin;
 }
 
+/** What the map view last laid out for: its fit key, viewport height, width and revealed pin. */
+export interface MapLayout {
+  key: string;
+  vh: number;
+  w: number;
+  reveal: string | null | undefined;
+}
+
+export interface MapUpdate {
+  prev: MapLayout | null;
+  next: MapLayout;
+  /** The visitor moved the map since the last fit. */
+  moved: boolean;
+  view: MapView;
+  content: Box;
+  viewport: Box;
+  fit: { rect: MapRect; max: number; pad: number; insets: FitInsets };
+  /** The pin `next.reveal` names, if it's drawn. */
+  revealPin?: MapPoint;
+  /** Viewport px at the bottom a revealed pin must stay above (the pin card). */
+  revealInset: number;
+}
+
+/**
+ * Where the map goes when its inputs change, or null to stay put. In order:
+ * 1. A new fit key or width, or a sheet move the visitor hasn't panned since: fit `fit.rect` again
+ *    (`refit`, so the caller clears `moved`). A sheet move after panning instead keeps what was in
+ *    the middle of the visible part in the middle.
+ * 2. Then, a newly revealed pin that the view from step 1 leaves hidden (or behind the card) is
+ *    centred in the room above the card. Both can happen in one render: tapping a facility in the
+ *    list raises the sheet and opens it at once.
+ */
+export function mapUpdate(u: MapUpdate): { view: MapView; refit: boolean } | null {
+  const { prev, next, content, viewport } = u;
+  let view: MapView | null = null;
+  const refit = !prev || prev.key !== next.key || prev.w !== next.w || (prev.vh !== next.vh && !u.moved);
+  if (refit) {
+    view = fitRect(u.fit.rect, content, viewport, u.fit.pad, u.fit.max, u.fit.insets);
+  } else if (prev.vh !== next.vh) {
+    const mid = toMap({ x: next.w / 2, y: prev.vh / 2 }, content, u.view);
+    view = centreOn(mid, { x: next.w / 2, y: next.vh / 2 }, u.view, content, viewport);
+  }
+  if (next.reveal && prev?.reveal !== next.reveal && u.revealPin) {
+    const room: Box = { w: viewport.w, h: Math.max(viewport.h - u.revealInset, 1) };
+    const base = view ?? u.view;
+    if (!isVisible(u.revealPin, content, base, room, 32)) view = centreOn(u.revealPin, { x: next.w / 2, y: room.h / 2 }, base, content, viewport);
+  }
+  return view ? { view, refit } : null;
+}
+
 /**
  * The pins to draw for a chip: every facility for "All" (null), else only that category's (see
  * matchesCategory). Ids in `keep` (the open facility, a route's ends) stay whatever the chip.
