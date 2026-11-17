@@ -344,7 +344,6 @@
     "notFound": "未找到该设施",
     "wheelchair": "轮椅可通行",
     "directions": "路线",
-    "directionsSoon": "分步导航即将推出。{{name}}：{{location}}。",
     "imHere": "我在这里",
     "imHereHint": "请求帮助时将此处作为你的位置",
     "isHere": "你的位置",
@@ -398,5 +397,26 @@
     "titleTooLong": "标题请少于 {{max}} 个字符。",
     "topicRequired": "请选择最合适的主题。",
     "bodyTooLong": "反馈请少于 {{max}} 个字符。"
+  },
+  "directions": {
+    "title": "步行路线",
+    "from": "从{{from}}出发",
+    "fromArrival": "从主入口{{from}}出发。在别处？打开那个地点并点按“我在这里”。",
+    "steps_other": "约{{number}}步",
+    "stepStart": "从{{from}}出发。",
+    "stepHead": "向{{direction}}走约{{meters}}米。",
+    "stepArrive": "{{name}}：{{location}}。",
+    "here": "你已经在这里了。",
+    "end": "结束路线",
+    "dir": {
+      "n": "北",
+      "ne": "东北",
+      "e": "东",
+      "se": "东南",
+      "s": "南",
+      "sw": "西南",
+      "w": "西",
+      "nw": "西北"
+    }
   }
 }

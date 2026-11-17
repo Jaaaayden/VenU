@@ -80,9 +80,12 @@ describe('normalized positions on screen', () => {
   });
 
   it('keeps a fitted region below the bar over the map\'s top edge', () => {
-    const view = fitRect([0.1, 0.4, 0.4, 0.8], content, viewport, 24, 6, 52);
-    expect(toScreen({ x: 0.1, y: 0.4 }, content, view).y).toBeGreaterThanOrEqual(52 + 24 - 1e-6);
-    expect(toScreen({ x: 0.4, y: 0.8 }, content, view).y).toBeLessThanOrEqual(viewport.h - 24 + 1e-6);
+    const view = fitRect([0.4, 0.4, 0.8, 0.7], content, viewport, 24, 6, { top: 52, right: 52 });
+    expect(view.s).toBeGreaterThan(1);
+    expect(toScreen({ x: 0.4, y: 0.4 }, content, view).y).toBeGreaterThanOrEqual(52 + 24 - 1e-6);
+    expect(toScreen({ x: 0.8, y: 0.7 }, content, view).y).toBeLessThanOrEqual(viewport.h - 24 + 1e-6);
+    // …and left of the zoom buttons at the right edge.
+    expect(toScreen({ x: 0.8, y: 0.7 }, content, view).x).toBeLessThanOrEqual(viewport.w - 52 - 24 + 1e-6);
   });
 
   it('caps how far a fit zooms in, so one pin still shows its surroundings', () => {

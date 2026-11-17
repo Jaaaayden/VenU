@@ -1,7 +1,10 @@
-/** Sheet content: one facility (name, distance and wait, tags, Directions, I'm here) and its reports. */
+/**
+ * Sheet content: one facility (name, distance and wait, tags, Directions, I'm here) and its reports.
+ * Directions is the venue's one way to a facility: it draws the route on the map and shows the walk here.
+ */
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, type ComponentRef } from 'react';
+import { ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
@@ -12,19 +15,27 @@ import { goBack } from '@/lib/navigation';
 
 import { Notification, ReportCard } from './cards';
 import { setCurrentSpot, setCurrentVenue, useWhereAmI } from './current';
+import { DirectionsPanel } from './directions-panel';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
-import { BackArrow, InlineNote, TagRow, venueText } from './ui';
+import { BackArrow, TagRow, venueText } from './ui';
 
 export function FacilityDetail() {
   const t = useT('venue');
-  const { venue, facilities, snap, setSnap, freshReport, setFreshReport } = useVenueScreen();
+  const { venue, facilities, snap, setSnap, freshReport, setFreshReport, route, setRouteTo } = useVenueScreen();
   const { facilityId, submitted } = useLocalSearchParams<{ facilityId: string; submitted?: string }>();
   const facility = facilities.find(f => f.id === facilityId);
   const reports = useFacilityReports(venue.id, facilityId);
-  const [directions, setDirections] = useState(false);
   const where = useWhereAmI();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  // Set by Directions: once the panel lays out, scroll the sheet to it.
+  const scrollToRoute = useRef(false);
+  const onRouteLayout = (e: LayoutChangeEvent) => {
+    if (!scrollToRoute.current) return;
+    scrollToRoute.current = false;
+    scroll.current?.scrollTo({ y: Math.max(e.nativeEvent.layout.y - Spacing.sm, 0), animated: true });
+  };
 
   // The form returns here with ?submitted=<id>. Closing the notification drops that param, so the
   // venue screen remembers the id and keeps "New" on the card while the user stays on this
@@ -70,7 +81,7 @@ export function FacilityDetail() {
 
   return (
     <View style={styles.flex}>
-      <SheetScroll contentContainerStyle={styles.content}>
+      <SheetScroll scrollRef={scroll} contentContainerStyle={styles.content}>
         <View style={styles.topRow}>
           <BackArrow onPress={back} label={t('back.facilities')} />
           {facility.accessible ? (
@@ -89,6 +100,13 @@ export function FacilityDetail() {
           </View>
         </View>
 
+        {/* Up top, so it shows above the fold while the map shows the route. */}
+        {route ? (
+          <View onLayout={onRouteLayout}>
+            <DirectionsPanel route={route} onEnd={() => setRouteTo(null)} />
+          </View>
+        ) : null}
+
         <TagRow tags={facility.tags.map(tag => ({ label: tagLabel(tag, t), tone: tag.tone }))} />
 
         <View style={styles.directions}>
@@ -97,10 +115,14 @@ export function FacilityDetail() {
             variant="dark"
             size="lg"
             icon={<FigmaIcon name="icon-28465a" size={24} color={Colors.onPrimary} />}
-            onPress={() => setDirections(true)}
+            onPress={() => {
+              scrollToRoute.current = true;
+              setRouteTo(facility.id);
+              // Room for both: the route on the map above, the walk in the sheet.
+              setSnap('mid');
+            }}
             style={styles.directionsButton}
           />
-          {directions ? <InlineNote>{t('facility.directionsSoon', { name, location })}</InlineNote> : null}
           {/* Sets the spot the help request uses ("Near Entry 4"); shows a check once it's yours. */}
           <Button
             label={isMySpot ? t('facility.isHere') : t('facility.imHere')}

@@ -345,7 +345,6 @@
     "notFound": "Facility not found",
     "wheelchair": "Wheelchair accessible",
     "directions": "Directions",
-    "directionsSoon": "Step-by-step directions are coming soon. {{name}}: {{location}}.",
     "imHere": "I’m here",
     "imHereHint": "Uses this spot as your location when you ask for help",
     "isHere": "Your location",
@@ -400,5 +399,27 @@
     "titleTooLong": "Keep the title under {{max}} characters.",
     "topicRequired": "Pick the topic that fits best.",
     "bodyTooLong": "Keep the report under {{max}} characters."
+  },
+  "directions": {
+    "title": "Walking route",
+    "from": "From {{from}}",
+    "fromArrival": "From {{from}}, the main way in. Somewhere else? Open that spot and tap “I’m here”.",
+    "steps_one": "about {{number}} step",
+    "steps_other": "about {{number}} steps",
+    "stepStart": "Start at {{from}}.",
+    "stepHead": "Head {{direction}} for about {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "You’re already here.",
+    "end": "End route",
+    "dir": {
+      "n": "north",
+      "ne": "northeast",
+      "e": "east",
+      "se": "southeast",
+      "s": "south",
+      "sw": "southwest",
+      "w": "west",
+      "nw": "northwest"
+    }
   }
 }

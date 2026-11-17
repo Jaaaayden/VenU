@@ -346,7 +346,6 @@
     "notFound": "Serviço não encontrado",
     "wheelchair": "Acessível para cadeira de rodas",
     "directions": "Como chegar",
-    "directionsSoon": "As rotas passo a passo chegam em breve. {{name}}: {{location}}.",
     "imHere": "Estou aqui",
     "imHereHint": "Usa este lugar como sua localização ao pedir ajuda",
     "isHere": "Sua localização",
@@ -402,5 +401,28 @@
     "titleTooLong": "O título deve ter menos de {{max}} caracteres.",
     "topicRequired": "Escolha o assunto que melhor se encaixa.",
     "bodyTooLong": "O relato deve ter menos de {{max}} caracteres."
+  },
+  "directions": {
+    "title": "Rota a pé",
+    "from": "De {{from}}",
+    "fromArrival": "De {{from}}, a entrada principal. Está em outro lugar? Abra esse local e toque em “Estou aqui”.",
+    "steps_many": "cerca de {{number}} de passos",
+    "steps_one": "cerca de {{number}} passo",
+    "steps_other": "cerca de {{number}} passos",
+    "stepStart": "Comece em {{from}}.",
+    "stepHead": "Siga para o {{direction}} por cerca de {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Você já está aqui.",
+    "end": "Encerrar rota",
+    "dir": {
+      "n": "norte",
+      "ne": "nordeste",
+      "e": "leste",
+      "se": "sudeste",
+      "s": "sul",
+      "sw": "sudoeste",
+      "w": "oeste",
+      "nw": "noroeste"
+    }
   }
 }

@@ -344,7 +344,6 @@
     "notFound": "시설을 찾을 수 없습니다",
     "wheelchair": "휠체어 이용 가능",
     "directions": "길찾기",
-    "directionsSoon": "단계별 길찾기는 곧 제공됩니다. {{name}}: {{location}}.",
     "imHere": "여기 있어요",
     "imHereHint": "도움을 요청할 때 이곳을 내 위치로 사용합니다",
     "isHere": "내 위치",
@@ -398,5 +397,26 @@
     "titleTooLong": "제목은 {{max}}자 미만으로 입력하세요.",
     "topicRequired": "가장 알맞은 주제를 고르세요.",
     "bodyTooLong": "제보는 {{max}}자 미만으로 입력하세요."
+  },
+  "directions": {
+    "title": "도보 경로",
+    "from": "출발: {{from}}",
+    "fromArrival": "주 출입구인 {{from}}에서 출발합니다. 다른 곳에 있나요? 그 장소를 열고 ‘여기 있어요’ 버튼을 누르세요.",
+    "steps_other": "약 {{number}}걸음",
+    "stepStart": "{{from}}에서 출발하세요.",
+    "stepHead": "{{direction}}쪽으로 약 {{meters}}m 가세요.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "이미 여기에 있어요.",
+    "end": "경로 종료",
+    "dir": {
+      "n": "북",
+      "ne": "북동",
+      "e": "동",
+      "se": "남동",
+      "s": "남",
+      "sw": "남서",
+      "w": "서",
+      "nw": "북서"
+    }
   }
 }

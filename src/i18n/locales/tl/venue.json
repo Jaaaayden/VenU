@@ -345,7 +345,6 @@
     "notFound": "Hindi nakita ang pasilidad",
     "wheelchair": "Accessible sa wheelchair",
     "directions": "Direksyon",
-    "directionsSoon": "Malapit na ang sunud-sunod na direksyon. {{name}}: {{location}}.",
     "imHere": "Nandito ako",
     "imHereHint": "Gagamitin ang lugar na ito bilang lokasyon mo kapag humingi ka ng tulong",
     "isHere": "Lokasyon mo",
@@ -400,5 +399,27 @@
     "titleTooLong": "Dapat wala pang {{max}} character ang pamagat.",
     "topicRequired": "Piliin ang pinakaangkop na paksa.",
     "bodyTooLong": "Dapat wala pang {{max}} character ang ulat."
+  },
+  "directions": {
+    "title": "Ruta sa paglalakad",
+    "from": "Mula sa {{from}}",
+    "fromArrival": "Mula sa {{from}}, ang pangunahing pasukan. Nasa ibang lugar ka? Buksan ang lugar na iyon at i-tap ang “Nandito ako”.",
+    "steps_one": "mga {{number}} hakbang",
+    "steps_other": "mga {{number}} hakbang",
+    "stepStart": "Magsimula sa {{from}}.",
+    "stepHead": "Pumunta sa {{direction}} nang mga {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Nandito ka na.",
+    "end": "Tapusin ang ruta",
+    "dir": {
+      "n": "hilaga",
+      "ne": "hilagang-silangan",
+      "e": "silangan",
+      "se": "timog-silangan",
+      "s": "timog",
+      "sw": "timog-kanluran",
+      "w": "kanluran",
+      "nw": "hilagang-kanluran"
+    }
   }
 }

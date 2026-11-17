@@ -344,7 +344,6 @@
     "notFound": "Không tìm thấy tiện ích",
     "wheelchair": "Xe lăn vào được",
     "directions": "Chỉ đường",
-    "directionsSoon": "Chỉ đường từng bước sắp ra mắt. {{name}}: {{location}}.",
     "imHere": "Tôi ở đây",
     "imHereHint": "Dùng chỗ này làm vị trí của bạn khi nhờ giúp đỡ",
     "isHere": "Vị trí của bạn",
@@ -398,5 +397,26 @@
     "titleTooLong": "Tiêu đề phải dưới {{max}} ký tự.",
     "topicRequired": "Chọn chủ đề phù hợp nhất.",
     "bodyTooLong": "Báo cáo phải dưới {{max}} ký tự."
+  },
+  "directions": {
+    "title": "Lộ trình đi bộ",
+    "from": "Từ {{from}}",
+    "fromArrival": "Từ {{from}}, lối vào chính. Bạn đang ở chỗ khác? Mở địa điểm đó và nhấn “Tôi ở đây”.",
+    "steps_other": "khoảng {{number}} bước",
+    "stepStart": "Bắt đầu tại {{from}}.",
+    "stepHead": "Đi về hướng {{direction}} khoảng {{meters}} m.",
+    "stepArrive": "{{name}}: {{location}}.",
+    "here": "Bạn đã ở đây rồi.",
+    "end": "Kết thúc lộ trình",
+    "dir": {
+      "n": "bắc",
+      "ne": "đông bắc",
+      "e": "đông",
+      "se": "đông nam",
+      "s": "nam",
+      "sw": "tây nam",
+      "w": "tây",
+      "nw": "tây bắc"
+    }
   }
 }

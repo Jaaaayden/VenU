@@ -344,7 +344,6 @@
     "notFound": "施設が見つかりません",
     "wheelchair": "車いす対応",
     "directions": "経路",
-    "directionsSoon": "ステップごとの経路案内はまもなく対応します。{{name}}：{{location}}。",
     "imHere": "ここにいます",
     "imHereHint": "助けを求めるときに、ここを現在地として使います",
     "isHere": "現在地",
@@ -398,5 +397,26 @@
     "titleTooLong": "タイトルは {{max}} 文字未満にしてください。",
     "topicRequired": "最も近いトピックを選んでください。",
     "bodyTooLong": "レポートは {{max}} 文字未満にしてください。"
+  },
+  "directions": {
+    "title": "徒歩ルート",
+    "from": "出発：{{from}}",
+    "fromArrival": "メイン入口の{{from}}から出発します。別の場所にいる場合は、その場所を開いて「ここにいます」をタップしてください。",
+    "steps_other": "約{{number}}歩",
+    "stepStart": "{{from}}から出発します。",
+    "stepHead": "{{direction}}へ約{{meters}}m進みます。",
+    "stepArrive": "{{name}}：{{location}}。",
+    "here": "すでにここにいます。",
+    "end": "ルートを終了",
+    "dir": {
+      "n": "北",
+      "ne": "北東",
+      "e": "東",
+      "se": "南東",
+      "s": "南",
+      "sw": "南西",
+      "w": "西",
+      "nw": "北西"
+    }
   }
 }

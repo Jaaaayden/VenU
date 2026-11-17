@@ -346,7 +346,6 @@
     "notFound": "Service introuvable",
     "wheelchair": "Accessible en fauteuil roulant",
     "directions": "Itinéraire",
-    "directionsSoon": "L’itinéraire pas à pas arrive bientôt. {{name}} : {{location}}.",
     "imHere": "Je suis ici",
     "imHereHint": "Utilise cet endroit comme votre position quand vous demandez de l’aide",
     "isHere": "Votre position",
@@ -402,5 +401,28 @@
     "titleTooLong": "Le titre doit faire moins de {{max}} caractères.",
     "topicRequired": "Choisissez le sujet le plus adapté.",
     "bodyTooLong": "Le signalement doit faire moins de {{max}} caractères."
+  },
+  "directions": {
+    "title": "Itinéraire à pied",
+    "from": "Depuis {{from}}",
+    "fromArrival": "Depuis {{from}}, l’entrée principale. Vous êtes ailleurs ? Ouvrez cet endroit et touchez « Je suis ici ».",
+    "steps_many": "environ {{number}} de pas",
+    "steps_one": "environ {{number}} pas",
+    "steps_other": "environ {{number}} pas",
+    "stepStart": "Partez de {{from}}.",
+    "stepHead": "Allez vers le {{direction}} sur environ {{meters}} m.",
+    "stepArrive": "{{name}} : {{location}}.",
+    "here": "Vous y êtes déjà.",
+    "end": "Terminer l’itinéraire",
+    "dir": {
+      "n": "nord",
+      "ne": "nord-est",
+      "e": "est",
+      "se": "sud-est",
+      "s": "sud",
+      "sw": "sud-ouest",
+      "w": "ouest",
+      "nw": "nord-ouest"
+    }
   }
 }

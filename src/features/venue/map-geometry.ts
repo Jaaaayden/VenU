@@ -81,21 +81,27 @@ export function zoomAt(view: MapView, factor: number, at: MapPoint, content: Box
   return clampView({ s, x: at.x - (at.x - view.x) * k, y: at.y - (at.y - view.y) * k }, content, viewport);
 }
 
+/** Screen px a fit keeps clear along the viewport's top and right edges (the bar and buttons over the map). */
+export interface FitInsets {
+  top: number;
+  right: number;
+}
+
 /**
  * The view that shows a normalized region as large as fits in the viewport, centred, with `pad`
- * screen px around it and `top` px kept clear above that (for the bar over the map's top edge),
- * zoomed in no further than `maxScale`.
+ * screen px around it and `insets` kept clear beyond that, zoomed in no further than `maxScale`.
  * e.g. fitRect([0, 0, 1, 1], …) shows the whole image.
  */
-export function fitRect(rect: MapRect, content: Box, viewport: Box, pad = 24, maxScale = MAX_SCALE, top = 0): MapView {
+export function fitRect(rect: MapRect, content: Box, viewport: Box, pad = 24, maxScale = MAX_SCALE, insets: FitInsets = { top: 0, right: 0 }): MapView {
   const [l, t, r, b] = rect;
   const rw = Math.max((r - l) * content.w, 1);
   const rh = Math.max((b - t) * content.h, 1);
-  const room = Math.max(viewport.h - top, 1);
-  const s = Math.min((viewport.w - 2 * pad) / rw, (room - 2 * pad) / rh, maxScale);
+  const roomW = Math.max(viewport.w - insets.right, 1);
+  const roomH = Math.max(viewport.h - insets.top, 1);
+  const s = Math.min((roomW - 2 * pad) / rw, (roomH - 2 * pad) / rh, maxScale);
   const cx = ((l + r) / 2) * content.w;
   const cy = ((t + b) / 2) * content.h;
-  return clampView({ s, x: viewport.w / 2 - cx * s, y: top + room / 2 - cy * s }, content, viewport);
+  return clampView({ s, x: roomW / 2 - cx * s, y: insets.top + roomH / 2 - cy * s }, content, viewport);
 }
 
 /** The smallest region holding every point (a single point gives a zero-size region). */

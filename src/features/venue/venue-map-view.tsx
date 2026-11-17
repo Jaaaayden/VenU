@@ -39,11 +39,13 @@ import { mapAspect, type VenueMap } from './venue-maps';
 const PIN = 30;
 const PIN_BIG = 40;
 const HIT = 44;
+/** The zoom buttons' column at the right edge. */
+const HIT_BUTTONS = 44 + 8;
 const ZOOM_STEP = 1.6;
 const DOUBLE_TAP_ZOOM = 2;
 const TIMING = { duration: 320 };
-/** The source bar over the map's top edge: fits keep pins below it. */
-const TOP_BAR = 52;
+/** Fits keep pins below the source bar and left of the zoom buttons. */
+const FIT_INSETS = { top: 52, right: HIT_BUTTONS };
 /** Room the bottom overlays (pin card, zoom buttons) keep clear above the sheet. */
 export const MAP_CARD_SPACE = 104;
 
@@ -109,7 +111,7 @@ export function VenueMapView(props: VenueMapViewProps) {
     const prev = last.current;
     last.current = { key: fitKey, vh: viewport.h, w: width, reveal: revealId };
     if (!prev || prev.key !== fitKey || prev.w !== width) {
-      go(fitRect(rect, content, viewport, 24, fitMax, TOP_BAR), !!prev);
+      go(fitRect(rect, content, viewport, 24, fitMax, FIT_INSETS), !!prev);
       return;
     }
     if (prev.vh !== viewport.h) {

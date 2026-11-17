@@ -6,7 +6,7 @@
  * is the current child route (facility list, facility card, report, add report).
  */
 import { router, Slot, useGlobalSearchParams } from 'expo-router';
-import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode, type Ref } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent, type ScrollViewProps } from 'react-native';
 import { GestureDetector, GestureHandlerRootView, usePanGesture } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -18,6 +18,8 @@ import { Colors, Shadow, Spacing } from '@/constants/theme';
 import { useT } from '@/i18n';
 
 import { CategoryChips } from './category-chips';
+import { useWhereAmI } from './current';
+import { routeFor, type Route } from './directions';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { facilitiesFor } from './mock';
 import { PinCard } from './pin-card';
@@ -42,6 +44,10 @@ interface VenueScreenState {
   /** The report just submitted here, highlighted as "New" until the user leaves its facility. */
   freshReport: FreshReport | null;
   setFreshReport: (r: FreshReport | null) => void;
+  /** The route drawn on the map, to the open facility (null when none or after leaving it). */
+  route: Route | null;
+  /** Directions to a facility (the open one), or null to end them. */
+  setRouteTo: (facilityId: string | null) => void;
 }
 
 export interface FreshReport {
@@ -59,11 +65,16 @@ export function useVenueScreen(): VenueScreenState {
 }
 
 /** Scroll view for sheet content: pads the bottom so the last item clears the tab bar. */
-export function SheetScroll({ children, contentContainerStyle, ...rest }: ScrollViewProps & { children: ReactNode }) {
+export function SheetScroll({ children, contentContainerStyle, scrollRef, ...rest }: ScrollViewProps & {
+  children: ReactNode;
+  /** For scrolling the sheet to a part of its content (the directions). */
+  scrollRef?: Ref<ComponentRef<typeof ScrollView>>;
+}) {
   const { contentInset } = useVenueScreen();
   return (
     <ScrollView
       {...rest}
+      ref={scrollRef}
       keyboardShouldPersistTaps="handled"
       automaticallyAdjustKeyboardInsets
       showsVerticalScrollIndicator={false}
@@ -102,6 +113,15 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const [cardState, setCardState] = useState<{ id: string; at: string | undefined } | null>(null);
   const cardId = cardState && cardState.at === facilityId ? cardState.id : null;
   const setCardId = (id: string | null) => setCardState(id ? { id, at: facilityId } : null);
+  // Directions shown for a facility. They last while it stays open in the sheet, so backing out to
+  // the list or opening another facility ends them.
+  const [routeTo, setRouteState] = useState<string | null>(null);
+  const where = useWhereAmI();
+  const route = routeTo && routeTo === facilityId ? routeFor(map, facilities, where, venue.id, routeTo) : null;
+  const setRouteTo = (id: string | null) => {
+    setRouteState(id);
+    if (id) setCardState(null);
+  };
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
   const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
@@ -167,22 +187,25 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
 
   const sheetStyle = useAnimatedStyle(() => ({ transform: [{ translateY: top.get() }] }));
 
-  const pickCategory = useCallback((c: FacilityCategory | null) => {
+  const pickCategory = (c: FacilityCategory | null) => {
     setCategory(c);
     setCardState(null);
     // The chip's pins need the map in view.
     setSnap(s => (s === 'up' ? 'mid' : s));
-  }, []);
+  };
 
 
   // Pins for the chip (the open facility always stays), and what the map fits into view: the
   // chip's pins, or the venue's own starting region for "All".
-  const pins = pinsFor(facilities, category, [facilityId, cardId]);
+  const pins = pinsFor(facilities, category, [facilityId, cardId, route?.from.id, route?.to.id]);
   const card = cardId ? facilities.find(f => f.id === cardId) : undefined;
   const chipBounds = category ? boundsOf(pinsFor(facilities, category)) : null;
-  const fit: { key: string; rect: MapRect; max: number } = chipBounds
-    ? { key: `chip:${category}`, rect: chipBounds, max: FIT_MAX_SCALE }
-    : { key: 'focus', rect: map.focus, max: MAX_SCALE };
+  // A route wins: both its ends in view above the sheet.
+  const fit: { key: string; rect: MapRect; max: number } = route
+    ? { key: `route:${route.from.id}>${route.to.id}`, rect: boundsOf([route.from, route.to])!, max: FIT_MAX_SCALE }
+    : chipBounds
+      ? { key: `chip:${category}`, rect: chipBounds, max: FIT_MAX_SCALE }
+      : { key: 'focus', rect: map.focus, max: MAX_SCALE };
 
   // A pin shows its card; the card opens the facility in the sheet.
   const showCard = (f: Facility) => {
@@ -207,6 +230,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     contentInset: positions[snap] - positions.up + tabClearance + Spacing.xl,
     freshReport,
     setFreshReport,
+    route,
+    setRouteTo,
   };
 
   return (
@@ -233,9 +258,9 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
                 width={box.w}
                 height={box.h}
                 viewportHeight={positions[snap]}
-                highlightIds={[facilityId, cardId]}
+                highlightIds={[facilityId, cardId, route?.to.id]}
                 tinted={!!category}
-                route={null}
+                route={route}
                 fitKey={fit.key}
                 fitRect={fit.rect}
                 fitMax={fit.max}
