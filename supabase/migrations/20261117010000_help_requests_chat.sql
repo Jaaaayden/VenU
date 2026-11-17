@@ -32,8 +32,7 @@ create table public.help_requests (
   status              text not null default 'open' check (status in ('open', 'matched', 'cancelled', 'done')),
 
   -- Filled in by accept_help_request from the volunteer's profile, so the visitor sees who is
-  -- coming without reading anyone else's profile: first name, languages (main first), trainings, gender
-  -- (only for "on his / her / their way").
+  -- coming without reading anyone else's profile: first name, languages (main first), trainings.
   volunteer_id        uuid references auth.users (id) on delete set null,
   volunteer_name      text,
   volunteer_languages text[],
