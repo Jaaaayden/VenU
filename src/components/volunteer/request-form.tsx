@@ -9,7 +9,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { AppLanguagePill } from '@/components/volunteer/app-language-pill';
+import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName, languageName } from '@/features/profile/options';
 import { useWhereAmI } from '@/features/venue/current';
 import { meetPointFrom, meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
@@ -88,18 +89,22 @@ export function RequestForm({ visitorName, defaultLanguage, notice, draft }: Req
   return (
     <View style={styles.page}>
       <View style={styles.header}>
-        {/* Figma's small segmented control: the language you want help in. */}
-        <Pressable
-          onPress={() => setPickingLanguage(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t('form.languageLabel', { language: isolatedLanguageName(language) })}
-          style={({ pressed }) => [styles.langPill, pressed && styles.langPressed]}>
-          <FigmaIcon name="icon-c513eb" size={18} color={Colors.ink} />
-          <Text style={styles.langText} numberOfLines={1}>{languageName(language)}</Text>
-        </Pressable>
+        {/* The app language, as on every tab. The help language is its own control below. */}
+        <View style={styles.appLang}>
+          <AppLanguagePill />
+        </View>
         <View style={styles.titles}>
           <Text style={styles.title} accessibilityRole="header">{t('form.title')}</Text>
           <Text style={styles.subtitle}>{t('form.subtitle')}</Text>
+          {/* The language you want help in, sent with the request; starts as your main language. */}
+          <Pressable
+            onPress={() => setPickingLanguage(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('form.languageLabel', { language: isolatedLanguageName(language) })}
+            style={({ pressed }) => [styles.langPill, pressed && styles.langPressed]}>
+            <FigmaIcon name="icon-c513eb" size={16} color={Colors.primary} />
+            <Text style={styles.langText} numberOfLines={1}>{t('helpIn', { language: languageName(language) })}</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -173,22 +178,20 @@ const styles = StyleSheet.create({
   titles: { gap: 5, marginTop: -8 },
   title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
+  appLang: { alignSelf: 'flex-end' },
   langPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    minHeight: 36,
-    maxWidth: 160,
-    alignSelf: 'flex-end',
-    paddingHorizontal: 14,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: Colors.controlBorder,
-    backgroundColor: Colors.surface,
-    ...Shadow.card,
+    gap: 6,
+    minHeight: 32,
+    alignSelf: 'flex-start',
+    marginTop: Spacing.xs,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    backgroundColor: Colors.primarySoft,
   },
-  langPressed: { backgroundColor: Colors.primarySoft },
-  langText: { fontFamily: Fonts.text, fontSize: 14, color: Colors.text, flexShrink: 1 },
+  langPressed: { opacity: 0.7 },
+  langText: { fontFamily: Fonts.text, fontSize: 14, color: Colors.primary, flexShrink: 1 },
   location: {
     flexDirection: 'row',
     alignItems: 'center',
