@@ -74,6 +74,21 @@ export function draftFromProfile(p: Profile): ProfileDraft {
   return { ...rest, privacyAccepted: privacyVersion === PRIVACY_VERSION };
 }
 
+/**
+ * Whether two drafts say the same thing. Lists (chips, languages) compare as sets: ticking a chip
+ * off and on again moves it to the end but changes nothing.
+ * e.g. accessNeeds ['wheelchair', 'low_vision'] vs ['low_vision', 'wheelchair'] → true
+ */
+export function sameDraft(a: ProfileDraft, b: ProfileDraft): boolean {
+  const keys = Object.keys({ ...a, ...b }) as (keyof ProfileDraft)[];
+  return keys.every(k => {
+    const x = a[k];
+    const y = b[k];
+    if (Array.isArray(x) && Array.isArray(y)) return x.length === y.length && x.every(v => (y as unknown[]).includes(v));
+    return x === y;
+  });
+}
+
 /** Where each role lands after sign-in or setup. */
 export function homeFor(p: Pick<Profile, 'role'>): '/venue' | '/volunteer' {
   return p.role === 'volunteer' ? '/volunteer' : '/venue';

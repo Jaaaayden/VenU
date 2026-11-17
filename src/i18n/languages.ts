@@ -107,3 +107,21 @@ export function setupAppLanguage(mainLanguage: string, picked: string | null | u
 export function setupPrimaryLanguage(pick: string | null, onScreen: UiLanguage): string {
   return isUiLanguage(pick) ? pick : onScreen;
 }
+
+/**
+ * Setup's spoken languages after the corner pill switches from `before` to `now`, or null to leave
+ * them. Primary follows the pill while it's still the untouched start (just the old pill language);
+ * once the user changed their languages by hand, the pill never overwrites them.
+ * e.g. ['en'] main 'en', pill en → ja → ['ja'] main 'ja'
+ *      the user picked 'en' as primary by hand, pill en → ja → null
+ */
+export function languagesFollowingPill(
+  current: { languages: string[]; mainLanguage: string },
+  before: string,
+  now: string,
+  changedByHand: boolean,
+): { languages: string[]; mainLanguage: string } | null {
+  if (changedByHand || before === now) return null;
+  const untouched = current.mainLanguage === before && current.languages.length === 1 && current.languages[0] === before;
+  return untouched ? { languages: [now], mainLanguage: now } : null;
+}

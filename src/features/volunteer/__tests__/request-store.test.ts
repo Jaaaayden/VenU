@@ -173,6 +173,7 @@ describe('volunteer request store', () => {
     const find = backend.findVolunteer;
     backend.findVolunteer = () => Promise.reject(new Error('offline'));
     const store = createRequestStore(backend);
+    store.setUser('rosa');
     store.editDraft({ helpTypes: ['physical', 'language'], note: 'By the ramp', language: 'es' });
     store.editDraft({ photoUri: 'file:///ramp.jpg' });
     const draft = { helpTypes: ['physical', 'language'], note: 'By the ramp', photoUri: 'file:///ramp.jpg', language: 'es' };
@@ -213,6 +214,23 @@ describe('volunteer request store', () => {
 
     store.setUser('sam');
     expect(store.getState()).toEqual(INITIAL_STATE);
+  });
+
+  it('ignores a draft edit that lands after sign-out, so the next user never sees the note', async () => {
+    const storage = memoryStorage();
+    const store = createRequestStore(createMockBackend(TIMING), { storage, key: KEY });
+    await store.setUser('rosa');
+    store.editDraft({ note: 'Near gate 2' });
+    expect(store.getState().draft?.note).toBe('Near gate 2');
+
+    await store.setUser(null);
+    // The request form unmounts after sign-out and dictation saves its last words.
+    store.editDraft({ note: 'Near gate 2, by the blue sign' });
+    expect(store.getState().draft).toBeNull();
+
+    await store.setUser('sam');
+    expect(store.getState()).toEqual(INITIAL_STATE);
+    expect(storage.data.has(KEY)).toBe(false);
   });
 
   it('another user signing in drops a search in progress', async () => {
@@ -420,6 +438,7 @@ describe('no volunteer free in time', () => {
     const backend = createMockBackend(TIMING);
     const cancelRequest = jest.spyOn(backend, 'cancelRequest');
     const store = createRequestStore(backend);
+    store.setUser('rosa');
     store.editDraft(draft);
     let settled = false;
     void store.sendRequest(nobodySpeaks).then(() => { settled = true; });
@@ -463,6 +482,7 @@ describe('no volunteer free in time', () => {
 
   it('cancel from notFound goes back to the form with the draft', async () => {
     const store = setup();
+    store.setUser('rosa');
     store.editDraft(draft);
     void store.sendRequest(nobodySpeaks);
     await advance(SEARCH_TIMEOUT_MS);
