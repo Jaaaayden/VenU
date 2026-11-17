@@ -52,7 +52,12 @@ async function post(path: string, body: unknown) {
 }
 const signUp = (email: string, username: string) => post('/auth/v1/signup', { email, password: 'longenough', data: { username } });
 const available = async (name: string) => (await post('/rest/v1/rpc/username_available', { p_username: name })).body;
-const emailFor = async (name: string) => (await post('/rest/v1/rpc/email_for_username', { p_username: name })).body;
+// Who holds a name, as email_for_username would answer it server-side (the RPC itself is service
+// role only, 20261117000000_private_username_lookup.sql).
+async function emailFor(name: string) {
+  const state = JSON.parse((await call('GET', '/__state')).text);
+  return state.users.find((u: { username?: string }) => u.username === name.toLowerCase())?.email ?? null;
+}
 const confirm = (email: string) => call('GET', `/__confirm?email=${encodeURIComponent(email)}`);
 const clock = (ms: number) => post('/__control', { clockOffsetMs: ms });
 async function usernameOf(email: string) {
