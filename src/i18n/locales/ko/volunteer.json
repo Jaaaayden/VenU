@@ -105,7 +105,8 @@
   },
   "map": {
     "label": "지도: {{name}} 님이 {{distance}} 거리에 있으며 {{place}}(으)로 오고 있어요.",
-    "you": "나"
+    "you": "나",
+    "labelNoDistance": "지도: {{name}} 님이 {{place}}(으)로 오고 있어요."
   },
   "messages": {
     "label": "메시지",
@@ -128,7 +129,8 @@
     "messageTo": "{{name}} 님에게 메시지",
     "stickers": "스티커",
     "stickersSoon": "스티커는 곧 지원돼요.",
-    "record": "음성으로 메시지 입력"
+    "record": "음성으로 메시지 입력",
+    "emptyVolunteer": "{{name}} 님에게 인사하고 가는 중이라고 알려 주세요."
   },
   "translation": {
     "translatedFrom": "{{language}}에서 번역됨",
@@ -151,10 +153,10 @@
   },
   "bubble": {
     "mine": "나, {{time}}: {{text}}",
-    "theirs": "자원봉사자, {{time}}: {{text}}",
-    "theirsTranslated": "자원봉사자, {{time}}: {{text}} ({{language}}에서 번역됨)",
     "listen": "듣기",
-    "listenLabel": "이 메시지 듣기"
+    "listenLabel": "이 메시지 듣기",
+    "from": "{{name}}, {{time}}: {{text}}",
+    "fromTranslated": "{{name}}, {{time}}: {{text}} ({{language}}에서 번역됨)"
   },
   "feedback": {
     "skip": "건너뛰기",
@@ -209,7 +211,24 @@
     "who": "{{help}} · {{name}}",
     "meta": "{{distance}} 거리 · {{minutes}}분 전 · {{language}}",
     "accept": "수락",
-    "acceptSoon": "매칭이 시작되면 요청을 수락할 수 있어요."
+    "acceptSoon": "매칭이 시작되면 요청을 수락할 수 있어요.",
+    "empty": "지금은 근처에 도움이 필요한 사람이 없어요. 새 요청이 여기에 표시돼요.",
+    "metaLive": "{{minutes}}분 전 · {{language}}"
+  },
+  "active": {
+    "title": "{{name}} 님을 돕는 중",
+    "subtitle": "상대방에게 가서 채팅으로 인사해 보세요.",
+    "end": "채팅 종료",
+    "endHint": "나와 {{name}} 님 모두에게 도움이 완료로 표시돼요",
+    "confirmEnd": "{{name}} 님과의 채팅을 종료할까요? 도움이 완료로 표시돼요.",
+    "yesEnd": "네, 종료할게요"
+  },
+  "desk": {
+    "taken": "다른 자원봉사자가 이미 이 요청을 수락했어요.",
+    "acceptFailed": "요청을 수락하지 못했어요. 연결을 확인하고 다시 시도해 주세요.",
+    "cancelled": "{{name}} 님이 요청을 취소했어요.",
+    "done": "{{name}} 님이 도움을 완료로 표시했어요. 감사합니다!",
+    "ended": "채팅이 종료됐어요. {{name}} 님을 도와주셔서 감사합니다!"
   },
   "home": {
     "greeting": "안녕하세요, {{name}}님",

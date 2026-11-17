@@ -105,7 +105,8 @@
   },
   "map": {
     "label": "Map: {{name}} is {{distance}} away, walking to you at {{place}}.",
-    "you": "You"
+    "you": "You",
+    "labelNoDistance": "Map: {{name}} is walking to you at {{place}}."
   },
   "messages": {
     "label": "Messages",
@@ -129,7 +130,8 @@
     "messageTo": "Message {{name}}",
     "stickers": "Stickers",
     "stickersSoon": "Stickers are coming soon.",
-    "record": "Speak a message"
+    "record": "Speak a message",
+    "emptyVolunteer": "Say hello to {{name}} and let them know you're on your way."
   },
   "translation": {
     "translatedFrom": "Translated from {{language}}",
@@ -152,10 +154,10 @@
   },
   "bubble": {
     "mine": "You, {{time}}: {{text}}",
-    "theirs": "Volunteer, {{time}}: {{text}}",
-    "theirsTranslated": "Volunteer, {{time}}: {{text}} (translated from {{language}})",
     "listen": "listen",
-    "listenLabel": "Listen to this message"
+    "listenLabel": "Listen to this message",
+    "from": "{{name}}, {{time}}: {{text}}",
+    "fromTranslated": "{{name}}, {{time}}: {{text}} (translated from {{language}})"
   },
   "feedback": {
     "skip": "Skip",
@@ -211,7 +213,24 @@
     "who": "{{help}} · {{name}}",
     "meta": "{{distance}} away · {{minutes}} min ago · {{language}}",
     "accept": "Accept",
-    "acceptSoon": "Accepting requests opens when matching goes live."
+    "acceptSoon": "Accepting requests opens when matching goes live.",
+    "empty": "No one nearby needs help right now. New requests show up here.",
+    "metaLive": "{{minutes}} min ago · {{language}}"
+  },
+  "active": {
+    "title": "You're helping {{name}}",
+    "subtitle": "Go meet them and say hello in the chat.",
+    "end": "End chat",
+    "endHint": "Marks the help as done for you and {{name}}",
+    "confirmEnd": "End your chat with {{name}}? This marks the help as done.",
+    "yesEnd": "Yes, end chat"
+  },
+  "desk": {
+    "taken": "Someone else already took this request.",
+    "acceptFailed": "Couldn't accept the request. Check your connection and try again.",
+    "cancelled": "{{name}} cancelled the request.",
+    "done": "{{name}} marked the help as done. Thank you!",
+    "ended": "Chat ended. Thanks for helping {{name}}!"
   },
   "home": {
     "greeting": "Hi, {{name}}",

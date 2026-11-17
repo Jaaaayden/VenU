@@ -52,10 +52,12 @@ interface Props {
   message: ChatMessage;
   /** Who reads your message, for the line under it, e.g. { name: 'Daniel', language: 'en' }. */
   recipient?: { name: string; language: string } | null;
+  /** Who wrote an incoming message, for screen readers, e.g. 'Daniel K.' or 'Rosa'. */
+  senderName: string;
   onListen?: () => void;
 }
 
-export function ChatBubble({ message, recipient, onListen }: Props) {
+export function ChatBubble({ message, recipient, senderName, onListen }: Props) {
   const mine = message.from === 'me';
   const t = useT('volunteer');
   const tp = useT('profile'); // language names in the UI language
@@ -83,8 +85,8 @@ export function ChatBubble({ message, recipient, onListen }: Props) {
   const label = mine
     ? t('bubble.mine', { time, text })
     : source
-      ? t('bubble.theirsTranslated', { time, text, language: source })
-      : t('bubble.theirs', { time, text });
+      ? t('bubble.fromTranslated', { name: senderName, time, text, language: source })
+      : t('bubble.from', { name: senderName, time, text });
 
   return (
     <View style={[styles.row, mine ? styles.rowMine : styles.rowTheirs]}>

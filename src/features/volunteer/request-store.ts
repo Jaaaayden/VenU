@@ -9,7 +9,8 @@ import { useSyncExternalStore } from 'react';
 
 import { chatLanguage } from '@/features/translate/languages';
 
-import { createMockBackend, newId, type VolunteerBackend } from './backend';
+import { appBackend } from './app-backend';
+import { newId, type VolunteerBackend } from './backend';
 import { restoreMeetPoint } from './meet-point';
 import type { ChatMessage, FeedbackTag, HelpRequest, Match, ProblemKind, RequestDraft, RequestState } from './types';
 
@@ -72,7 +73,8 @@ export function reduce(state: RequestState, action: RequestAction): RequestState
     case 'send':
       return state.status === 'matched' ? { ...state, messages: [...state.messages, action.message] } : state;
     case 'receive':
-      return state.status === 'matched' && state.request?.id === action.requestId
+      // A live service resends the chat so far on (re)subscribing: skip messages already here.
+      return state.status === 'matched' && state.request?.id === action.requestId && !state.messages.some(m => m.id === action.message.id)
         ? { ...state, messages: [...state.messages, action.message], unread: state.unread + 1, typing: false }
         : state;
     case 'typing':
@@ -155,7 +157,8 @@ export function parseSaved(raw: string | null, userId: string): RequestState | n
     request: s.request ? { ...s.request, photoUri: livePhoto(s.request.photoUri), location: restoreMeetPoint(s.request.location) } : null,
     // Saved before Match had `language`: work it out the same way the matcher does.
     match: s.match ? { ...s.match, language: s.match.language ?? chatLanguage(s.match.volunteer?.languages ?? []) } : null,
-    messages: s.messages,
+    // Saved before ChatMessage.from said 'them' for the other person.
+    messages: s.messages.map(m => ((m.from as string) === 'volunteer' ? { ...m, from: 'them' } : m)),
     unread: typeof s.unread === 'number' ? s.unread : 0,
     draft: s.draft ? { ...EMPTY_DRAFT, ...s.draft, photoUri: livePhoto(s.draft.photoUri) } : null,
   };
@@ -182,6 +185,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
   function emit() {
     listeners.forEach(l => l());
   }
+
+  const requestId = () => backend.newRequestId?.() ?? newId('req');
 
   function queueWrite(write: (storage: KeyValueStorage, key: string) => Promise<void>) {
     if (!persist) return;
@@ -216,9 +221,17 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     stopListening();
     const offMessage = backend.onMessage(requestId, message => dispatch({ type: 'receive', requestId, message }));
     const offTyping = backend.onTyping?.(requestId, typing => dispatch({ type: 'typing', requestId, typing }));
+    // The volunteer ended the chat: ask for feedback, as after "Mark help as done". Closed on our
+    // side (or called off by the service): back to the form, keeping the draft.
+    const offClosed = backend.onClosed?.(requestId, closed => {
+      if (closed.byMe || state.request?.id !== requestId) return;
+      stopListening();
+      dispatch(closed.status === 'done' ? { type: 'end' } : { type: 'cancel' });
+    });
     unsubscribe = () => {
       offMessage();
       offTyping?.();
+      offClosed?.();
     };
   }
 
@@ -310,7 +323,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     /** Starts searching; resolves once matched, failed, timed out or cancelled. */
     async sendRequest(input: NewRequest): Promise<void> {
       if (state.status !== 'idle') return;
-      const request: HelpRequest = { ...input, id: newId('req'), createdAt: Date.now() };
+      const request: HelpRequest = { ...input, id: requestId(), createdAt: Date.now() };
       searchSince = request.createdAt;
       dispatch({ type: 'search', request });
       await runSearch(request);
@@ -322,7 +335,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
      */
     async keepSearching(): Promise<void> {
       if (state.status !== 'notFound' || !state.request) return;
-      const request: HelpRequest = { ...state.request, id: newId('req'), createdAt: Date.now() };
+      const request: HelpRequest = { ...state.request, id: requestId(), createdAt: Date.now() };
       searchSince = Date.now();
       dispatch({ type: 'keepSearching', request });
       await runSearch(request);
@@ -344,7 +357,7 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       if (!body || !id || state.status !== 'matched') return;
       const lang = senderLanguage ? { lang: senderLanguage } : {};
       dispatch({ type: 'send', message: { id: newId('msg'), from: 'me', text: body, sentAt: Date.now(), ...lang } });
-      backend.sendMessage(id, body).catch(() => {});
+      backend.sendMessage(id, body, senderLanguage).catch(() => {});
     },
 
     markRead() {
@@ -416,8 +429,8 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
 
 export type RequestStore = ReturnType<typeof createRequestStore>;
 
-/** The app's store. Swap createMockBackend() for the real service here. */
-export const volunteerRequests: RequestStore = createRequestStore(createMockBackend(), {
+/** The app's store: on Supabase when the app has a project, else the on-device mock (app-backend.ts). */
+export const volunteerRequests: RequestStore = createRequestStore(appBackend, {
   storage: AsyncStorage,
   key: 'venu.volunteer.request',
 });
