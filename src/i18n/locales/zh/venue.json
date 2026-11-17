@@ -78,7 +78,8 @@
     "pin": "地图上的{{name}}",
     "north": "北",
     "label": "{{venue}}地图，已标出各项设施。拖动可移动，双指缩放或使用缩放按钮。",
-    "you": "你"
+    "you": "你",
+    "cardHint": "在下方面板中打开"
   },
   "officialMap": {
     "attribution": "地图：{{source}}",

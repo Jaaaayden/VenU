@@ -78,7 +78,8 @@
     "pin": "{{name}} sur le plan",
     "north": "N",
     "label": "Carte de {{venue}} avec les services épinglés. Faites glisser pour la déplacer, pincez ou utilisez les boutons pour zoomer.",
-    "you": "Vous"
+    "you": "Vous",
+    "cardHint": "L’ouvre dans le panneau ci-dessous"
   },
   "officialMap": {
     "attribution": "Plan : {{source}}",

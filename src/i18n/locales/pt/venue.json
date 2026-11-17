@@ -78,7 +78,8 @@
     "pin": "{{name}} no mapa",
     "north": "N",
     "label": "Mapa de {{venue}} com os serviços marcados. Arraste para mover; faça pinça ou use os botões para dar zoom.",
-    "you": "Você"
+    "you": "Você",
+    "cardHint": "Abre no painel abaixo"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",

@@ -78,7 +78,8 @@
     "pin": "{{name}} trên bản đồ",
     "north": "B",
     "label": "Bản đồ {{venue}} có ghim các tiện ích. Kéo để di chuyển, chụm ngón tay hoặc dùng nút để phóng to, thu nhỏ.",
-    "you": "Bạn"
+    "you": "Bạn",
+    "cardHint": "Mở trong bảng bên dưới"
   },
   "officialMap": {
     "attribution": "Bản đồ: {{source}}",

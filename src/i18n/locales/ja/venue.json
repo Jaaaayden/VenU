@@ -78,7 +78,8 @@
     "pin": "地図上の{{name}}",
     "north": "北",
     "label": "施設のピンが付いた{{venue}}のマップ。ドラッグで移動、ピンチまたはズームボタンで拡大・縮小できます。",
-    "you": "現在地"
+    "you": "現在地",
+    "cardHint": "下のパネルで開きます"
   },
   "officialMap": {
     "attribution": "地図：{{source}}",
