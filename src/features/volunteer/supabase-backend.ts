@@ -1,0 +1,455 @@
+// VolunteerBackend on Supabase: help_requests and messages (supabase/migrations/20261117010000_help_requests_chat.sql).
+// A stand-in for real matching: the visitor opens a request, every free volunteer sees it, and the
+// first to Accept gets it (accept_help_request is atomic). Changes arrive over Realtime; if the
+// channel doesn't reach SUBSCRIBED (e.g. the local mock server has no Realtime), it polls every 2 s.
+//
+// The database calls sit behind `HelpDb`, so tests drive the same backend with an in-memory fake:
+//   createSupabaseBackend(supabase)            the app
+//   createLiveBackend(fakeDb)                  tests
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { chatLanguage } from '@/features/translate/languages';
+import { languageName } from '@/features/profile/options';
+
+import { abortError, AlreadyTakenError, type VolunteerBackend } from './backend';
+import { HELP_TYPES } from './mock';
+import type { Assignment, ChatMessage, ClosedStatus, HelpRequest, HelpTypeId, IncomingRequest, Match, SkillCode, Volunteer } from './types';
+
+export type RequestStatusRow = 'open' | 'matched' | 'cancelled' | 'done';
+
+/** A help_requests row, as PostgREST returns it. */
+export interface RequestRow {
+  id: string;
+  visitor_id: string;
+  visitor_name: string;
+  venue_id: string;
+  spot: string | null;
+  help_types: string[];
+  note: string;
+  language: string;
+  status: RequestStatusRow;
+  volunteer_id: string | null;
+  volunteer_name: string | null;
+  volunteer_languages: string[] | null;
+  volunteer_trainings: string[] | null;
+  volunteer_gender: string | null;
+  closed_by: string | null;
+  created_at: string;
+  matched_at: string | null;
+  closed_at: string | null;
+}
+
+/** What the visitor's app inserts; the database fills in the rest (visitor_id from the session). */
+export type NewRequestRow = Pick<RequestRow, 'id' | 'visitor_name' | 'venue_id' | 'spot' | 'help_types' | 'note' | 'language'>;
+
+export interface MessageRow {
+  id: string;
+  request_id: string;
+  sender_id: string;
+  text: string;
+  language: string | null;
+  created_at: string;
+}
+
+export type NewMessageRow = Pick<MessageRow, 'request_id' | 'text' | 'language'>;
+
+export type WatchSpec = { table: 'help_requests'; filter?: string } | { table: 'messages'; filter: string };
+
+/** The few database calls the backend makes. supabaseHelpDb() is the real one. */
+export interface HelpDb {
+  /** The signed-in user's id; rejects when signed out. */
+  me(): Promise<string>;
+  /** Inserts a request; an id that's already there (a search resumed after a restart) is fine. */
+  insertRequest(row: NewRequestRow): Promise<void>;
+  getRequest(id: string): Promise<RequestRow | null>;
+  /** Open requests created at or after `sinceIso`, newest first. */
+  openRequests(sinceIso: string): Promise<RequestRow[]>;
+  /** The matched request `volunteerId` accepted most recently, if any. */
+  activeAssignment(volunteerId: string): Promise<RequestRow | null>;
+  /** accept_help_request; rejects with AlreadyTakenError when it isn't open any more. */
+  accept(id: string): Promise<RequestRow>;
+  close(id: string, status: ClosedStatus): Promise<void>;
+  messages(requestId: string): Promise<MessageRow[]>;
+  sendMessage(row: NewMessageRow): Promise<void>;
+  /**
+   * Realtime changes to `spec`'s rows: `onRow` gets the new row (null for a delete), `onLive` whether
+   * the channel is subscribed (true) or failed / closed (false). Returns a function that leaves.
+   */
+  subscribe<Row>(spec: WatchSpec, onRow: (row: Row | null) => void, onLive: (live: boolean) => void): () => void;
+}
+
+/** Poll this often while Realtime isn't subscribed. */
+export const POLL_MS = 2000;
+/** Wait this long for Realtime to subscribe before polling. */
+export const CONNECT_GRACE_MS = 3000;
+/**
+ * Refetch the open list this often even with Realtime on: a request that's taken or cancelled stops
+ * being visible to other volunteers (RLS), so Realtime never tells them; this also keeps "3 min ago" fresh.
+ */
+export const OPEN_REFRESH_MS = 5000;
+/** Requests older than this aren't shown: the visitor's app gives up after 2 minutes (SEARCH_TIMEOUT_MS). */
+export const OPEN_WINDOW_MS = 5 * 60 * 1000;
+
+// ---- mapping
+
+/** A v4 UUID for a new request (the table's id column is a uuid). */
+export function randomUuid(): string {
+  const bytes = new Uint8Array(16);
+  const c = (globalThis as { crypto?: { getRandomValues?: (a: Uint8Array) => Uint8Array } }).crypto;
+  if (c?.getRandomValues) c.getRandomValues(bytes);
+  else for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+export function requestToRow(r: HelpRequest): NewRequestRow {
+  return {
+    id: r.id,
+    visitor_name: r.visitorName.slice(0, 40),
+    venue_id: r.location.venueId,
+    spot: r.location.facilityId,
+    help_types: r.helpTypes,
+    note: r.note.slice(0, 500),
+    language: r.language,
+  };
+}
+
+const SKILLS: SkillCode[] = ['wheelchair', 'first_aid', 'asl'];
+
+function helpTypes(values: string[]): HelpTypeId[] {
+  const known = values.filter((v): v is HelpTypeId => (HELP_TYPES as string[]).includes(v));
+  return known.length ? known : ['other'];
+}
+
+/** "on his / her / their way", from the gender on the volunteer's profile. */
+function possessive(gender: string | null): Volunteer['possessive'] {
+  return gender === 'man' ? 'his' : gender === 'woman' ? 'her' : 'their';
+}
+
+/**
+ * The volunteer on an accepted request, from the snapshot accept_help_request took of their profile.
+ * e.g. { volunteer_name: 'Sam', volunteer_languages: ['en','es'], volunteer_trainings: ['first_aid'] }
+ *   → Sam, tags First aid (green), English, Español (yellow), no rating yet.
+ */
+export function rowToVolunteer(row: RequestRow): Volunteer {
+  const name = row.volunteer_name?.trim() || '?';
+  const languages = row.volunteer_languages ?? [];
+  const skills = (row.volunteer_trainings ?? []).filter((s): s is SkillCode => (SKILLS as string[]).includes(s));
+  return {
+    id: row.volunteer_id ?? '',
+    name,
+    firstName: name,
+    possessive: possessive(row.volunteer_gender),
+    languages,
+    rating: null,
+    tags: [
+      ...skills.map(skill => ({ label: skill, skill, tone: 'success' as const })),
+      ...languages.map(code => ({ label: languageName(code), tone: 'warning' as const })),
+    ],
+  };
+}
+
+export function rowToMatch(row: RequestRow): Match {
+  const volunteer = rowToVolunteer(row);
+  return { volunteer, language: chatLanguage(volunteer.languages), etaMinutes: null, distanceFeet: null };
+}
+
+export function rowToIncoming(row: RequestRow, now = Date.now()): IncomingRequest {
+  return {
+    id: row.id,
+    visitorName: row.visitor_name,
+    helpType: helpTypes(row.help_types)[0]!,
+    location: { venueId: row.venue_id, facilityId: row.spot },
+    language: row.language,
+    minutesAgo: Math.max(0, Math.floor((now - Date.parse(row.created_at)) / 60000)),
+    distanceFeet: null,
+    note: row.note,
+  };
+}
+
+export function rowToAssignment(row: RequestRow): Assignment {
+  return {
+    id: row.id,
+    visitorName: row.visitor_name,
+    helpTypes: helpTypes(row.help_types),
+    note: row.note,
+    language: row.language,
+    location: { venueId: row.venue_id, facilityId: row.spot },
+    createdAt: Date.parse(row.created_at),
+  };
+}
+
+export function rowToMessage(row: MessageRow, me: string): ChatMessage {
+  return {
+    id: row.id,
+    from: row.sender_id === me ? 'me' : 'them',
+    text: row.text,
+    sentAt: Date.parse(row.created_at),
+    ...(row.language ? { lang: row.language } : {}),
+  };
+}
+
+const isClosed = (s: RequestStatusRow): s is ClosedStatus => s === 'cancelled' || s === 'done';
+
+// ---- live updates
+
+/**
+ * Keeps `refresh` running against the database: once now, on every Realtime change (`onRow`), once
+ * more when the channel subscribes (to catch anything missed while connecting), and every POLL_MS
+ * while it isn't subscribed. `everyMs` refreshes on a timer even while subscribed. Returns a stop function.
+ */
+export function watch<Row>(
+  db: HelpDb,
+  spec: WatchSpec,
+  onRow: (row: Row | null) => void,
+  refresh: () => void,
+  everyMs?: number,
+): () => void {
+  let stopped = false;
+  /** null until the channel first reports. */
+  let live: boolean | null = null;
+  let poll: ReturnType<typeof setInterval> | null = null;
+  const startPolling = () => { if (!poll && !stopped) poll = setInterval(refresh, POLL_MS); };
+  const stopPolling = () => { if (poll) clearInterval(poll); poll = null; };
+  const grace = setTimeout(() => { if (live !== true) startPolling(); }, CONNECT_GRACE_MS);
+  const steady = everyMs ? setInterval(() => { if (live) refresh(); }, everyMs) : null;
+  const leave = db.subscribe<Row>(
+    spec,
+    row => { if (!stopped) onRow(row); },
+    isLive => {
+      if (stopped || isLive === live) return;
+      live = isLive;
+      if (isLive) {
+        stopPolling();
+        refresh();
+      } else startPolling();
+    },
+  );
+  refresh();
+  return () => {
+    stopped = true;
+    clearTimeout(grace);
+    if (steady) clearInterval(steady);
+    stopPolling();
+    leave();
+  };
+}
+
+// ---- the backend
+
+export function createLiveBackend(db: HelpDb): VolunteerBackend {
+  /** Inserts in flight, so a cancel that races its insert waits for the row to exist first. */
+  const inserting = new Map<string, Promise<void>>();
+
+  async function close(requestId: string, status: ClosedStatus) {
+    await inserting.get(requestId)?.catch(() => {});
+    await db.close(requestId, status);
+  }
+
+  /** Runs `start` once the user id is known; the returned stop works before that too. */
+  function withMe(start: (me: string) => () => void): () => void {
+    let stop: (() => void) | null = null;
+    let stopped = false;
+    db.me().then(
+      me => { if (!stopped) stop = start(me); },
+      () => {},
+    );
+    return () => {
+      stopped = true;
+      stop?.();
+    };
+  }
+
+  return {
+    newRequestId: randomUuid,
+
+    findVolunteer(request, signal) {
+      return new Promise<Match>((resolve, reject) => {
+        if (signal.aborted) return reject(abortError());
+        let settled = false;
+        let stop = () => {};
+        const finish = (settle: () => void) => {
+          if (settled) return;
+          settled = true;
+          stop();
+          settle();
+        };
+        const check = (row: RequestRow | null) => {
+          if (!row || row.id !== request.id) return;
+          if (row.status === 'matched') finish(() => resolve(rowToMatch(row)));
+          else if (isClosed(row.status)) finish(() => reject(new Error(`Request ${row.status}`)));
+        };
+        signal.addEventListener('abort', () => finish(() => reject(abortError())), { once: true });
+
+        const insert = db.insertRequest(requestToRow(request));
+        inserting.set(request.id, insert);
+        insert.then(
+          () => {
+            inserting.delete(request.id);
+            if (settled) return;
+            stop = watch<RequestRow>(db, { table: 'help_requests', filter: `id=eq.${request.id}` }, check, () => {
+              db.getRequest(request.id).then(check, () => {});
+            });
+          },
+          e => {
+            inserting.delete(request.id);
+            finish(() => reject(e));
+          },
+        );
+      });
+    },
+
+    cancelRequest: requestId => close(requestId, 'cancelled'),
+    endHelp: requestId => close(requestId, 'done'),
+
+    async sendMessage(requestId, text, lang) {
+      await db.sendMessage({ request_id: requestId, text, language: lang ?? null });
+    },
+
+    onMessage(requestId, listener) {
+      return withMe(me => {
+        const seen = new Set<string>();
+        const deliver = (rows: MessageRow[]) => {
+          for (const row of rows) {
+            if (row.request_id !== requestId || seen.has(row.id)) continue;
+            seen.add(row.id);
+            if (row.sender_id !== me) listener(rowToMessage(row, me));
+          }
+        };
+        return watch<MessageRow>(db, { table: 'messages', filter: `request_id=eq.${requestId}` }, row => row && deliver([row]), () => {
+          db.messages(requestId).then(deliver, () => {});
+        });
+      });
+    },
+
+    onClosed(requestId, listener) {
+      return withMe(me => {
+        let told = false;
+        const check = (row: RequestRow | null) => {
+          if (told || !row || row.id !== requestId || !isClosed(row.status)) return;
+          told = true;
+          listener({ status: row.status, byMe: row.closed_by === me });
+        };
+        return watch<RequestRow>(db, { table: 'help_requests', filter: `id=eq.${requestId}` }, check, () => {
+          db.getRequest(requestId).then(check, () => {});
+        });
+      });
+    },
+
+    // Feedback and problem reports have no tables yet; the matching service will own them.
+    async submitFeedback() {},
+    async reportProblem() {},
+
+    watchOpenRequests(listener) {
+      let latest = 0;
+      const refresh = () => {
+        const call = ++latest;
+        const since = new Date(Date.now() - OPEN_WINDOW_MS).toISOString();
+        db.openRequests(since).then(
+          rows => { if (call === latest) listener(rows.filter(r => r.status === 'open').map(r => rowToIncoming(r))); },
+          () => {},
+        );
+      };
+      return watch<RequestRow>(db, { table: 'help_requests' }, () => refresh(), refresh, OPEN_REFRESH_MS);
+    },
+
+    async acceptRequest(requestId) {
+      return rowToAssignment(await db.accept(requestId));
+    },
+
+    async currentAssignment() {
+      const row = await db.activeAssignment(await db.me());
+      return row ? rowToAssignment(row) : null;
+    },
+
+    async loadMessages(requestId) {
+      const [me, rows] = await Promise.all([db.me(), db.messages(requestId)]);
+      return rows.map(r => rowToMessage(r, me));
+    },
+  };
+}
+
+// ---- the real database
+
+let channelSeq = 0;
+
+export function supabaseHelpDb(client: SupabaseClient): HelpDb {
+  const fail = (error: unknown): never => { throw error; };
+  return {
+    async me() {
+      const { data } = await client.auth.getSession();
+      const id = data.session?.user.id;
+      if (!id) throw new Error('Not signed in');
+      return id;
+    },
+    async insertRequest(row) {
+      const { error } = await client.from('help_requests').insert(row);
+      if (error && error.code !== '23505') fail(error); // 23505: already inserted before a restart
+    },
+    async getRequest(id) {
+      const { data, error } = await client.from('help_requests').select('*').eq('id', id).maybeSingle();
+      if (error) fail(error);
+      return (data as RequestRow | null) ?? null;
+    },
+    async openRequests(sinceIso) {
+      const { data, error } = await client
+        .from('help_requests')
+        .select('*')
+        .eq('status', 'open')
+        .gte('created_at', sinceIso)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error) fail(error);
+      return (data as RequestRow[] | null) ?? [];
+    },
+    async activeAssignment(volunteerId) {
+      const { data, error } = await client
+        .from('help_requests')
+        .select('*')
+        .eq('volunteer_id', volunteerId)
+        .eq('status', 'matched')
+        .order('matched_at', { ascending: false })
+        .limit(1);
+      if (error) fail(error);
+      return ((data as RequestRow[] | null) ?? [])[0] ?? null;
+    },
+    async accept(id) {
+      const { data, error } = await client.rpc('accept_help_request', { p_request_id: id });
+      if (error) {
+        if (/already_taken/.test(error.message)) throw new AlreadyTakenError();
+        fail(error);
+      }
+      return data as RequestRow;
+    },
+    async close(id, status) {
+      const { error } = await client.rpc('close_help_request', { p_request_id: id, p_status: status });
+      if (error) fail(error);
+    },
+    async messages(requestId) {
+      const { data, error } = await client.from('messages').select('*').eq('request_id', requestId).order('created_at', { ascending: true });
+      if (error) fail(error);
+      return (data as MessageRow[] | null) ?? [];
+    },
+    async sendMessage(row) {
+      const { error } = await client.from('messages').insert(row);
+      if (error) fail(error);
+    },
+    subscribe<Row>(spec: WatchSpec, onRow: (row: Row | null) => void, onLive: (live: boolean) => void) {
+      const filter = spec.filter ? { filter: spec.filter } : {};
+      const channel = client
+        .channel(`venu-${spec.table}-${(channelSeq += 1)}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: spec.table, ...filter }, payload => {
+          const row = payload.new as Record<string, unknown> | undefined;
+          onRow(row && Object.keys(row).length ? (row as Row) : null);
+        })
+        .subscribe(status => onLive(status === 'SUBSCRIBED'));
+      return () => { void client.removeChannel(channel); };
+    },
+  };
+}
+
+export function createSupabaseBackend(client: SupabaseClient): VolunteerBackend {
+  return createLiveBackend(supabaseHelpDb(client));
+}

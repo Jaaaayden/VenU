@@ -45,7 +45,7 @@ export function IncomingRequests() {
                 <Text style={Type.bodyStrong}>{t('incoming.who', { help, name: r.visitorName })}</Text>
                 <MeetPlaceText point={r.location} style={styles.where} />
                 <Text style={styles.meta}>
-                  {t('incoming.meta', { distance: formatDistance(r.distanceFeet, languageOf(t)), minutes: formatNumber(r.minutesAgo, undefined, languageOf(t)), language: isolate(uiLanguageName(r.language, tp)) })}
+                  {t('incoming.meta', { distance: formatDistance(r.distanceFeet ?? 0, languageOf(t)), minutes: formatNumber(r.minutesAgo, undefined, languageOf(t)), language: isolate(uiLanguageName(r.language, tp)) })}
                 </Text>
               </View>
             </View>

@@ -29,7 +29,9 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
     their: t('match.onTheWay.their', { name: v.firstName }),
   }[v.possessive];
   const openChat = () => router.push({ pathname: '/chat/[id]', params: { id: request.id } });
-  const distance = formatDistance(match.distanceFeet, languageOf(t));
+  // Live matching knows neither (no locations yet): the tiles and the map's distance just don't show.
+  const distance = match.distanceFeet != null ? formatDistance(match.distanceFeet, languageOf(t)) : null;
+  const eta = match.etaMinutes != null ? formatNumber(match.etaMinutes, undefined, languageOf(t)) : null;
   const startAligned = useStartAligned(); // "Daniel K." on the start edge in Arabic too
 
   return (
@@ -49,7 +51,7 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
         </View>
       </View>
 
-      <MeetMap volunteerName={v.name} distanceLabel={distance} place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
+      <MeetMap volunteerName={v.name} distanceLabel={distance ?? ''}place={meetSpotName(request.location, tv) ?? meetVenueName(request.location)} />
 
       <View style={[styles.gutter, styles.card]}>
         <View style={styles.who}>
@@ -58,10 +60,12 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
             <Text style={[styles.name, startAligned]}>{v.name}</Text>
             <Text style={[styles.role, startAligned]}>{t('role')}</Text>
           </View>
-          <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating, undefined, languageOf(t)) })}>
-            <FigmaIcon name="star" size={18} color={Colors.warning} />
-            <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, languageOf(t))}</Text>
-          </View>
+          {v.rating != null ? (
+            <View style={styles.rating} accessible accessibilityLabel={t('match.rated', { rating: formatNumber(v.rating, undefined, languageOf(t)) })}>
+              <FigmaIcon name="star" size={18} color={Colors.warning} />
+              <Text style={styles.ratingText}>{formatNumber(v.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, languageOf(t))}</Text>
+            </View>
+          ) : null}
         </View>
 
         <View style={styles.tagsBlock}>
@@ -75,15 +79,16 @@ export function MatchView({ request, match, unread }: { request: HelpRequest; ma
           </View>
         </View>
 
-        <View style={styles.infoRow}>
-          <InfoTile
-            icon="clock"
-            main={t('match.etaMain', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
-            sub={t('match.etaSub')}
-            label={t('match.etaLabel', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}
-          />
-          <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
-        </View>
+        {eta !== null || distance !== null ? (
+          <View style={styles.infoRow}>
+            {eta !== null ? (
+              <InfoTile icon="clock" main={t('match.etaMain', { minutes: eta })} sub={t('match.etaSub')} label={t('match.etaLabel', { minutes: eta })} />
+            ) : null}
+            {distance !== null ? (
+              <InfoTile icon="map-pin" main={distance} sub={t('match.awaySub')} label={t('match.awayLabel', { distance })} />
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
       <View style={[styles.gutter, styles.actions]}>

@@ -1,39 +1,70 @@
 // The seam between the volunteer flow and the matching service. The app talks only to
-// `VolunteerBackend`; `createMockBackend()` fakes it on the device. A Supabase version (matching owned
-// by Krisha) implements the same interface and is swapped in where the store is created.
+// `VolunteerBackend`; `createMockBackend()` fakes it on the device, and `createSupabaseBackend()`
+// (supabase-backend.ts) runs it on Supabase when the app has a project. app-backend.ts picks one.
+// The visitor side (find, chat, end) is required; the volunteer side (open requests, Accept) is
+// optional, and a backend without it keeps the volunteer home's example requests.
 import { chatLanguage } from '@/features/translate/languages';
 import { isUiLanguage } from '@/i18n';
 
 import { greetingFrom, mockReply, MOCK_VOLUNTEERS, mockTextLanguage } from './mock';
-import type { ChatMessage, Feedback, HelpRequest, Match, ProblemReport, Volunteer } from './types';
+import type { Assignment, ChatMessage, Feedback, HelpRequest, IncomingRequest, Match, ProblemReport, RequestClosed, Volunteer } from './types';
 
 export interface VolunteerBackend {
+  /** The id for a new request, when the service needs its own format (e.g. a UUID). Default: newId('req'). */
+  newRequestId?(): string;
   /** Resolves when a volunteer accepts; rejects with an AbortError when `signal` aborts. */
   findVolunteer(request: HelpRequest, signal: AbortSignal): Promise<Match>;
   cancelRequest(requestId: string): Promise<void>;
-  sendMessage(requestId: string, text: string): Promise<void>;
+  /** `lang`: the language the sender writes in (e.g. 'es'), so the reader's app knows what to translate. */
+  sendMessage(requestId: string, text: string, lang?: string | null): Promise<void>;
   /**
    * Picks a matched request back up after an app restart (the store calls it before listening), so
    * the service knows who is on the other end. Optional: a server-side service already knows.
    */
   resume?(requestId: string, match: Match): void;
-  /** Volunteer messages for a request, as they arrive. Returns an unsubscribe function. */
+  /**
+   * The other person's messages for a request, as they arrive (a live service also sends the ones
+   * already there when you subscribe; the store skips ids it has). Returns an unsubscribe function.
+   */
   onMessage(requestId: string, listener: (message: ChatMessage) => void): () => void;
   /**
    * Whether the volunteer is typing, called with the current value on subscribing and on each
    * change. Optional: a service without typing events just never shows the line.
    */
   onTyping?(requestId: string, listener: (typing: boolean) => void): () => void;
+  /**
+   * Called once when the request closes, whoever closed it: e.g. the volunteer ended the chat, or the
+   * visitor cancelled. Optional: in the mock nobody else can close it.
+   */
+  onClosed?(requestId: string, listener: (closed: RequestClosed) => void): () => void;
   endHelp(requestId: string): Promise<void>;
   submitFeedback(feedback: Feedback): Promise<void>;
   reportProblem(report: ProblemReport): Promise<void>;
+
+  // ---- the volunteer's side (live matching only)
+  /** Open requests, newest first, called on subscribing and on each change. Returns an unsubscribe function. */
+  watchOpenRequests?(listener: (requests: IncomingRequest[]) => void): () => void;
+  /** Takes an open request. Rejects with AlreadyTakenError when another volunteer got it first. */
+  acceptRequest?(requestId: string): Promise<Assignment>;
+  /** The request this volunteer accepted and hasn't finished, e.g. after an app restart. */
+  currentAssignment?(): Promise<Assignment | null>;
+  /** Every message on a request so far, both people's, oldest first. */
+  loadMessages?(requestId: string): Promise<ChatMessage[]>;
+}
+
+/** Accept lost the race: the request was taken (or closed) before this volunteer got it. */
+export class AlreadyTakenError extends Error {
+  constructor() {
+    super('Someone else already took this request');
+    this.name = 'AlreadyTakenError';
+  }
 }
 
 export function newId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function abortError(): Error {
+export function abortError(): Error {
   const e = new Error('Request cancelled');
   e.name = 'AbortError';
   return e;
@@ -72,7 +103,7 @@ export function createMockBackend(timing = MOCK_TIMING): VolunteerBackend {
 
   function emit(requestId: string, text: string) {
     const lang = langs.get(requestId);
-    const message: ChatMessage = { id: newId('msg'), from: 'volunteer', text, sentAt: Date.now(), ...(lang ? { lang } : {}) };
+    const message: ChatMessage = { id: newId('msg'), from: 'them', text, sentAt: Date.now(), ...(lang ? { lang } : {}) };
     listeners.get(requestId)?.forEach(l => l(message));
   }
 

@@ -64,7 +64,7 @@ describe('volunteer request store', () => {
     expect(matched.unread).toBe(0);
 
     await advance(TIMING.greeting);
-    expect(store.getState().messages.map(m => m.from)).toEqual(['volunteer']);
+    expect(store.getState().messages.map(m => m.from)).toEqual(['them']);
     expect(store.getState().messages[0]!.text).toBe(
       "Hi Rosa! I'm Daniel, your LA28 volunteer. I'm heading to you now. Meeting point: Entry 4.",
     );
@@ -94,7 +94,7 @@ describe('volunteer request store', () => {
 
     await advance(TIMING.reply);
     const { messages } = store.getState();
-    expect(messages.map(m => m.from)).toEqual(['volunteer', 'me', 'volunteer']);
+    expect(messages.map(m => m.from)).toEqual(['them', 'me', 'them']);
   });
 
   it('shows the volunteer typing while a reply is on its way', async () => {
@@ -111,7 +111,7 @@ describe('volunteer request store', () => {
     expect(store.getState().typing).toBe(true);
     await advance(TIMING.reply);
     expect(store.getState().typing).toBe(false);
-    expect(store.getState().messages.at(-1)?.from).toBe('volunteer');
+    expect(store.getState().messages.at(-1)?.from).toBe('them');
 
     store.sendMessage('Thanks');
     await advance(0);
@@ -257,7 +257,7 @@ describe('volunteer request store', () => {
 
       after.sendMessage('Are you close?');
       await advance(TIMING.reply);
-      expect(after.getState().messages.map(m => m.from)).toEqual(['volunteer', 'me', 'me', 'volunteer']);
+      expect(after.getState().messages.map(m => m.from)).toEqual(['them', 'me', 'me', 'them']);
     });
 
     it('keeps the volunteer writing in their language, tagged, after a restart in another UI language', async () => {
@@ -276,7 +276,7 @@ describe('volunteer request store', () => {
         expect(after.getState().match?.language).toBe('en');
         after.sendMessage('¿Estás cerca?');
         await advance(TIMING.reply);
-        expect(after.getState().messages.at(-1)).toMatchObject({ from: 'volunteer', text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
+        expect(after.getState().messages.at(-1)).toMatchObject({ from: 'them', text: "Got it, thanks! I'll be there in a couple of minutes.", lang: 'en' });
       } finally {
         await i18n.changeLanguage('en');
       }

@@ -41,7 +41,8 @@ export interface Volunteer {
   /** For "Daniel is on his way". */
   possessive: 'his' | 'her' | 'their';
   languages: string[];
-  rating: number;
+  /** Average stars, e.g. 4.9; null for someone with no ratings yet (live matching keeps none). */
+  rating: number | null;
   /** `label` shows as is (language names are native names) unless `skill` names a translated training. */
   tags: { label: string; tone: TagTone; skill?: SkillCode }[];
 }
@@ -51,13 +52,15 @@ export interface Match {
   volunteer: Volunteer;
   /** The language the volunteer reads and writes chat in, e.g. 'en' (chatLanguage of their languages). */
   language: string;
-  etaMinutes: number;
-  distanceFeet: number;
+  /** Estimates for "2 min until arrival" and "180 ft away"; null when the service doesn't know (live matching). */
+  etaMinutes: number | null;
+  distanceFeet: number | null;
 }
 
 export interface ChatMessage {
   id: string;
-  from: 'me' | 'volunteer';
+  /** 'them': the other person in the chat (the volunteer for a visitor, the visitor for a volunteer). */
+  from: 'me' | 'them';
   text: string;
   sentAt: number;
   /** Language the sender wrote in, when known (e.g. 'en'). Lets the reader skip translating their own language. */
@@ -127,13 +130,38 @@ export interface RequestState {
   typing: boolean;
 }
 
-/** An open request as a volunteer sees it (volunteer role's placeholder list). */
+/** An open request as a volunteer sees it under "Incoming requests". */
 export interface IncomingRequest {
   id: string;
   visitorName: string;
+  /** The first thing they asked for (the card's icon and title). */
   helpType: HelpTypeId;
   location: MeetPoint;
   language: string;
   minutesAgo: number;
-  distanceFeet: number;
+  /** null when the service doesn't know where the volunteer is (live matching). */
+  distanceFeet: number | null;
+  /** What the visitor wrote, or ''. */
+  note?: string;
+}
+
+/** A request this volunteer accepted: who they're helping, where, and in which language. */
+export interface Assignment {
+  id: string;
+  visitorName: string;
+  helpTypes: HelpTypeId[];
+  note: string;
+  /** The language the visitor asked for help in, e.g. 'es'. */
+  language: string;
+  location: MeetPoint;
+  createdAt: number;
+}
+
+/** How a request ended: called off ('cancelled') or the help happened ('done'). */
+export type ClosedStatus = 'cancelled' | 'done';
+
+/** A request closing, as the backend reports it. `byMe`: this device's user closed it. */
+export interface RequestClosed {
+  status: ClosedStatus;
+  byMe: boolean;
 }

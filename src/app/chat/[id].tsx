@@ -79,7 +79,9 @@ export default function ChatScreen() {
           <View style={styles.headerText}>
             <Text style={[styles.name, startAligned]} accessibilityRole="header" numberOfLines={1}>{v.name}</Text>
             {/* Digits as on "Volunteer found" (۲ in Persian). */}
-            <Text style={[styles.away, startAligned]}>{t('chat.away', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}</Text>
+            {match.etaMinutes != null ? (
+              <Text style={[styles.away, startAligned]}>{t('chat.away', { minutes: formatNumber(match.etaMinutes, undefined, languageOf(t)) })}</Text>
+            ) : null}
           </View>
           <Pressable
             onPress={() => show(t('chat.callSoon', { name: v.firstName }))}
