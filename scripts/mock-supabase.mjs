@@ -72,6 +72,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql).
   const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
   const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
+  let usernameSignIn = null; // the username-sign-in function's handler, loaded on first use
   // Supabase Auth stores and matches emails in lower case: "Rosa@Example.com" signs in as rosa@example.com.
   const normalEmail = email => (typeof email === 'string' ? email.trim().toLowerCase() : '');
   function session(user) {
@@ -187,9 +188,29 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       return user ? send(res, 200, publicUser(user)) : authErr(res, 401, 'bad_jwt', 'invalid JWT');
     }
 
-    // ---- username functions (callable signed out, like the anon grants in the migration)
+    // ---- username functions. username_available is callable signed out (Create Account needs it);
+    // email_for_username is service role only (20261117000000_private_username_lookup.sql), so Sign
+    // In by username goes through the username-sign-in Edge Function, the same code as
+    // supabase/functions/username-sign-in, which looks the email up here and never returns it.
     if (p === '/rest/v1/rpc/email_for_username' && req.method === 'POST') {
-      return send(res, 200, userByUsername(json()?.p_username)?.email ?? null);
+      return pgErr(res, uid ? 403 : 401, '42501', 'permission denied for function email_for_username');
+    }
+    if (p === '/functions/v1/username-sign-in') {
+      usernameSignIn ??= importShared('supabase/functions/username-sign-in/handler.ts').then(({ createHandler, httpPasswordGrant }) => createHandler({
+        emailForUsername: async name => userByUsername(name)?.email ?? null,
+        // Auth's password grant on this same server, as the real function calls Supabase Auth.
+        passwordGrant: httpPasswordGrant(`http://localhost:${port}`, 'mock-secret-key'),
+        log: line => log(`mock supabase: ${line}`),
+      })).catch(e => {
+        log(`mock supabase: username sign-in is off (${e.message}). It needs Node 22.18+, which loads the shared .ts files.`);
+        return null;
+      });
+      const handle = await usernameSignIn;
+      if (!handle) return send(res, 503, { code: 'unexpected_failure', message: 'Username sign-in needs Node 22.18 or newer in mock mode.' });
+      const headers = Object.entries(req.headers).filter(([, v]) => typeof v === 'string');
+      const reply = await handle(new Request(`http://mock${req.url}`, { method: req.method, headers, body: req.method === 'POST' ? raw : undefined }));
+      res.writeHead(reply.status, Object.fromEntries(reply.headers));
+      return res.end(Buffer.from(await reply.arrayBuffer()));
     }
     if (p === '/rest/v1/rpc/username_available' && req.method === 'POST') {
       return send(res, 200, !userByUsername(json()?.p_username));
