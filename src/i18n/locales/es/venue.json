@@ -76,29 +76,19 @@
   },
   "map": {
     "pin": "{{name}} en el mapa",
-    "north": "N"
+    "north": "N",
+    "label": "Mapa de {{venue}} con los servicios marcados. Arrastra para moverlo; pellizca o usa los botones para hacer zoom.",
+    "you": "Tú"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",
-    "open": "Abrir en el navegador",
     "openLabel": "Abrir el mapa oficial de {{source}} en tu navegador",
-    "frameLabel": "Mapa oficial de {{source}}. Con un lector de pantalla, usa la lista Servicios cerca de ti de abajo.",
-    "loading": "Cargando el mapa de {{source}}…",
     "error": "No se pudo cargar el mapa. Ábrelo en tu navegador.",
     "retry": "Reintentar",
-    "viewsLabel": "Vista del mapa",
-    "views": {
-      "exterior": "Exterior",
-      "east_garage": "Garaje este",
-      "west_garage": "Garaje oeste"
-    },
-    "imageLabel": "Mapa de {{source}}: {{view}}",
-    "imageLabelZoom": "Mapa de {{source}}: {{view}}. Pellizca o usa los botones para hacer zoom.",
-    "enlarge": "Toca para ampliar",
-    "enlargeHint": "Abre el mapa a pantalla completa para hacer zoom",
-    "close": "Cerrar mapa",
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar"
+    "zoomOut": "Alejar",
+    "openInteractive": "Abrir mapa interactivo",
+    "schematic": "Mapa simplificado"
   },
   "walk_one": "{{number}} min a pie",
   "walk_many": "{{number}} min a pie",

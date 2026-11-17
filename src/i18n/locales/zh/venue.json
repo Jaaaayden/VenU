@@ -76,29 +76,19 @@
   },
   "map": {
     "pin": "地图上的{{name}}",
-    "north": "北"
+    "north": "北",
+    "label": "{{venue}}地图，已标出各项设施。拖动可移动，双指缩放或使用缩放按钮。",
+    "you": "你"
   },
   "officialMap": {
     "attribution": "地图：{{source}}",
-    "open": "在浏览器中打开",
     "openLabel": "在浏览器中打开 {{source}} 官方地图",
-    "frameLabel": "{{source}} 官方地图。使用读屏软件时，请改用下方的“附近设施”列表。",
-    "loading": "正在加载 {{source}} 地图…",
     "error": "地图加载失败。请在浏览器中打开。",
     "retry": "重试",
-    "viewsLabel": "地图视图",
-    "views": {
-      "exterior": "外部",
-      "east_garage": "东停车楼",
-      "west_garage": "西停车楼"
-    },
-    "imageLabel": "{{source}}地图：{{view}}",
-    "imageLabelZoom": "{{source}}地图：{{view}}。双指缩放或使用缩放按钮。",
-    "enlarge": "点按放大",
-    "enlargeHint": "全屏打开地图以便放大",
-    "close": "关闭地图",
     "zoomIn": "放大",
-    "zoomOut": "缩小"
+    "zoomOut": "缩小",
+    "openInteractive": "打开互动地图",
+    "schematic": "简化地图"
   },
   "walk_other": "步行 {{number}} 分钟",
   "wait": {

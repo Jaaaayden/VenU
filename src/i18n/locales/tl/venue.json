@@ -76,29 +76,19 @@
   },
   "map": {
     "pin": "{{name}} sa mapa",
-    "north": "H"
+    "north": "H",
+    "label": "Mapa ng {{venue}} na may mga pin ng pasilidad. I-drag para ilipat; i-pinch o gamitin ang mga button para mag-zoom.",
+    "you": "Ikaw"
   },
   "officialMap": {
     "attribution": "Mapa: {{source}}",
-    "open": "Buksan sa browser",
     "openLabel": "Buksan ang opisyal na mapa ng {{source}} sa iyong browser",
-    "frameLabel": "Opisyal na mapa ng {{source}}. Kung gumagamit ng screen reader, gamitin ang listahang Mga Pasilidad na Malapit sa Iyo sa ibaba.",
-    "loading": "Nilo-load ang mapa ng {{source}}…",
     "error": "Hindi ma-load ang mapa. Buksan ito sa iyong browser.",
     "retry": "Subukan ulit",
-    "viewsLabel": "View ng mapa",
-    "views": {
-      "exterior": "Labas",
-      "east_garage": "Silangang garahe",
-      "west_garage": "Kanlurang garahe"
-    },
-    "imageLabel": "Mapa ng {{source}}: {{view}}",
-    "imageLabelZoom": "Mapa ng {{source}}: {{view}}. I-pinch o gamitin ang mga zoom button para mag-zoom.",
-    "enlarge": "I-tap para palakihin",
-    "enlargeHint": "Binubuksan ang mapa nang full screen para ma-zoom",
-    "close": "Isara ang mapa",
     "zoomIn": "Mag-zoom in",
-    "zoomOut": "Mag-zoom out"
+    "zoomOut": "Mag-zoom out",
+    "openInteractive": "Buksan ang interactive na mapa",
+    "schematic": "Pinasimpleng mapa"
   },
   "walk_one": "{{number}} minutong lakad",
   "walk_other": "{{number}} minutong lakad",

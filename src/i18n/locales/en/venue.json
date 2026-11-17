@@ -76,29 +76,19 @@
   },
   "map": {
     "pin": "{{name}} on the map",
-    "north": "N"
+    "north": "N",
+    "label": "{{venue}} map with facility pins. Drag to move, pinch or use the zoom buttons to zoom.",
+    "you": "You"
   },
   "officialMap": {
     "attribution": "Map: {{source}}",
-    "open": "Open in browser",
     "openLabel": "Open the official {{source}} map in your browser",
-    "frameLabel": "Official {{source}} map. With a screen reader, use the Facilities Near You list below instead.",
-    "loading": "Loading the {{source}} map…",
     "error": "Couldn’t load the map. Open it in your browser.",
     "retry": "Try again",
-    "viewsLabel": "Map view",
-    "views": {
-      "exterior": "Exterior",
-      "east_garage": "East garage",
-      "west_garage": "West garage"
-    },
-    "imageLabel": "{{source}} map: {{view}}",
-    "imageLabelZoom": "{{source}} map: {{view}}. Pinch or use the zoom buttons to zoom.",
-    "enlarge": "Tap to enlarge",
-    "enlargeHint": "Opens the map full screen to zoom in",
-    "close": "Close map",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomOut": "Zoom out",
+    "openInteractive": "Open interactive map",
+    "schematic": "Simplified map"
   },
   "walk_one": "{{number}} min walk",
   "walk_other": "{{number}} min walk",

@@ -4,19 +4,21 @@ import i18n, { type UiLanguage } from '@/i18n';
 import { resources } from '@/i18n/locales';
 
 import { facilityDescription, facilityLocation, facilityName } from '../labels';
-import { facilitiesFor, getFacility, VENUES } from '../mock';
+import { facilitiesFor, getFacility, getVenue, VENUES } from '../mock';
 import { SEED_REPORTS } from '../reports';
-import { MAP_SIZE } from '../stadium-map';
+import { mapAspect, venueMapFor } from '../venue-maps';
 
 // reports.ts builds its store on AsyncStorage, which has no native module under jest.
 jest.mock('@react-native-async-storage/async-storage', () => ({ __esModule: true, default: { getItem: async () => null, setItem: async () => {} } }));
 
 // Every venue's facilities come from its official guide (see mock.ts).
 const RESEARCHED = ['sofi', 'crypto-arena', 'intuit-dome'];
-// A pin is a 34pt circle; keep its centre this far inside the map and away from other pins.
-const EDGE = 16;
-const MIN_GAP = 44;
+// Pins are normalized (0 to 1) on the venue's map: keep each inside its edge, and apart from the
+// others by this share of the map's width (pins overlap a little only until the visitor zooms in).
+const EDGE = 0.01;
+const MIN_GAP = 0.018;
 const LANGS = Object.keys(resources) as UiLanguage[];
+const getVenueOrThrow = (id: string) => getVenue(id) ?? (() => { throw new Error(id); })();
 
 describe('venue facility data', () => {
   it.each(VENUES.map(v => v.id))('%s has gates, first aid and guest services, with unique ids', venueId => {
@@ -31,15 +33,23 @@ describe('venue facility data', () => {
 
   it.each(VENUES.map(v => v.id))('%s puts every pin inside the map, clear of the others', venueId => {
     const list = facilitiesFor(venueId);
+    const aspect = mapAspect(venueMapFor(getVenueOrThrow(venueId)));
     for (const f of list) {
-      expect({ id: f.id, inside: f.x >= EDGE && f.x <= MAP_SIZE - EDGE && f.y >= EDGE && f.y <= MAP_SIZE - EDGE }).toEqual({ id: f.id, inside: true });
+      expect({ id: f.id, inside: f.x >= EDGE && f.x <= 1 - EDGE && f.y >= EDGE && f.y <= 1 - EDGE }).toEqual({ id: f.id, inside: true });
     }
     for (const a of list) {
       for (const b of list) {
         if (a.id >= b.id) continue;
-        expect({ pair: `${a.id}/${b.id}`, apart: Math.hypot(a.x - b.x, a.y - b.y) >= MIN_GAP }).toEqual({ pair: `${a.id}/${b.id}`, apart: true });
+        // In widths of the map: a step down a tall map is longer than the same share across.
+        const gap = Math.hypot(a.x - b.x, (a.y - b.y) / aspect);
+        expect({ pair: `${a.id}/${b.id}`, apart: gap >= MIN_GAP }).toEqual({ pair: `${a.id}/${b.id}`, apart: true });
       }
     }
+  });
+
+  it.each(VENUES.map(v => v.id))('%s starts walks from one of its own facilities', venueId => {
+    const map = venueMapFor(getVenueOrThrow(venueId));
+    expect(getFacility(venueId, map.arrival ?? undefined)?.category).toBe('gate');
   });
 
   it('has a name, description and location for every facility in all 13 languages', () => {

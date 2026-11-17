@@ -76,29 +76,19 @@
   },
   "map": {
     "pin": "{{name}} trên bản đồ",
-    "north": "B"
+    "north": "B",
+    "label": "Bản đồ {{venue}} có ghim các tiện ích. Kéo để di chuyển, chụm ngón tay hoặc dùng nút để phóng to, thu nhỏ.",
+    "you": "Bạn"
   },
   "officialMap": {
     "attribution": "Bản đồ: {{source}}",
-    "open": "Mở trong trình duyệt",
     "openLabel": "Mở bản đồ chính thức của {{source}} trong trình duyệt",
-    "frameLabel": "Bản đồ chính thức của {{source}}. Nếu dùng trình đọc màn hình, hãy dùng danh sách Tiện ích gần bạn bên dưới.",
-    "loading": "Đang tải bản đồ {{source}}…",
     "error": "Không tải được bản đồ. Hãy mở trong trình duyệt.",
     "retry": "Thử lại",
-    "viewsLabel": "Chế độ xem bản đồ",
-    "views": {
-      "exterior": "Bên ngoài",
-      "east_garage": "Nhà xe phía đông",
-      "west_garage": "Nhà xe phía tây"
-    },
-    "imageLabel": "Bản đồ {{source}}: {{view}}",
-    "imageLabelZoom": "Bản đồ {{source}}: {{view}}. Chụm hai ngón tay hoặc dùng nút thu phóng để phóng to.",
-    "enlarge": "Chạm để phóng to",
-    "enlargeHint": "Mở bản đồ toàn màn hình để phóng to",
-    "close": "Đóng bản đồ",
     "zoomIn": "Phóng to",
-    "zoomOut": "Thu nhỏ"
+    "zoomOut": "Thu nhỏ",
+    "openInteractive": "Mở bản đồ tương tác",
+    "schematic": "Bản đồ giản lược"
   },
   "walk_other": "{{number}} phút đi bộ",
   "wait": {
