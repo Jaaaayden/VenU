@@ -12,7 +12,7 @@ import { useProfile } from '@/features/profile/profile-context';
 import { draftForRole, goToNextStep, stepErrors, useSetupDraft } from '@/features/profile/setup-draft';
 import type { Role } from '@/features/profile/types';
 import { useT, useUiLanguage } from '@/i18n';
-import { pickFor, setupPrimaryLanguage } from '@/i18n/languages';
+import { languagesFollowingPill, pickFor, setupPrimaryLanguage } from '@/i18n/languages';
 
 /**
  * Setup step 1, "Choose your languages" (Figma 482:32493 / 492:5984): primary, secondary
@@ -47,16 +47,16 @@ export default function LanguagesStep() {
     start(draftForRole(role, draft, setupPrimaryLanguage(pick, onScreen), pending.firstName ?? ''));
   }, [pending, ready, role, draft, start, userId, onScreen]);
 
-  // The corner pill and the primary language start out the same. Until the primary language is
-  // changed by hand, it follows the pill: switch the pill to 日本語 and primary becomes 日本語 too.
+  // The corner pill and the primary language start out the same. Until the languages are changed
+  // by hand, primary follows the pill: switch the pill to 日本語 and primary becomes 日本語 too.
+  // Once they are (even back to the pill's language), the pill leaves them alone.
   const shownBefore = useRef(onScreen);
+  const changedByHand = useRef(false);
   useEffect(() => {
     const before = shownBefore.current;
     shownBefore.current = onScreen;
-    if (!draft || before === onScreen) return;
-    if (draft.mainLanguage === before && draft.languages.length === 1 && draft.languages[0] === before) {
-      update({ languages: [onScreen], mainLanguage: onScreen });
-    }
+    const next = draft ? languagesFollowingPill(draft, before, onScreen, changedByHand.current) : null;
+    if (next) update(next);
   }, [onScreen, draft, update]);
 
   if (!pending || !ready) return null; // storage reads (pending setup, answers saved before a reload)
@@ -83,7 +83,10 @@ export default function LanguagesStep() {
         languages={draft.languages}
         main={draft.mainLanguage}
         // Spoken languages only: the app language belongs to the language pills.
-        onChange={(languages, mainLanguage) => update({ languages, mainLanguage })}
+        onChange={(languages, mainLanguage) => {
+          changedByHand.current = true;
+          update({ languages, mainLanguage });
+        }}
       />
       {errors.languages ? <Text style={styles.error} accessibilityLiveRegion="polite">{errors.languages}</Text> : null}
     </OnboardingScreen>
