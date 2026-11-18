@@ -13,7 +13,11 @@
 // (drop the next n profile-save responses, to test lost connections), { failTranslate: n } (the next
 // n translate calls fail), { translateDelayMs: ms } (slow translations), { clockOffsetMs: ms } (move the
 // clock used for how long a sign-up has waited unconfirmed, e.g. 2h to free its username),
-// GET /__confirm?email=...
+// { disabledProviders: ['apple'] } (social sign-in providers that are "off"), { missingFunctions: ['delete-account'] }
+// (password-reset / delete-account answer 404 as if not deployed), GET /__confirm?email=...
+// Password reset prints its link like confirmation does; social sign-in (/auth/v1/authorize) returns
+// straight away as "<Provider> User"; the delete-account and password-reset functions run their
+// shared code from supabase/functions.
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -40,8 +44,9 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const profiles = new Map(); // user id -> row
   const files = new Map(); // path -> { bytes: Buffer, type }
   const refreshTokens = new Map(); // token -> user id
+  const recoveryTokens = new Map(); // token -> { userId, expires }: password-reset links, one use each
   const requests = [];
-  const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0, clockOffsetMs: 0 };
+  const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0, clockOffsetMs: 0, disabledProviders: [], missingFunctions: [] };
   const now = () => Date.now() + control.clockOffsetMs;
 
   if (stateFile && existsSync(stateFile)) {
@@ -70,7 +75,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const publicUser = u => ({
     id: u.id, aud: 'authenticated', role: 'authenticated', email: u.email,
     email_confirmed_at: u.confirmed ? '2026-11-09T00:00:00Z' : null,
-    app_metadata: { provider: 'email' }, user_metadata: u.username ? { username: u.username } : {},
+    app_metadata: { provider: u.provider ?? 'email' },
+    user_metadata: { ...(u.username ? { username: u.username } : {}), ...(u.fullName ? { full_name: u.fullName, name: u.fullName } : {}) },
     created_at: new Date(u.createdAt ?? Date.parse('2026-11-09T00:00:00Z')).toISOString(),
   });
   // Mirrors public.usernames (supabase/migrations/20261116000000_usernames.sql and
@@ -78,6 +84,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
   const normalUsername = name => (typeof name === 'string' ? name.trim().toLowerCase() : '');
   const userByUsername = name => [...users.values()].find(u => u.username && u.username === normalUsername(name));
   let usernameSignIn = null; // the username-sign-in function's handler, loaded on first use
+  let passwordReset = null; // the password-reset function's handler, loaded on first use
+  let deleteAccount = null; // the delete-account function's handler, loaded on first use
   // A name an unconfirmed sign-up has held for over an hour is free. (Saved users from before
   // createdAt was kept count as old.)
   const USERNAME_HOLD_MS = 60 * 60 * 1000;
@@ -97,6 +105,22 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       access_token: `${b64url({ alg: 'HS256', typ: 'JWT' })}.${b64url({ sub: user.id, email: user.email, role: 'authenticated', aud: 'authenticated', exp })}.mock`,
       token_type: 'bearer', expires_in: 3600, expires_at: exp, refresh_token, user: publicUser(user),
     };
+  }
+  /**
+   * auth.admin.deleteUser with the foreign keys of 20261118030000_account_deletion.sql: profile,
+   * username (kept on the user here) and sessions go; help requests stay for the other person.
+   * False when there was no such user.
+   */
+  function deleteUser(id) {
+    const user = [...users.values()].find(u => u.id === id);
+    if (!user) return false;
+    users.delete(user.email);
+    profiles.delete(id);
+    for (const [token, owner] of refreshTokens) if (owner === id) refreshTokens.delete(token);
+    for (const [token, entry] of recoveryTokens) if (entry.userId === id) recoveryTokens.delete(token);
+    forgetHelpUser(profiles, id);
+    persist();
+    return true;
   }
   /** The signed-in user's id, or null. Tokens for users that no longer exist don't count. */
   function userIdOf(req) {
@@ -209,6 +233,76 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       const user = [...users.values()].find(u => u.id === uid);
       return user ? send(res, 200, publicUser(user)) : authErr(res, 401, 'bad_jwt', 'invalid JWT');
     }
+    // New password (from a reset link's session, or signed in). Auth's own minimum is 6; the app asks for 8.
+    if (p === '/auth/v1/user' && req.method === 'PUT') {
+      const user = [...users.values()].find(u => u.id === uid);
+      if (!user) return authErr(res, 401, 'bad_jwt', 'invalid JWT');
+      const { password } = json() ?? {};
+      if (typeof password === 'string') {
+        if (password.length < 6) return authErr(res, 422, 'weak_password', 'Password should be at least 6 characters.');
+        if (password === user.password) return authErr(res, 422, 'same_password', 'New password should be different from the old password.');
+        user.password = password;
+        persist();
+      }
+      return send(res, 200, publicUser(user));
+    }
+    // Forgot password: like Supabase, the same empty 200 whether or not the email has an account. The
+    // "email" is printed here, linking to /auth/v1/verify as Supabase's template does.
+    if (p === '/auth/v1/recover' && req.method === 'POST') {
+      const user = users.get(normalEmail(json()?.email));
+      if (user) {
+        const token = randomUUID();
+        recoveryTokens.set(token, { userId: user.id, expires: Date.now() + 60 * 60 * 1000 });
+        const redirect = url.searchParams.get('redirect_to');
+        const link = `http://localhost:${server.address().port}/auth/v1/verify?token=${token}&type=recovery${redirect ? `&redirect_to=${encodeURIComponent(redirect)}` : ''}`;
+        log(`\n  Password reset "email" for ${user.email}: ${link}\n`);
+      }
+      return send(res, 200, {});
+    }
+    // The link in that email: one use, an hour. Back to redirect_to with a session (implicit flow), or Auth's error.
+    if (p === '/auth/v1/verify' && req.method === 'GET') {
+      const redirect = url.searchParams.get('redirect_to');
+      const entry = recoveryTokens.get(url.searchParams.get('token'));
+      recoveryTokens.delete(url.searchParams.get('token'));
+      const user = entry && entry.expires > Date.now() && [...users.values()].find(u => u.id === entry.userId);
+      let fragment;
+      if (user) {
+        user.confirmed = true; // opening a reset link proves the email, as in Supabase
+        const s = session(user);
+        fragment = new URLSearchParams({ access_token: s.access_token, expires_at: String(s.expires_at), expires_in: '3600', refresh_token: s.refresh_token, token_type: 'bearer', type: 'recovery' });
+      } else {
+        fragment = new URLSearchParams({ error: 'access_denied', error_code: 'otp_expired', error_description: 'Email link is invalid or has expired' });
+      }
+      if (!redirect) return send(res, user ? 200 : 403, user ? { note: 'no redirect_to; nothing to open' } : Object.fromEntries(fragment));
+      res.writeHead(303, { location: `${redirect}#${fragment}` });
+      return res.end();
+    }
+    // Which sign-in methods are on (Authentication > Sign In / Providers). POST /__control
+    // { disabledProviders: ['apple'] } switches one off, to see the app's "isn't set up yet".
+    if (p === '/auth/v1/settings' && req.method === 'GET') {
+      const external = Object.fromEntries(['email', 'facebook', 'google', 'apple'].map(name => [name, !control.disabledProviders.includes(name)]));
+      return send(res, 200, { external, disable_signup: false, mailer_autoconfirm: !confirmEmail });
+    }
+    // Social sign-in without the provider: straight back to redirect_to signed in as "<Provider> User"
+    // (<provider>-user@mock.venu, made on first use), as Supabase does after the provider says yes.
+    if (p === '/auth/v1/authorize' && req.method === 'GET') {
+      const provider = url.searchParams.get('provider') ?? '';
+      const redirect = url.searchParams.get('redirect_to');
+      if (!['facebook', 'google', 'apple'].includes(provider) || control.disabledProviders.includes(provider))
+        return authErr(res, 400, 'validation_failed', 'Unsupported provider: provider is not enabled');
+      if (!redirect) return authErr(res, 400, 'validation_failed', 'mock supabase: send redirect_to');
+      const email = `${provider}-user@mock.venu`;
+      const name = `${provider[0].toUpperCase()}${provider.slice(1)} User`;
+      let user = users.get(email);
+      if (!user) {
+        user = { id: randomUUID(), email, password: null, confirmed: true, createdAt: now(), provider, fullName: name };
+        users.set(email, user);
+      }
+      const s = session(user);
+      const fragment = new URLSearchParams({ access_token: s.access_token, expires_at: String(s.expires_at), expires_in: '3600', provider_token: 'mock', refresh_token: s.refresh_token, token_type: 'bearer' });
+      res.writeHead(302, { location: `${redirect}#${fragment}` });
+      return res.end();
+    }
 
     // ---- username functions. username_available is callable signed out (Create Account needs it);
     // email_for_username is service role only (20261117000000_private_username_lookup.sql), so Sign
@@ -229,6 +323,35 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
       });
       const handle = await usernameSignIn;
       if (!handle) return send(res, 503, { code: 'unexpected_failure', message: 'Username sign-in needs Node 22.18 or newer in mock mode.' });
+      const headers = Object.entries(req.headers).filter(([, v]) => typeof v === 'string');
+      const reply = await handle(new Request(`http://mock${req.url}`, { method: req.method, headers, body: req.method === 'POST' ? raw : undefined }));
+      res.writeHead(reply.status, Object.fromEntries(reply.headers));
+      return res.end(Buffer.from(await reply.arrayBuffer()));
+    }
+    // ---- account functions: the same code as supabase/functions/password-reset and delete-account.
+    if (p === '/functions/v1/password-reset' || p === '/functions/v1/delete-account') {
+      const name = p.slice('/functions/v1/'.length);
+      // As the gateway answers for a function that isn't deployed (POST /__control { missingFunctions: ['delete-account'] }).
+      if (control.missingFunctions.includes(name)) return send(res, 404, { code: 'NOT_FOUND', message: 'Requested function was not found' });
+      const load = () => importShared(`supabase/functions/${name}/handler.ts`).then(mod => name === 'password-reset'
+        ? mod.createHandler({
+          emailForUsername: async n => userByUsername(n)?.email ?? null,
+          // Auth's recover endpoint on this same server, which prints the link.
+          sendRecovery: mod.httpRecover(`http://localhost:${server.address().port}`, 'mock-secret-key'),
+          log: line => log(`mock supabase: ${line}`),
+        })
+        : mod.createHandler({
+          verifyUser: async token => userIdOfToken(token),
+          listAvatars: async id => [...files.keys()].filter(k => k.startsWith(`${id}/`)),
+          removeAvatars: async paths => { for (const k of paths) files.delete(k); persist(); },
+          deleteUser: async id => (deleteUser(id) ? 'deleted' : 'gone'),
+          log: line => log(`mock supabase: ${line}`),
+        })).catch(e => {
+        log(`mock supabase: ${name} is off (${e.message}). It needs Node 22.18+, which loads the shared .ts files.`);
+        return null;
+      });
+      const handle = await (name === 'password-reset' ? (passwordReset ??= load()) : (deleteAccount ??= load()));
+      if (!handle) return send(res, 503, { code: 'unexpected_failure', message: `${name} needs Node 22.18 or newer in mock mode.` });
       const headers = Object.entries(req.headers).filter(([, v]) => typeof v === 'string');
       const reply = await handle(new Request(`http://mock${req.url}`, { method: req.method, headers, body: req.method === 'POST' ? raw : undefined }));
       res.writeHead(reply.status, Object.fromEntries(reply.headers));
@@ -408,6 +531,28 @@ function handleHelpRequests({ req, res, p, url, body, uid, profiles, send, pgErr
   if (!helpStores.has(profiles)) helpStores.set(profiles, { requests: new Map(), messages: [], rejectSends: false });
   helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, helpStores.get(profiles));
   return true;
+}
+
+/**
+ * A deleted user's part of the help store, as 20261118030000_account_deletion.sql does it: their
+ * running requests end (cancelled as the visitor, opened again as the volunteer), their id is
+ * cleared from the rest (names stay), and their messages go.
+ */
+function forgetHelpUser(profiles, id) {
+  const store = helpStores.get(profiles);
+  if (!store) return;
+  const at = new Date().toISOString();
+  for (const r of store.requests.values()) {
+    if (r.visitor_id === id && (r.status === 'open' || r.status === 'matched')) Object.assign(r, { status: 'cancelled', closed_at: at });
+    if (r.volunteer_id === id && r.status === 'matched') {
+      Object.assign(r, {
+        status: 'open', volunteer_id: null, volunteer_name: null, volunteer_languages: null, volunteer_trainings: null,
+        matched_at: null, opened_at: at,
+      });
+    }
+    for (const col of ['visitor_id', 'volunteer_id', 'closed_by']) if (r[col] === id) r[col] = null;
+  }
+  store.messages = store.messages.filter(m => m.sender_id !== id);
 }
 
 function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store) {
