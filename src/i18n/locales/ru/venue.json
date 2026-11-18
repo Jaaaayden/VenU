@@ -385,7 +385,12 @@
     "authorFallback": "Посетитель VenU",
     "submitted": "Отправлено {{date}}",
     "originalLanguage": "Язык оригинала: {{language}}",
-    "noBody": "Без подробностей."
+    "noBody": "Без подробностей.",
+    "delete": "Удалить мой отзыв",
+    "deleteConfirm": "Удалить этот отзыв? Посетители этой площадки больше его не увидят.",
+    "deleteKeep": "Оставить",
+    "deleteYes": "Удалить",
+    "deleteFailed": "Не удалось удалить отзыв. {{reason}}"
   },
   "form": {
     "title": "Новый отзыв",

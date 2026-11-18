@@ -381,7 +381,12 @@
     "authorFallback": "VenU visitor",
     "submitted": "Submitted {{date}}",
     "originalLanguage": "Original language: {{language}}",
-    "noBody": "No details added."
+    "noBody": "No details added.",
+    "delete": "Delete my report",
+    "deleteConfirm": "Delete this report? Visitors at this venue won’t see it any more.",
+    "deleteKeep": "Keep it",
+    "deleteYes": "Delete",
+    "deleteFailed": "Couldn’t delete the report. {{reason}}"
   },
   "form": {
     "title": "Add report",

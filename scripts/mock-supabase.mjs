@@ -19,6 +19,7 @@
 // clock used for how long a sign-up has waited unconfirmed, e.g. 2h to free its username),
 // { verify: 'sam_helps' } (verify a volunteer by username or email, as LA28 staff do in the dashboard;
 // add verified: false to take it back), GET /__confirm?email=...
+// /__state also lists facility_reports, help_feedback and app_feedback rows (see handleFeedbackTables).
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -58,6 +59,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
   const files = new Map(); // path -> { bytes: Buffer, type }
   const refreshTokens = new Map(); // token -> user id
   const requests = [];
+  // facility_reports, help_feedback and app_feedback rows, saved with the accounts.
+  const feedbackTables = { facility_reports: [], help_feedback: [], app_feedback: [] };
   const control = { dropNextProfileWrite: 0, failTranslate: 0, translateDelayMs: 0, clockOffsetMs: 0 };
   const now = () => Date.now() + control.clockOffsetMs;
 
@@ -73,6 +76,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       }
       for (const [path, f] of Object.entries(saved.files ?? {})) files.set(path, { bytes: Buffer.from(f.bytes, 'base64'), type: f.type });
       for (const [token, id] of Object.entries(saved.refreshTokens ?? {})) refreshTokens.set(token, id);
+      for (const table of Object.keys(feedbackTables)) feedbackTables[table] = saved[table] ?? [];
     } catch {
       log(`mock supabase: couldn't read ${stateFile}, starting empty`);
     }
@@ -86,6 +90,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       files: Object.fromEntries([...files].map(([path, f]) => [path, { bytes: f.bytes.toString('base64'), type: f.type }])),
       refreshTokens: Object.fromEntries(refreshTokens),
       verifiedRule: VERIFIED_RULE,
+      ...feedbackTables,
     }));
   }
 
@@ -160,7 +165,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
 
     // ---- test hooks
     if (p === '/__state') {
-      return send(res, 200, { users: [...users.values()].map(u => ({ id: u.id, email: u.email, confirmed: u.confirmed, username: u.username ?? null })), profiles: [...profiles.values()], files: [...files.keys()], log: requests });
+      return send(res, 200, { users: [...users.values()].map(u => ({ id: u.id, email: u.email, confirmed: u.confirmed, username: u.username ?? null })), profiles: [...profiles.values()], files: [...files.keys()], ...feedbackTables, log: requests });
     }
     if (p === '/__control') {
       const { verify, verified = true, ...rest } = json() ?? {};
@@ -348,6 +353,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
 
     // ---- help requests and chat (see handleHelpRequests below)
     if (handleHelpRequests({ req, res, p, url, body: json, uid, profiles, send, pgErr })) return;
+    // ---- facility reports, ratings / problem reports after help, Help & feedback
+    if (handleFeedbackTables({ req, res, p, url, body: json, uid, profiles, send, pgErr, tables: feedbackTables, persist })) return;
 
     // ---- the avatars bucket (private: owners only)
     const ownPath = path => path.split('/')[0] === uid;
@@ -576,6 +583,124 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
     }
     return send(res, 204);
   }
+}
+
+// ---- facility_reports, help_feedback and app_feedback, with the rules of
+// supabase/migrations/20261118010000_reports_feedback.sql. Signed in only. Saved in the state file with
+// the accounts (help requests aren't, so a rating can outlive its request across a restart; harmless).
+//   facility_reports  everyone signed in reads; insert as yourself (author_name from your profile's
+//                     first name, whatever the app sends); delete only your own; no updates.
+//   help_feedback     insert: a party to a matched or done request, one rating each (23505 after).
+//                     select: ratings only, to their author or to the request's volunteer.
+//   app_feedback      insert only.
+const FEEDBACK_ROUTES = new Set(['/rest/v1/facility_reports', '/rest/v1/help_feedback', '/rest/v1/app_feedback']);
+const REPORT_TOPICS = ['accessibility', 'directions', 'facility_condition', 'security', 'crowds', 'other'];
+const FEEDBACK_TAGS = ['language', 'venue', 'patient', 'fast', 'helpful', 'other'];
+const PROBLEM_KINDS = ['no_show', 'unsafe', 'rude', 'other'];
+const GRANTED = {
+  facility_reports: ['venue_id', 'facility_id', 'title', 'topic', 'body', 'language'],
+  help_feedback: ['request_id', 'kind', 'stars', 'tags', 'problem', 'note'],
+  app_feedback: ['note', 'language', 'platform'],
+};
+
+/** Handles the routes above; false for anything else. */
+function handleFeedbackTables(ctx) {
+  if (!FEEDBACK_ROUTES.has(ctx.p)) return false;
+  feedbackRoute(ctx);
+  return true;
+}
+
+function feedbackRoute({ req, res, p, url, body, uid, profiles, send, pgErr, tables, persist }) {
+  const table = p.slice('/rest/v1/'.length);
+  const permission = () => pgErr(res, 403, '42501', `permission denied for table ${table}`);
+  const rls = () => pgErr(res, 403, '42501', `new row violates row-level security policy for table "${table}"`);
+  const check = () => pgErr(res, 400, '23514', `new row for relation "${table}" violates check constraint`);
+  if (!uid) return permission(); // anon has no grants on these tables
+  const wantsRows = (req.headers.prefer ?? '').includes('return=representation');
+  const wantsObject = (req.headers.accept ?? '').includes('vnd.pgrst.object');
+  const reply = (rows, status = 200) => {
+    if (!wantsObject) return send(res, status, rows);
+    if (rows.length !== 1) return pgErr(res, 406, 'PGRST116', 'JSON object requested, multiple (or no) rows returned');
+    return send(res, status, rows[0]);
+  };
+  const input = body();
+  const row = Array.isArray(input) ? input[0] : input;
+  const text = (v, max) => typeof v === 'string' && v.length <= max;
+  const saved = full => {
+    tables[table].push(full);
+    persist();
+    return wantsRows ? reply([full], 201) : send(res, 201);
+  };
+  if (req.method === 'POST') {
+    if (!row || typeof row !== 'object') return check();
+    // Only the granted columns; ids, authors and times come from the server.
+    if (Object.keys(row).some(k => !GRANTED[table].includes(k))) return permission();
+  }
+
+  if (table === 'facility_reports') {
+    if (req.method === 'GET') return reply(orderAndLimit(tables.facility_reports.filter(rowFilter(url)), url));
+    if (req.method === 'POST') {
+      const title = typeof row.title === 'string' ? row.title : '';
+      if (!row.venue_id || !text(row.venue_id, 40) || !row.facility_id || !text(row.facility_id, 80) || !title.trim() || title.trim().length > 80
+        || !REPORT_TOPICS.includes(row.topic) || !text(row.body ?? '', 1000) || (row.language != null && !text(row.language, 12))) return check();
+      return saved({
+        id: randomUUID(), venue_id: row.venue_id, facility_id: row.facility_id, author_id: uid,
+        // set_report_author_name: the profile's first name, whatever the app sent.
+        author_name: String(profiles.get(uid)?.first_name ?? '').trim().slice(0, 40),
+        title, topic: row.topic, body: row.body ?? '', language: row.language ?? null, created_at: new Date().toISOString(),
+      });
+    }
+    if (req.method === 'DELETE') {
+      const match = rowFilter(url);
+      // RLS: only your own rows match; someone else's are left alone without an error.
+      tables.facility_reports = tables.facility_reports.filter(r => !(r.author_id === uid && match(r)));
+      persist();
+      return send(res, 204);
+    }
+    return permission();
+  }
+
+  if (table === 'help_feedback') {
+    const helpRequests = helpStores.get(profiles)?.requests ?? new Map();
+    if (req.method === 'GET') {
+      const visible = tables.help_feedback.filter(f => {
+        if (f.kind !== 'rating') return false;
+        const r = helpRequests.get(f.request_id);
+        return f.author_id === uid || (!!r && r.volunteer_id === uid && r.visitor_id === f.author_id);
+      });
+      return reply(orderAndLimit(visible.filter(rowFilter(url)), url));
+    }
+    if (req.method === 'POST') {
+      const tags = row.tags ?? [];
+      const stars = row.stars ?? null;
+      const problem = row.problem ?? null;
+      const okRating = row.kind === 'rating' && Number.isInteger(stars) && stars >= 1 && stars <= 5 && problem === null;
+      const okProblem = row.kind === 'problem' && stars === null && PROBLEM_KINDS.includes(problem) && Array.isArray(tags) && tags.length === 0;
+      if (!Array.isArray(tags) || tags.length > 6 || !tags.every(t => FEEDBACK_TAGS.includes(t)) || !(okRating || okProblem) || !text(row.note ?? '', 1000))
+        return check();
+      const r = helpRequests.get(row.request_id);
+      // private.is_help_party, on a request a volunteer took.
+      if (!r || (r.visitor_id !== uid && r.volunteer_id !== uid) || (r.status !== 'matched' && r.status !== 'done')) return rls();
+      if (row.kind === 'rating' && tables.help_feedback.some(f => f.kind === 'rating' && f.request_id === row.request_id && f.author_id === uid))
+        return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "help_feedback_one_rating"');
+      // Problem reports have no select policy, so nothing comes back for them.
+      if (wantsRows && row.kind === 'problem') return rls();
+      return saved({
+        id: randomUUID(), request_id: row.request_id, author_id: uid, kind: row.kind, stars, tags, problem,
+        note: row.note ?? '', created_at: new Date().toISOString(),
+      });
+    }
+    return permission();
+  }
+
+  // app_feedback: insert only, and no select grant, so nothing comes back.
+  if (req.method !== 'POST' || wantsRows) return permission();
+  if (typeof row.note !== 'string' || !row.note.trim() || row.note.length > 1000
+    || (row.platform != null && !['ios', 'android', 'web'].includes(row.platform)) || (row.language != null && !text(row.language, 12))) return check();
+  return saved({
+    id: randomUUID(), author_id: uid, note: row.note, language: row.language ?? null, platform: row.platform ?? null,
+    created_at: new Date().toISOString(),
+  });
 }
 
 /**

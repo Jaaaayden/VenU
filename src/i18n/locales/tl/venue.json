@@ -381,7 +381,12 @@
     "authorFallback": "Bisita ng VenU",
     "submitted": "Ipinadala noong {{date}}",
     "originalLanguage": "Orihinal na wika: {{language}}",
-    "noBody": "Walang idinagdag na detalye."
+    "noBody": "Walang idinagdag na detalye.",
+    "delete": "Burahin ang ulat ko",
+    "deleteConfirm": "Burahin ang ulat na ito? Hindi na ito makikita ng mga bisita sa venue na ito.",
+    "deleteKeep": "Huwag burahin",
+    "deleteYes": "Burahin",
+    "deleteFailed": "Hindi mabura ang ulat. {{reason}}"
   },
   "form": {
     "title": "Magdagdag ng ulat",

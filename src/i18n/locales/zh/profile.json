@@ -207,7 +207,8 @@
     "placeholder": "例如 阳光下地图很难看清",
     "feedbackLabel": "你的反馈",
     "send": "发送反馈",
-    "empty": "请先写几句话。"
+    "empty": "请先写几句话。",
+    "sendFailed": "无法发送你的反馈。{{reason}}"
   },
   "notifications": {
     "title": "通知",

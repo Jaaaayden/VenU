@@ -379,7 +379,12 @@
     "authorFallback": "VenU 방문객",
     "submitted": "{{date}}에 제출됨",
     "originalLanguage": "원문 언어: {{language}}",
-    "noBody": "추가된 내용이 없습니다."
+    "noBody": "추가된 내용이 없습니다.",
+    "delete": "내 제보 삭제",
+    "deleteConfirm": "이 제보를 삭제할까요? 이 경기장의 방문객에게 더 이상 보이지 않아요.",
+    "deleteKeep": "그대로 두기",
+    "deleteYes": "삭제",
+    "deleteFailed": "제보를 삭제하지 못했어요. {{reason}}"
   },
   "form": {
     "title": "제보 추가",

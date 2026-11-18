@@ -207,7 +207,8 @@
     "placeholder": "p. ex. La carte était difficile à lire au soleil",
     "feedbackLabel": "Votre avis",
     "send": "Envoyer l'avis",
-    "empty": "Écrivez d'abord quelques mots."
+    "empty": "Écrivez d'abord quelques mots.",
+    "sendFailed": "Impossible d’envoyer votre avis. {{reason}}"
   },
   "notifications": {
     "title": "Notifications",

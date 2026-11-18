@@ -379,7 +379,12 @@
     "authorFallback": "VenU 访客",
     "submitted": "提交于 {{date}}",
     "originalLanguage": "原文语言：{{language}}",
-    "noBody": "未添加详情。"
+    "noBody": "未添加详情。",
+    "delete": "删除我的反馈",
+    "deleteConfirm": "要删除这条反馈吗？此场馆的访客将不会再看到它。",
+    "deleteKeep": "保留",
+    "deleteYes": "删除",
+    "deleteFailed": "无法删除反馈。{{reason}}"
   },
   "form": {
     "title": "添加反馈",

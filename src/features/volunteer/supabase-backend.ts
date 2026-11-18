@@ -1,4 +1,5 @@
-// VolunteerBackend on Supabase: help_requests and messages (supabase/migrations/20261117010000_help_requests_chat.sql).
+// VolunteerBackend on Supabase: help_requests and messages (supabase/migrations/20261117010000_help_requests_chat.sql),
+// and ratings / problem reports after help in help_feedback (20261118010000_reports_feedback.sql).
 // A stand-in for real matching: the visitor opens a request, every free volunteer sees it, and the
 // first to Accept gets it (accept_help_request is atomic). Changes arrive over Realtime; if the
 // channel doesn't reach SUBSCRIBED (e.g. the local mock server has no Realtime), it polls every 2 s.
@@ -13,7 +14,9 @@ import { languageName } from '@/features/profile/options';
 
 import { abortError, AlreadyHelpingError, AlreadyTakenError, NotVerifiedError, RequestClosedError, type VolunteerBackend } from './backend';
 import { HELP_TYPES } from './mock';
-import type { Assignment, ChatMessage, ClosedStatus, HelpRequest, HelpTypeId, IncomingRequest, Match, SkillCode, Volunteer } from './types';
+import type {
+  Assignment, ChatMessage, ClosedStatus, Feedback, HelpRequest, HelpTypeId, IncomingRequest, Match, ProblemReport, SkillCode, Volunteer,
+} from './types';
 
 export type RequestStatusRow = 'open' | 'matched' | 'cancelled' | 'done';
 
@@ -57,6 +60,24 @@ export interface MessageRow {
 
 export type NewMessageRow = Pick<MessageRow, 'request_id' | 'text' | 'language'>;
 
+/**
+ * What the visitor's app inserts into help_feedback after help: stars ('rating') or "Report a
+ * problem" ('problem'). The database fills in the author (the session) and time.
+ */
+export interface NewFeedbackRow {
+  request_id: string;
+  kind: 'rating' | 'problem';
+  /** 1–5 for a rating, null for a problem report. */
+  stars: number | null;
+  tags: string[];
+  /** e.g. 'no_show' for a problem report, null for a rating. */
+  problem: string | null;
+  note: string;
+}
+
+/** help_feedback.note's limit. */
+export const FEEDBACK_NOTE_MAX = 1000;
+
 export type WatchSpec = { table: 'help_requests'; filter?: string } | { table: 'messages'; filter: string };
 
 /** The few database calls the backend makes. supabaseHelpDb() is the real one. */
@@ -81,6 +102,8 @@ export interface HelpDb {
   /** The messages on a request you may read, oldest first; with `sinceIso`, only those created at or after it. */
   messages(requestId: string, sinceIso?: string): Promise<MessageRow[]>;
   sendMessage(row: NewMessageRow): Promise<void>;
+  /** Saves a rating or problem report; a rating already saved for this request (a retried Submit) is fine. */
+  insertFeedback(row: NewFeedbackRow): Promise<void>;
   /**
    * Realtime changes to `spec`'s rows: `onRow` gets the new row (null for a delete), `onLive` whether
    * the channel is subscribed (true) or failed / closed (false). Returns a function that leaves.
@@ -204,6 +227,15 @@ export function rowToMessage(row: MessageRow, me: string): ChatMessage {
 }
 
 const isClosed = (s: RequestStatusRow): s is ClosedStatus => s === 'cancelled' || s === 'done';
+
+/** e.g. 4 stars, ['patient'], ' Thanks ' → { kind: 'rating', stars: 4, tags: ['patient'], problem: null, note: 'Thanks' }. */
+export function feedbackToRow(f: Feedback): NewFeedbackRow {
+  return { request_id: f.requestId, kind: 'rating', stars: f.stars, tags: f.tags, problem: null, note: f.note.trim().slice(0, FEEDBACK_NOTE_MAX) };
+}
+
+export function problemToRow(r: ProblemReport): NewFeedbackRow {
+  return { request_id: r.requestId, kind: 'problem', stars: null, tags: [], problem: r.kind, note: r.note.trim().slice(0, FEEDBACK_NOTE_MAX) };
+}
 
 // ---- live updates
 
@@ -397,9 +429,12 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
       });
     },
 
-    // Feedback and problem reports have no tables yet; the matching service will own them.
-    async submitFeedback() {},
-    async reportProblem() {},
+    async submitFeedback(feedback) {
+      await db.insertFeedback(feedbackToRow(feedback));
+    },
+    async reportProblem(report) {
+      await db.insertFeedback(problemToRow(report));
+    },
 
     watchOpenRequests(listener) {
       let latest = 0;
@@ -508,6 +543,11 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
     async sendMessage(row) {
       const { error } = await client.from('messages').insert(row);
       if (error) fail(error);
+    },
+    async insertFeedback(row) {
+      // No .select(): problem reports can't be read back (insert-only), so ask for nothing back.
+      const { error } = await client.from('help_feedback').insert(row);
+      if (error && !(error.code === '23505' && row.kind === 'rating')) fail(error); // 23505: rated already
     },
     subscribe<Row>(spec: WatchSpec, onRow: (row: Row | null) => void, onLive: (live: boolean) => void) {
       const filter = spec.filter ? { filter: spec.filter } : {};

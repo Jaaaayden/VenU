@@ -379,7 +379,12 @@
     "authorFallback": "VenUの来場者",
     "submitted": "{{date}} に送信",
     "originalLanguage": "原文の言語：{{language}}",
-    "noBody": "詳細はありません。"
+    "noBody": "詳細はありません。",
+    "delete": "自分のレポートを削除",
+    "deleteConfirm": "このレポートを削除しますか？この会場の来場者には表示されなくなります。",
+    "deleteKeep": "残す",
+    "deleteYes": "削除",
+    "deleteFailed": "レポートを削除できませんでした。{{reason}}"
   },
   "form": {
     "title": "レポートを追加",

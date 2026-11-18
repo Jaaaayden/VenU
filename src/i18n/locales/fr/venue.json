@@ -383,7 +383,12 @@
     "authorFallback": "Visiteur VenU",
     "submitted": "Envoyé le {{date}}",
     "originalLanguage": "Langue d’origine : {{language}}",
-    "noBody": "Aucun détail ajouté."
+    "noBody": "Aucun détail ajouté.",
+    "delete": "Supprimer mon signalement",
+    "deleteConfirm": "Supprimer ce signalement ? Les visiteurs de ce site ne le verront plus.",
+    "deleteKeep": "Le garder",
+    "deleteYes": "Supprimer",
+    "deleteFailed": "Impossible de supprimer le signalement. {{reason}}"
   },
   "form": {
     "title": "Nouveau signalement",

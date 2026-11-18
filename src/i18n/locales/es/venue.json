@@ -383,7 +383,12 @@
     "authorFallback": "Visitante de VenU",
     "submitted": "Enviado el {{date}}",
     "originalLanguage": "Idioma original: {{language}}",
-    "noBody": "Sin detalles."
+    "noBody": "Sin detalles.",
+    "delete": "Eliminar mi reporte",
+    "deleteConfirm": "¿Eliminar este reporte? Los visitantes de este recinto ya no lo verán.",
+    "deleteKeep": "Conservarlo",
+    "deleteYes": "Eliminar",
+    "deleteFailed": "No se pudo eliminar el reporte. {{reason}}"
   },
   "form": {
     "title": "Agregar reporte",

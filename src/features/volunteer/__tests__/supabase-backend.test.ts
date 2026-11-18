@@ -22,6 +22,7 @@ import {
   supabaseHelpDb,
   type HelpDb,
   type MessageRow,
+  type NewFeedbackRow,
   type RequestRow,
   type WatchSpec,
 } from '../supabase-backend';
@@ -70,6 +71,8 @@ interface Sub {
 function fakeServer({ realtime = true } = {}) {
   const requests = new Map<string, RequestRow>();
   const messages: MessageRow[] = [];
+  /** help_feedback rows, with the author the database would set. */
+  const feedback: (NewFeedbackRow & { author_id: string })[] = [];
   const subs = new Set<Sub>();
   /** The server's clock, which tests move with advance(); the device clock (Date.now) is separate. */
   let clock = Date.parse('2026-11-17T18:00:00Z');
@@ -177,6 +180,14 @@ function fakeServer({ realtime = true } = {}) {
         messages.push(full);
         posted(full);
       },
+      // help_feedback's insert policy: a party to a matched or finished request; one rating each.
+      async insertFeedback(row) {
+        await Promise.resolve();
+        const r = requests.get(row.request_id);
+        if (!party(row.request_id, who) || (r?.status !== 'matched' && r?.status !== 'done')) throw new Error('row-level security');
+        if (row.kind === 'rating' && feedback.some(f => f.kind === 'rating' && f.request_id === row.request_id && f.author_id === who)) return; // 23505
+        feedback.push({ ...row, author_id: who });
+      },
       subscribe<Row>(spec: WatchSpec, onRow: (row: Row | null) => void, onLive: (live: boolean) => void) {
         const sub: Sub = { viewer: who, spec, onRow: onRow as (row: unknown) => void };
         if (realtime) subs.add(sub);
@@ -186,7 +197,7 @@ function fakeServer({ realtime = true } = {}) {
     };
   }
 
-  return { requests, messages, subs, dbFor, control, advance: (ms: number) => { clock += ms; } };
+  return { requests, messages, feedback, subs, dbFor, control, advance: (ms: number) => { clock += ms; } };
 }
 
 const rosaNeedsHelp: NewRequest = {
@@ -340,6 +351,31 @@ describe('live help requests', () => {
     expect(server.requests.get(id)).toMatchObject({ status: 'done', closed_by: 'sam' });
     expect(visitor.getState().status).toBe('done');
     expect(visitor.getState().match?.volunteer.firstName).toBe('Sam');
+  });
+
+  it('saves the visitor’s rating to help_feedback, once, then thanks them', async () => {
+    const { visitor, id, server } = await matched();
+    visitor.endHelp();
+    await settle();
+    await visitor.submitFeedback(4, ['patient', 'helpful'], '  Found me a seat  ');
+    expect(server.feedback).toEqual([
+      { request_id: id, kind: 'rating', stars: 4, tags: ['patient', 'helpful'], problem: null, note: 'Found me a seat', author_id: 'rosa' },
+    ]);
+    expect(visitor.getState()).toMatchObject({ status: 'idle', notice: { key: 'thanks', params: { name: 'Sam' } } });
+  });
+
+  it('saves a problem report with its kind, and a refused insert reaches the screen', async () => {
+    const { visitor, id, server } = await matched();
+    visitor.endHelp();
+    await settle();
+    await visitor.reportProblem('no_show', ' Waited 20 minutes ');
+    expect(server.feedback).toEqual([
+      { request_id: id, kind: 'problem', stars: null, tags: [], problem: 'no_show', note: 'Waited 20 minutes', author_id: 'rosa' },
+    ]);
+    // Someone who isn't on the request (RLS refuses): the error reaches feedback-view's "Couldn't send".
+    const lee = createLiveBackend(server.dbFor('lee'));
+    await expect(lee.reportProblem({ requestId: id, volunteerId: 'sam', kind: 'rude', note: '' })).rejects.toThrow('row-level security');
+    expect(server.feedback).toHaveLength(1);
   });
 
   it('open → cancelled while searching: it leaves the volunteer’s list on the next refresh', async () => {
@@ -720,6 +756,27 @@ describe('the Supabase calls', () => {
     await db.openRequests();
     await db.release('r1');
     expect(rpc.mock.calls).toEqual([['open_help_requests'], ['release_help_request', { p_request_id: 'r1' }]]);
+  });
+
+  it('inserts ratings and problem reports into help_feedback without reading them back', async () => {
+    const insert = jest.fn(async (_row: unknown) => ({ error: null as null | { code: string; message: string } }));
+    const from = jest.fn((_table: string) => ({ insert }));
+    const backend = createLiveBackend(supabaseHelpDb({ from } as unknown as SupabaseClient));
+    await backend.submitFeedback({ requestId: 'r1', volunteerId: 'sam', stars: 5, tags: ['fast'], note: ' Great ' });
+    await backend.reportProblem({ requestId: 'r1', volunteerId: 'sam', kind: 'unsafe', note: 'x'.repeat(1200) });
+    expect(from.mock.calls).toEqual([['help_feedback'], ['help_feedback']]);
+    expect(insert.mock.calls[0]![0]).toEqual({ request_id: 'r1', kind: 'rating', stars: 5, tags: ['fast'], problem: null, note: 'Great' });
+    expect(insert.mock.calls[1]![0]).toMatchObject({ request_id: 'r1', kind: 'problem', stars: null, tags: [], problem: 'unsafe' });
+    expect((insert.mock.calls[1]![0] as { note: string }).note).toHaveLength(1000);
+  });
+
+  it('a rating saved before (23505, a retried Submit) counts as sent; other errors throw', async () => {
+    const failing = (code: string) => ({ from: () => ({ insert: async () => ({ error: { code, message: code } }) }) }) as unknown as SupabaseClient;
+    const rating = { request_id: 'r1', kind: 'rating' as const, stars: 5, tags: [], problem: null, note: '' };
+    await expect(supabaseHelpDb(failing('23505')).insertFeedback(rating)).resolves.toBeUndefined();
+    await expect(supabaseHelpDb(failing('42501')).insertFeedback(rating)).rejects.toMatchObject({ code: '42501' });
+    await expect(supabaseHelpDb(failing('23505')).insertFeedback({ ...rating, kind: 'problem', stars: null, problem: 'rude' }))
+      .rejects.toMatchObject({ code: '23505' });
   });
 });
 
