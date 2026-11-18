@@ -12,17 +12,17 @@ import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { categoryLabel, facilityMeta, facilityName } from './labels';
+import { categoryLabel, facilityMeta, facilityName, type FacilityWalk } from './labels';
 import type { Facility } from './types';
 
 const PHOTO = 56;
 
-export function PinCard({ facility, onOpen, onClose }: { facility: Facility; onOpen: () => void; onClose: () => void }) {
+export function PinCard({ facility, walk, onOpen, onClose }: { facility: Facility; walk?: FacilityWalk | null; onOpen: () => void; onClose: () => void }) {
   const t = useT('venue');
   const tc = useT('common');
   const rtl = useLayoutRtl();
   const name = facilityName(facility, t);
-  const meta = facilityMeta(facility, t);
+  const meta = facilityMeta(facility, t, walk);
   return (
     <View style={styles.card}>
       <Pressable
@@ -33,7 +33,8 @@ export function PinCard({ facility, onOpen, onClose }: { facility: Facility; onO
         accessibilityHint={t('map.cardHint')}>
         <Photo facility={facility} />
         <View style={styles.text}>
-          <Text style={styles.name} numberOfLines={1}>{name}</Text>
+          {/* Two lines: a translated name can be long ("Answers Portal مستوى Terrace"). */}
+          <Text style={[styles.name, rtl && styles.rtlText]} numberOfLines={2}>{name}</Text>
           <Text style={styles.meta} numberOfLines={1}>{meta}</Text>
         </View>
         <View style={rtl && styles.flip}>
@@ -76,5 +77,6 @@ const styles = StyleSheet.create({
   name: { fontFamily: Fonts.display, fontSize: 17, lineHeight: 22, color: Colors.text },
   meta: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.textMuted },
   flip: { transform: [{ scaleX: -1 }] },
+  rtlText: { writingDirection: 'rtl' },
   close: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start' },
 });

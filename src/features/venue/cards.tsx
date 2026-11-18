@@ -7,7 +7,7 @@ import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { eventsLabel, facilityMeta, facilityName } from './labels';
+import { eventsLabel, facilityMeta, facilityName, type FacilityWalk } from './labels';
 import { reportAuthor, type FacilityReport } from './reports';
 import { useReportTranslation } from './report-translation';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
@@ -36,10 +36,10 @@ export function StadiumCard({ venue, onPress }: { venue: Venue; onPress: () => v
 }
 
 /** White row: category icon, name, distance and wait, chevron (pointing left in RTL). */
-export function FacilityRow({ facility, onPress }: { facility: Facility; onPress: () => void }) {
+export function FacilityRow({ facility, walk, onPress }: { facility: Facility; walk?: FacilityWalk | null; onPress: () => void }) {
   const t = useT('venue');
   const rtl = useLayoutRtl();
-  const meta = facilityMeta(facility, t);
+  const meta = facilityMeta(facility, t, walk);
   const name = facilityName(facility, t);
   return (
     <Pressable

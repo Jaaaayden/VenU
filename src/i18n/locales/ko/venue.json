@@ -96,6 +96,9 @@
     "schematic": "간략 지도"
   },
   "walk_other": "도보 {{number}}분",
+  "walkStart": "여기서 길찾기 시작",
+  "walkMine": "여기 있어요",
+  "walkAsk": "위치 비공개",
   "wait": {
     "none": "대기 없음",
     "short": "대기 짧음",
@@ -120,10 +123,10 @@
     "long_lines_halftime": "하프타임에 긴 줄",
     "wheelchair_loans": "휠체어 대여",
     "permit_needed": "허가증 필요",
+    "pass_needed": "주차권 필요",
     "wheelchair_escort": "휠체어 동행",
     "premium_access": "VIP·프리미엄",
     "sensory_room": "감각실",
-    "pass_needed": "주차권 필요",
     "assistive_listening": "보청 보조",
     "lost_items": "분실물",
     "changing_table": "기저귀 교환대"
@@ -359,6 +362,7 @@
     "notFound": "시설을 찾을 수 없습니다",
     "wheelchair": "휠체어 이용 가능",
     "directions": "길찾기",
+    "noRoute": "도보 경로 없음: 경기장이 이 위치를 공개하지 않습니다. 직원에게 길을 물어보세요.",
     "imHere": "여기 있어요",
     "imHereHint": "도움을 요청할 때 이곳을 내 위치로 사용합니다",
     "isHere": "내 위치",
@@ -422,6 +426,7 @@
     "title": "도보 경로",
     "from": "출발: {{from}}",
     "fromArrival": "주 출입구인 {{from}}에서 출발합니다. 다른 곳에 있나요? 그 장소를 열고 ‘여기 있어요’ 버튼을 누르세요.",
+    "fromArrivalPlain": "{{from}}에서 출발합니다. 다른 곳에 있나요? 그 장소를 열고 ‘여기 있어요’ 버튼을 누르세요.",
     "steps_other": "약 {{number}}걸음",
     "stepStart": "{{from}}에서 출발하세요.",
     "stepHead": "{{direction}}쪽으로 약 {{meters}}m 가세요.",

@@ -10,7 +10,7 @@
  * - `walkMinutes` and `wait` are stand-ins for live data, e.g. a gate is a "Long wait" before doors.
  * - `accessible` = the guide says it's step-free or reachable by the venue's elevators/ramp.
  */
-import { eventsLabel, facilityDescription, facilityLocation, facilityName, venueT, type VenueT } from './labels';
+import { categoryLabel, eventsLabel, facilityDescription, facilityLocation, facilityName, tagLabel, venueT, type VenueT } from './labels';
 import type { Facility, FacilityCategory, Venue } from './types';
 
 export const VENUES: Venue[] = [
@@ -390,18 +390,42 @@ export function searchVenues(query: string, venues: Venue[] = VENUES, t: VenueT 
   });
 }
 
-/** "Accessibility" also matches any facility that is accessible, not only the services desk. */
+/**
+ * "Accessibility" also matches any facility that is accessible, not only the services desk, and
+ * "Lost & Found" any desk that takes lost items (a guest services desk with the `lost_items` tag).
+ */
 export function matchesCategory(f: Facility, category: FacilityCategory | null): boolean {
   if (!category) return true;
-  return f.category === category || (category === 'accessible' && f.accessible);
+  return f.category === category
+    || (category === 'accessible' && f.accessible)
+    || (category === 'lost_found' && f.tags.some(tag => tag.id === 'lost_items'));
 }
 
-/** Matches name, description and location, in English and in `t`'s language (see searchKey). */
+/** Words people search for that no label says, in English (labels cover every language). */
+const SEARCH_ALIASES: Partial<Record<FacilityCategory, string>> = {
+  gate: 'entrance entry door',
+  restroom: 'bathroom toilet washroom wc',
+  first_aid: 'medical doctor nurse emt',
+  accessible: 'wheelchair disability disabled',
+  parking: 'car garage',
+};
+
+/**
+ * Matches name, description, location, category and tag labels, in English and in `t`'s language
+ * (see searchKey), so "restroom" finds the infant care room and "wheelchair" an escort desk.
+ */
 export function searchFacilities(facilities: Facility[], query: string, category: FacilityCategory | null, t: VenueT = venueT()): Facility[] {
   const words = searchWords(query);
+  const en = venueT('en');
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
-    const hay = searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)}`);
+    if (!words.length) return true;
+    const labels = [
+      categoryLabel(f.category, en), categoryLabel(f.category, t), SEARCH_ALIASES[f.category] ?? '',
+      ...f.tags.flatMap(tag => [tagLabel(tag, en), tagLabel(tag, t)]),
+      f.accessible ? `${categoryLabel('accessible', en)} ${categoryLabel('accessible', t)} ${SEARCH_ALIASES.accessible}` : '',
+    ];
+    const hay = searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)} ${labels.join(' ')}`);
     return words.every(w => hay.includes(w));
   });
 }

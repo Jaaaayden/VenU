@@ -96,6 +96,9 @@
     "schematic": "Bản đồ giản lược"
   },
   "walk_other": "{{number}} phút đi bộ",
+  "walkStart": "Lộ trình bắt đầu từ đây",
+  "walkMine": "Bạn đang ở đây",
+  "walkAsk": "Vị trí chưa công bố",
   "wait": {
     "none": "Không phải chờ",
     "short": "Chờ ít",
@@ -120,10 +123,10 @@
     "long_lines_halftime": "Xếp hàng dài giờ nghỉ",
     "wheelchair_loans": "Cho mượn xe lăn",
     "permit_needed": "Cần giấy phép",
+    "pass_needed": "Cần vé đỗ xe",
     "wheelchair_escort": "Hỗ trợ xe lăn",
     "premium_access": "VIP và vé cao cấp",
     "sensory_room": "Phòng giác quan",
-    "pass_needed": "Cần vé đỗ xe",
     "assistive_listening": "Hỗ trợ nghe",
     "lost_items": "Đồ thất lạc",
     "changing_table": "Bàn thay tã"
@@ -359,6 +362,7 @@
     "notFound": "Không tìm thấy tiện ích",
     "wheelchair": "Xe lăn vào được",
     "directions": "Chỉ đường",
+    "noRoute": "Không có lộ trình đi bộ: địa điểm không công bố vị trí này. Hãy hỏi nhân viên đường đi.",
     "imHere": "Tôi ở đây",
     "imHereHint": "Dùng chỗ này làm vị trí của bạn khi nhờ giúp đỡ",
     "isHere": "Vị trí của bạn",
@@ -422,6 +426,7 @@
     "title": "Lộ trình đi bộ",
     "from": "Từ {{from}}",
     "fromArrival": "Từ {{from}}, lối vào chính. Bạn đang ở chỗ khác? Mở địa điểm đó và nhấn “Tôi ở đây”.",
+    "fromArrivalPlain": "Từ {{from}}. Bạn đang ở chỗ khác? Mở địa điểm đó và nhấn “Tôi ở đây”.",
     "steps_other": "khoảng {{number}} bước",
     "stepStart": "Bắt đầu tại {{from}}.",
     "stepHead": "Đi về hướng {{direction}} khoảng {{meters}} m.",

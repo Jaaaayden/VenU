@@ -96,6 +96,9 @@
     "schematic": "簡略マップ"
   },
   "walk_other": "徒歩{{number}}分",
+  "walkStart": "ここから経路が始まります",
+  "walkMine": "現在地",
+  "walkAsk": "場所は非公開",
   "wait": {
     "none": "待ち時間なし",
     "short": "待ち時間短め",
@@ -120,10 +123,10 @@
     "long_lines_halftime": "ハーフタイムは行列",
     "wheelchair_loans": "車いす貸出",
     "permit_needed": "許可証が必要",
+    "pass_needed": "駐車券が必要",
     "wheelchair_escort": "車いす介助",
     "premium_access": "VIP・プレミアム",
     "sensory_room": "センサリールーム",
-    "pass_needed": "駐車券が必要",
     "assistive_listening": "補聴支援",
     "lost_items": "落とし物",
     "changing_table": "おむつ交換台"
@@ -359,6 +362,7 @@
     "notFound": "施設が見つかりません",
     "wheelchair": "車いす対応",
     "directions": "経路",
+    "noRoute": "徒歩経路はありません：会場はこの場所を公開していません。スタッフに道を聞いてください。",
     "imHere": "ここにいます",
     "imHereHint": "助けを求めるときに、ここを現在地として使います",
     "isHere": "現在地",
@@ -422,6 +426,7 @@
     "title": "徒歩ルート",
     "from": "出発：{{from}}",
     "fromArrival": "メイン入口の{{from}}から出発します。別の場所にいる場合は、その場所を開いて「ここにいます」をタップしてください。",
+    "fromArrivalPlain": "{{from}}から出発します。別の場所にいる場合は、その場所を開いて「ここにいます」をタップしてください。",
     "steps_other": "約{{number}}歩",
     "stepStart": "{{from}}から出発します。",
     "stepHead": "{{direction}}へ約{{meters}}m進みます。",
