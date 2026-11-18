@@ -721,7 +721,8 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
     const r = store.requests.get(input?.p_request_id);
     const allowed = r && (r.status === 'open' || r.status === 'matched')
       && (r.visitor_id === uid || (r.volunteer_id === uid && r.status === 'matched' && status === 'done'));
-    if (allowed) Object.assign(r, { status, closed_by: uid, closed_at: now() });
+    // 'done' on a request nobody took (still open) cancels it (20261118050000_review_fixes.sql).
+    if (allowed) Object.assign(r, { status: r.status === 'matched' ? status : 'cancelled', closed_by: uid, closed_at: now() });
     return send(res, 204);
   }
   // withdraw_open_request (20261118040000_help_flow_fixes.sql): the visitor's search gave up. Cancels
@@ -748,12 +749,18 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
 // ---- facility_reports, help_feedback and app_feedback, with the rules of
 // supabase/migrations/20261118010000_reports_feedback.sql. Signed in only. Saved in the state file with
 // the accounts (help requests aren't, so a rating can outlive its request across a restart; harmless).
-//   facility_reports  everyone signed in reads; insert as yourself (author_name from your profile's
+//   facility_reports  everyone signed in reads, every column but author_id (20261118050000_review_fixes.sql:
+//                     select=* or author_id is refused); insert as yourself (author_name from your profile's
 //                     first name, whatever the app sends); delete only your own; no updates.
-//   help_feedback     insert: a party to a matched or done request, one rating each (23505 after).
+//   facility_report_cards  the reports as the app lists them: no author_id, plus mine (yours).
+//   help_feedback     insert: a party to a request a volunteer took (matched_at set, status matched or
+//                     done), one rating each (23505 after).
 //                     select: ratings only, to their author or to the request's volunteer.
 //   app_feedback      insert only.
-const FEEDBACK_ROUTES = new Set(['/rest/v1/facility_reports', '/rest/v1/help_feedback', '/rest/v1/app_feedback']);
+const FEEDBACK_ROUTES = new Set(['/rest/v1/facility_reports', '/rest/v1/facility_report_cards', '/rest/v1/help_feedback', '/rest/v1/app_feedback']);
+// facility_reports columns signed-in users may read (all but author_id), and the view's.
+const REPORT_COLUMNS = ['id', 'venue_id', 'facility_id', 'author_name', 'title', 'topic', 'body', 'language', 'created_at'];
+const REPORT_CARD_COLUMNS = [...REPORT_COLUMNS, 'mine'];
 const REPORT_TOPICS = ['accessibility', 'directions', 'facility_condition', 'security', 'crowds', 'other'];
 const FEEDBACK_TAGS = ['language', 'venue', 'patient', 'fast', 'helpful', 'other'];
 const PROBLEM_KINDS = ['no_show', 'unsafe', 'rude', 'other'];
@@ -786,11 +793,25 @@ function feedbackRoute({ req, res, p, url, body, uid, profiles, send, pgErr, tab
   const input = body();
   const row = Array.isArray(input) ? input[0] : input;
   const text = (v, max) => typeof v === 'string' && v.length <= max;
-  const saved = full => {
+  const saved = (full, shown = full) => {
     tables[table].push(full);
     persist();
-    return wantsRows ? reply([full], 201) : send(res, 201);
+    return wantsRows ? reply([shown], 201) : send(res, 201);
   };
+  /** The asked-for columns of a report, or null when the select (or a filter) needs one the caller can't read. */
+  const reportColumns = allowed => {
+    const cols = (url.searchParams.get('select') ?? '*').split(',').map(c => c.trim());
+    const wanted = cols.includes('*') ? (allowed === REPORT_CARD_COLUMNS ? allowed : null) : cols;
+    if (!wanted || !wanted.every(c => allowed.includes(c)) || url.searchParams.has('author_id')) return null;
+    return r => Object.fromEntries(wanted.map(c => [c, r[c]]));
+  };
+  if (table === 'facility_report_cards') {
+    // A security_invoker view with only a select grant.
+    const project = reportColumns(REPORT_CARD_COLUMNS);
+    if (req.method !== 'GET' || !project) return permission();
+    const cards = tables.facility_reports.map(({ author_id, ...r }) => ({ ...r, mine: author_id === uid }));
+    return reply(orderAndLimit(cards.filter(rowFilter(url)), url).map(project));
+  }
   if (req.method === 'POST') {
     if (!row || typeof row !== 'object') return check();
     // Only the granted columns; ids, authors and times come from the server.
@@ -798,19 +819,23 @@ function feedbackRoute({ req, res, p, url, body, uid, profiles, send, pgErr, tab
   }
 
   if (table === 'facility_reports') {
-    if (req.method === 'GET') return reply(orderAndLimit(tables.facility_reports.filter(rowFilter(url)), url));
+    const project = reportColumns(REPORT_COLUMNS);
+    if (req.method === 'GET') return project ? reply(orderAndLimit(tables.facility_reports.filter(rowFilter(url)), url).map(project)) : permission();
     if (req.method === 'POST') {
+      if (wantsRows && !project) return permission(); // RETURNING author_id: the whole insert fails
       const title = typeof row.title === 'string' ? row.title : '';
       if (!row.venue_id || !text(row.venue_id, 40) || !row.facility_id || !text(row.facility_id, 80) || !title.trim() || title.trim().length > 80
         || !REPORT_TOPICS.includes(row.topic) || !text(row.body ?? '', 1000) || (row.language != null && !text(row.language, 12))) return check();
-      return saved({
+      const full = {
         id: randomUUID(), venue_id: row.venue_id, facility_id: row.facility_id, author_id: uid,
         // set_report_author_name: the profile's first name, whatever the app sent.
         author_name: String(profiles.get(uid)?.first_name ?? '').trim().slice(0, 40),
         title, topic: row.topic, body: row.body ?? '', language: row.language ?? null, created_at: new Date().toISOString(),
-      });
+      };
+      return saved(full, project ? project(full) : full);
     }
     if (req.method === 'DELETE') {
+      if (url.searchParams.has('author_id')) return permission();
       const match = rowFilter(url);
       // RLS: only your own rows match; someone else's are left alone without an error.
       tables.facility_reports = tables.facility_reports.filter(r => !(r.author_id === uid && match(r)));
@@ -839,8 +864,9 @@ function feedbackRoute({ req, res, p, url, body, uid, profiles, send, pgErr, tab
       if (!Array.isArray(tags) || tags.length > 6 || !tags.every(t => FEEDBACK_TAGS.includes(t)) || !(okRating || okProblem) || !text(row.note ?? '', 1000))
         return check();
       const r = helpRequests.get(row.request_id);
-      // private.is_help_party, on a request a volunteer took.
-      if (!r || (r.visitor_id !== uid && r.volunteer_id !== uid) || (r.status !== 'matched' && r.status !== 'done')) return rls();
+      // private.is_help_party, on a request a volunteer took (matched_at survives finishing, and the
+      // volunteer's account being deleted afterwards; a hand-back clears it).
+      if (!r || (r.visitor_id !== uid && r.volunteer_id !== uid) || (r.status !== 'matched' && r.status !== 'done') || !r.matched_at) return rls();
       if (row.kind === 'rating' && tables.help_feedback.some(f => f.kind === 'rating' && f.request_id === row.request_id && f.author_id === uid))
         return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "help_feedback_one_rating"');
       // Problem reports have no select policy, so nothing comes back for them.

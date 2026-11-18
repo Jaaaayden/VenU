@@ -207,15 +207,15 @@ export function createLiveReportStore(db: ReportDb, seed: FacilityReport[] = [])
   const samples = createMemoryReportStore(seed);
   return {
     async list(venueId, facilityId) {
-      const [me, rows, fromSeed] = await Promise.all([db.me(), db.list(venueId, facilityId), samples.list(venueId, facilityId)]);
-      return [...rows.map(r => rowToReport(r, me)), ...fromSeed].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      const [rows, fromSeed] = await Promise.all([db.list(venueId, facilityId), samples.list(venueId, facilityId)]);
+      return [...rows.map(rowToReport), ...fromSeed].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     },
     async get(id) {
       const sample = await samples.get(id);
       if (sample) return sample;
       if (!isUuid(id)) return null; // a hand-typed or stale link
-      const [me, row] = await Promise.all([db.me(), db.get(id)]);
-      return row ? rowToReport(row, me) : null;
+      const row = await db.get(id);
+      return row ? rowToReport(row) : null;
     },
     async add({ venueId, facilityId, language, draft }) {
       const errors = validateReport(draft);
@@ -228,7 +228,7 @@ export function createLiveReportStore(db: ReportDb, seed: FacilityReport[] = [])
         body: draft.body.trim(),
         language: language ?? null,
       });
-      return rowToReport(row, await db.me());
+      return rowToReport(row);
     },
     async remove(id) {
       if (isUuid(id)) await db.remove(id);

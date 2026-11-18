@@ -370,6 +370,12 @@ const STEPS = [
       try {
         const { data: seen } = await ctx.volunteer.client.from('facility_reports').select('id').eq('id', data.id).maybeSingle();
         if (!seen) throw new Error("the volunteer can't see the report");
+        // Who wrote it stays private (20261118050000_review_fixes.sql): only the author's card says mine.
+        const { error: hidden } = await ctx.volunteer.client.from('facility_reports').select('author_id').eq('id', data.id).maybeSingle();
+        if (!hidden) throw new Error("the volunteer can read the report's author_id");
+        const { data: cards } = await ctx.visitor.client.from('facility_report_cards').select('mine').eq('id', data.id);
+        const { data: theirs } = await ctx.volunteer.client.from('facility_report_cards').select('mine').eq('id', data.id);
+        if (cards?.[0]?.mine !== true || theirs?.[0]?.mine !== false) throw new Error('facility_report_cards.mine is wrong');
         const { error: del } = await ctx.volunteer.client.from('facility_reports').delete().eq('id', data.id);
         const { data: still } = await ctx.visitor.client.from('facility_reports').select('id').eq('id', data.id).maybeSingle();
         if (!del && !still) throw new Error("the volunteer deleted someone else's report");
@@ -387,7 +393,8 @@ const STEPS = [
     async run(ctx) {
       const { error } = await ctx.visitor.client.rpc('close_help_request', { p_request_id: ctx.request.id, p_status: 'done' });
       if (error) throw new Error(`close failed: ${error.message}`);
-      ctx.request.status = 'done';
+      // Nobody took it (no volunteer this run): 'done' cancels it instead (20261118050000_review_fixes.sql).
+      ctx.request.status = ctx.matched ? 'done' : 'cancelled';
     },
   },
   {
@@ -395,13 +402,13 @@ const STEPS = [
     needs: ['request', 'visitor'],
     async run(ctx) {
       const mine = await readRequest(ctx.visitor.client, ctx.request.id);
-      if (mine?.status !== 'done') throw new Error(`the visitor sees status ${mine?.status ?? 'missing'}, expected done`);
+      if (mine?.status !== ctx.request.status) throw new Error(`the visitor sees status ${mine?.status ?? 'missing'}, expected ${ctx.request.status}`);
       if (mine.closed_by !== ctx.visitor.id || !mine.closed_at) throw new Error('closed_by / closed_at not set');
       if (ctx.volunteer && ctx.matched) {
         const theirs = await readRequest(ctx.volunteer.client, ctx.request.id);
         if (theirs?.status !== 'done') throw new Error(`the volunteer sees status ${theirs?.status ?? 'missing'}, expected done`);
       }
-      return 'done for both';
+      return ctx.matched ? 'done for both' : 'cancelled (nobody took it)';
     },
   },
 
@@ -412,7 +419,7 @@ const STEPS = [
     async run(ctx) {
       const notes = [];
       for (const channel of ctx.channels ?? []) await channel.unsubscribe();
-      if (ctx.request && ctx.visitor && ctx.request.status !== 'done') {
+      if (ctx.request && ctx.visitor && ctx.request.status !== 'done' && ctx.request.status !== 'cancelled') {
         const { error } = await ctx.visitor.client.rpc('close_help_request', { p_request_id: ctx.request.id, p_status: 'cancelled' });
         notes.push(error ? `couldn't cancel the request: ${error.message}` : 'cancelled the unfinished request');
       }
