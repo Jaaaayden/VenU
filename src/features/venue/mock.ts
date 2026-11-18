@@ -10,7 +10,7 @@
  * - `walkMinutes` and `wait` are stand-ins for live data, e.g. a gate is a "Long wait" before doors.
  * - `accessible` = the guide says it's step-free or reachable by the venue's elevators/ramp.
  */
-import { categoryLabel, eventsLabel, facilityDescription, facilityLocation, facilityName, tagLabel, venueT, type VenueT } from './labels';
+import { categoryLabel, eventsLabel, facilityDescription, facilityLocation, facilityName, facilityOffer, tagLabel, venueT, type VenueT } from './labels';
 import type { Facility, FacilityCategory, Venue } from './types';
 
 export const VENUES: Venue[] = [
@@ -393,9 +393,12 @@ export function searchVenues(query: string, venues: Venue[] = VENUES, t: VenueT 
 /**
  * "Accessibility" also matches any facility that is accessible, not only the services desk, and
  * "Lost & Found" any desk that takes lost items (a guest services desk with the `lost_items` tag).
+ * A sponsored stand only ever matches its own category (food): an ad never answers an
+ * accessibility or safety filter, though its page keeps the wheelchair badge.
  */
 export function matchesCategory(f: Facility, category: FacilityCategory | null): boolean {
   if (!category) return true;
+  if (f.sponsor) return f.category === category;
   return f.category === category
     || (category === 'accessible' && f.accessible)
     || (category === 'lost_found' && f.tags.some(tag => tag.id === 'lost_items'));
@@ -411,8 +414,28 @@ const SEARCH_ALIASES: Partial<Record<FacilityCategory, string>> = {
 };
 
 /**
+ * What search compares a facility against: name, description, location, category and tag labels,
+ * in English and in `t`'s language. A sponsored stand only has its own name, brand, offer and
+ * description plus its category's words, never tag or accessibility words, so an ad never answers
+ * "wheelchair" or "first aid".
+ */
+function searchText(f: Facility, t: VenueT, en: VenueT): string {
+  const category = `${categoryLabel(f.category, en)} ${categoryLabel(f.category, t)} ${SEARCH_ALIASES[f.category] ?? ''}`;
+  if (f.sponsor) {
+    return searchKey(`${f.name} ${f.description} ${f.sponsor.brand} ${f.sponsor.offer} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityOffer(f, t)} ${category}`);
+  }
+  const labels = [
+    category,
+    ...f.tags.flatMap(tag => [tagLabel(tag, en), tagLabel(tag, t)]),
+    f.accessible ? `${categoryLabel('accessible', en)} ${categoryLabel('accessible', t)} ${SEARCH_ALIASES.accessible}` : '',
+  ];
+  return searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)} ${labels.join(' ')}`);
+}
+
+/**
  * Matches name, description, location, category and tag labels, in English and in `t`'s language
  * (see searchKey), so "restroom" finds the infant care room and "wheelchair" an escort desk.
+ * Sponsored stands match only their own words (see searchText).
  */
 export function searchFacilities(facilities: Facility[], query: string, category: FacilityCategory | null, t: VenueT = venueT()): Facility[] {
   const words = searchWords(query);
@@ -420,12 +443,7 @@ export function searchFacilities(facilities: Facility[], query: string, category
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
     if (!words.length) return true;
-    const labels = [
-      categoryLabel(f.category, en), categoryLabel(f.category, t), SEARCH_ALIASES[f.category] ?? '',
-      ...f.tags.flatMap(tag => [tagLabel(tag, en), tagLabel(tag, t)]),
-      f.accessible ? `${categoryLabel('accessible', en)} ${categoryLabel('accessible', t)} ${SEARCH_ALIASES.accessible}` : '',
-    ];
-    const hay = searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)} ${labels.join(' ')}`);
+    const hay = searchText(f, t, en);
     return words.every(w => hay.includes(w));
   });
 }

@@ -5,6 +5,7 @@ import { join, relative } from 'node:path';
 import i18n, { type UiLanguage } from '@/i18n';
 import { resources } from '@/i18n/locales';
 
+import { categoriesAt } from '../categories';
 import { routeFor } from '../directions';
 import { facilityDescription, facilityLocation, facilityName, facilityOffer } from '../labels';
 import { facilitiesFor, getFacility, getVenue, searchFacilities, VENUES } from '../mock';
@@ -175,6 +176,38 @@ describe('facilityListLayout (the promoted card)', () => {
   it('shows no card at a venue without a featured stand', () => {
     const results = facilitiesFor('sofi');
     expect(facilityListLayout(results, undefined, '', null)).toEqual({ rows: results, promoted: null, promotedAt: 0 });
+  });
+});
+
+describe('search and chips never answer accessibility or safety with an ad', () => {
+  const all = venueFacilitiesFor('intuit-dome');
+  const en = i18n.getFixedT('en', 'venue');
+  const stands = (list: { id: string }[]) => list.filter(f => sponsoredStandsFor('intuit-dome').some(s => s.id === f.id)).map(f => f.id);
+
+  it.each(['wheelchair', 'accessible', 'accessibility', 'disabled', 'disability', 'first aid', 'medical', 'lost'])('"%s" finds no sponsored stand and no promoted card', query => {
+    const results = searchFacilities(all, query, null, en);
+    expect(stands(results)).toEqual([]);
+    expect(facilityListLayout(results, featuredStandFor('intuit-dome'), query, null).promoted).toBeNull();
+  });
+
+  it('keeps accessibility words out in the app language too', () => {
+    const es = i18n.getFixedT('es', 'venue');
+    expect(stands(searchFacilities(all, es('category.accessible'), null, es))).toEqual([]);
+    expect(stands(searchFacilities(all, es('tags.accessible'), null, es))).toEqual([]);
+  });
+
+  it('still finds a stand by its own name, brand, offer, description and food words', () => {
+    for (const query of ['coca-cola', 'refresh', 'panda', 'egg roll', 'orange chicken', 'food', 'drinks']) {
+      expect({ query, found: stands(searchFacilities(all, query, null, en)).length > 0 }).toEqual({ query, found: true });
+    }
+    const es = i18n.getFixedT('es', 'venue');
+    expect(stands(searchFacilities(all, 'descuento', null, es))).toEqual(['coca-cola-refresh-intuit']);
+  });
+
+  it('keeps stands off the Accessibility chip but keeps their wheelchair badge', () => {
+    expect(stands(searchFacilities(all, '', 'accessible', en))).toEqual([]);
+    expect(categoriesAt(all)).toContain('accessible'); // the venue's own accessible spots still fill it
+    expect(sponsoredStandsFor('intuit-dome').every(s => s.accessible)).toBe(true);
   });
 });
 
