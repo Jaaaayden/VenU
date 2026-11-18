@@ -1,6 +1,6 @@
 /**
- * "Where are you?": a sheet listing the current venue's facilities to pick your spot from, with the
- * venue tab's search and category chips. Picking sets the current spot; "I'm not sure" clears it.
+ * "Where are you?": a sheet listing the current venue's facilities to pick your spot from (not the
+ * ones whose spot it doesn't publish, see meetSpotsFor), with the venue tab's search and category chips. Picking sets the current spot; "I'm not sure" clears it.
  * e.g. SoFi Stadium → tap "Entry 4" → the request form reads "Near Entry 4 · SoFi Stadium".
  */
 import { router } from 'expo-router';
@@ -14,10 +14,10 @@ import { categoriesAt, emptyFacilitiesMessage, FacilityIcon } from '@/features/v
 import { CategoryChips } from '@/features/venue/category-chips';
 import { setCurrentSpot, useWhereAmI } from '@/features/venue/current';
 import { facilityLocation, facilityName } from '@/features/venue/labels';
-import { facilitiesFor, getVenue } from '@/features/venue/mock';
+import { getVenue } from '@/features/venue/mock';
 import type { Facility, FacilityCategory } from '@/features/venue/types';
 import { SearchField } from '@/features/venue/ui';
-import { spotChoices } from '@/features/volunteer/meet-point';
+import { meetSpotsFor, spotChoices } from '@/features/volunteer/meet-point';
 import { useT } from '@/i18n';
 
 export function LocationPicker({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -28,7 +28,7 @@ export function LocationPicker({ visible, onClose }: { visible: boolean; onClose
   const venue = getVenue(venueId);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  const facilities = facilitiesFor(venueId);
+  const facilities = meetSpotsFor(venueId);
   const results = spotChoices(facilities, query, category, tv);
   const venueName = venue?.name ?? venueId;
 

@@ -1,7 +1,8 @@
 /**
  * Sheet content: one facility (name, Directions, I'm here, description, distance and wait, tags) and
  * its reports. Directions is the venue's one way to a facility: it draws the route on the map and
- * shows the walk here. A spot the venue doesn't publish gets a note instead.
+ * shows the walk here. A spot the venue doesn't publish gets a note instead, and no "I'm here"
+ * (nobody could find you there; see isMeetSpot).
  * A sponsored stand adds its offer (labelled "Sponsored") and has no "I'm here": an ad is never a
  * meeting spot for a volunteer.
  */
@@ -17,7 +18,7 @@ import { formatNumber } from '@/i18n/format';
 import { goBack } from '@/lib/navigation';
 
 import { Notification, ReportCard } from './cards';
-import { setCurrentSpot, setCurrentVenue, useWhereAmI } from './current';
+import { isMeetSpot, setCurrentSpot, setCurrentVenue, useWhereAmI } from './current';
 import { DirectionsPanel } from './directions-panel';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
@@ -119,7 +120,7 @@ export function FacilityDetail() {
             />
           )}
           {/* Sets the spot the help request uses ("Near Entry 4"); shows a check once it's yours. */}
-          {sponsored ? null : <Button
+          {!isMeetSpot(facility) ? null : <Button
             label={isMySpot ? t('facility.isHere') : t('facility.imHere')}
             variant="outline"
             icon={<FigmaIcon name={isMySpot ? 'check-circle' : 'location-on'} size={22} color={Colors.primary} />}
