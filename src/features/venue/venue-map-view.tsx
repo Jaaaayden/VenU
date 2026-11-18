@@ -397,7 +397,8 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     height: SOURCE_BAR,
     paddingHorizontal: Spacing.gutter,
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    // Solid, so a pin panned under the bar is hidden instead of showing through its text.
+    backgroundColor: Colors.surface,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
   },
