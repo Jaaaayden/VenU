@@ -101,6 +101,25 @@ node scripts/e2e.mjs --url https://<ref>.supabase.co --anon <publishable key> --
 - SKIP means "not checkable here": no Realtime on the mock, `translate` not deployed (404) or without a provider (503), or a feature not built yet (TODO steps).
 - New feature, new step: add `{ id, needs, run }` to `STEPS` in `scripts/e2e.mjs`; `run` throws to FAIL or returns `{ skip: 'why' }`.
 
+## Accounts: password reset, social sign-in, delete account
+
+- **Forgot Password** (Sign In → Forgot Password?) takes a username or an email and always answers "If an account exists…". An email goes to Supabase Auth; a username goes to the `password-reset` Edge Function, which looks the email up server-side. The link opens `/reset-password`, which sets the new password and signs out everywhere.
+- **Social sign-in** (landing: Facebook, Google, Apple) returns to `/auth-callback`. A new account goes on to setup like an email sign-up, with no username (it signs in with the provider).
+- **Delete my data** (Profile) calls the `delete-account` Edge Function: photos, then the auth user; the database drops the profile and username, and keeps finished help requests for the other person (`supabase/migrations/20261118030000_account_deletion.sql`). Until it's deployed, the app deletes the profile and photo and says the sign-in remains.
+
+On the mock backend: the reset link prints in the terminal, social sign-in comes straight back as "Google User" etc., and `POST /__control` takes `{"disabledProviders":["apple"]}` or `{"missingFunctions":["delete-account"]}` to try the "isn't set up" and "not deployed" paths.
+
+### Set up on Supabase (project owner)
+
+```bash
+supabase db push                                         # 20261118030000_account_deletion.sql first
+supabase functions deploy delete-account                 # add --no-verify-jwt if the gateway rejects new signing keys
+supabase functions deploy password-reset --no-verify-jwt # callers are signed out
+```
+
+- Authentication → URL Configuration → Redirect URLs: add `<site>/reset-password`, `<site>/auth-callback`, `venu://reset-password`, `venu://auth-callback` (and `http://localhost:8081/**` for `npm run dev:supabase`).
+- Authentication → Sign In / Providers: turn on Google, Facebook and Apple with each provider's client ID and secret. Each provider's console needs the callback `https://<project-ref>.supabase.co/auth/v1/callback`.
+
 ## Scripts
 
 | Command | What it does |

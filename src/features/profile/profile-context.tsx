@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 
+import { deleteAccount, forgetDeletedAccount } from '@/lib/account';
 import * as auth from '@/lib/auth';
 import { onBeforeSignOut } from '@/lib/before-sign-out';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
@@ -62,8 +63,13 @@ interface ProfileContextValue {
    * Keeps the photo URL when the photo hasn't changed.
    */
   recheck(): Promise<void>;
-  /** Deletes the profile and photos, then signs out (one step, so no screen sees "signed in, no profile"). */
-  deleteAll(): Promise<void>;
+  /**
+   * Deletes the account: its sign-in, profile and photos (the delete-account Edge Function), then
+   * forgets it on this device (one step, so no screen sees "signed in, no profile"). Resolves
+   * 'account', or 'dataOnly' when the function isn't deployed yet: the profile and photos are gone
+   * but the sign-in remains, and the screen says so.
+   */
+  deleteAll(): Promise<'account' | 'dataOnly'>;
   signOut(): Promise<void>;
 }
 
@@ -287,21 +293,27 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const deleteAll = useCallback(async () => {
-    if (!userId) return;
+  const deleteAll = useCallback(async (): Promise<'account' | 'dataOnly'> => {
+    if (!userId) return 'account';
     // Any kept upload is in the folder this sweeps, so it can't be reused afterwards either way.
     pendingUploads.current = [];
+    let outcome: Awaited<ReturnType<typeof deleteAccount>>;
     try {
-      await store.deleteAll(userId);
+      outcome = await deleteAccount();
+      // Not deployed yet (or local mode): delete what the app can reach itself.
+      if (outcome !== 'deleted') await store.deleteAll(userId);
     } catch (e) {
       // Part of it may be gone (e.g. the photo). Show what's actually there now, quietly, so the
       // Profile screen stays up to report the failure even if this reload fails too.
       await load(true).catch(() => {});
       throw e;
     }
-    // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile.
-    await auth.signOut().catch(() => {});
+    // The data is gone; a sign-out hiccup mustn't leave a signed-in user with no profile. A deleted
+    // account's server session went with it, so only this device's copy is dropped.
+    if (outcome === 'deleted') await forgetDeletedAccount();
+    else await auth.signOut().catch(() => {});
     goSignedOut();
+    return outcome === 'notDeployed' ? 'dataOnly' : 'account';
   }, [userId, load, goSignedOut]);
 
   const signOut = useCallback(async () => {

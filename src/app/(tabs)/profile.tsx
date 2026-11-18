@@ -73,8 +73,9 @@ export default function ProfileScreen() {
     setBusy(true);
     setDeleteError(null);
     try {
-      await deleteAll(); // also signs out
-      router.replace('/welcome');
+      const deleted = await deleteAll(); // also signs out
+      // The first screen says what happened: the account is gone, or (function not deployed) the sign-in remains.
+      router.replace({ pathname: '/welcome', params: { deleted } });
     } catch (e) {
       // Photos go first, so a failure can be partial (the context has already reloaded what's left).
       setDeleteError(t('tab.deleteFailed', { reason: friendlyError(e) }));

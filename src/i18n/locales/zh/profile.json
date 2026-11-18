@@ -15,7 +15,7 @@
     "help": "帮助与反馈",
     "terms": "使用条款",
     "signOutFailed": "无法退出登录。{{reason}}",
-    "deleteWarning": "这将永久删除你的资料和照片。之后你可以重新创建。",
+    "deleteWarning": "这将永久删除你的账户、资料和照片。之后将无法再用它登录。",
     "deleteFailed": "未能删除你的全部数据。{{reason}}",
     "deleteData": "删除我的数据"
   },

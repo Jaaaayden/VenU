@@ -15,7 +15,7 @@
     "help": "Aide et avis",
     "terms": "Conditions d'utilisation",
     "signOutFailed": "Impossible de se déconnecter. {{reason}}",
-    "deleteWarning": "Votre profil et votre photo seront supprimés définitivement. Vous pourrez en créer un nouveau plus tard.",
+    "deleteWarning": "Votre compte, votre profil et votre photo seront supprimés définitivement. Vous ne pourrez plus vous connecter avec ce compte.",
     "deleteFailed": "Impossible de supprimer toutes vos données. {{reason}}",
     "deleteData": "Supprimer mes données"
   },

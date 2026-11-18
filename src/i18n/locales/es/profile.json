@@ -15,7 +15,7 @@
     "help": "Ayuda y comentarios",
     "terms": "Términos de uso",
     "signOutFailed": "No se pudo cerrar sesión. {{reason}}",
-    "deleteWarning": "Esto elimina tu perfil y tu foto para siempre. Puedes crear uno nuevo más adelante.",
+    "deleteWarning": "Esto elimina tu cuenta, tu perfil y tu foto para siempre. Ya no podrás iniciar sesión con ella.",
     "deleteFailed": "No se pudieron eliminar todos tus datos. {{reason}}",
     "deleteData": "Eliminar mis datos"
   },

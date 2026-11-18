@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -22,6 +22,8 @@ export default function WelcomeScreen() {
   const signedInHref = useSignedInHref();
   const t = useT('onboarding');
   const tc = useT('common');
+  // Set by Profile -> Delete my data: 'account' (all gone) or 'dataOnly' (the sign-in remains).
+  const { deleted } = useLocalSearchParams<{ deleted?: string }>();
   const [role, setRole] = useState<Role | null>(null);
 
   // Coming back here (Back from the landing page, or a reload): show the earlier choice.
@@ -48,6 +50,12 @@ export default function WelcomeScreen() {
         <LogoMark size={100} />
         <Text style={styles.name} accessibilityRole="header">VenU</Text>
       </View>
+
+      {(deleted === 'account' || deleted === 'dataOnly') && (
+        <Text style={styles.deleted} accessibilityLiveRegion="polite">
+          {deleted === 'account' ? t('welcome.accountDeleted') : t('welcome.signInKept')}
+        </Text>
+      )}
 
       <View style={styles.choices} accessibilityRole="radiogroup" accessibilityLabel={t('welcome.roleQuestion')}>
         {ROLES.map((r, i) => {
@@ -76,6 +84,7 @@ const styles = StyleSheet.create({
   // Figma 530:10212: the logo sits about 160pt from the top, the cards 72pt under "VenU".
   hero: { alignItems: 'center', marginTop: 100, gap: Spacing.xl },
   name: { fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
+  deleted: { ...Type.caption, textAlign: 'center', marginTop: Spacing.xl, marginBottom: -Spacing.xxl },
   choices: { alignItems: 'center', marginTop: 72 },
   choiceWrap: { alignItems: 'center', gap: Spacing.md, marginTop: Spacing.md },
   or: { ...Type.body },

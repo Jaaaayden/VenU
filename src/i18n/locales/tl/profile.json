@@ -15,7 +15,7 @@
     "help": "Tulong at feedback",
     "terms": "Mga tuntunin ng paggamit",
     "signOutFailed": "Hindi makapag-sign out. {{reason}}",
-    "deleteWarning": "Permanenteng mabubura ang iyong profile at larawan. Puwede kang gumawa ng bago mamaya.",
+    "deleteWarning": "Permanenteng mabubura ang iyong account, profile at larawan. Hindi ka na makakapag-sign in gamit ito.",
     "deleteFailed": "Hindi natapos burahin ang iyong data. {{reason}}",
     "deleteData": "Burahin ang aking data"
   },
