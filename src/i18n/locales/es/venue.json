@@ -125,6 +125,7 @@
     "wheelchair_escort": "Acompañamiento en silla de ruedas",
     "premium_access": "VIP y premium",
     "sensory_room": "Sala sensorial",
+    "pass_needed": "Requiere pase",
     "assistive_listening": "Audición asistida",
     "lost_items": "Objetos perdidos",
     "changing_table": "Cambiador"
@@ -282,27 +283,27 @@
     },
     "main-entrance": {
       "name": "Entrada principal",
-      "description": "Carril GameFace ID a la izquierda y carril Identity Pass a la derecha. Ayuda de movilidad gratis desde el control de seguridad hasta tu asiento.",
+      "description": "Carril GameFace ID a la izquierda y carril Identity Pass a la derecha; para la entrada accesible, quienes tienen Identity Pass validan en el Answers Portal. Bolsos de hasta 10×6×2 in (médicos hasta 14×14×6). Ayuda de movilidad gratis desde el control de seguridad hasta tu asiento.",
       "location": "En la plaza, junto a Century Blvd. y Prairie Ave."
     },
     "vip-entrance": {
       "name": "Entrada VIP",
-      "description": "Para boletos de suite, club y pista.",
+      "description": "Para boletos de suite, club y pista (también pueden usar la entrada principal).",
       "location": "A la izquierda de la entrada principal"
     },
     "wall-entrance": {
       "name": "Entrada de The Wall",
-      "description": "Entrada exclusiva para The Wall.",
+      "description": "Para boletos en The Wall (también pueden usar la entrada principal).",
       "location": "A la izquierda de la entrada principal, pasando la entrada VIP"
     },
     "answers-portal-main": {
       "name": "Answers Portal, nivel Main",
-      "description": "Atención al visitante: objetos perdidos, audición asistida gratis (se retiene una identificación con foto) y dispositivos OneCourt.",
+      "description": "Atención al visitante: objetos perdidos, audición asistida gratis (se retiene una identificación con foto), bolsas sensoriales (se retiene una identificación) y dispositivos OneCourt.",
       "location": "Nivel Main, cerca de la sección Main 6"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal, nivel Terrace",
-      "description": "Atención al visitante: objetos perdidos y audición asistida gratis (se retiene una identificación con foto).",
+      "description": "Atención al visitante: objetos perdidos, audición asistida gratis (se retiene una identificación con foto) y dispositivos OneCourt.",
       "location": "Nivel Terrace, cerca de la sección Terrace 18"
     },
     "first-aid-main": {
@@ -322,7 +323,7 @@
     },
     "sensory-room": {
       "name": "Sala sensorial",
-      "description": "La sala sensorial privada Kaiser Permanente. Hay bolsas sensoriales a pedido.",
+      "description": "La sala sensorial privada Kaiser Permanente. Las bolsas sensoriales (audífonos, juguetes antiestrés) están en el Answers Portal junto a Main 6; se pide identificación.",
       "location": "Pide indicaciones a un anfitrión de la arena"
     },
     "infant-care-room": {
@@ -332,18 +333,28 @@
     },
     "mobility-hub": {
       "name": "Centro de movilidad",
-      "description": "Subida y bajada de viajes compartidos y taxis, zona para dejar a la familia y lanzaderas.",
-      "location": "Garaje Este, nivel 1"
+      "description": "El único punto de subida y bajada de viajes compartidos. También taxis, zona para dejar a la familia y lanzaderas gratis (con camionetas adaptadas).",
+      "location": "Garaje Este, nivel 1 (3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "Garaje Este",
-      "description": "Estacionamiento estándar; compra el pase con anticipación. Los espacios accesibles se venden por orden de llegada.",
-      "location": "Entrada por 102nd St."
+      "description": "Estacionamiento estándar; compra el pase con anticipación. Los espacios accesibles se compran con un pase de estacionamiento, por orden de llegada.",
+      "location": "3665 W 102nd St (entrada por 102nd St.)"
     },
     "west-garage": {
       "name": "Garaje Oeste",
-      "description": "Estacionamiento VIP al otro lado de Prairie Ave.; compra el pase con anticipación.",
-      "location": "Entrada por Prairie Ave."
+      "description": "Estacionamiento VIP al otro lado de Prairie Ave.; compra el pase con anticipación. Los espacios accesibles se compran con un pase de estacionamiento, por orden de llegada.",
+      "location": "10117 S Prairie Ave (entrada por Prairie Ave.)"
+    },
+    "infant-care-terrace": {
+      "name": "Sala de cuidado infantil, nivel Terrace",
+      "description": "Sala privada para el cuidado de bebés. Todos los baños tienen cambiador.",
+      "location": "Nivel Terrace, Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "Elevadores",
+      "description": "Los elevadores van de la entrada principal a todos los niveles, y las escaleras mecánicas unen los niveles Main y Terrace en el vestíbulo principal. Las personas con movilidad reducida tienen prioridad.",
+      "location": "Pide a un anfitrión de la arena el más cercano"
     }
   },
   "facility": {

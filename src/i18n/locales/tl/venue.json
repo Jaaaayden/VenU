@@ -124,6 +124,7 @@
     "wheelchair_escort": "Alalay sa wheelchair",
     "premium_access": "VIP at premium",
     "sensory_room": "Silid-sensory",
+    "pass_needed": "Kailangan ng pass",
     "assistive_listening": "Tulong sa pandinig",
     "lost_items": "Nawawalang gamit",
     "changing_table": "Palitan ng lampin"
@@ -281,27 +282,27 @@
     },
     "main-entrance": {
       "name": "Pangunahing Pasukan",
-      "description": "GameFace ID lane sa kaliwa, Identity Pass lane sa kanan. Libreng tulong sa paggalaw mula security hanggang sa upuan mo.",
+      "description": "GameFace ID lane sa kaliwa, Identity Pass lane sa kanan; para sa accessible na pagpasok, mag-tap ang may Identity Pass sa Answers Portal. Bag hanggang 10×6×2 in. (medical bag hanggang 14×14×6). Libreng tulong sa paggalaw mula security hanggang sa upuan mo.",
       "location": "Sa plaza, malapit sa Century Blvd. at Prairie Ave."
     },
     "vip-entrance": {
       "name": "Pasukang VIP",
-      "description": "Para sa may suite, club at floor na tiket.",
+      "description": "Para sa suite, club at floor na tiket (puwede rin sa Pangunahing Pasukan).",
       "location": "Sa kaliwa ng Pangunahing Pasukan"
     },
     "wall-entrance": {
       "name": "Pasukan ng The Wall",
-      "description": "Sariling pasukan para sa The Wall.",
+      "description": "Para sa tiket sa The Wall (puwede rin sa Pangunahing Pasukan).",
       "location": "Sa kaliwa ng Pangunahing Pasukan, lampas sa Pasukang VIP"
     },
     "answers-portal-main": {
       "name": "Answers Portal sa Main",
-      "description": "Serbisyo sa bisita: nawawalang gamit, libreng tulong sa pandinig (iiwan ang photo ID) at OneCourt device.",
+      "description": "Serbisyo sa bisita: nawawalang gamit, libreng tulong sa pandinig (iiwan ang photo ID), sensory bag (iiwan ang ID) at OneCourt device.",
       "location": "Main Level, malapit sa section Main 6"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal sa Terrace",
-      "description": "Serbisyo sa bisita: nawawalang gamit at libreng tulong sa pandinig (iiwan ang photo ID).",
+      "description": "Serbisyo sa bisita: nawawalang gamit, libreng tulong sa pandinig (iiwan ang photo ID) at OneCourt device.",
       "location": "Terrace Level, malapit sa section Terrace 18"
     },
     "first-aid-main": {
@@ -321,7 +322,7 @@
     },
     "sensory-room": {
       "name": "Silid-sensory",
-      "description": "Ang pribadong Kaiser Permanente Sensory Room. May sensory bag kapag hiniling.",
+      "description": "Ang pribadong Kaiser Permanente Sensory Room. Nasa Answers Portal sa tabi ng Main 6 ang sensory bag (headphones, fidget toy); kailangan ng ID.",
       "location": "Magtanong ng daan sa isang Arena Host"
     },
     "infant-care-room": {
@@ -331,18 +332,28 @@
     },
     "mobility-hub": {
       "name": "Sentro ng Sakayan",
-      "description": "Sakayan at babaan ng sakay-hatid at taxi, babaan ng pamilya at mga shuttle.",
-      "location": "Silangang Garahe, level 1"
+      "description": "Ang tanging sakayan at babaan ng sakay-hatid. May taxi rin, babaan ng pamilya at libreng shuttle (may ADA van).",
+      "location": "Silangang Garahe, level 1 (3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "Silangang Garahe",
-      "description": "Karaniwang paradahan; bumili ng pass nang maaga. Ibinebenta ang accessible na puwesto, unahan sa pagbili.",
-      "location": "Pasukan sa 102nd St."
+      "description": "Karaniwang paradahan; bumili ng pass nang maaga. Nabibili ang accessible na puwesto kasama ng parking pass, unahan sa pagbili.",
+      "location": "3665 W 102nd St (pasukan sa 102nd St.)"
     },
     "west-garage": {
       "name": "Kanlurang Garahe",
-      "description": "VIP na paradahan sa tapat ng Prairie Ave.; bumili ng pass nang maaga.",
-      "location": "Pasukan sa Prairie Ave."
+      "description": "VIP na paradahan sa tapat ng Prairie Ave.; bumili ng pass nang maaga. Nabibili ang accessible na puwesto kasama ng parking pass, unahan sa pagbili.",
+      "location": "10117 S Prairie Ave (pasukan sa Prairie Ave.)"
+    },
+    "infant-care-terrace": {
+      "name": "Silid para sa Sanggol sa Terrace",
+      "description": "Pribadong silid para sa pag-aalaga ng sanggol. May palitan ng lampin sa lahat ng restroom.",
+      "location": "Terrace Level, Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "Mga Elevator",
+      "description": "Umaabot ang mga elevator mula sa Pangunahing Pasukan hanggang sa bawat level, at pinagdurugtong ng mga escalator sa main lobby ang Main at Terrace Level. Inuuna ang may kapansanan sa paggalaw.",
+      "location": "Itanong sa isang Arena Host ang pinakamalapit"
     }
   },
   "facility": {

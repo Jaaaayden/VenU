@@ -128,6 +128,7 @@
     "wheelchair_escort": "مرافقة بالكرسي المتحرك",
     "premium_access": "VIP والمميزة",
     "sensory_room": "غرفة حسية",
+    "pass_needed": "يلزم تصريح وقوف",
     "assistive_listening": "مساعدة السمع",
     "lost_items": "المفقودات",
     "changing_table": "طاولة تغيير الحفاضات"
@@ -285,27 +286,27 @@
     },
     "main-entrance": {
       "name": "المدخل الرئيسي",
-      "description": "مسار GameFace ID على اليسار ومسار Identity Pass على اليمين. مساعدة مجانية في التنقل من التفتيش الأمني إلى مقعدك.",
+      "description": "مسار GameFace ID على اليسار ومسار Identity Pass على اليمين؛ للدخول المهيأ يمرّر حاملو Identity Pass هواتفهم عند Answers Portal. الحقائب حتى 10×6×2 بوصة (الطبية حتى 14×14×6). مساعدة مجانية في التنقل من التفتيش الأمني إلى مقعدك.",
       "location": "في الساحة، قرب Century Blvd. وPrairie Ave."
     },
     "vip-entrance": {
       "name": "مدخل VIP",
-      "description": "لحاملي تذاكر الأجنحة والنادي والأرضية.",
+      "description": "لتذاكر الأجنحة والنادي والأرضية (ويمكنهم أيضًا استخدام المدخل الرئيسي).",
       "location": "يسار المدخل الرئيسي"
     },
     "wall-entrance": {
       "name": "مدخل The Wall",
-      "description": "مدخل مخصص لـ The Wall.",
+      "description": "لتذاكر The Wall (ويمكنهم أيضًا استخدام المدخل الرئيسي).",
       "location": "يسار المدخل الرئيسي، بعد مدخل VIP"
     },
     "answers-portal-main": {
       "name": "Answers Portal مستوى Main",
-      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة) وأجهزة OneCourt.",
+      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة) والحقائب الحسية (تُحتجز هوية) وأجهزة OneCourt.",
       "location": "مستوى Main، قرب القسم Main 6"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal مستوى Terrace",
-      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة).",
+      "description": "خدمة الزوار: المفقودات وأجهزة مساعدة السمع المجانية (تُحتجز هوية بصورة) وأجهزة OneCourt.",
       "location": "مستوى Terrace، قرب القسم Terrace 18"
     },
     "first-aid-main": {
@@ -325,7 +326,7 @@
     },
     "sensory-room": {
       "name": "الغرفة الحسية",
-      "description": "غرفة Kaiser Permanente الحسية الخاصة. الحقائب الحسية متاحة عند الطلب.",
+      "description": "غرفة Kaiser Permanente الحسية الخاصة. الحقائب الحسية (سماعات وألعاب لتخفيف التوتر) عند Answers Portal قرب Main 6؛ تلزم هوية.",
       "location": "اسأل أحد مضيفي الساحة عن الطريق"
     },
     "infant-care-room": {
@@ -335,18 +336,28 @@
     },
     "mobility-hub": {
       "name": "مركز التنقل",
-      "description": "صعود ونزول ركاب سيارات التطبيقات والأجرة، ومنطقة إنزال العائلات، والحافلات المكوكية.",
-      "location": "المرآب الشرقي، المستوى 1"
+      "description": "المكان الوحيد لصعود ونزول ركاب سيارات التطبيقات. وفيه أيضًا سيارات الأجرة ومنطقة إنزال العائلات وحافلات مكوكية مجانية (تتوفر حافلات مهيأة).",
+      "location": "المرآب الشرقي، المستوى 1 (3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "المرآب الشرقي",
-      "description": "مواقف عادية؛ اشترِ تصريح الوقوف مسبقًا. تُباع الأماكن المهيأة بالأسبقية.",
-      "location": "المدخل من 102nd St."
+      "description": "مواقف عادية؛ اشترِ تصريح الوقوف مسبقًا. تُشترى الأماكن المهيأة مع تصريح الوقوف، بالأسبقية.",
+      "location": "3665 W 102nd St (المدخل من 102nd St.)"
     },
     "west-garage": {
       "name": "المرآب الغربي",
-      "description": "مواقف VIP مقابل Prairie Ave.؛ اشترِ تصريح الوقوف مسبقًا.",
-      "location": "المدخل من Prairie Ave."
+      "description": "مواقف VIP مقابل Prairie Ave.؛ اشترِ تصريح الوقوف مسبقًا. تُشترى الأماكن المهيأة مع تصريح الوقوف، بالأسبقية.",
+      "location": "10117 S Prairie Ave (المدخل من Prairie Ave.)"
+    },
+    "infant-care-terrace": {
+      "name": "غرفة رعاية الرضع مستوى Terrace",
+      "description": "غرفة خاصة لرعاية الرضع. في كل دورات المياه طاولة لتغيير الحفاضات.",
+      "location": "مستوى Terrace، Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "المصاعد",
+      "description": "تصل المصاعد من المدخل الرئيسي إلى كل المستويات، وتربط السلالم الكهربائية في الردهة الرئيسية بين مستويي Main وTerrace. الأولوية لذوي الإعاقة الحركية.",
+      "location": "اسأل أحد مضيفي الساحة عن أقربها"
     }
   },
   "facility": {

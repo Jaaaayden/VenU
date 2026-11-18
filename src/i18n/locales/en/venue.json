@@ -124,6 +124,7 @@
     "wheelchair_escort": "Wheelchair escort",
     "premium_access": "VIP & premium",
     "sensory_room": "Sensory room",
+    "pass_needed": "Pass needed",
     "assistive_listening": "Assistive listening",
     "lost_items": "Lost & found",
     "changing_table": "Changing table"
@@ -281,27 +282,27 @@
     },
     "main-entrance": {
       "name": "Main Entrance",
-      "description": "GameFace ID lane on the left, Identity Pass lane on the right. Free mobility help from security to your seat.",
+      "description": "GameFace ID lane on the left, Identity Pass lane on the right; for accessible entry, Identity Pass holders tap in at the Answers Portal. Bags up to 10×6×2 in. (medical bags up to 14×14×6). Free mobility help from security to your seat.",
       "location": "On the plaza, off Century Blvd. and Prairie Ave."
     },
     "vip-entrance": {
       "name": "VIP Entrance",
-      "description": "For suite, club and floor ticket holders.",
+      "description": "For suite, club and floor tickets (they can also use the Main Entrance).",
       "location": "Left of the Main Entrance"
     },
     "wall-entrance": {
       "name": "The Wall Entrance",
-      "description": "Dedicated entrance for The Wall.",
+      "description": "For tickets in The Wall (they can also use the Main Entrance).",
       "location": "Left of the Main Entrance, past the VIP Entrance"
     },
     "answers-portal-main": {
       "name": "Answers Portal Main",
-      "description": "Guest services: lost and found, free assisted listening (photo ID held) and OneCourt devices.",
+      "description": "Guest services: lost and found, free assisted listening (photo ID held), sensory bags (ID held) and OneCourt devices.",
       "location": "Main Level, near section Main 6"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal Terrace",
-      "description": "Guest services: lost and found and free assisted listening (photo ID held).",
+      "description": "Guest services: lost and found, free assisted listening (photo ID held) and OneCourt devices.",
       "location": "Terrace Level, near section Terrace 18"
     },
     "first-aid-main": {
@@ -321,7 +322,7 @@
     },
     "sensory-room": {
       "name": "Sensory Room",
-      "description": "The private Kaiser Permanente Sensory Room. Sensory bags are available on request.",
+      "description": "The private Kaiser Permanente Sensory Room. Sensory bags (headphones, fidget toys) are at the Answers Portal by Main 6; ID needed.",
       "location": "Ask an Arena Host for the way"
     },
     "infant-care-room": {
@@ -331,18 +332,28 @@
     },
     "mobility-hub": {
       "name": "Mobility Hub",
-      "description": "Rideshare and taxi drop-off and pick-up, family drop-off and shuttles.",
-      "location": "East Garage, level 1"
+      "description": "The only rideshare drop-off and pick-up. Also taxis, family drop-off and free shuttles (ADA vans available).",
+      "location": "East Garage, level 1 (3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "East Garage",
-      "description": "Standard parking; buy a pass ahead. Accessible spaces are sold first come, first served.",
-      "location": "Entrance on 102nd St."
+      "description": "Standard parking; buy a pass ahead. Accessible spaces can be bought with a parking pass, first come, first served.",
+      "location": "3665 W 102nd St (entrance on 102nd St.)"
     },
     "west-garage": {
       "name": "West Garage",
-      "description": "VIP parking across Prairie Ave.; buy a pass ahead.",
-      "location": "Entrance on Prairie Ave."
+      "description": "VIP parking across Prairie Ave.; buy a pass ahead. Accessible spaces can be bought with a parking pass, first come, first served.",
+      "location": "10117 S Prairie Ave (entrance on Prairie Ave.)"
+    },
+    "infant-care-terrace": {
+      "name": "Infant Care Room Terrace",
+      "description": "A private room for infant care. Every restroom also has a baby changing station.",
+      "location": "Terrace Level, Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "Elevators",
+      "description": "Elevators go from the Main Entrance to every level, and escalators link the Main and Terrace levels in the main lobby. Guests with limited mobility go first.",
+      "location": "Ask an Arena Host for the nearest one"
     }
   },
   "facility": {

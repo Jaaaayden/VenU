@@ -125,6 +125,7 @@
     "wheelchair_escort": "Accompagnement fauteuil",
     "premium_access": "VIP et premium",
     "sensory_room": "Salle sensorielle",
+    "pass_needed": "Pass requis",
     "assistive_listening": "Aide à l’écoute",
     "lost_items": "Objets trouvés",
     "changing_table": "Table à langer"
@@ -282,47 +283,47 @@
     },
     "main-entrance": {
       "name": "Entrée principale",
-      "description": "File GameFace ID à gauche, file Identity Pass à droite. Aide gratuite à la mobilité du contrôle de sécurité à votre place.",
+      "description": "File GameFace ID à gauche, file Identity Pass à droite ; pour l’entrée accessible, les détenteurs d’Identity Pass valident à l’Answers Portal. Sacs jusqu’à 10×6×2 po (sacs médicaux jusqu’à 14×14×6). Aide gratuite à la mobilité du contrôle de sécurité à votre place.",
       "location": "Sur la place, près de Century Blvd. et Prairie Ave."
     },
     "vip-entrance": {
       "name": "Entrée VIP",
-      "description": "Pour les billets suite, club et parquet.",
+      "description": "Pour les billets suite, club et parquet (l’entrée principale reste possible).",
       "location": "À gauche de l’entrée principale"
     },
     "wall-entrance": {
       "name": "Entrée The Wall",
-      "description": "Entrée réservée à The Wall.",
+      "description": "Pour les billets The Wall (l’entrée principale reste possible).",
       "location": "À gauche de l’entrée principale, après l’entrée VIP"
     },
     "answers-portal-main": {
       "name": "Answers Portal (Main)",
-      "description": "Accueil : objets trouvés, aide à l’écoute gratuite (pièce d’identité avec photo conservée) et appareils OneCourt.",
+      "description": "Accueil : objets trouvés, aide à l’écoute gratuite (pièce d’identité avec photo conservée), sacs sensoriels (pièce d’identité conservée) et appareils OneCourt.",
       "location": "Niveau Main, près de la section Main 6"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal (Terrace)",
-      "description": "Accueil : objets trouvés et aide à l’écoute gratuite (pièce d’identité avec photo conservée).",
+      "description": "Accueil : objets trouvés, aide à l’écoute gratuite (pièce d’identité avec photo conservée) et appareils OneCourt.",
       "location": "Niveau Terrace, près de la section Terrace 18"
     },
     "first-aid-main": {
       "name": "Poste de secours (Main)",
-      "description": "Secouristes formés à chaque événement.",
+      "description": "Techniciens médicaux d’urgence (EMT) formés à chaque événement.",
       "location": "Coursive du niveau Main, Main 6"
     },
     "first-aid-terrace": {
       "name": "Poste de secours (Terrace)",
-      "description": "Secouristes formés à chaque événement.",
+      "description": "Techniciens médicaux d’urgence (EMT) formés à chaque événement.",
       "location": "Coursive du niveau Terrace, Terrace 27"
     },
     "first-aid-floor": {
       "name": "Poste de secours (parquet)",
-      "description": "Secouristes formés à chaque événement.",
+      "description": "Techniciens médicaux d’urgence (EMT) formés à chaque événement.",
       "location": "Niveau parquet, sous Wall 19 près du tunnel est"
     },
     "sensory-room": {
       "name": "Salle sensorielle",
-      "description": "La salle sensorielle privée Kaiser Permanente. Sacs sensoriels sur demande.",
+      "description": "La salle sensorielle privée Kaiser Permanente. Les sacs sensoriels (casque, jouets anti-stress) sont à l’Answers Portal près de Main 6 ; pièce d’identité demandée.",
       "location": "Demandez le chemin à un hôte de l’aréna"
     },
     "infant-care-room": {
@@ -332,18 +333,28 @@
     },
     "mobility-hub": {
       "name": "Pôle mobilité",
-      "description": "Prise en charge et dépose VTC et taxis, dépose des familles et navettes.",
-      "location": "Parking est, niveau 1"
+      "description": "Le seul point de dépose et de prise en charge VTC. Aussi taxis, dépose des familles et navettes gratuites (vans adaptés disponibles).",
+      "location": "Parking est, niveau 1 (3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "Parking est",
-      "description": "Parking standard ; achetez votre pass à l’avance. Places accessibles vendues selon les arrivées.",
-      "location": "Entrée par 102nd St."
+      "description": "Parking standard ; achetez votre pass à l’avance. Les places accessibles s’achètent avec un pass parking, par ordre d’arrivée.",
+      "location": "3665 W 102nd St (entrée par 102nd St.)"
     },
     "west-garage": {
       "name": "Parking ouest",
-      "description": "Parking VIP de l’autre côté de Prairie Ave. ; achetez votre pass à l’avance.",
-      "location": "Entrée par Prairie Ave."
+      "description": "Parking VIP de l’autre côté de Prairie Ave. ; achetez votre pass à l’avance. Les places accessibles s’achètent avec un pass parking, par ordre d’arrivée.",
+      "location": "10117 S Prairie Ave (entrée par Prairie Ave.)"
+    },
+    "infant-care-terrace": {
+      "name": "Espace bébé (Terrace)",
+      "description": "Pièce privée pour s’occuper des bébés. Toutes les toilettes ont une table à langer.",
+      "location": "Niveau Terrace, Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "Ascenseurs",
+      "description": "Les ascenseurs relient l’entrée principale à tous les niveaux, et des escalators relient les niveaux Main et Terrace dans le hall principal. Priorité aux personnes à mobilité réduite.",
+      "location": "Demandez le plus proche à un hôte de l’aréna"
     }
   },
   "facility": {
