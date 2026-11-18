@@ -9,7 +9,7 @@
 //   POST { username: 'nobody' }                                                → 200 { sent: true }
 //   POST { username: 42 }                                                      → 400 { code: 'bad_request' }
 
-import { clientIpOf } from '../username-sign-in/handler.ts';
+import { clientIpOf, CORS, json } from '../_shared/edge.ts';
 
 export type RecoverResult = { ok: true } | { ok: false; status: number; code: string | null };
 
@@ -25,16 +25,6 @@ export interface HandlerDeps {
 const USERNAME_RE = /^[a-z0-9_.]{3,20}$/;
 const MAX_USERNAME_CHARS = 100;
 const MAX_REDIRECT_CHARS = 500;
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function json(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
-}
 
 /** The one reply for any well-formed username, so the answer can't be used to find accounts. */
 const sent = () => json(200, { sent: true });

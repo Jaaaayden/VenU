@@ -6,9 +6,10 @@
 // Auth must allow the link's target: Authentication > URL Configuration > Redirect URLs gets
 // <site>/reset-password (and venu://reset-password for the phone app).
 // Until it's deployed, the app asks for the email instead of a username.
-// Contract: handler.ts.
+// Contract: handler.ts. Files: index.ts, handler.ts, deno.json and ../_shared/edge.ts (see there for the dashboard).
 import { createClient } from '@supabase/supabase-js';
 
+import { serverKey } from '../_shared/edge.ts';
 import { createHandler, httpRecover } from './handler.ts';
 
 // The Deno globals this file uses, so the app's `tsc` can check it too (no Deno types in the repo).
@@ -19,19 +20,8 @@ declare const Deno: {
 
 const env = (name: string) => Deno.env.get(name);
 
-/** The project's default secret key (sb_secret_…), else the legacy service_role key. */
-function serverKey(): string {
-  try {
-    const secret = (JSON.parse(env('SUPABASE_SECRET_KEYS') ?? '{}') as Record<string, string>).default;
-    if (secret) return secret;
-  } catch {
-    // Not set or not JSON: use the legacy key.
-  }
-  return env('SUPABASE_SERVICE_ROLE_KEY') ?? '';
-}
-
 const url = env('SUPABASE_URL') ?? '';
-const key = serverKey();
+const key = serverKey(env);
 if (!url || !key) console.error('password-reset: SUPABASE_URL or a server key is missing; reset links will fail');
 
 const admin = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });

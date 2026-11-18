@@ -11,6 +11,8 @@
 //   storage or auth failed                     → 502 { code: 'unexpected_failure' } (nothing half done
 //     that a retry can't finish: photos first, so a failed user delete leaves only a photo-less account)
 
+import { CORS, json } from '../_shared/edge.ts';
+
 export interface HandlerDeps {
   /** The user id for a valid signed-in (not anonymous) user's access token, else null. */
   verifyUser(token: string): Promise<string | null>;
@@ -20,16 +22,6 @@ export interface HandlerDeps {
   /** Deletes the auth user. Resolves 'gone' when there was no such user (already deleted). */
   deleteUser(userId: string): Promise<'deleted' | 'gone'>;
   log?: (line: string) => void;
-}
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function json(status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
 }
 
 const failed = () => json(502, { code: 'unexpected_failure', message: "Couldn't delete the account. Try again later." });
