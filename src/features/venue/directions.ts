@@ -67,10 +67,11 @@ export function routeFor(
  * e.g. walkFromStart(intuitMap, intuitFacilities, nowhere, 'intuit-dome', mainEntrance) → { kind: 'start' }
  */
 export function walkFromStart(map: VenueMap, facilities: Facility[], where: WhereAmI, venueId: string, to: Facility): FacilityWalk | null {
-  if (to.approximate) return { kind: 'ask' };
   const start = routeStart(map, facilities, where, venueId);
+  // The start first: it reads "Walks start here" / "You're here" even if its own pin is a placeholder.
+  if (start && start.from.id === to.id) return { kind: start.mine ? 'mine' : 'start' };
+  if (to.approximate) return { kind: 'ask' };
   if (!start) return null;
-  if (start.from.id === to.id) return { kind: start.mine ? 'mine' : 'start' };
   return { kind: 'walk', minutes: walkBetween(start.from, to, contentSize(mapAspect(map), 1), map.widthMeters).minutes };
 }
 

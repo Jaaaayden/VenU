@@ -94,6 +94,13 @@ describe('walk times', () => {
     expect(ids(sorted.slice(-2))).toEqual(['elevators', 'sensory-room']);
   });
 
+  it('calls the start spot the start even when its own spot isn\'t published', () => {
+    // A venue whose way in is a placeholder pin: walks still start there, so it reads "Walks start here".
+    const map = { ...intuitMap, arrival: 'elevators' };
+    expect(walkFromStart(map, intuit, nowhere, 'intuit-dome', f('elevators'))).toEqual({ kind: 'start' });
+    expect(walkFromStart(map, intuit, nowhere, 'intuit-dome', f('sensory-room'))).toEqual({ kind: 'ask' });
+  });
+
   it('never starts a walk from a spot that isn\'t published', () => {
     expect(routeStart(intuitMap, intuit, { venueId: 'intuit-dome', facilityId: 'sensory-room' }, 'intuit-dome')).toEqual({ from: f('main-entrance'), mine: false });
   });
