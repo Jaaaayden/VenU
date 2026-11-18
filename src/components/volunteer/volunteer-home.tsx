@@ -33,8 +33,11 @@ export const VERIFIED_RECHECK_MS = 30_000;
 
 export function VolunteerHome({ profile }: { profile: HomeProfile }) {
   const t = useT('volunteer');
-  const { venueId } = useWhereAmI();
-  const venueName = getVenue(venueId)?.name ?? '';
+  const tv = useT('venue');
+  const where = useWhereAmI();
+  const venueName = getVenue(where.venueId)?.name ?? '';
+  // With no spot chosen the location card below is just the venue: don't name it twice.
+  const spotChosen = meetSpotLabel(where, tv, t) !== null;
   const { saveSettings, recheck } = useProfile();
   const status = profile.availability;
   const setStatus = (availability: HomeProfile['availability']) => saveSettings({ availability });
@@ -48,7 +51,7 @@ export function VolunteerHome({ profile }: { profile: HomeProfile }) {
         <AppLanguagePill />
         <View style={styles.titles}>
           <Text style={styles.title} accessibilityRole="header">{t('home.greeting', { name: profile.firstName })}</Text>
-          <Text style={[styles.subtitle, startAligned]}>{venueName}</Text>
+          {spotChosen ? <Text style={[styles.subtitle, startAligned]}>{venueName}</Text> : null}
         </View>
       </View>
 

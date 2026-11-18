@@ -18,6 +18,9 @@
     "assistTitle": "Kailangan ng Tulong?",
     "assistBody": "Kumonekta sa isang boluntaryo",
     "assistLabel": "Kailangan ng tulong? Kumonekta sa isang boluntaryo",
+    "assistTitleVolunteer": "Handa nang Tumulong?",
+    "assistBodyVolunteer": "Tingnan ang mga request malapit sa iyo",
+    "assistLabelVolunteer": "Handa nang tumulong? Tingnan ang mga request malapit sa iyo",
     "empty": "Walang lugar na tugma sa “{{query}}”. Subukan ang isang lungsod, gaya ng Inglewood.",
     "cardHint": "Binubuksan ang mapa at mga pasilidad"
   },

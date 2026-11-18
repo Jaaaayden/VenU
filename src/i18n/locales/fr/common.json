@@ -95,6 +95,7 @@
     "take": "Prendre une photo",
     "remove": "Retirer",
     "hint": "Aide votre accompagnant à vous repérer. Facultatif.",
+    "hintVolunteer": "Aide les visiteurs à vous repérer. Facultatif.",
     "cameraOff": "L'accès à l'appareil photo est désactivé. Activez-le dans Réglages.",
     "libraryOff": "L'accès aux photos est désactivé. Activez-le dans Réglages.",
     "labelNamed": "Photo de profil de {{name}}",

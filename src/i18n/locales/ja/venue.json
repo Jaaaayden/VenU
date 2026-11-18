@@ -18,6 +18,9 @@
     "assistTitle": "お困りですか？",
     "assistBody": "ボランティアに相談する",
     "assistLabel": "お困りですか？ボランティアに相談する",
+    "assistTitleVolunteer": "手助けしますか？",
+    "assistBodyVolunteer": "近くのリクエストを見る",
+    "assistLabelVolunteer": "手助けしますか？近くのリクエストを見る",
     "empty": "「{{query}}」に一致する会場はありません。Inglewood などの都市名で試してください。",
     "cardHint": "地図と施設を開きます"
   },

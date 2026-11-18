@@ -22,6 +22,7 @@
   "edit": {
     "title": "Modifier le profil",
     "subtitle": "Les changements s'appliquent à votre prochaine demande d'aide.",
+    "subtitleVolunteer": "Les visiteurs verront ces changements la prochaine fois que vous aiderez.",
     "submit": "Enregistrer",
     "discardTitle": "Quitter sans enregistrer ? Vos modifications seront perdues.",
     "keepEditing": "Continuer à modifier",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "Nouvelles du bénévole",
-        "hint": "p. ex. Daniel a accepté et arrive"
+        "hint": "p. ex. Daniel a accepté et arrive",
+        "labelVolunteer": "Demandes d’aide",
+        "hintVolunteer": "p. ex. Un visiteur près de vous a besoin d’aide"
       },
       "chat": {
         "label": "Messages du chat",

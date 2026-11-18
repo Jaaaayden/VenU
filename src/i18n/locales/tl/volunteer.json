@@ -255,7 +255,7 @@
       "off": "Pahinga"
     },
     "statusLine": {
-      "free": "Makakatanggap ka ng mga request sa malapit. Kapag naka-break, lumipat sa Abala o Pahinga at lalaktawan ka ng mga request.",
+      "free": "Makakatanggap ka ng mga request sa malapit. Lumipat sa Abala o Pahinga at lalaktawan ka ng mga request.",
       "busy": "Abala ka muna. Lalaktawan ka ng mga bagong request hanggang bumalik ka sa Bakante.",
       "off": "Naka-pahinga ka. Lalaktawan ka ng mga request hanggang lumipat ka sa Bakante."
     },
@@ -264,7 +264,7 @@
     "languages": "Mga wikang matatas ka",
     "training": "Pagsasanay",
     "noTraining": "Wala pang naidagdag na pagsasanay",
-    "paused": "Naka-pause ang mga request habang naka-break ka. Lumipat sa Bakante para makita kung sino ang kailangan ng tulong sa malapit."
+    "paused": "Naka-pause ang mga request habang Abala ka o naka-Pahinga. Lumipat sa Bakante para makita kung sino ang kailangan ng tulong sa malapit."
   },
   "mock": {
     "greeting": "Hi {{name}}! Ako si {{volunteer}}, ang iyong LA28 volunteer. Papunta na ako sa iyo. Tagpuan: {{spot}}.",

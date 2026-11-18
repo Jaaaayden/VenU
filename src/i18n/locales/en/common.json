@@ -94,6 +94,7 @@
     "take": "Take photo",
     "remove": "Remove",
     "hint": "Helps your helper spot you. Optional.",
+    "hintVolunteer": "Helps visitors spot you. Optional.",
     "cameraOff": "Camera access is off. Turn it on in Settings.",
     "libraryOff": "Photo access is off. Turn it on in Settings.",
     "labelNamed": "Profile photo of {{name}}",

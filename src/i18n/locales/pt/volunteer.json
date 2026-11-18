@@ -257,7 +257,7 @@
       "off": "Ausente"
     },
     "statusLine": {
-      "free": "Você vai receber pedidos por perto. Numa pausa, mude para Ocupado ou Ausente e os pedidos vão pular você.",
+      "free": "Você vai receber pedidos por perto. Mude para Ocupado ou Ausente e os pedidos vão pular você.",
       "busy": "Você está ocupado agora. Novos pedidos pulam você até você voltar para Livre.",
       "off": "Você está fora do turno. Os pedidos pulam você até você mudar para Livre."
     },
@@ -266,7 +266,7 @@
     "languages": "Idiomas fluentes",
     "training": "Treinamento",
     "noTraining": "Nenhum treinamento adicionado ainda",
-    "paused": "Os pedidos ficam pausados enquanto você descansa. Mude para Livre para ver quem precisa de ajuda por perto."
+    "paused": "Os pedidos ficam pausados enquanto você está ocupado ou fora do turno. Mude para Livre para ver quem precisa de ajuda por perto."
   },
   "mock": {
     "greeting": "Oi, {{name}}! Aqui é {{volunteer}}, da equipe de voluntários do LA28. Estou indo até você agora. Ponto de encontro: {{spot}}.",

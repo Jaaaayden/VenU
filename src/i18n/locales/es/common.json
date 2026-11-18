@@ -95,6 +95,7 @@
     "take": "Tomar foto",
     "remove": "Quitar",
     "hint": "Ayuda a quien te ayuda a reconocerte. Opcional.",
+    "hintVolunteer": "Ayuda a los visitantes a reconocerte. Opcional.",
     "cameraOff": "El acceso a la cámara está desactivado. Actívalo en Ajustes.",
     "libraryOff": "El acceso a las fotos está desactivado. Actívalo en Ajustes.",
     "labelNamed": "Foto de perfil de {{name}}",

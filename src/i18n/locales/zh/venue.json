@@ -18,6 +18,9 @@
     "assistTitle": "需要帮助？",
     "assistBody": "联系志愿者",
     "assistLabel": "需要帮助？联系志愿者",
+    "assistTitleVolunteer": "准备好帮忙了吗？",
+    "assistBodyVolunteer": "查看你附近的求助",
+    "assistLabelVolunteer": "准备好帮忙了吗？查看你附近的求助",
     "empty": "没有与“{{query}}”匹配的场馆。试试城市名，例如 Inglewood。",
     "cardHint": "打开地图和设施"
   },

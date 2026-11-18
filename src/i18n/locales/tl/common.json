@@ -94,6 +94,7 @@
     "take": "Kumuha ng larawan",
     "remove": "Alisin",
     "hint": "Para madali kang makita ng tutulong sa iyo. Opsyonal.",
+    "hintVolunteer": "Para madali kang makita ng mga bisita. Opsyonal.",
     "cameraOff": "Naka-off ang access sa camera. I-on ito sa Settings.",
     "libraryOff": "Naka-off ang access sa mga larawan. I-on ito sa Settings.",
     "labelNamed": "Larawan sa profile ni {{name}}",

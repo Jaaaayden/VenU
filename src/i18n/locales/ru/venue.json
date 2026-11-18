@@ -18,6 +18,9 @@
     "assistTitle": "Нужна помощь?",
     "assistBody": "Свяжитесь с волонтёром",
     "assistLabel": "Нужна помощь? Свяжитесь с волонтёром",
+    "assistTitleVolunteer": "Готовы помочь?",
+    "assistBodyVolunteer": "Смотрите запросы рядом",
+    "assistLabelVolunteer": "Готовы помочь? Смотрите запросы рядом",
     "empty": "Нет площадок по запросу «{{query}}». Попробуйте город, например Inglewood.",
     "cardHint": "Открывает карту и объекты"
   },

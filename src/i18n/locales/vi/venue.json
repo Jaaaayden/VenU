@@ -18,6 +18,9 @@
     "assistTitle": "Cần hỗ trợ?",
     "assistBody": "Kết nối với tình nguyện viên",
     "assistLabel": "Cần hỗ trợ? Kết nối với tình nguyện viên",
+    "assistTitleVolunteer": "Sẵn sàng giúp đỡ?",
+    "assistBodyVolunteer": "Xem các yêu cầu gần bạn",
+    "assistLabelVolunteer": "Sẵn sàng giúp đỡ? Xem các yêu cầu gần bạn",
     "empty": "Không có địa điểm nào khớp với “{{query}}”. Hãy thử tên thành phố, như Inglewood.",
     "cardHint": "Mở bản đồ và tiện ích"
   },

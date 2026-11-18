@@ -18,6 +18,9 @@
     "assistTitle": "Need Assistance?",
     "assistBody": "Connect with a volunteer",
     "assistLabel": "Need assistance? Connect with a volunteer",
+    "assistTitleVolunteer": "Ready to Help?",
+    "assistBodyVolunteer": "See requests near you",
+    "assistLabelVolunteer": "Ready to help? See requests near you",
     "empty": "No venue matches “{{query}}”. Try a city, like Inglewood.",
     "cardHint": "Opens the map and facilities"
   },

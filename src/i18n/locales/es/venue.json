@@ -18,6 +18,9 @@
     "assistTitle": "¿Necesitas ayuda?",
     "assistBody": "Habla con un voluntario",
     "assistLabel": "¿Necesitas ayuda? Habla con un voluntario",
+    "assistTitleVolunteer": "¿Quieres ayudar?",
+    "assistBodyVolunteer": "Mira las solicitudes cerca de ti",
+    "assistLabelVolunteer": "¿Quieres ayudar? Mira las solicitudes cerca de ti",
     "empty": "Ninguna sede coincide con «{{query}}». Prueba con una ciudad, como Inglewood.",
     "cardHint": "Abre el mapa y los servicios"
   },

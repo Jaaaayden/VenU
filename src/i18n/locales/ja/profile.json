@@ -22,6 +22,7 @@
   "edit": {
     "title": "プロフィールを編集",
     "subtitle": "変更は次回のサポート依頼から反映されます。",
+    "subtitleVolunteer": "次に手助けするときから、来場者にこの変更が表示されます。",
     "submit": "変更を保存",
     "discardTitle": "保存せずに戻りますか？変更は失われます。",
     "keepEditing": "編集を続ける",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "ボランティアの状況",
-        "hint": "例：Daniel が承諾し、向かっています"
+        "hint": "例：Daniel が承諾し、向かっています",
+        "labelVolunteer": "サポート依頼",
+        "hintVolunteer": "例：近くの来場者が助けを求めています"
       },
       "chat": {
         "label": "チャットのメッセージ",

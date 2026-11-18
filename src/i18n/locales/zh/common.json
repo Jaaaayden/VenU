@@ -93,6 +93,7 @@
     "take": "拍照",
     "remove": "移除",
     "hint": "方便帮手认出你。选填。",
+    "hintVolunteer": "方便访客认出你。选填。",
     "cameraOff": "相机权限已关闭。请在设置中开启。",
     "libraryOff": "照片权限已关闭。请在设置中开启。",
     "labelNamed": "{{name}}的头像",

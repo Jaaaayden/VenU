@@ -18,6 +18,9 @@
     "assistTitle": "تحتاج إلى مساعدة؟",
     "assistBody": "تواصل مع متطوع",
     "assistLabel": "تحتاج إلى مساعدة؟ تواصل مع متطوع",
+    "assistTitleVolunteer": "مستعد للمساعدة؟",
+    "assistBodyVolunteer": "اطّلع على الطلبات القريبة منك",
+    "assistLabelVolunteer": "مستعد للمساعدة؟ اطّلع على الطلبات القريبة منك",
     "empty": "لا يوجد مكان يطابق «{{query}}». جرّب اسم مدينة، مثل Inglewood.",
     "cardHint": "يفتح الخريطة والمرافق"
   },
