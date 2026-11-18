@@ -354,7 +354,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
 }
 
 // ---- help requests and chat: the help_requests and messages tables and their functions, with the
-// rules of supabase/migrations/20261117010000_help_requests_chat.sql. One store per server (keyed
+// rules of supabase/migrations/20261117010000_help_requests_chat.sql. Signed in only, tables and
+// functions alike (20261118000000_db_hardening.sql took EXECUTE away from anon). One store per server (keyed
 // by its profiles map), kept in memory only. There's no Realtime here: the app sees its channels fail
 // and polls instead (src/features/volunteer/supabase-backend.ts).
 // Test hooks: GET /__help (every request and message); POST /__help { rejectSends: true } makes
