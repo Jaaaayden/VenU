@@ -96,6 +96,9 @@
     "schematic": "簡略マップ"
   },
   "walk_other": "徒歩{{number}}分",
+  "walkStart": "ここから経路が始まります",
+  "walkMine": "現在地",
+  "walkAsk": "場所は非公開",
   "wait": {
     "none": "待ち時間なし",
     "short": "待ち時間短め",
@@ -132,6 +135,7 @@
     "long_lines_halftime": "ハーフタイムは行列",
     "wheelchair_loans": "車いす貸出",
     "permit_needed": "許可証が必要",
+    "pass_needed": "駐車券が必要",
     "wheelchair_escort": "車いす介助",
     "premium_access": "VIP・プレミアム",
     "sensory_room": "センサリールーム",
@@ -322,27 +326,27 @@
     },
     "main-entrance": {
       "name": "メインエントランス",
-      "description": "左が GameFace ID レーン、右が Identity Pass レーン。保安検査から座席まで無料で移動をサポートします。",
+      "description": "左が GameFace ID レーン、右が Identity Pass レーン。バリアフリー入場では、Identity Pass をお持ちの方は Answers Portal でタッチして入場します。バッグは 10×6×2 インチまで（医療用は 14×14×6 まで）。保安検査から座席まで無料で移動をサポートします。",
       "location": "プラザ内、Century Blvd. と Prairie Ave. のそば"
     },
     "vip-entrance": {
       "name": "VIP 入口",
-      "description": "スイート・クラブ・フロアのチケットをお持ちの方向け。",
+      "description": "スイート・クラブ・フロアのチケット向け（メインエントランスも利用できます）。",
       "location": "メインエントランスの左"
     },
     "wall-entrance": {
       "name": "The Wall 入口",
-      "description": "The Wall 専用の入口。",
+      "description": "The Wall のチケット向け（メインエントランスも利用できます）。",
       "location": "メインエントランスの左、VIP 入口の先"
     },
     "answers-portal-main": {
       "name": "Answers Portal（Main 階）",
-      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）、OneCourt 機器。",
+      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）、センサリーバッグ（身分証を預かります）、OneCourt 機器。",
       "location": "Main 階、Main 6 セクション付近"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal（Terrace 階）",
-      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）。",
+      "description": "ゲストサービス：落とし物、無料の補聴支援機器（写真付き身分証を預かります）、OneCourt 機器。",
       "location": "Terrace 階、Terrace 18 セクション付近"
     },
     "first-aid-main": {
@@ -362,7 +366,7 @@
     },
     "sensory-room": {
       "name": "センサリールーム",
-      "description": "個室の Kaiser Permanente センサリールーム。センサリーバッグも頼めば借りられます。",
+      "description": "個室の Kaiser Permanente センサリールーム。センサリーバッグ（ヘッドホン、フィジェットトイ）は Main 6 そばの Answers Portal で借りられます。身分証が必要です。",
       "location": "アリーナホストに道を聞いてください"
     },
     "infant-care-room": {
@@ -372,24 +376,35 @@
     },
     "mobility-hub": {
       "name": "モビリティハブ",
-      "description": "配車サービスとタクシーの乗降、家族の送迎エリア、シャトル。",
-      "location": "東ガレージ1階"
+      "description": "配車サービスの乗降はここだけ。タクシー、家族の送迎エリア、無料シャトル（車いす対応車あり）もあります。",
+      "location": "東ガレージ1階（3700 W Century Blvd.）"
     },
     "east-garage": {
       "name": "東ガレージ",
-      "description": "一般駐車場。駐車券は事前購入を。バリアフリー区画は先着順で販売します。",
-      "location": "102nd St. 側の入口"
+      "description": "一般駐車場。駐車券は事前購入を。バリアフリー区画は駐車券と一緒に先着順で購入できます。",
+      "location": "3665 W 102nd St（102nd St. 側の入口）"
     },
     "west-garage": {
       "name": "西ガレージ",
-      "description": "Prairie Ave. の向かいの VIP 駐車場。駐車券は事前購入を。",
-      "location": "Prairie Ave. 側の入口"
+      "description": "Prairie Ave. の向かいの VIP 駐車場。駐車券は事前購入を。バリアフリー区画は駐車券と一緒に先着順で購入できます。",
+      "location": "10117 S Prairie Ave（Prairie Ave. 側の入口）"
+    },
+    "infant-care-terrace": {
+      "name": "ベビーケアルーム（Terrace 階）",
+      "description": "赤ちゃんのお世話ができる個室。すべてのトイレにおむつ交換台があります。",
+      "location": "Terrace 階、Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "エレベーター",
+      "description": "エレベーターはメインエントランスから全フロアへ、メインロビーのエスカレーターは Main 階と Terrace 階を結びます。移動に不自由のある方が優先です。",
+      "location": "最寄りの場所はアリーナホストに聞いてください"
     }
   },
   "facility": {
     "notFound": "施設が見つかりません",
     "wheelchair": "車いす対応",
     "directions": "経路",
+    "noRoute": "徒歩経路はありません：会場はこの場所を公開していません。スタッフに道を聞いてください。",
     "imHere": "ここにいます",
     "imHereHint": "助けを求めるときに、ここを現在地として使います",
     "isHere": "現在地",
@@ -453,6 +468,7 @@
     "title": "徒歩ルート",
     "from": "出発：{{from}}",
     "fromArrival": "メイン入口の{{from}}から出発します。別の場所にいる場合は、その場所を開いて「ここにいます」をタップしてください。",
+    "fromArrivalPlain": "{{from}}から出発します。別の場所にいる場合は、その場所を開いて「ここにいます」をタップしてください。",
     "steps_other": "約{{number}}歩",
     "stepStart": "{{from}}から出発します。",
     "stepHead": "{{direction}}へ約{{meters}}m進みます。",

@@ -80,8 +80,30 @@ export function echoQuery(query: string): string {
   return chars.length > ECHO_MAX ? `${chars.slice(0, ECHO_MAX).join('').trimEnd()}…` : q;
 }
 
-/** "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian). */
-export function facilityMeta(f: Facility, t: VenueT = venueT()): string {
-  const number = formatNumber(f.walkMinutes, undefined, languageOf(t));
-  return `${t('walk', { count: f.walkMinutes, number })} · ${t(`wait.${f.wait}`)}`;
+/**
+ * How far a facility is from where walks start (see walkFromStart in ./directions): a walk in
+ * minutes, the start itself (the way in, or the visitor's own "I'm here" spot), or `ask` when its
+ * spot isn't published.
+ */
+export type FacilityWalk = { kind: 'walk'; minutes: number } | { kind: 'start' | 'mine' | 'ask' };
+
+/**
+ * "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian).
+ * With a `walk`, the first part says that walk ("Walks start here", "Spot not published"); without
+ * one it falls back to the facility's stand-in walkMinutes.
+ */
+export function facilityMeta(f: Facility, t: VenueT = venueT(), walk?: FacilityWalk | null): string {
+  const w: FacilityWalk = walk ?? { kind: 'walk', minutes: f.walkMinutes };
+  const first = w.kind === 'walk'
+    ? t('walk', { count: w.minutes, number: formatNumber(w.minutes, undefined, languageOf(t)) })
+    : t(w.kind === 'start' ? 'walkStart' : w.kind === 'mine' ? 'walkMine' : 'walkAsk');
+  return `${first} · ${t(`wait.${f.wait}`)}`;
+}
+
+/**
+ * Text without its closing full stop, for a template that adds its own.
+ * e.g. withoutFinalStop('Entrance on 102nd St.') → 'Entrance on 102nd St'; withoutFinalStop('Main 6') → 'Main 6'
+ */
+export function withoutFinalStop(text: string): string {
+  return text.replace(/[.。．]\s*$/u, '');
 }

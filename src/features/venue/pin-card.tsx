@@ -13,18 +13,18 @@ import { Colors, Face, Fonts, Radius, Shadow, Spacing } from '@/constants/theme'
 import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { categoryLabel, facilityMeta, facilityName, facilityOffer } from './labels';
+import { categoryLabel, facilityMeta, facilityName, facilityOffer, type FacilityWalk } from './labels';
 import { SPONSOR_ACCENT, SPONSOR_SOFT, SponsoredIcon, SponsoredTag } from './sponsor-ui';
 import type { Facility } from './types';
 
 const PHOTO = 56;
 
-export function PinCard({ facility, onOpen, onClose }: { facility: Facility; onOpen: () => void; onClose: () => void }) {
+export function PinCard({ facility, walk, onOpen, onClose }: { facility: Facility; walk?: FacilityWalk | null; onOpen: () => void; onClose: () => void }) {
   const t = useT('venue');
   const tc = useT('common');
   const rtl = useLayoutRtl();
   const name = facilityName(facility, t);
-  const meta = facilityMeta(facility, t);
+  const meta = facilityMeta(facility, t, walk);
   const offer = facilityOffer(facility, t);
   return (
     <View style={styles.card}>
@@ -39,12 +39,13 @@ export function PinCard({ facility, onOpen, onClose }: { facility: Facility; onO
         {offer ? (
           <View style={styles.text}>
             <SponsoredTag />
-            <Text style={styles.name} numberOfLines={1}>{name}</Text>
+            <Text style={[styles.name, rtl && styles.rtlText]} numberOfLines={1}>{name}</Text>
             <Text style={styles.offer} numberOfLines={2}>{offer}</Text>
           </View>
         ) : (
           <View style={styles.text}>
-            <Text style={styles.name} numberOfLines={1}>{name}</Text>
+            {/* Two lines: a translated name can be long ("Answers Portal مستوى Terrace"). */}
+            <Text style={[styles.name, rtl && styles.rtlText]} numberOfLines={2}>{name}</Text>
             <Text style={styles.meta} numberOfLines={1}>{meta}</Text>
           </View>
         )}
@@ -98,5 +99,6 @@ const styles = StyleSheet.create({
   offer: { ...Face.textSemiBold, fontSize: 13, lineHeight: 17, color: SPONSOR_ACCENT },
   sponsorTile: { width: 44, height: 44, backgroundColor: SPONSOR_SOFT },
   flip: { transform: [{ scaleX: -1 }] },
+  rtlText: { writingDirection: 'rtl' },
   close: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start' },
 });

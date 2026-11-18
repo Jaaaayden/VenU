@@ -11,6 +11,7 @@ import { useT } from '@/i18n';
 
 import { FacilityRow } from './cards';
 import { emptyFacilitiesMessage } from './categories';
+import { walkOrder } from './directions';
 import { categoryLabel } from './labels';
 import { searchFacilities } from './mock';
 import { PromotedCard } from './sponsor-ui';
@@ -21,10 +22,14 @@ import { SearchField, venueText } from './ui';
 
 export function FacilityList() {
   const t = useT('venue');
-  const { venue, facilities, category, setCategory, snap, setSnap, setFreshReport } = useVenueScreen();
+  const { venue, facilities, category, setCategory, snap, setSnap, setFreshReport, walkTo } = useVenueScreen();
   const [query, setQuery] = useState('');
-  const results = searchFacilities(facilities, query, category, t).sort((a, b) => a.walkMinutes - b.walkMinutes);
-  const { rows, promoted, promotedAt } = facilityListLayout(results, featuredStandFor(venue.id), query, category);
+  // Nearest first, by the same walk the route panel shows (from the visitor's spot or the way in).
+  const results = searchFacilities(facilities, query, category, t)
+    .map(f => ({ f, walk: walkTo(f) }))
+    .sort((a, b) => walkOrder(a.walk) - walkOrder(b.walk));
+  const walks = new Map(results.map(r => [r.f.id, r.walk]));
+  const { rows, promoted, promotedAt } = facilityListLayout(results.map(r => r.f), featuredStandFor(venue.id), query, category);
   const open = (f: Facility) => {
     if (snap === 'down') setSnap('mid');
     router.push({ pathname: '/venue/[venueId]/[facilityId]', params: { venueId: venue.id, facilityId: f.id } });
@@ -50,7 +55,7 @@ export function FacilityList() {
       <View style={styles.list}>
         {promotedAt === 0 ? card : null}
         {rows.map((f, i) => [
-          <FacilityRow key={f.id} facility={f} onPress={() => open(f)} />,
+          <FacilityRow key={f.id} facility={f} walk={walks.get(f.id)} onPress={() => open(f)} />,
           promotedAt > 0 && i === promotedAt - 1 ? card : null,
         ])}
         {!results.length ? (

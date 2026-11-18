@@ -6,7 +6,7 @@ import { Colors, Face, Fonts, Radius, Shadow, Spacing } from '@/constants/theme'
 import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 
-import { eventsLabel, facilityMeta, facilityName } from './labels';
+import { eventsLabel, facilityMeta, facilityName, type FacilityWalk } from './labels';
 import { reportAuthor, type FacilityReport } from './reports';
 import { useReportTranslation } from './report-translation';
 import { SponsoredTag, StandIcon } from './sponsor-ui';
@@ -39,10 +39,10 @@ export function StadiumCard({ venue, onPress }: { venue: Venue; onPress: () => v
  * White row: category icon, name, distance and wait, chevron (pointing left in RTL). A sponsored
  * stand gets the Sponsored glyph and pill, and "Sponsored" first in its screen-reader label.
  */
-export function FacilityRow({ facility, onPress }: { facility: Facility; onPress: () => void }) {
+export function FacilityRow({ facility, walk, onPress }: { facility: Facility; walk?: FacilityWalk | null; onPress: () => void }) {
   const t = useT('venue');
   const rtl = useLayoutRtl();
-  const meta = facilityMeta(facility, t);
+  const meta = facilityMeta(facility, t, walk);
   const name = facilityName(facility, t);
   return (
     <Pressable

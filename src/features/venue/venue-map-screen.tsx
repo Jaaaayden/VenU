@@ -17,9 +17,11 @@ import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
 import { Colors, Shadow, Spacing } from '@/constants/theme';
 import { useT } from '@/i18n';
 
+import { categoriesAt } from './categories';
 import { CategoryChips } from './category-chips';
 import { useWhereAmI } from './current';
-import { routeFor, type Route } from './directions';
+import { routeFor, walkFromStart, type Route } from './directions';
+import type { FacilityWalk } from './labels';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { PinCard } from './pin-card';
 import { snapPositions, type SheetSnap } from './sheet';
@@ -49,6 +51,8 @@ interface VenueScreenState {
   route: Route | null;
   /** Directions to a facility (the open one), or null to end them. */
   setRouteTo: (facilityId: string | null) => void;
+  /** How far a facility is from where walks start, in the same minutes the route panel shows. */
+  walkTo: (f: Facility) => FacilityWalk | null;
 }
 
 export interface FreshReport {
@@ -118,6 +122,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     setRouteState(id);
     if (id) setCardState(null);
   };
+  const walkTo = (f: Facility) => walkFromStart(map, facilities, where, venue.id, f);
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
   const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
@@ -228,6 +233,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     setFreshReport,
     route,
     setRouteTo,
+    walkTo,
   };
 
   return (
@@ -241,10 +247,10 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
               <Text style={venueText.caption} numberOfLines={1}>{venue.address}</Text>
             </View>
           </View>
-          <CategoryChips value={category} onChange={pickCategory} />
+          <CategoryChips value={category} onChange={pickCategory} categories={categoriesAt(facilities, category)} />
         </SafeAreaView>
 
-        <View style={[styles.area, map.image && styles.areaImage]} onLayout={onAreaLayout}>
+        <View style={[styles.area, map.image && styles.areaImage, map.background ? { backgroundColor: map.background } : null]} onLayout={onAreaLayout}>
           {box.w > 0 ? (
             <>
               <VenueMapView
@@ -263,7 +269,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
                 revealId={cardId ?? facilityId}
                 revealInset={card ? MAP_CARD_SPACE : 0}
                 onPinPress={showCard}>
-                {card ? <PinCard facility={card} onOpen={() => openFacility(card)} onClose={() => setCardId(null)} /> : null}
+                {card ? <PinCard facility={card} walk={walkTo(card)} onOpen={() => openFacility(card)} onClose={() => setCardId(null)} /> : null}
               </VenueMapView>
 
               <Animated.View style={[styles.sheet, { height: sheetHeight }, sheetStyle]}>

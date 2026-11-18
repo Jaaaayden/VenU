@@ -96,6 +96,9 @@
     "schematic": "간략 지도"
   },
   "walk_other": "도보 {{number}}분",
+  "walkStart": "여기서 길찾기 시작",
+  "walkMine": "여기 있어요",
+  "walkAsk": "위치 비공개",
   "wait": {
     "none": "대기 없음",
     "short": "대기 짧음",
@@ -132,6 +135,7 @@
     "long_lines_halftime": "하프타임에 긴 줄",
     "wheelchair_loans": "휠체어 대여",
     "permit_needed": "허가증 필요",
+    "pass_needed": "주차권 필요",
     "wheelchair_escort": "휠체어 동행",
     "premium_access": "VIP·프리미엄",
     "sensory_room": "감각실",
@@ -322,27 +326,27 @@
     },
     "main-entrance": {
       "name": "정문",
-      "description": "왼쪽은 GameFace ID 줄, 오른쪽은 Identity Pass 줄입니다. 보안 검색대부터 좌석까지 무료 이동 지원을 받을 수 있습니다.",
+      "description": "왼쪽은 GameFace ID 줄, 오른쪽은 Identity Pass 줄입니다. 무장애 입장은 Identity Pass 소지자가 Answers Portal에서 휴대폰을 대고 들어갑니다. 가방은 10×6×2인치까지(의료용은 14×14×6까지). 보안 검색대부터 좌석까지 무료 이동 지원을 받을 수 있습니다.",
       "location": "광장, Century Blvd.와 Prairie Ave. 근처"
     },
     "vip-entrance": {
       "name": "VIP 입구",
-      "description": "스위트, 클럽, 플로어 티켓 소지자용.",
+      "description": "스위트, 클럽, 플로어 티켓용(정문도 이용 가능).",
       "location": "정문 왼쪽"
     },
     "wall-entrance": {
       "name": "The Wall 입구",
-      "description": "The Wall 전용 입구.",
+      "description": "The Wall 티켓용(정문도 이용 가능).",
       "location": "정문 왼쪽, VIP 입구 지나서"
     },
     "answers-portal-main": {
       "name": "Answers Portal 메인",
-      "description": "관람객 서비스: 분실물, 무료 보청 보조기기(사진 신분증 보관), OneCourt 기기.",
+      "description": "관람객 서비스: 분실물, 무료 보조 청취 장치(사진 신분증 보관), 감각 가방(신분증 보관), OneCourt 기기.",
       "location": "Main 레벨, Main 6 구역 근처"
     },
     "answers-portal-terrace": {
       "name": "Answers Portal 테라스",
-      "description": "관람객 서비스: 분실물, 무료 보청 보조기기(사진 신분증 보관).",
+      "description": "관람객 서비스: 분실물, 무료 보조 청취 장치(사진 신분증 보관), OneCourt 기기.",
       "location": "Terrace 레벨, Terrace 18 구역 근처"
     },
     "first-aid-main": {
@@ -362,7 +366,7 @@
     },
     "sensory-room": {
       "name": "감각실",
-      "description": "개인용 Kaiser Permanente 감각실. 요청하면 감각 가방도 받을 수 있습니다.",
+      "description": "개인용 Kaiser Permanente 감각실. 감각 가방(헤드폰, 피젯 장난감)은 Main 6 옆 Answers Portal에 있으며 신분증이 필요합니다.",
       "location": "아레나 호스트에게 길을 물어보세요"
     },
     "infant-care-room": {
@@ -372,24 +376,35 @@
     },
     "mobility-hub": {
       "name": "모빌리티 허브",
-      "description": "차량 호출·택시 승하차, 가족 승하차 구역, 셔틀.",
-      "location": "동쪽 주차장 1층"
+      "description": "차량 호출 승하차는 이곳에서만 가능합니다. 택시, 가족 승하차 구역, 무료 셔틀(휠체어 차량 있음)도 있습니다.",
+      "location": "동쪽 주차장 1층(3700 W Century Blvd.)"
     },
     "east-garage": {
       "name": "동쪽 주차장",
-      "description": "일반 주차. 주차권을 미리 구매하세요. 장애인 주차면은 선착순으로 판매합니다.",
-      "location": "102nd St. 입구"
+      "description": "일반 주차. 주차권을 미리 구매하세요. 장애인 주차면은 주차권과 함께 선착순으로 구매합니다.",
+      "location": "3665 W 102nd St(102nd St. 입구)"
     },
     "west-garage": {
       "name": "서쪽 주차장",
-      "description": "Prairie Ave. 건너편의 VIP 주차장. 주차권을 미리 구매하세요.",
-      "location": "Prairie Ave. 입구"
+      "description": "Prairie Ave. 건너편의 VIP 주차장. 주차권을 미리 구매하세요. 장애인 주차면은 주차권과 함께 선착순으로 구매합니다.",
+      "location": "10117 S Prairie Ave(Prairie Ave. 입구)"
+    },
+    "infant-care-terrace": {
+      "name": "영유아 돌봄실 테라스",
+      "description": "아기를 돌볼 수 있는 개인 공간. 모든 화장실에 기저귀 교환대가 있습니다.",
+      "location": "Terrace 레벨, Terrace Wall 16"
+    },
+    "elevators": {
+      "name": "엘리베이터",
+      "description": "엘리베이터는 정문에서 모든 층으로 가고, 메인 로비의 에스컬레이터가 Main 레벨과 Terrace 레벨을 잇습니다. 이동이 불편한 분이 우선입니다.",
+      "location": "가장 가까운 곳은 아레나 호스트에게 물어보세요"
     }
   },
   "facility": {
     "notFound": "시설을 찾을 수 없습니다",
     "wheelchair": "휠체어 이용 가능",
     "directions": "길찾기",
+    "noRoute": "도보 경로 없음: 경기장이 이 위치를 공개하지 않습니다. 직원에게 길을 물어보세요.",
     "imHere": "여기 있어요",
     "imHereHint": "도움을 요청할 때 이곳을 내 위치로 사용합니다",
     "isHere": "내 위치",
@@ -453,6 +468,7 @@
     "title": "도보 경로",
     "from": "출발: {{from}}",
     "fromArrival": "주 출입구인 {{from}}에서 출발합니다. 다른 곳에 있나요? 그 장소를 열고 ‘여기 있어요’ 버튼을 누르세요.",
+    "fromArrivalPlain": "{{from}}에서 출발합니다. 다른 곳에 있나요? 그 장소를 열고 ‘여기 있어요’ 버튼을 누르세요.",
     "steps_other": "약 {{number}}걸음",
     "stepStart": "{{from}}에서 출발하세요.",
     "stepHead": "{{direction}}쪽으로 약 {{meters}}m 가세요.",

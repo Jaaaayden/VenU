@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Face, Fonts, Radius, Spacing, Type, WEB_COLUMN_MAX } from '@/constants/theme';
-import { emptyFacilitiesMessage, FacilityIcon } from '@/features/venue/categories';
+import { categoriesAt, emptyFacilitiesMessage, FacilityIcon } from '@/features/venue/categories';
 import { CategoryChips } from '@/features/venue/category-chips';
 import { setCurrentSpot, useWhereAmI } from '@/features/venue/current';
 import { facilityLocation, facilityName } from '@/features/venue/labels';
@@ -28,7 +28,8 @@ export function LocationPicker({ visible, onClose }: { visible: boolean; onClose
   const venue = getVenue(venueId);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<FacilityCategory | null>(null);
-  const results = spotChoices(facilitiesFor(venueId), query, category, tv);
+  const facilities = facilitiesFor(venueId);
+  const results = spotChoices(facilities, query, category, tv);
   const venueName = venue?.name ?? venueId;
 
   function close() {
@@ -83,7 +84,7 @@ export function LocationPicker({ visible, onClose }: { visible: boolean; onClose
           </Pressable>
           <SearchField value={query} onChangeText={setQuery} placeholder={t('where.search')} accessibilityLabel={t('where.search')} />
           <View style={styles.chips}>
-            <CategoryChips value={category} onChange={setCategory} />
+            <CategoryChips value={category} onChange={setCategory} categories={categoriesAt(facilities, category)} />
           </View>
           <FlatList<Facility>
             data={results}
