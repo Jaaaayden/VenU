@@ -68,6 +68,8 @@ describe('mock facility_reports, help_feedback and app_feedback', () => {
   beforeAll(async () => {
     rosa = await account('rosa@example.com', 'visitor', 'Rosa');
     sam = await account('sam@example.com', 'volunteer', 'Sam');
+    // Volunteers start unverified (only verified ones can accept); LA28 staff verify them.
+    expect((await call('POST', '/__control', { body: { verify: 'sam@example.com' } })).status).toBe(200);
     lee = await account('lee@example.com', 'visitor', 'Lee');
   });
 
