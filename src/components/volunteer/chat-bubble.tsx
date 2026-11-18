@@ -16,7 +16,7 @@ import { Platform, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } f
 import Svg, { Path } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Colors, Face, Fonts, Spacing } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
 import { isRealProvider, useMessageTranslation, useReaderLanguage, useTranslationProvider, type MessageTranslation } from '@/features/translate';
 import { formatClock } from '@/features/volunteer/format';
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   toggle: { minHeight: 32, justifyContent: 'center' },
   pressed: { opacity: 0.6 },
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted },
-  noteLink: { fontFamily: Fonts.textSemiBold, color: Colors.primary },
+  noteLink: { ...Face.textSemiBold, color: Colors.primary },
   hint: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, alignSelf: 'flex-end', marginTop: 6, paddingEnd: TAIL + 2 },
   // Under your bubble, on the same edge as the hint it replaces.
   failed: { alignSelf: 'flex-end', paddingEnd: TAIL + 2 },

@@ -11,7 +11,7 @@ import { Button } from '@/components/button';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { AppLanguagePill } from '@/components/volunteer/app-language-pill';
-import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { isolatedLanguageName, languageName } from '@/features/profile/options';
 import { useWhereAmI } from '@/features/venue/current';
 import { meetPointFrom, meetSpotLabel, meetVenueName } from '@/features/volunteer/meet-point';
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   header: { gap: 0 },
   // No negative margin: a long title ("Maghanap ng Volunteer") runs under the language pill.
   titles: { gap: 5, marginTop: 2 },
-  title: { ...Type.title, fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30 },
+  title: { ...Type.title, ...Face.displaySemiBold, fontSize: 25, lineHeight: 30 },
   subtitle: { fontFamily: Fonts.text, fontSize: 14, lineHeight: 18, color: Colors.text },
   appLang: { alignSelf: 'flex-end' },
   langPill: {

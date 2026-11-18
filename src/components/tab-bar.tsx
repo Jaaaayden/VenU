@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
-import { Colors, Fonts, Shadow } from '@/constants/theme';
+import { Colors, Face, Fonts, Shadow } from '@/constants/theme';
 import { useT } from '@/i18n';
 
 export type Tab = 'volunteer' | 'venue' | 'profile';
@@ -71,5 +71,5 @@ const styles = StyleSheet.create({
   circleActive: { backgroundColor: Colors.inkDeep },
   // Figma 506:9816 sets the labels at 15.
   label: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 18, color: Colors.text, marginTop: -2 },
-  labelActive: { fontFamily: Fonts.displayMedium },
+  labelActive: { ...Face.displayMedium },
 });

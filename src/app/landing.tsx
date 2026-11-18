@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button } from '@/components/button';
 import { LogoMark } from '@/components/wordmark';
-import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Spacing, Type } from '@/constants/theme';
 import type { OAuthProvider } from '@/features/auth/auth-redirect';
 import { SocialButtons, WelcomeLanguagePill } from '@/features/auth/auth-ui';
 import { OnboardingScreen } from '@/features/auth/onboarding-screen';
@@ -73,7 +73,7 @@ export default function LandingScreen() {
 
 const styles = StyleSheet.create({
   hero: { alignItems: 'center', marginTop: 72, gap: Spacing.lg },
-  name: { fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
+  name: { ...Face.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
   actions: { alignItems: 'center', marginTop: 72, gap: Spacing.lg },
   // Figma's 260x93 cards, a little shorter so the social row fits a 390pt screen.
   action: { width: 260, maxWidth: '100%', minHeight: 72 },

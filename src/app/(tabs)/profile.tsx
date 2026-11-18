@@ -8,7 +8,7 @@ import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { FigmaIcon, type FigmaIconName } from '@/components/icons/figma-icon';
 import { NAV_BAR_CLEARANCE } from '@/components/tab-bar';
-import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
 import { SummaryTags } from '@/features/profile/summary-tags';
 import { useLayoutRtl, useT } from '@/i18n';
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   nameFill: { flex: 1, minWidth: 0 },
   name: { fontFamily: Fonts.display, fontSize: 20, lineHeight: 26, color: Colors.text },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  badge: { ...Type.caption, fontFamily: Fonts.textSemiBold, paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
+  badge: { ...Type.caption, ...Face.textSemiBold, paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: 6, overflow: 'hidden' },
   badgeRole: { backgroundColor: Colors.primarySoft, color: Colors.primary },
   badgeOk: { backgroundColor: Colors.successSoft, color: Colors.success },
   badgePending: { backgroundColor: Colors.accentSoft, color: Colors.accent },

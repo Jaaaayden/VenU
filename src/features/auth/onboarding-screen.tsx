@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
 import { PageGradient } from '@/components/page-gradient';
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Colors, Face, Fonts, Spacing } from '@/constants/theme';
 
 interface OnboardingScreenProps {
   /** The corner language pill (signed out: WelcomeLanguagePill; during setup: AppLanguagePill). */
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   header: { gap: Spacing.sm, marginTop: 56, marginBottom: Spacing.xxl },
   headerUnderBack: { marginTop: Spacing.xxl },
   headerCentered: { alignItems: 'center', marginTop: 72 },
-  title: { fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
+  title: { ...Face.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
   subtitle: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.text },
   centerText: { textAlign: 'center' },
   spacer: { flexGrow: 1, minHeight: Spacing.xl },

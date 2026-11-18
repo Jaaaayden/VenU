@@ -5,7 +5,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { useWidestWord } from '@/components/widest-word';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
 import { AVAILABILITIES, type Availability } from '@/features/volunteer/availability';
 import { useT } from '@/i18n';
 
@@ -122,8 +122,8 @@ const styles = StyleSheet.create({
   selected: { backgroundColor: Colors.primarySoft, borderColor: Colors.primary },
   pressed: { opacity: 0.8 },
   label: { fontFamily: Fonts.display, fontSize: 15, lineHeight: 19, color: Colors.text },
-  labelSelected: { fontFamily: Fonts.displayMedium, color: Colors.primary },
-  labelMeasure: { fontFamily: Fonts.displayMedium, fontSize: LABEL_SIZE, lineHeight: 19 },
+  labelSelected: { ...Face.displayMedium, color: Colors.primary },
+  labelMeasure: { ...Face.displayMedium, fontSize: LABEL_SIZE, lineHeight: 19 },
   // A row, not absolute: react-native-web ignores `end`, and a row flips in RTL on its own.
   tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   tick: {
