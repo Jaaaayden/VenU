@@ -6,4 +6,4 @@
 //   chatLanguage(['ase', 'es']) → 'es'        the language a person reads and writes chat in
 export { chatLanguage, profileChatLanguage } from './languages';
 export { isRealProvider, setTranslationOwner, translate, translationCache, useTranslationProvider } from './service';
-export { useMessageTranslation, useReaderLanguage, useTranslatedText, type MessageTranslation, type Translatable } from './use-translation';
+export { shownText, useMessageTranslation, useReaderLanguage, useTranslatedText, type MessageTranslation, type Translatable } from './use-translation';

@@ -74,6 +74,16 @@ export function useMessageTranslation(
 }
 
 /**
+ * The text to show for `view`: the translation (with "…" when only its start was translated), or
+ * `text` as written while `original` is on or there's no translation.
+ * e.g. shownText({ kind: 'translated', text: 'Hi', source: 'es', partial: false }, 'Hola', false) → 'Hi'
+ */
+export function shownText(view: MessageTranslation, text: string, original: boolean): string {
+  if (view.kind !== 'translated' || original) return text;
+  return view.partial ? `${view.text}…` : view.text;
+}
+
+/**
  * `item` in the reader's language, with a "Show original" switch: the text to show (the translation,
  * or the original while switched or when there's none), the view for TranslationNote, and the switch.
  */
@@ -85,7 +95,5 @@ export function useTranslatedText(
   const { view, retry } = useMessageTranslation(item, reader, cache);
   const [original, setOriginal] = useState(false);
   const toggle = useCallback(() => setOriginal(o => !o), []);
-  const translated = view.kind === 'translated' && !original ? view : null;
-  const text = translated ? (translated.partial ? `${translated.text}…` : translated.text) : item.text;
-  return { text, view, original, toggle, retry };
+  return { text: shownText(view, item.text, original), view, original, toggle, retry };
 }

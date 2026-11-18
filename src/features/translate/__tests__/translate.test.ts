@@ -8,7 +8,7 @@ import { createTranslateClient, cutToLimit, type Transport, type Translate, type
 import { chatLanguage, profileChatLanguage } from '../languages';
 import { MOCK_CATALOG } from '../local';
 import { createStub } from '../stub';
-import { needsTranslation, viewOf } from '../use-translation';
+import { needsTranslation, shownText, viewOf } from '../use-translation';
 
 // use-translation reads the profile, whose store uses AsyncStorage.
 jest.mock('@react-native-async-storage/async-storage', () => jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'));
@@ -255,6 +255,15 @@ describe('what a bubble shows', () => {
     expect(viewOf(done({ text: incoming.text, detectedSource: null, unavailable: true }), incoming, 'hi')).toEqual({ kind: 'unavailable' });
     // The provider found it was already in the reader's language.
     expect(viewOf(done({ text: 'Hola', detectedSource: 'es' }), { ...incoming, text: 'Hola', lang: undefined }, 'es')).toEqual({ kind: 'original' });
+  });
+});
+
+describe('shownText', () => {
+  it('shows the translation, its start with "…", or the original when switched or untranslated', () => {
+    expect(shownText({ kind: 'translated', text: 'Hi', source: 'es', partial: false }, 'Hola', false)).toBe('Hi');
+    expect(shownText({ kind: 'translated', text: 'Hi', source: 'es', partial: true }, 'Hola', false)).toBe('Hi…');
+    expect(shownText({ kind: 'translated', text: 'Hi', source: 'es', partial: false }, 'Hola', true)).toBe('Hola');
+    expect(shownText({ kind: 'loading' }, 'Hola', false)).toBe('Hola');
   });
 });
 
