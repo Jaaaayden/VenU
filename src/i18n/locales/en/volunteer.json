@@ -35,7 +35,7 @@
     "question": "What do you need help with?",
     "notePlaceholder": "e.g. I'm stuck near ramp 2",
     "photoOff": "Photo access is off. Turn it on in Settings.",
-    "pickOne": "Pick at least one thing you need help with.",
+    "pickOne": "Choose what you need help with.",
     "send": "Send Request"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "Speak your note",
     "placeholder": "Enter text",
     "attached": "Attached picture",
-    "remove": "Remove picture"
+    "remove": "Remove picture",
+    "count": "{{used}} of {{max}} characters"
   },
   "emergency": {
     "title": "Emergency?",
@@ -133,7 +134,9 @@
     "stickers": "Stickers",
     "stickersSoon": "Stickers are coming soon.",
     "record": "Speak a message",
-    "emptyVolunteer": "Say hello to {{name}} and let them know you're on your way."
+    "emptyVolunteer": "Say hello to {{name}} and let them know you're on your way.",
+    "yourRequest": "Your request",
+    "requestFrom": "Request from {{name}}"
   },
   "translation": {
     "translatedFrom": "Translated from {{language}}",
@@ -156,7 +159,7 @@
   },
   "bubble": {
     "mine": "You, {{time}}: {{text}}",
-    "listen": "listen",
+    "listen": "Listen",
     "listenLabel": "Listen to this message",
     "from": "{{name}}, {{time}}: {{text}}",
     "fromTranslated": "{{name}}, {{time}}: {{text}} (translated from {{language}})",

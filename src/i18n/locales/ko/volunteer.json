@@ -35,7 +35,7 @@
     "question": "어떤 도움이 필요하세요?",
     "notePlaceholder": "예: 2번 경사로 근처에서 못 움직여요",
     "photoOff": "사진 접근이 꺼져 있어요. 설정에서 켜 주세요.",
-    "pickOne": "필요한 도움을 하나 이상 선택하세요.",
+    "pickOne": "필요한 도움을 선택하세요.",
     "send": "요청 보내기"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "음성으로 메모하기",
     "placeholder": "내용 입력",
     "attached": "첨부한 사진",
-    "remove": "사진 삭제"
+    "remove": "사진 삭제",
+    "count": "{{used}}/{{max}}자"
   },
   "emergency": {
     "title": "긴급 상황인가요?",
@@ -132,7 +133,9 @@
     "stickers": "스티커",
     "stickersSoon": "스티커는 곧 지원돼요.",
     "record": "음성으로 메시지 입력",
-    "emptyVolunteer": "{{name}} 님에게 인사하고 가는 중이라고 알려 주세요."
+    "emptyVolunteer": "{{name}} 님에게 인사하고 가는 중이라고 알려 주세요.",
+    "yourRequest": "내 요청",
+    "requestFrom": "{{name}} 님의 요청"
   },
   "translation": {
     "translatedFrom": "{{language}}에서 번역됨",

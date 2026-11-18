@@ -35,7 +35,7 @@
     "question": "你需要什么帮助？",
     "notePlaceholder": "例如：我在 2 号坡道附近过不去",
     "photoOff": "照片访问已关闭。请在“设置”中开启。",
-    "pickOne": "请至少选择一项需要的帮助。",
+    "pickOne": "请选择你需要的帮助。",
     "send": "发送请求"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "语音输入备注",
     "placeholder": "输入文字",
     "attached": "已附加的图片",
-    "remove": "移除图片"
+    "remove": "移除图片",
+    "count": "{{used}}/{{max}} 个字符"
   },
   "emergency": {
     "title": "紧急情况？",
@@ -132,7 +133,9 @@
     "stickers": "贴纸",
     "stickersSoon": "贴纸即将推出。",
     "record": "语音输入消息",
-    "emptyVolunteer": "向 {{name}} 打个招呼，告诉对方你正在路上。"
+    "emptyVolunteer": "向 {{name}} 打个招呼，告诉对方你正在路上。",
+    "yourRequest": "你的请求",
+    "requestFrom": "{{name}} 的请求"
   },
   "translation": {
     "translatedFrom": "译自{{language}}",
