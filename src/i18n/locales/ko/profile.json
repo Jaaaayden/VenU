@@ -207,7 +207,8 @@
     "placeholder": "예: 햇빛 아래에서 지도가 잘 안 보였어요",
     "feedbackLabel": "의견",
     "send": "의견 보내기",
-    "empty": "먼저 몇 마디 적어 주세요."
+    "empty": "먼저 몇 마디 적어 주세요.",
+    "sendFailed": "의견을 보내지 못했어요. {{reason}}"
   },
   "notifications": {
     "title": "알림",

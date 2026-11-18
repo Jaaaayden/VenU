@@ -207,7 +207,8 @@
     "placeholder": "ex.: O mapa ficou difícil de ler no sol",
     "feedbackLabel": "Sua sugestão",
     "send": "Enviar sugestão",
-    "empty": "Escreva algumas palavras primeiro."
+    "empty": "Escreva algumas palavras primeiro.",
+    "sendFailed": "Não foi possível enviar sua sugestão. {{reason}}"
   },
   "notifications": {
     "title": "Notificações",

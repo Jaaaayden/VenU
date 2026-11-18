@@ -207,7 +207,8 @@
     "placeholder": "例：日差しの下で地図が見づらかった",
     "feedbackLabel": "ご意見",
     "send": "ご意見を送る",
-    "empty": "まず何か書いてください。"
+    "empty": "まず何か書いてください。",
+    "sendFailed": "ご意見を送信できませんでした。{{reason}}"
   },
   "notifications": {
     "title": "通知",

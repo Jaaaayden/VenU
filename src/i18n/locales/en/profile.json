@@ -207,7 +207,8 @@
     "placeholder": "e.g. The map was hard to read in the sun",
     "feedbackLabel": "Your feedback",
     "send": "Send feedback",
-    "empty": "Write a few words first."
+    "empty": "Write a few words first.",
+    "sendFailed": "Couldn’t send your feedback. {{reason}}"
   },
   "notifications": {
     "title": "Notifications",

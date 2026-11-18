@@ -207,7 +207,8 @@
     "placeholder": "p. ej., El mapa se veía mal con el sol",
     "feedbackLabel": "Tus comentarios",
     "send": "Enviar comentarios",
-    "empty": "Escribe unas palabras primero."
+    "empty": "Escribe unas palabras primero.",
+    "sendFailed": "No se pudieron enviar tus comentarios. {{reason}}"
   },
   "notifications": {
     "title": "Notificaciones",

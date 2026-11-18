@@ -207,7 +207,8 @@
     "placeholder": "vd. Bản đồ khó đọc dưới nắng",
     "feedbackLabel": "Góp ý của bạn",
     "send": "Gửi góp ý",
-    "empty": "Hãy viết vài chữ trước."
+    "empty": "Hãy viết vài chữ trước.",
+    "sendFailed": "Không gửi được góp ý. {{reason}}"
   },
   "notifications": {
     "title": "Thông báo",

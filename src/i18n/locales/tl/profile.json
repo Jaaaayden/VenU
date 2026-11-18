@@ -207,7 +207,8 @@
     "placeholder": "hal. Mahirap basahin ang mapa sa ilalim ng araw",
     "feedbackLabel": "Ang iyong feedback",
     "send": "Magpadala ng feedback",
-    "empty": "Sumulat muna ng ilang salita."
+    "empty": "Sumulat muna ng ilang salita.",
+    "sendFailed": "Hindi maipadala ang feedback mo. {{reason}}"
   },
   "notifications": {
     "title": "Mga notification",
