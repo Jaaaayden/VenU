@@ -43,3 +43,18 @@ Answers from Jayden before the run, and calls made during it. Each line: decisio
 5. Tell Krisha: matching can use profiles (role = volunteer, verified, availability = 'free', availability_updated_at, notification_prefs->>'volunteer'); new public functions must revoke anon/public EXECUTE (Supabase's default privileges grant it).
 6. Figma options that need a migration + matching work, not built: a "Find a facility" help type, helper age bands 20-30 / 30-40, "Speech impairment" need.
 7. Review and open PRs from jayden/night-batch (not pushed).
+
+## Review fixes
+Branch `jayden/review-fixes` (on night-batch 73ad38c), from the code review of `main...jayden/night-batch`.
+- Volunteer tab after a restart: a search that ran out while the app was closed shows "No volunteer is free" at once and is withdrawn in the background (it used to wait for the network, leaving the tab blank). A volunteer who accepted meanwhile still becomes the match; if the visitor already searched again, that late match is called off.
+- Free / Busy / Off and the alert switches saved on a device before they moved to the profile are carried over once (only while the profile still has the default), then the old keys go (`src/features/profile/device-settings.ts`).
+- Help nobody gave can't be rated or reported: `close_help_request(id, 'done')` on a request still open cancels it, `done` requires `matched_at` (check `done_was_matched`), and the rate-or-report policy requires `matched_at` (kept when the volunteer deletes their account after finishing, cleared by a hand-back).
+- Report authors are private: signed-in users read every `facility_reports` column except `author_id`; the app lists `public.facility_report_cards` (security_invoker view) whose `mine` comes from `private.is_own_report(id)`. Delete-own works as before.
+- Request notes in the reader's language aren't sent to the translator (the request's language goes along as the note's). A slow translation of an id's old text no longer replaces the new one. The sample reports still show when the report list can't load.
+- Not changed: a report's title and body are two cache entries but already one translator call (same batch; a list of cards is one call), so they weren't merged into one text, which would need splitting the translation back apart. `shownText()` is now shared by notes and reports; reports keep their one switch for both parts.
+- Edge functions username-sign-in, password-reset and delete-account share `supabase/functions/_shared/edge.ts` (CORS, json, clientIpOf, serverKey). translate keeps its own copy.
+
+To do (orchestrator):
+1. Apply `supabase/migrations/20261118050000_review_fixes.sql` to live (PGlite: 45 checks pass).
+2. Redeploy username-sign-in, password-reset and delete-account. Each deploys `index.ts`, `handler.ts`, `deno.json` and `_shared/edge.ts`; in the dashboard's flat editor upload it as `edge.ts` and change `'../_shared/edge.ts'` to `'./edge.ts'` (password-reset no longer needs the `username-sign-in-handler.ts` copy). Settings unchanged: Verify JWT off for all three.
+3. After both: `node scripts/e2e.mjs` against live (it now also checks author_id is hidden and that `facility_report_cards.mine` is right).
