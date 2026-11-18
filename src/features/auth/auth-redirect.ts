@@ -10,7 +10,7 @@
 //     → { kind: 'error', code: 'invalid_request', description: 'Unsupported provider' }
 //   …/reset-password → { kind: 'none' }
 
-import { FIRST_NAME_MAX } from '@/features/profile/validate';
+import { FIRST_NAME_MAX, firstNameFrom } from '@/features/profile/validate';
 
 export type AuthRedirect =
   | { kind: 'session'; accessToken: string; refreshToken: string; type: string | null }
@@ -56,6 +56,5 @@ export function firstNameFromMetadata(meta: Record<string, unknown> | null | und
   if (typeof given === 'string' && given.trim()) return given.trim().slice(0, FIRST_NAME_MAX);
   const full = meta?.full_name ?? meta?.name;
   if (typeof full !== 'string') return undefined;
-  const first = full.trim().split(/\s+/)[0];
-  return first ? first.slice(0, FIRST_NAME_MAX) : undefined;
+  return firstNameFrom(full) || undefined;
 }
