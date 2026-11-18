@@ -128,7 +128,7 @@ function RequestCard({ request: r, children }: { request: IncomingRequest; child
               : t('incoming.metaLive', { minutes, language })}
           </Text>
           {/* In the volunteer's language, so they can read it before accepting. */}
-          {r.note ? <RequestNote requestId={r.id} note={r.note} style={styles.note} /> : null}
+          {r.note ? <RequestNote requestId={r.id} note={r.note} lang={r.language} style={styles.note} /> : null}
         </View>
       </View>
       {children}

@@ -56,7 +56,7 @@ export function ActiveRequest({ assignment: a, unread }: { assignment: Assignmen
           <Text style={Type.bodyStrong}>{help}</Text>
           <MeetPlaceText point={a.location} style={styles.line} />
           <Text style={styles.line}>{t('helpIn', { language: uiLanguageName(a.language, tp) })}</Text>
-          {a.note ? <RequestNote requestId={a.id} note={a.note} style={styles.line} /> : null}
+          {a.note ? <RequestNote requestId={a.id} note={a.note} lang={a.language} style={styles.line} /> : null}
         </View>
       </View>
 

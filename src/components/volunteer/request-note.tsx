@@ -2,7 +2,8 @@
  * A visitor's request note in the reader's language, with "Translated from Spanish · Show original"
  * under it, like a chat message. The same translation (one call, kept across reloads) is shared by the
  * volunteer's request card, their helping card and the chat, under the id `note:<request id>`.
- * The visitor's own note (`mine`) shows as written.
+ * The visitor's own note (`mine`) shows as written, and so does one already in the reader's language
+ * (`lang`: the language the visitor asked for help in, taken as the note's), without a translator call.
  *
  * RequestSummary: the request at the top of the chat ("Lucia's request · Language Help" and the note).
  */
@@ -19,15 +20,20 @@ import { HelpIcon } from './help-icon';
 interface NoteProps {
   requestId: string;
   note: string;
+  /** The request's language, e.g. 'es' (the note is taken to be written in it). */
+  lang?: string;
   /** The reader wrote it (the visitor): no translation. */
   mine?: boolean;
   style?: StyleProp<TextStyle>;
 }
 
-export function RequestNote({ requestId, note, mine = false, style }: NoteProps) {
+export function RequestNote({ requestId, note, lang, mine = false, style }: NoteProps) {
   const t = useT('volunteer');
   const reader = useReaderLanguage();
-  const { text, view, original, toggle, retry } = useTranslatedText({ id: `note:${requestId}`, from: mine ? 'me' : 'them', text: note }, reader);
+  const { text, view, original, toggle, retry } = useTranslatedText(
+    { id: `note:${requestId}`, from: mine ? 'me' : 'them', text: note, ...(lang ? { lang } : {}) },
+    reader,
+  );
   return (
     <View>
       <Text style={style}>{t('quoted', { text })}</Text>
@@ -38,7 +44,7 @@ export function RequestNote({ requestId, note, mine = false, style }: NoteProps)
 }
 
 interface SummaryProps {
-  request: { id: string; helpTypes: HelpTypeId[]; note: string; mine: boolean };
+  request: { id: string; helpTypes: HelpTypeId[]; note: string; language: string; mine: boolean };
   /** The visitor's first name, on the volunteer's side. */
   visitorName: string;
 }
@@ -54,7 +60,7 @@ export function RequestSummary({ request, visitorName }: SummaryProps) {
       <View style={styles.text}>
         <Text style={styles.label}>{request.mine ? t('chat.yourRequest') : t('chat.requestFrom', { name: visitorName })}</Text>
         <Text style={Type.bodyStrong}>{help}</Text>
-        {request.note ? <RequestNote requestId={request.id} note={request.note} mine={request.mine} style={styles.note} /> : null}
+        {request.note ? <RequestNote requestId={request.id} note={request.note} lang={request.language} mine={request.mine} style={styles.note} /> : null}
       </View>
     </View>
   );
