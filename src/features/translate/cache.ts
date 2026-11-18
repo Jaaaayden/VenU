@@ -112,9 +112,11 @@ export function createTranslationCache(
     timers.delete(key);
     set(key, { status: 'loading' });
     const gen = generation;
+    // Answered for the previous account, or for text that has changed since (a newer call is on its way).
+    const stale = () => gen !== generation || requests.get(key)?.text !== req.text;
     translate(req).then(
       result => {
-        if (gen !== generation) return; // answered for the previous account
+        if (stale()) return;
         failures.delete(key);
         if (keepable(result) && storage) {
           stored.set(key, { text: req.text, result, at: now() });
@@ -123,7 +125,7 @@ export function createTranslationCache(
         set(key, { status: 'done', result });
       },
       () => {
-        if (gen !== generation) return;
+        if (stale()) return;
         failures.set(key, (failures.get(key) ?? 0) + 1);
         set(key, { status: 'error', at: now() });
         timers.set(key, setTimeout(() => {
