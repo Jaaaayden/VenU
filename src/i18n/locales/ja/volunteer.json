@@ -49,6 +49,7 @@
   "note": {
     "label": "メモを追加<muted>（任意）</muted>",
     "labelPlain": "メモを追加（任意）",
+    "speak": "メモを音声で入力",
     "placeholder": "テキストを入力",
     "attached": "添付した写真",
     "remove": "写真を削除"

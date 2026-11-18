@@ -49,6 +49,7 @@
   "note": {
     "label": "添加备注<muted>（可选）</muted>",
     "labelPlain": "添加备注（可选）",
+    "speak": "语音输入备注",
     "placeholder": "输入文字",
     "attached": "已附加的图片",
     "remove": "移除图片"

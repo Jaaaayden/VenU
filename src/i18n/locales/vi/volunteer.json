@@ -49,6 +49,7 @@
   "note": {
     "label": "Thêm ghi chú <muted>(không bắt buộc)</muted>",
     "labelPlain": "Thêm ghi chú (không bắt buộc)",
+    "speak": "Nói ghi chú của bạn",
     "placeholder": "Nhập nội dung",
     "attached": "Ảnh đã đính kèm",
     "remove": "Xóa ảnh"
