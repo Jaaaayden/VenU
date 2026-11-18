@@ -78,6 +78,21 @@ supabase functions deploy translate --no-verify-jwt
 
 DeepL can't translate into Tagalog, Vietnamese, Armenian or Persian (and some other app languages); those messages show the original with "Translation isn't available for Tagalog yet". Claude covers all of them.
 
+## End-to-end API test
+
+`scripts/e2e.mjs` runs the core flow as two users against any backend and prints PASS / FAIL / SKIP per step (exit code 1 on any FAIL): sign in (username through `username-sign-in`, or email), read profiles, open a help request, the volunteer finds and accepts it, both chat (Realtime delivery when the backend has it), translate, close.
+
+```bash
+# the mock (start it first with npm run dev:mock); --signup creates two throwaway accounts
+node scripts/e2e.mjs --url http://localhost:47330 --anon mock-publishable-key --signup
+# a real project, with existing confirmed accounts (or set E2E_VISITOR / E2E_VOLUNTEER to keep passwords out of shell history)
+node scripts/e2e.mjs --url https://<ref>.supabase.co --anon <publishable key> --visitor rosa_m:<pw> --volunteer sam_helps:<pw>
+```
+
+- Safe on a shared project: it creates accounts only with `--signup`, writes only rows it created (one request, its messages, the `--signup` profiles), deletes nothing, and cancels its own request if a step fails.
+- SKIP means "not checkable here": no Realtime on the mock, `translate` not deployed (404) or without a provider (503), or a feature not built yet (TODO steps).
+- New feature, new step: add `{ id, needs, run }` to `STEPS` in `scripts/e2e.mjs`; `run` throws to FAIL or returns `{ skip: 'why' }`.
+
 ## Scripts
 
 | Command | What it does |
@@ -87,7 +102,7 @@ DeepL can't translate into Tagalog, Vietnamese, Armenian or Persian (and some ot
 | `npm run stop` | End every VenU dev server |
 | `npm run lint` | ESLint, fails on any warning |
 | `npm run typecheck` | Generate typed routes, then `tsc --noEmit` |
-| `npm test` | Jest unit tests (`src/**/__tests__`, `supabase/functions/**/__tests__`) |
+| `npm test` | Jest unit tests (`src/**/__tests__`, `supabase/functions/**/__tests__`, `scripts/__tests__`) |
 | `npm run check` | Lint, typecheck, tests and `expo-doctor`; run before opening a PR (CI runs the same) |
 
 ## Adding packages
@@ -112,7 +127,7 @@ src/lib/            supabase client, auth
 src/components/     shared UI (chips, buttons, avatar, language picker, nav bar)
 src/constants/      design tokens (Colors, Spacing, Radius, Type)
 supabase/           SQL migrations; functions/translate (Edge Function, providers)
-scripts/            dev.mjs (backend modes, stop), mock-supabase.mjs (fake backend)
+scripts/            dev.mjs (backend modes, stop), mock-supabase.mjs (fake backend), e2e.mjs (API test)
 assets/             app icon, splash, favicon
 .kiro/figma/        Figma export the first screens were built from
 ```
