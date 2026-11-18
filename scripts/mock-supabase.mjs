@@ -148,6 +148,10 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
     for (const [token, owner] of refreshTokens) if (owner === id) refreshTokens.delete(token);
     for (const [token, entry] of recoveryTokens) if (entry.userId === id) recoveryTokens.delete(token);
     forgetHelpUser(profiles, id);
+    // 20261118010000_reports_feedback.sql: reports and help feedback cascade; app feedback keeps the note.
+    feedbackTables.facility_reports = feedbackTables.facility_reports.filter(r => r.author_id !== id);
+    feedbackTables.help_feedback = feedbackTables.help_feedback.filter(r => r.author_id !== id);
+    for (const row of feedbackTables.app_feedback) if (row.author_id === id) row.author_id = null;
     persist();
     return true;
   }

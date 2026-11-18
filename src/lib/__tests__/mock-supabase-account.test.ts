@@ -133,14 +133,23 @@ describe('mock delete-account', () => {
     }, s.access_token);
     await profile(visitor, 'visitor', 'Vee');
     await profile(vol, 'volunteer', 'Hal');
+    // Only verified volunteers can accept (LA28 staff verify them).
+    expect((await call('POST', '/__control', { verify: 'helper_x' })).status).toBe(200);
     const req = (await call('POST', '/rest/v1/help_requests', { visitor_name: 'Vee', venue_id: 'sofi', help_types: ['lost'], language: 'en' }, visitor.access_token)).status;
     expect(req).toBe(201);
     const id = (await call('GET', '/__help')).body.requests.at(-1).id;
     await call('POST', '/rest/v1/rpc/accept_help_request', { p_request_id: id }, vol.access_token);
     await call('POST', '/rest/v1/messages', { request_id: id, text: 'Hi' }, visitor.access_token);
     await call('POST', '/rest/v1/messages', { request_id: id, text: 'Coming' }, vol.access_token);
+    const report = { venue_id: 'sofi', facility_id: 'entry-4', title: 'Ramp is cracked', topic: 'accessibility', body: '', language: 'en' };
+    expect((await call('POST', '/rest/v1/facility_reports', report, visitor.access_token)).status).toBe(201);
+    expect((await call('POST', '/rest/v1/app_feedback', { note: 'Nice app', language: 'en', platform: 'web' }, visitor.access_token)).status).toBe(201);
 
     await call('POST', '/functions/v1/delete-account', {}, visitor.access_token);
+    // 20261118010000_reports_feedback.sql: their reports go with them; app feedback stays without an author.
+    const after = (await call('GET', '/__state')).body;
+    expect(after.facility_reports.filter((r: { author_id: string }) => r.author_id === visitor.user.id)).toEqual([]);
+    expect(after.app_feedback.find((r: { note: string }) => r.note === 'Nice app')).toMatchObject({ author_id: null });
     const help = (await call('GET', '/__help')).body;
     expect(help.requests.find((r: { id: string }) => r.id === id)).toMatchObject({ status: 'cancelled', visitor_id: null, visitor_name: 'Vee', volunteer_name: 'Hal' });
     expect(help.messages.filter((m: { request_id: string }) => m.request_id === id).map((m: { text: string }) => m.text)).toEqual(['Coming']);
