@@ -221,6 +221,8 @@
     "meta": "À {{distance}} · il y a {{minutes}} min · {{language}}",
     "accept": "Accepter",
     "acceptSoon": "Vous pourrez accepter des demandes quand la mise en relation sera active.",
+    "waitTitle": "En attente de vérification",
+    "waitBody": "LA28 vérifie vos informations. Vous voyez déjà les demandes et pourrez les accepter une fois votre compte vérifié.",
     "empty": "Personne à proximité n’a besoin d’aide pour l’instant. Les nouvelles demandes s’afficheront ici.",
     "metaLive": "il y a {{minutes}} min · {{language}}"
   },
@@ -235,6 +237,7 @@
   "desk": {
     "taken": "Quelqu’un d’autre a déjà accepté cette demande.",
     "acceptFailed": "Impossible d’accepter la demande. Vérifiez votre connexion et réessayez.",
+    "notVerified": "Vous pourrez accepter des demandes une fois que LA28 aura vérifié votre compte.",
     "cancelled": "{{name}} a annulé la demande.",
     "done": "{{name}} a indiqué que l’aide est terminée. Merci !",
     "ended": "Conversation terminée. Merci d’avoir aidé {{name}} !",

@@ -1,6 +1,8 @@
 // A small stand-in for Supabase (auth, the `profiles` table, the `avatars` bucket) for testing on
 // your own machine without a real project. It mirrors the rules in supabase/migrations: users see
 // and change only their own row, can't change role or verified, and keep photos in their own folder.
+// Sign-ups start unverified, as on the real project; only the verify hook below (the dashboard,
+// live) verifies a volunteer, and unverified volunteers can't accept requests.
 // Started by `npm run dev:mock`; see scripts/dev.mjs.
 //
 // It also serves the `translate` Edge Function (POST /functions/v1/translate), running the same code
@@ -15,7 +17,8 @@
 // (drop the next n profile-save responses, to test lost connections), { failTranslate: n } (the next
 // n translate calls fail), { translateDelayMs: ms } (slow translations), { clockOffsetMs: ms } (move the
 // clock used for how long a sign-up has waited unconfirmed, e.g. 2h to free its username),
-// GET /__confirm?email=...
+// { verify: 'sam_helps' } (verify a volunteer by username or email, as LA28 staff do in the dashboard;
+// add verified: false to take it back), GET /__confirm?email=...
 import { Buffer } from 'node:buffer';
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -28,6 +31,14 @@ export const SERVER_ENV_FILE = join(ROOT, '.env.server.local');
 export const ENV_LOCAL_FILE = join(ROOT, '.env.local');
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+// profiles columns from 20261118020000_volunteer_settings_verified.sql.
+const AVAILABILITIES = ['free', 'busy', 'off'];
+const NOTIFICATION_KINDS = ['volunteer', 'chat', 'venue', 'reports'];
+const DEFAULT_NOTIFICATION_PREFS = { volunteer: true, chat: true, venue: true, reports: true };
+// Saved state from before verified was enforced: its volunteers were made when anyone could accept,
+// so they load verified (keeps the demo's volunteer working). Later sign-ups start unverified.
+const VERIFIED_RULE = 1;
 
 // Below 49152 on purpose: Windows (Hyper-V, WSL, Docker) reserves blocks of 49152-65535 that move
 // between reboots, and a reserved port fails with EACCES. 54330 was inside one of those blocks.
@@ -54,7 +65,12 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
     try {
       const saved = JSON.parse(readFileSync(stateFile, 'utf8'));
       for (const u of saved.users ?? []) users.set(u.email, u);
-      for (const p of saved.profiles ?? []) profiles.set(p.id, p);
+      const grandfather = (saved.verifiedRule ?? 0) < VERIFIED_RULE;
+      for (const p of saved.profiles ?? []) {
+        // Rows from before the settings columns get their defaults, as `add column ... default` does.
+        const row = { availability: 'free', availability_updated_at: p.created_at ?? null, notification_prefs: { ...DEFAULT_NOTIFICATION_PREFS }, ...p };
+        profiles.set(p.id, grandfather && p.role === 'volunteer' ? { ...row, verified: true } : row);
+      }
       for (const [path, f] of Object.entries(saved.files ?? {})) files.set(path, { bytes: Buffer.from(f.bytes, 'base64'), type: f.type });
       for (const [token, id] of Object.entries(saved.refreshTokens ?? {})) refreshTokens.set(token, id);
     } catch {
@@ -69,6 +85,7 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       profiles: [...profiles.values()],
       files: Object.fromEntries([...files].map(([path, f]) => [path, { bytes: f.bytes.toString('base64'), type: f.type }])),
       refreshTokens: Object.fromEntries(refreshTokens),
+      verifiedRule: VERIFIED_RULE,
     }));
   }
 
@@ -145,7 +162,21 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
     if (p === '/__state') {
       return send(res, 200, { users: [...users.values()].map(u => ({ id: u.id, email: u.email, confirmed: u.confirmed, username: u.username ?? null })), profiles: [...profiles.values()], files: [...files.keys()], log: requests });
     }
-    if (p === '/__control') { Object.assign(control, json()); return send(res, 200, control); }
+    if (p === '/__control') {
+      const { verify, verified = true, ...rest } = json() ?? {};
+      if (verify !== undefined) {
+        // By username or email, like the dashboard's Table Editor (which runs as postgres, past the guard).
+        const user = userByUsername(verify) ?? users.get(normalEmail(verify));
+        const row = user && profiles.get(user.id);
+        if (!row) return send(res, 404, { error: `no profile for ${verify}` });
+        row.verified = verified === true;
+        row.updated_at = new Date().toISOString();
+        persist();
+        log(`mock supabase: ${user.username ?? user.email} is ${row.verified ? 'verified' : 'unverified'}`);
+      }
+      Object.assign(control, rest);
+      return send(res, 200, control);
+    }
     if (p === '/__confirm') {
       const user = users.get(normalEmail(url.searchParams.get('email')));
       if (user && !user.confirmed) {
@@ -257,6 +288,10 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       const checkRow = r => {
         if (r.avatar_path != null && !new RegExp(`^${r.id}/[A-Za-z0-9._-]+$`).test(r.avatar_path)) return 'new row for relation "profiles" violates check constraint "avatar_path_own_folder"';
         if (!Array.isArray(r.languages) || !r.languages.includes(r.main_language)) return 'new row for relation "profiles" violates check constraint "main_language_listed"';
+        if (!AVAILABILITIES.includes(r.availability)) return 'new row for relation "profiles" violates check constraint "profiles_availability_check"';
+        const prefs = r.notification_prefs;
+        if (!prefs || typeof prefs !== 'object' || Array.isArray(prefs) || Object.entries(prefs).some(([k, v]) => !NOTIFICATION_KINDS.includes(k) || typeof v !== 'boolean'))
+          return 'new row for relation "profiles" violates check constraint "notification_prefs_shape"';
         return null;
       };
       // Simulates a lost connection: the write is saved but the app never hears back.
@@ -275,10 +310,14 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       if (req.method === 'POST') {
         const body = json();
         const row = Array.isArray(body) ? body[0] : body;
-        if (row?.id !== uid || row.verified) return pgErr(res, 403, '42501', 'new row violates row-level security policy for table "profiles"');
+        if (row?.id !== uid) return pgErr(res, 403, '42501', 'new row violates row-level security policy for table "profiles"');
         if (profiles.has(row.id)) return pgErr(res, 409, '23505', 'duplicate key value violates unique constraint "profiles_pkey"');
         const now = new Date().toISOString();
-        const full = { ...row, verified: false, created_at: now, updated_at: now };
+        // The profiles_guard trigger: a client's verified always comes out false, and the server stamps the time.
+        const full = {
+          availability: 'free', notification_prefs: { ...DEFAULT_NOTIFICATION_PREFS },
+          ...row, verified: false, availability_updated_at: now, created_at: now, updated_at: now,
+        };
         const bad = checkRow(full);
         if (bad) return pgErr(res, 400, '23514', bad);
         profiles.set(row.id, full);
@@ -288,10 +327,12 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, trans
       }
       if (req.method === 'PATCH') {
         const body = json() ?? {};
-        if ('role' in body || 'verified' in body || 'id' in body) return pgErr(res, 403, '42501', 'permission denied for table profiles');
+        if (['role', 'verified', 'id', 'availability_updated_at'].some(k => k in body)) return pgErr(res, 403, '42501', 'permission denied for table profiles');
         const existing = idEq === uid ? profiles.get(uid) : undefined;
         if (!existing) return reply([]);
-        const next = { ...existing, ...body, updated_at: new Date().toISOString() };
+        const at = new Date().toISOString();
+        const next = { ...existing, ...body, updated_at: at };
+        if (existing.availability !== next.availability) next.availability_updated_at = at;
         const bad = checkRow(next);
         if (bad) return pgErr(res, 400, '23514', bad);
         profiles.set(uid, next);
@@ -503,6 +544,7 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
   if (p === '/rest/v1/rpc/accept_help_request') {
     const me = profiles.get(uid);
     if (me?.role !== 'volunteer') return pgErr(res, 403, '42501', 'not_a_volunteer');
+    if (me.verified !== true) return pgErr(res, 403, '42501', 'not_verified');
     if ([...store.requests.values()].some(x => x.volunteer_id === uid && x.status === 'matched')) return pgErr(res, 400, 'P0001', 'already_helping');
     const r = store.requests.get(input?.p_request_id);
     // Node runs one request at a time, so check-and-set here is as atomic as the SQL update.

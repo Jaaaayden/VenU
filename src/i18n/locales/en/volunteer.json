@@ -219,6 +219,8 @@
     "meta": "{{distance}} away · {{minutes}} min ago · {{language}}",
     "accept": "Accept",
     "acceptSoon": "Accepting requests opens when matching goes live.",
+    "waitTitle": "Waiting for verification",
+    "waitBody": "LA28 is checking your details. You can see requests now, and accept them once you're verified.",
     "empty": "No one nearby needs help right now. New requests show up here.",
     "metaLive": "{{minutes}} min ago · {{language}}"
   },
@@ -233,6 +235,7 @@
   "desk": {
     "taken": "Someone else already took this request.",
     "acceptFailed": "Couldn't accept the request. Check your connection and try again.",
+    "notVerified": "You can accept requests once LA28 verifies you.",
     "cancelled": "{{name}} cancelled the request.",
     "done": "{{name}} marked the help as done. Thank you!",
     "ended": "Chat ended. Thanks for helping {{name}}!",

@@ -52,7 +52,15 @@ Then `npm run dev:mock -- --web`. The terminal says which provider it uses: `Tra
 - `npm run dev:mock -- --stub-translate`: offline stub even with keys (tests, no network, no cost).
 - `npm run dev:mock -- --env-file ../VenU/.env.local`: keys from another file, e.g. the main checkout's when you work in a worktree.
 
-Test hooks on the mock backend (port 47330, or your `-- --mock-port N`): `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow), `-d '{"clockOffsetMs":7200000}'` (two hours on, so a username held by an unconfirmed sign-up is free again).
+Test hooks on the mock backend (port 47330, or your `-- --mock-port N`): `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow), `-d '{"clockOffsetMs":7200000}'` (two hours on, so a username held by an unconfirmed sign-up is free again), `-d '{"verify":"sam_helps"}'` (verify a volunteer by username or email, as LA28 staff do in the dashboard; add `"verified":false` to undo).
+
+## Verified volunteers
+
+New volunteers start unverified: they finish setup and see requests, but Accept stays off under "Waiting for verification" until LA28 staff verify them. The app re-checks every 30 seconds while they wait.
+
+- Live: Supabase → Table Editor → `profiles` → set `verified` to `true` (or `update public.profiles set verified = true where id = '<user id>';` in the SQL editor). The app can't change it; a trigger keeps it as is.
+- Mock: the `verify` hook above. Mock sign-ups start unverified too; volunteers saved before this rule load as verified, so the demo's volunteer keeps working.
+- Local mode has no verification: its example requests never accept anyway.
 
 ### Deploy (Supabase project owner)
 

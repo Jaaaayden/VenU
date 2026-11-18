@@ -217,6 +217,8 @@
     "meta": "Cách {{distance}} · {{minutes}} phút trước · {{language}}",
     "accept": "Nhận",
     "acceptSoon": "Bạn có thể nhận yêu cầu khi tính năng ghép đôi hoạt động.",
+    "waitTitle": "Đang chờ xác minh",
+    "waitBody": "LA28 đang kiểm tra thông tin của bạn. Bạn đã có thể xem các yêu cầu và sẽ nhận được chúng sau khi được xác minh.",
     "empty": "Hiện không có ai gần đây cần giúp đỡ. Yêu cầu mới sẽ hiện ở đây.",
     "metaLive": "{{minutes}} phút trước · {{language}}"
   },
@@ -231,6 +233,7 @@
   "desk": {
     "taken": "Người khác đã nhận yêu cầu này.",
     "acceptFailed": "Không thể nhận yêu cầu. Hãy kiểm tra kết nối và thử lại.",
+    "notVerified": "Bạn có thể nhận yêu cầu sau khi LA28 xác minh bạn.",
     "cancelled": "{{name}} đã hủy yêu cầu.",
     "done": "{{name}} đã đánh dấu là đã được giúp xong. Cảm ơn bạn!",
     "ended": "Đã kết thúc trò chuyện. Cảm ơn bạn đã giúp {{name}}!",

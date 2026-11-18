@@ -217,6 +217,8 @@
     "meta": "距离 {{distance}} · {{minutes}} 分钟前 · {{language}}",
     "accept": "接受",
     "acceptSoon": "匹配功能上线后即可接受请求。",
+    "waitTitle": "等待验证",
+    "waitBody": "LA28 正在核实你的信息。你现在可以查看请求，验证通过后即可接受。",
     "empty": "附近暂时没有人需要帮助。新的请求会显示在这里。",
     "metaLive": "{{minutes}} 分钟前 · {{language}}"
   },
@@ -231,6 +233,7 @@
   "desk": {
     "taken": "这个请求已被其他志愿者接受。",
     "acceptFailed": "无法接受请求。请检查网络连接后重试。",
+    "notVerified": "LA28 验证你的身份后，你就可以接受请求了。",
     "cancelled": "{{name}} 取消了请求。",
     "done": "{{name}} 已将帮助标记为完成。谢谢你！",
     "ended": "聊天已结束。感谢你帮助 {{name}}！",

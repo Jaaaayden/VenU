@@ -221,6 +221,8 @@
     "meta": "A {{distance}} · hace {{minutes}} min · {{language}}",
     "accept": "Aceptar",
     "acceptSoon": "Podrás aceptar solicitudes cuando se active el emparejamiento.",
+    "waitTitle": "Esperando verificación",
+    "waitBody": "LA28 está revisando tus datos. Ya puedes ver las solicitudes y podrás aceptarlas cuando te verifiquen.",
     "empty": "Nadie cerca necesita ayuda ahora. Las nuevas solicitudes aparecerán aquí.",
     "metaLive": "hace {{minutes}} min · {{language}}"
   },
@@ -235,6 +237,7 @@
   "desk": {
     "taken": "Otra persona ya aceptó esta solicitud.",
     "acceptFailed": "No se pudo aceptar la solicitud. Revisa tu conexión e inténtalo de nuevo.",
+    "notVerified": "Podrás aceptar solicitudes cuando LA28 te verifique.",
     "cancelled": "{{name}} canceló la solicitud.",
     "done": "{{name}} marcó la ayuda como terminada. ¡Gracias!",
     "ended": "Chat terminado. ¡Gracias por ayudar a {{name}}!",

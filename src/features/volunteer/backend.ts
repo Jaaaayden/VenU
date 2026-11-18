@@ -54,7 +54,7 @@ export interface VolunteerBackend {
   /**
    * Takes an open request. Rejects with AlreadyTakenError when another volunteer got it first,
    * RequestClosedError when the visitor withdrew it, AlreadyHelpingError when this volunteer
-   * already has one.
+   * already has one, NotVerifiedError when LA28 hasn't verified this volunteer yet.
    */
   acceptRequest?(requestId: string): Promise<Assignment>;
   /** The volunteer leaves without finishing (signing out): the request opens again for someone else. */
@@ -78,6 +78,14 @@ export class RequestClosedError extends Error {
   constructor() {
     super('This request was withdrawn');
     this.name = 'RequestClosedError';
+  }
+}
+
+/** Accept refused: LA28 hasn't verified this volunteer yet (profiles.verified is false). */
+export class NotVerifiedError extends Error {
+  constructor() {
+    super('Waiting for verification');
+    this.name = 'NotVerifiedError';
   }
 }
 

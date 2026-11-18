@@ -11,7 +11,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { chatLanguage } from '@/features/translate/languages';
 import { languageName } from '@/features/profile/options';
 
-import { abortError, AlreadyHelpingError, AlreadyTakenError, RequestClosedError, type VolunteerBackend } from './backend';
+import { abortError, AlreadyHelpingError, AlreadyTakenError, NotVerifiedError, RequestClosedError, type VolunteerBackend } from './backend';
 import { HELP_TYPES } from './mock';
 import type { Assignment, ChatMessage, ClosedStatus, HelpRequest, HelpTypeId, IncomingRequest, Match, SkillCode, Volunteer } from './types';
 
@@ -482,6 +482,7 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
     async accept(id) {
       const { data, error } = await client.rpc('accept_help_request', { p_request_id: id });
       if (error) {
+        if (/not_verified/.test(error.message)) throw new NotVerifiedError();
         if (/already_helping/.test(error.message)) throw new AlreadyHelpingError();
         if (/request_closed/.test(error.message)) throw new RequestClosedError();
         if (/already_taken/.test(error.message)) throw new AlreadyTakenError();

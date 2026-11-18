@@ -219,6 +219,8 @@
     "meta": "{{distance}} ang layo · {{minutes}} min ang nakalipas · {{language}}",
     "accept": "Tanggapin",
     "acceptSoon": "Puwede nang tumanggap ng request kapag live na ang matching.",
+    "waitTitle": "Hinihintay ang verification",
+    "waitBody": "Sinusuri ng LA28 ang mga detalye mo. Nakikita mo na ang mga request, at puwede mo nang tanggapin ang mga ito kapag verified ka na.",
     "empty": "Walang nangangailangan ng tulong sa malapit ngayon. Dito lalabas ang mga bagong request.",
     "metaLive": "{{minutes}} min ang nakalipas · {{language}}"
   },
@@ -233,6 +235,7 @@
   "desk": {
     "taken": "May iba nang tumanggap sa request na ito.",
     "acceptFailed": "Hindi matanggap ang request. Tingnan ang koneksyon mo at subukan ulit.",
+    "notVerified": "Puwede kang tumanggap ng request kapag na-verify ka na ng LA28.",
     "cancelled": "Kinansela ni {{name}} ang request.",
     "done": "Minarkahan ni {{name}} na tapos na ang tulong. Salamat!",
     "ended": "Tapos na ang chat. Salamat sa pagtulong kay {{name}}!",

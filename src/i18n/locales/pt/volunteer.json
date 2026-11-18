@@ -221,6 +221,8 @@
     "meta": "A {{distance}} · há {{minutes}} min · {{language}}",
     "accept": "Aceitar",
     "acceptSoon": "Você poderá aceitar pedidos quando a conexão for ativada.",
+    "waitTitle": "Aguardando verificação",
+    "waitBody": "A LA28 está analisando seus dados. Você já pode ver os pedidos e poderá aceitá-los quando sua conta for verificada.",
     "empty": "Ninguém por perto precisa de ajuda agora. Novos pedidos aparecem aqui.",
     "metaLive": "há {{minutes}} min · {{language}}"
   },
@@ -235,6 +237,7 @@
   "desk": {
     "taken": "Outra pessoa já aceitou este pedido.",
     "acceptFailed": "Não foi possível aceitar o pedido. Verifique sua conexão e tente de novo.",
+    "notVerified": "Você poderá aceitar pedidos quando a LA28 verificar sua conta.",
     "cancelled": "{{name}} cancelou o pedido.",
     "done": "{{name}} marcou a ajuda como concluída. Obrigado!",
     "ended": "Conversa encerrada. Obrigado por ajudar {{name}}!",
