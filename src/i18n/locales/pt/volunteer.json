@@ -70,15 +70,16 @@
   "notice": {
     "searchFailed": "Não conseguimos falar com um voluntário. Verifique sua conexão e tente de novo.",
     "thanks": "Obrigado! Sua avaliação ajuda {{name}} e a equipe LA28.",
-    "volunteerLeft": "Seu voluntário precisou sair. Estamos procurando outra pessoa."
+    "volunteerLeft": "Seu voluntário precisou sair. Estamos procurando outra pessoa.",
+    "volunteerEnded": "{{name}} encerrou a conversa. Ainda precisa de ajuda? Toque em Pular e envie um novo pedido."
   },
   "searching": {
     "title": "Procurando um voluntário",
     "subtitle": "Geralmente menos de um minuto · Fique onde está",
     "askedFor": "Você pediu",
     "notFoundTitle": "Nenhum voluntário está livre agora",
-    "notFoundBody": "Seu pedido foi guardado. Continue procurando ou ligue para a equipe do local para pedir ajuda.",
-    "keepSearching": "Continuar procurando"
+    "notFoundBody": "Ninguém estava livre, então seu pedido foi retirado. Procure de novo ou ligue para a equipe do local para pedir ajuda.",
+    "keepSearching": "Procurar de novo"
   },
   "match": {
     "title": "Voluntário encontrado",
@@ -232,15 +233,23 @@
     "end": "Encerrar conversa",
     "endHint": "Marca a ajuda como concluída para você e para {{name}}",
     "confirmEnd": "Encerrar a conversa com {{name}}? Isso marca a ajuda como concluída.",
-    "yesEnd": "Sim, encerrar"
+    "yesEnd": "Sim, encerrar",
+    "handBack": "Não posso ir",
+    "handBackHint": "Devolve o pedido para que outro voluntário ajude {{name}}",
+    "confirmHandBack": "Não pode ir? Vamos encontrar outro voluntário para {{name}}.",
+    "keepHelping": "Continuar ajudando",
+    "yesHandBack": "Devolver",
+    "handBackFailed": "Não foi possível devolver o pedido. Verifique sua conexão e tente de novo."
   },
   "desk": {
     "taken": "Outra pessoa já aceitou este pedido.",
     "acceptFailed": "Não foi possível aceitar o pedido. Verifique sua conexão e tente de novo.",
     "notVerified": "Você poderá aceitar pedidos quando a LA28 verificar sua conta.",
     "cancelled": "{{name}} cancelou o pedido.",
+    "closed": "O pedido de {{name}} foi encerrado.",
     "done": "{{name}} marcou a ajuda como concluída. Obrigado!",
     "ended": "Conversa encerrada. Obrigado por ajudar {{name}}!",
+    "handedBack": "Você devolveu o pedido de {{name}}. Outro voluntário pode assumi-lo.",
     "withdrawn": "Este pedido foi retirado."
   },
   "home": {
@@ -259,7 +268,8 @@
     "statusLine": {
       "free": "Você vai receber pedidos por perto. Numa pausa, mude para Ocupado ou Ausente e os pedidos vão pular você.",
       "busy": "Você está ocupado agora. Novos pedidos pulam você até você voltar para Livre.",
-      "off": "Você está fora do turno. Os pedidos pulam você até você mudar para Livre."
+      "off": "Você está fora do turno. Os pedidos pulam você até você mudar para Livre.",
+      "helping": "Você está ajudando {{name}}. Novos pedidos esperam até você terminar."
     },
     "helpTitle": "Como você pode ajudar",
     "editLabel": "Editar como você pode ajudar",

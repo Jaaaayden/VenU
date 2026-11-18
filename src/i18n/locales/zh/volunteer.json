@@ -70,15 +70,16 @@
   "notice": {
     "searchFailed": "无法联系到志愿者。请检查网络连接后重试。",
     "thanks": "谢谢！你的反馈能帮助 {{name}} 和 LA28 团队。",
-    "volunteerLeft": "你的志愿者需要离开。正在为你寻找其他人。"
+    "volunteerLeft": "你的志愿者需要离开。正在为你寻找其他人。",
+    "volunteerEnded": "{{name}} 结束了聊天。仍需要帮助？点按“跳过”并发送新的请求。"
   },
   "searching": {
     "title": "正在寻找志愿者",
     "subtitle": "通常不到一分钟 · 请留在原地",
     "askedFor": "你请求的帮助",
     "notFoundTitle": "目前没有空闲的志愿者",
-    "notFoundBody": "你的请求已保存。可以继续寻找，或致电场馆工作人员寻求帮助。",
-    "keepSearching": "继续寻找"
+    "notFoundBody": "没有空闲的志愿者，所以你的请求已撤回。可以重新寻找，或致电场馆工作人员寻求帮助。",
+    "keepSearching": "重新寻找"
   },
   "match": {
     "title": "已找到志愿者",
@@ -228,15 +229,23 @@
     "end": "结束聊天",
     "endHint": "为你和 {{name}} 将帮助标记为完成",
     "confirmEnd": "要结束与 {{name}} 的聊天吗？帮助将被标记为完成。",
-    "yesEnd": "是的，结束聊天"
+    "yesEnd": "是的，结束聊天",
+    "handBack": "我去不了",
+    "handBackHint": "交回请求，让其他志愿者帮助 {{name}}",
+    "confirmHandBack": "去不了？我们会为 {{name}} 另找一位志愿者。",
+    "keepHelping": "继续帮忙",
+    "yesHandBack": "交回请求",
+    "handBackFailed": "无法交回请求。请检查网络连接后重试。"
   },
   "desk": {
     "taken": "这个请求已被其他志愿者接受。",
     "acceptFailed": "无法接受请求。请检查网络连接后重试。",
     "notVerified": "LA28 验证你的身份后，你就可以接受请求了。",
     "cancelled": "{{name}} 取消了请求。",
+    "closed": "{{name}} 的请求已关闭。",
     "done": "{{name}} 已将帮助标记为完成。谢谢你！",
     "ended": "聊天已结束。感谢你帮助 {{name}}！",
+    "handedBack": "你已交回 {{name}} 的请求。其他志愿者可以接手。",
     "withdrawn": "此请求已被撤回。"
   },
   "home": {
@@ -255,7 +264,8 @@
     "statusLine": {
       "free": "你会收到附近的请求。休息时切换到“忙碌”或“离线”，请求就会跳过你。",
       "busy": "你现在正忙。切换回“空闲”之前，新请求会跳过你。",
-      "off": "你已离线。切换到“空闲”之前，请求会跳过你。"
+      "off": "你已离线。切换到“空闲”之前，请求会跳过你。",
+      "helping": "你正在帮助 {{name}}。完成之前不会收到新的请求。"
     },
     "helpTitle": "你能提供的帮助",
     "editLabel": "编辑你能提供的帮助",

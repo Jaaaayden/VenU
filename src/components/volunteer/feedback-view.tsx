@@ -9,14 +9,16 @@ import { TextField } from '@/components/text-field';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { FEEDBACK_TAGS, PROBLEM_KINDS } from '@/features/volunteer/mock';
 import { volunteerRequests } from '@/features/volunteer/request-store';
-import type { FeedbackTag, Match, ProblemKind } from '@/features/volunteer/types';
+import type { FeedbackTag, Match, Notice, ProblemKind } from '@/features/volunteer/types';
 import { useT } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
 
+import { NoteBanner } from './note-banner';
 import { NoteBox } from './note-box';
 import { StarRating } from './star-rating';
 
-export function FeedbackView({ match }: { match: Match }) {
+/** `notice`: why the help ended, when the volunteer ended it ("Daniel ended the chat. …"). */
+export function FeedbackView({ match, notice }: { match: Match; notice?: Notice | null }) {
   const v = match.volunteer;
   const t = useT('volunteer');
   const tagOptions = useMemo(() => FEEDBACK_TAGS.map(value => ({ value, label: t(`feedback.tags.${value}`) })), [t]);
@@ -45,6 +47,10 @@ export function FeedbackView({ match }: { match: Match }) {
           <Text style={styles.skipText}>{t('feedback.skip')}</Text>
         </Pressable>
       </View>
+
+      {notice ? (
+        <NoteBanner tone={notice.tone} text={t(`notice.${notice.key}`, { name: notice.params?.name ?? v.firstName })} onDismiss={volunteerRequests.dismissNotice} sticky />
+      ) : null}
 
       <View style={styles.who}>
         <Avatar name={v.firstName} uri={null} size={56} />

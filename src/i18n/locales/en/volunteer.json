@@ -70,15 +70,16 @@
   "notice": {
     "searchFailed": "Couldn't reach a volunteer. Check your connection and try again.",
     "thanks": "Thanks! Your feedback helps {{name}} and the LA28 team.",
-    "volunteerLeft": "Your volunteer had to leave. Finding someone else."
+    "volunteerLeft": "Your volunteer had to leave. Finding someone else.",
+    "volunteerEnded": "{{name}} ended the chat. Still need help? Tap Skip and send a new request."
   },
   "searching": {
     "title": "Finding a volunteer",
     "subtitle": "Usually under a minute · Stay where you are",
     "askedFor": "You asked for",
     "notFoundTitle": "No volunteer is free right now",
-    "notFoundBody": "Your request is saved. Keep searching, or call venue staff for help.",
-    "keepSearching": "Keep searching"
+    "notFoundBody": "Nobody was free, so your request was withdrawn. Search again, or call venue staff for help.",
+    "keepSearching": "Search again"
   },
   "match": {
     "title": "Volunteer found",
@@ -230,15 +231,23 @@
     "end": "End chat",
     "endHint": "Marks the help as done for you and {{name}}",
     "confirmEnd": "End your chat with {{name}}? This marks the help as done.",
-    "yesEnd": "Yes, end chat"
+    "yesEnd": "Yes, end chat",
+    "handBack": "Can’t make it",
+    "handBackHint": "Hands the request back so another volunteer can help {{name}}",
+    "confirmHandBack": "Can’t make it? We’ll find another volunteer for {{name}}.",
+    "keepHelping": "Keep helping",
+    "yesHandBack": "Hand it back",
+    "handBackFailed": "Couldn’t hand the request back. Check your connection and try again."
   },
   "desk": {
     "taken": "Someone else already took this request.",
     "acceptFailed": "Couldn't accept the request. Check your connection and try again.",
     "notVerified": "You can accept requests once LA28 verifies you.",
     "cancelled": "{{name}} cancelled the request.",
+    "closed": "The request from {{name}} was closed.",
     "done": "{{name}} marked the help as done. Thank you!",
     "ended": "Chat ended. Thanks for helping {{name}}!",
+    "handedBack": "You handed back the request from {{name}}. Another volunteer can take it.",
     "withdrawn": "This request was withdrawn."
   },
   "home": {
@@ -257,7 +266,8 @@
     "statusLine": {
       "free": "You’ll get nearby requests. Switch to Busy or Off on a break and requests will skip you.",
       "busy": "You’re busy for now. New requests skip you until you switch back to Free.",
-      "off": "You’re off duty. Requests skip you until you switch to Free."
+      "off": "You’re off duty. Requests skip you until you switch to Free.",
+      "helping": "You’re helping {{name}}. New requests wait until you finish."
     },
     "helpTitle": "What you can help with",
     "editLabel": "Edit what you can help with",

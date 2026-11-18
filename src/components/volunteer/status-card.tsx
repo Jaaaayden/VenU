@@ -1,4 +1,8 @@
-/** "Your status": Free / Busy / Off as a radio group, with a line saying what the choice does. */
+/**
+ * "Your status": Free / Busy / Off as a radio group, with a line saying what the choice does. While
+ * helping someone (`helping`: their name) the line says so instead: no new requests come in then,
+ * whatever the stored status.
+ */
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -63,7 +67,7 @@ export function statusLabelFit(rowWidth: number, widestWord: number | null): { s
   return { size: Math.max(MIN_SIZE, Math.min(LABEL_SIZE, Math.floor((LABEL_SIZE * textWidth(padding)) / widestWord))), padding };
 }
 
-export function StatusCard({ status, onChange }: { status: Availability; onChange: (next: Availability) => void }) {
+export function StatusCard({ status, onChange, helping }: { status: Availability; onChange: (next: Availability) => void; helping?: string | null }) {
   const t = useT('volunteer');
   const [rowWidth, setRowWidth] = useState(0);
   // Measured in the chosen tile's (wider) weight, so choosing one never splits its word.
@@ -98,7 +102,9 @@ export function StatusCard({ status, onChange }: { status: Availability; onChang
           );
         })}
       </View>
-      <Text style={styles.line} accessibilityLiveRegion="polite">{t(`home.statusLine.${status}`)}</Text>
+      <Text style={styles.line} accessibilityLiveRegion="polite">
+        {helping != null ? t('home.statusLine.helping', { name: helping }) : t(`home.statusLine.${status}`)}
+      </Text>
     </View>
   );
 }
