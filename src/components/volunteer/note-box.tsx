@@ -1,6 +1,7 @@
 /**
  * Figma "Frame 2241" (235:26768): "Add a note (optional)", the multiline box, and (with
  * `onAddPicture` / `onSpeak`) the "Add picture" and speak buttons under it; `listening` shows dictation on.
+ * `hideLabel` drops the label when a NoteToggle row above already names the box (Find a Volunteer v3).
  */
 import { Image } from 'expo-image';
 import { Trans } from 'react-i18next';
@@ -21,23 +22,28 @@ interface NoteBoxProps {
   onSpeak?: () => void;
   speakLabel?: string;
   listening?: boolean;
+  hideLabel?: boolean;
+  autoFocus?: boolean;
 }
 
-export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPicture, onRemovePicture, onSpeak, speakLabel, listening }: NoteBoxProps) {
+export function NoteBox({ value, onChangeText, placeholder, photoUri, onAddPicture, onRemovePicture, onSpeak, speakLabel, listening, hideLabel, autoFocus }: NoteBoxProps) {
   const t = useT('volunteer');
   return (
     <View style={styles.wrap}>
       <View style={styles.field}>
         {/* One sentence for translators; the "(optional)" part is muted. */}
-        <Text style={styles.label}>
-          <Trans t={t} i18nKey="note.label" components={{ muted: <Text style={styles.optional} /> }} />
-        </Text>
+        {hideLabel ? null : (
+          <Text style={styles.label}>
+            <Trans t={t} i18nKey="note.label" components={{ muted: <Text style={styles.optional} /> }} />
+          </Text>
+        )}
         <TextField
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder ?? t('note.placeholder')}
           multiline
           maxLength={500}
+          autoFocus={autoFocus}
           accessibilityLabel={t('note.labelPlain')}
         />
       </View>

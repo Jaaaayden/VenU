@@ -26,6 +26,11 @@ export const Colors = {
   gradientTop: '#FBF7F3', // PageGradient: cream at the top…
   gradientMid: '#E9EDF3',
   gradientBottom: '#BAD3F9', // …light blue at the bottom
+  gradientShape: '#9DBFF3', // the soft blurred shapes on the onboarding gradient (Figma 530:10212)
+  frost: 'rgba(196,207,224,0.3)', // frosted cards on the onboarding gradient (Figma 506:10114)…
+  frostBorder: 'rgba(255,255,255,0.75)', // …and their white rim
+  logoLight: '#86B4F4',   // the heart logo's gradient (Figma 482:31930): light blue at the top…
+  logoDeep: '#173B7A',    // …navy at the point
   surface: '#FFFFFF',     // inputs, raised cards
   surfaceAlt: '#F5F5F5',  // tiles and info cards on a white page
   controlBorder: '#8C8C8C', // input and chip outlines (>= 3:1 on white)

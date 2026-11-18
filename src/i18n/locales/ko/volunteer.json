@@ -49,6 +49,7 @@
   "note": {
     "label": "메모 추가 <muted>(선택)</muted>",
     "labelPlain": "메모 추가 (선택)",
+    "speak": "음성으로 메모하기",
     "placeholder": "내용 입력",
     "attached": "첨부한 사진",
     "remove": "사진 삭제"

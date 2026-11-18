@@ -49,6 +49,7 @@
   "note": {
     "label": "Add a note <muted>(optional)</muted>",
     "labelPlain": "Add a note (optional)",
+    "speak": "Speak your note",
     "placeholder": "Enter text",
     "attached": "Attached picture",
     "remove": "Remove picture"

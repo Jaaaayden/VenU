@@ -49,6 +49,7 @@
   "note": {
     "label": "Magdagdag ng note <muted>(opsyonal)</muted>",
     "labelPlain": "Magdagdag ng note (opsyonal)",
+    "speak": "Sabihin ang iyong note",
     "placeholder": "Mag-type dito",
     "attached": "Nakalakip na larawan",
     "remove": "Alisin ang larawan"
