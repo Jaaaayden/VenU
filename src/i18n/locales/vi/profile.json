@@ -15,7 +15,7 @@
     "help": "Trợ giúp & góp ý",
     "terms": "Điều khoản sử dụng",
     "signOutFailed": "Không thể đăng xuất. {{reason}}",
-    "deleteWarning": "Thao tác này xóa vĩnh viễn hồ sơ và ảnh của bạn. Bạn có thể tạo hồ sơ mới sau.",
+    "deleteWarning": "Thao tác này xóa vĩnh viễn tài khoản, hồ sơ và ảnh của bạn. Bạn sẽ không thể đăng nhập bằng tài khoản này nữa.",
     "deleteFailed": "Không xóa hết được dữ liệu của bạn. {{reason}}",
     "deleteData": "Xóa dữ liệu của tôi"
   },

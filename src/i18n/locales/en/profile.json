@@ -15,7 +15,7 @@
     "help": "Help & feedback",
     "terms": "Terms of use",
     "signOutFailed": "Couldn't sign out. {{reason}}",
-    "deleteWarning": "This removes your profile and photo for good. You can make a new one later.",
+    "deleteWarning": "This deletes your account, profile and photo for good. You won’t be able to sign in with it again.",
     "deleteFailed": "Couldn't finish deleting your data. {{reason}}",
     "deleteData": "Delete my data"
   },

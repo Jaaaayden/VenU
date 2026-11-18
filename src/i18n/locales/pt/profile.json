@@ -15,7 +15,7 @@
     "help": "Ajuda e sugestões",
     "terms": "Termos de uso",
     "signOutFailed": "Não foi possível sair. {{reason}}",
-    "deleteWarning": "Isso apaga seu perfil e sua foto para sempre. Você pode criar um novo depois.",
+    "deleteWarning": "Isso apaga sua conta, seu perfil e sua foto para sempre. Você não poderá mais entrar com ela.",
     "deleteFailed": "Não foi possível apagar todos os seus dados. {{reason}}",
     "deleteData": "Apagar meus dados"
   },
