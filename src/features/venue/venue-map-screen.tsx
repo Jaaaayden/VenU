@@ -243,7 +243,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
           <CategoryChips value={category} onChange={pickCategory} />
         </SafeAreaView>
 
-        <View style={[styles.area, map.image && styles.areaImage]} onLayout={onAreaLayout}>
+        <View style={[styles.area, map.image && styles.areaImage, map.background ? { backgroundColor: map.background } : null]} onLayout={onAreaLayout}>
           {box.w > 0 ? (
             <>
               <VenueMapView

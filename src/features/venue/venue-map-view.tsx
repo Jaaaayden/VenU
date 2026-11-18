@@ -20,7 +20,7 @@ import { useT } from '@/i18n';
 import { FacilityIcon } from './categories';
 import { startMarker, type Route } from './directions';
 import { facilityName } from './labels';
-import { clampView, contentSize, mapUpdate, zoomAt, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
+import { clampView, contentSize, IMAGE_ZOOM_OUT_SLACK, isStrayPress, mapUpdate, zoomAt, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
 import { VenueDrawing } from './stadium-map';
 import type { Facility } from './types';
 import { mapAspect, type VenueMap } from './venue-maps';
@@ -74,15 +74,20 @@ export interface VenueMapViewProps {
 export function VenueMapView(props: VenueMapViewProps) {
   const { map, venueName, pins, width, height, viewportHeight, highlightIds, tinted, route, fitKey, fitRect: rect, fitMax, revealId, revealInset = 0, onPinPress, children } = props;
   const t = useT('venue');
-  const content = contentSize(mapAspect(map), width);
+  const content = contentSize(mapAspect(map), width, map.image ? IMAGE_ZOOM_OUT_SLACK : undefined);
   const viewport: Box = { w: width, h: Math.max(viewportHeight, 1) };
+  // What gestures clamp to: while the pin card shows, the map may pan up clear of it.
+  const reach: Box = { ...viewport, inset: revealInset };
 
   const s = useSharedValue(1);
   const x = useSharedValue(0);
   const y = useSharedValue(0);
-  const dims = useSharedValue({ content, viewport });
+  const dims = useSharedValue({ content, viewport: reach });
   // Whether the visitor moved the map since the last fit: then a sheet change keeps their view.
   const moved = useSharedValue(false);
+  // A mouse drag that starts on a pin also clicks it on release: pins ignore presses during a pan.
+  const panning = useSharedValue(false);
+  const panEnd = useSharedValue(0);
   // A React copy of the scale, for line widths: updated when a gesture or animation ends.
   const [zoom, setZoom] = useState(1);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(map.image ? 'loading' : 'ready');
@@ -99,7 +104,7 @@ export function VenueMapView(props: VenueMapViewProps) {
   // Fit on a new key or a sheet move, then bring a newly revealed pin on screen (see mapUpdate).
   const last = useRef<MapLayout | null>(null);
   useEffect(() => {
-    dims.set({ content, viewport });
+    dims.set({ content, viewport: reach });
     const prev = last.current;
     const next: MapLayout = { key: fitKey, vh: viewport.h, w: width, reveal: revealId };
     last.current = next;
@@ -114,11 +119,22 @@ export function VenueMapView(props: VenueMapViewProps) {
       revealPin: revealId ? pins.find(f => f.id === revealId) : undefined,
       revealInset,
     });
-    if (!update) return;
+    if (!update) {
+      // A closed card gives the map its bottom strip back: bring the image's edge down to it.
+      const now = current();
+      const v = clampView(now, content, reach);
+      if (prev && (v.x !== now.x || v.y !== now.y)) go(v);
+      return;
+    }
     if (update.refit) moved.set(false);
     go(update.view, !!prev);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- runs on these inputs only; the rest is read fresh
-  }, [fitKey, viewport.h, width, revealId]);
+  }, [fitKey, viewport.h, width, revealId, revealInset]);
+
+  const pressPin = (f: Facility) => {
+    if (isStrayPress(Date.now(), panEnd.get(), panning.get())) return;
+    onPinPress(f);
+  };
 
   const zoomBy = (factor: number) => {
     moved.set(true);
@@ -127,6 +143,15 @@ export function VenueMapView(props: VenueMapViewProps) {
 
   const pan = usePanGesture({
     minDistance: 6,
+    onActivate: () => {
+      'worklet';
+      panning.set(true);
+    },
+    onDeactivate: () => {
+      'worklet';
+      panning.set(false);
+      panEnd.set(Date.now());
+    },
     onUpdate: e => {
       'worklet';
       const d = dims.get();
@@ -219,16 +244,19 @@ export function VenueMapView(props: VenueMapViewProps) {
         <View ref={frame} style={StyleSheet.absoluteFill} accessible accessibilityRole="image" accessibilityLabel={t('map.label', { venue: venueName })}>
           <Animated.View style={[styles.content, { width: content.w, height: content.h }, contentStyle]}>
             {map.image ? (
-              <Image
-                key={attempt}
-                source={{ uri: map.image.url, width: map.image.width, height: map.image.height }}
-                style={{ width: content.w, height: content.h }}
-                contentFit="fill"
-                transition={150}
-                onLoad={() => setStatus('ready')}
-                onError={() => setStatus('error')}
-                accessible={false}
-              />
+              // Not a target: on web the <img> would start the browser's image drag instead of a pan.
+              <View style={[styles.passThrough, { width: content.w, height: content.h }]}>
+                <Image
+                  key={attempt}
+                  source={{ uri: map.image.url, width: map.image.width, height: map.image.height }}
+                  style={{ width: content.w, height: content.h }}
+                  contentFit="fill"
+                  transition={150}
+                  onLoad={() => setStatus('ready')}
+                  onError={() => setStatus('error')}
+                  accessible={false}
+                />
+              </View>
             ) : (
               <VenueDrawing shape={map.shape} width={content.w} height={content.h} />
             )}
@@ -248,7 +276,7 @@ export function VenueMapView(props: VenueMapViewProps) {
                 big={highlighted.has(f.id)}
                 tinted={tinted}
                 hidden={f.id === youId}
-                onPress={onPinPress}
+                onPress={pressPin}
               />
             ))}
             {start?.kind === 'you' ? <YouMarker left={start.at.x * content.w} top={start.at.y * content.h} counterScale={counterScale} label={t('map.you')} /> : null}
@@ -366,6 +394,7 @@ function ZoomButton({ glyph, label, onPress }: { glyph: string; label: string; o
 const styles = StyleSheet.create({
   root: { overflow: 'hidden' },
   content: { position: 'absolute', left: 0, top: 0 },
+  passThrough: { pointerEvents: 'none', userSelect: 'none' },
   pinBox: { position: 'absolute', width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' },
   hit: { width: HIT, height: HIT, alignItems: 'center', justifyContent: 'center' },
   onTop: { zIndex: 2 },
