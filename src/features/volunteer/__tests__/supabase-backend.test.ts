@@ -35,6 +35,8 @@ interface Profile {
   main_language: string;
   trainings: string[];
   gender: string | null;
+  /** False: LA28 hasn't verified them yet (accept_help_request refuses). Missing means verified. */
+  verified?: boolean;
 }
 
 const PROFILES: Record<string, Profile> = {
@@ -42,6 +44,7 @@ const PROFILES: Record<string, Profile> = {
   sam: { role: 'volunteer', first_name: 'Sam', languages: ['es', 'en'], main_language: 'en', trainings: ['first_aid', 'sighted_guide'], gender: 'man' },
   ana: { role: 'volunteer', first_name: 'Ana', languages: ['en'], main_language: 'en', trainings: [], gender: 'woman' },
   lee: { role: 'visitor', first_name: 'Lee', languages: ['en'], main_language: 'en', trainings: [], gender: null },
+  kim: { role: 'volunteer', first_name: 'Kim', languages: ['en'], main_language: 'en', trainings: [], gender: 'woman', verified: false },
 };
 
 /** Errors added with the review fixes, looked up at run time so these tests also run (and fail) without them. */
@@ -49,6 +52,7 @@ const errorClass = (name: string): new () => Error =>
   (backendModule as unknown as Record<string, (new () => Error) | undefined>)[name] ?? class extends Error { constructor() { super(name); } };
 const AlreadyHelpingError = errorClass('AlreadyHelpingError');
 const RequestClosedError = errorClass('RequestClosedError');
+const NotVerifiedError = errorClass('NotVerifiedError');
 
 /** How long an open request stays on volunteers' lists (open_help_requests in the migration). */
 const OPEN_WINDOW_S = 5 * 60;
@@ -133,6 +137,7 @@ function fakeServer({ realtime = true } = {}) {
         const p = PROFILES[who];
         const r = requests.get(id);
         if (!p || p.role !== 'volunteer') throw new Error('not_a_volunteer');
+        if (p.verified === false) throw new NotVerifiedError();
         if ([...requests.values()].some(x => x.volunteer_id === who && x.status === 'matched')) throw new AlreadyHelpingError();
         if (!r || r.status === 'cancelled' || r.status === 'done') throw new RequestClosedError();
         if (r.status !== 'open' || r.visitor_id === who) throw new AlreadyTakenError();
@@ -390,6 +395,25 @@ describe('live help requests', () => {
     const rosaAsVolunteer = createDeskStore(createLiveBackend(server.dbFor('rosa')));
     expect(await rosaAsVolunteer.accept(visitor.getState().request!.id)).toBe(false);
     expect(rosaAsVolunteer.getState().notice?.key).toBe('acceptFailed');
+  });
+
+  it('an unverified volunteer sees the request but can’t take it; it stays open for others', async () => {
+    const server = fakeServer();
+    const { visitor, sam } = devices(server);
+    const kim = createDeskStore(createLiveBackend(server.dbFor('kim')));
+    await kim.setUser('kim');
+    kim.watchOpen();
+    void visitor.sendRequest(rosaNeedsHelp);
+    await settle();
+    const id = visitor.getState().request!.id;
+    expect(kim.getState().open.map(r => r.id)).toEqual([id]);
+    expect(await kim.accept(id)).toBe(false);
+    expect(kim.getState()).toMatchObject({ assignment: null, notice: { tone: 'error', key: 'notVerified' } });
+    // Still listed (it isn't gone, Kim just can't take it), and Sam can.
+    expect(kim.getState().open.map(r => r.id)).toEqual([id]);
+    expect(server.requests.get(id)?.status).toBe('open');
+    await sam.setUser('sam');
+    expect(await sam.accept(id)).toBe(true);
   });
 
   it('polls every 2 s when Realtime never subscribes (the local mock server)', async () => {
@@ -687,6 +711,7 @@ describe('the Supabase calls', () => {
     await expect(supabaseHelpDb(failing('already_taken')).accept('r1')).rejects.toBeInstanceOf(AlreadyTakenError);
     await expect(supabaseHelpDb(failing('request_closed')).accept('r1')).rejects.toBeInstanceOf(RequestClosedError);
     await expect(supabaseHelpDb(failing('already_helping')).accept('r1')).rejects.toBeInstanceOf(AlreadyHelpingError);
+    await expect(supabaseHelpDb(failing('not_verified')).accept('r1')).rejects.toBeInstanceOf(NotVerifiedError);
   });
 
   it('lists open requests and hands a request back through the database functions', async () => {

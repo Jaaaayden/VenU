@@ -10,11 +10,11 @@ import { useSyncExternalStore } from 'react';
 import { onBeforeSignOut } from '@/lib/before-sign-out';
 
 import { appBackend } from './app-backend';
-import { AlreadyHelpingError, AlreadyTakenError, newId, RequestClosedError, type VolunteerBackend } from './backend';
+import { AlreadyHelpingError, AlreadyTakenError, newId, NotVerifiedError, RequestClosedError, type VolunteerBackend } from './backend';
 import type { Assignment, ChatMessage, IncomingRequest, RequestClosed } from './types';
 
 /** volunteer:desk.<key>, e.g. { key: 'cancelled', params: { name: 'Rosa' } } → "Rosa cancelled the request." */
-export type DeskNoticeKey = 'taken' | 'withdrawn' | 'acceptFailed' | 'cancelled' | 'done' | 'ended';
+export type DeskNoticeKey = 'taken' | 'withdrawn' | 'acceptFailed' | 'notVerified' | 'cancelled' | 'done' | 'ended';
 
 /** A restore that failed (offline) tries again after this, doubling each time up to RESTORE_RETRY_MAX_MS. */
 export const RESTORE_RETRY_MS = 2000;
@@ -179,7 +179,8 @@ export function createDeskStore(backend: VolunteerBackend) {
 
     /**
      * Takes an open request. True when this volunteer got it; false when someone else did first
-     * ("already taken"), the visitor withdrew it ("withdrawn") or it failed (e.g. offline). When
+     * ("already taken"), the visitor withdrew it ("withdrawn"), LA28 hasn't verified this volunteer
+     * yet ("notVerified") or it failed (e.g. offline). When
      * this volunteer already has a request (accepted on another device), that one shows instead.
      */
     async accept(requestId: string): Promise<boolean> {
@@ -200,10 +201,11 @@ export function createDeskStore(backend: VolunteerBackend) {
           return false;
         }
         const gone = e instanceof AlreadyTakenError || e instanceof RequestClosedError;
+        const key = e instanceof NotVerifiedError ? 'notVerified' : e instanceof RequestClosedError ? 'withdrawn' : gone ? 'taken' : 'acceptFailed';
         set({
           accepting: null,
           open: gone ? state.open.filter(r => r.id !== requestId) : state.open,
-          notice: { tone: 'error', key: e instanceof RequestClosedError ? 'withdrawn' : gone ? 'taken' : 'acceptFailed' },
+          notice: { tone: 'error', key },
         });
         return false;
       }
