@@ -28,7 +28,7 @@
     "languageLabel": "{{language}}でサポート。言語を変更",
     "locationLabel": "現在地：{{spot}}、{{venue}}",
     "near": "{{place}}付近",
-    "locationUnset": "現在地：未選択、{{venue}}",
+    "locationUnset": "現在地：{{venue}}（場所は未選択）",
     "whereAreYou": "今どこにいますか？",
     "tapToChoose": "タップして場所を選ぶ",
     "locationHint": "{{venue}} の場所の一覧を開きます",

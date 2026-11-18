@@ -354,9 +354,9 @@
     "imHereHint": "Utilise cet endroit comme votre position quand vous demandez de l’aide",
     "isHere": "Votre position",
     "reports": "Signalements",
-    "results_one": "{{number}} résultat",
-    "results_many": "{{number}} de résultats",
-    "results_other": "{{number}} résultats",
+    "reportCount_one": "{{number}} signalement",
+    "reportCount_many": "{{number}} de signalements",
+    "reportCount_other": "{{number}} signalements",
     "noReports": "Aucun signalement pour l’instant. Soyez le premier à partager ce que vous avez vu.",
     "addReport": "Ajouter un signalement"
   },

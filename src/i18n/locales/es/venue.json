@@ -354,9 +354,9 @@
     "imHereHint": "Usa este lugar como tu ubicación al pedir ayuda",
     "isHere": "Tu ubicación",
     "reports": "Reportes",
-    "results_one": "{{number}} resultado",
-    "results_many": "{{number}} de resultados",
-    "results_other": "{{number}} resultados",
+    "reportCount_one": "{{number}} reporte",
+    "reportCount_many": "{{number}} de reportes",
+    "reportCount_other": "{{number}} reportes",
     "noReports": "Aún no hay reportes. Sé el primero en contar lo que encontraste.",
     "addReport": "Agrega tu reporte"
   },

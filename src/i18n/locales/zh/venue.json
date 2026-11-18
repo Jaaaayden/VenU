@@ -352,7 +352,7 @@
     "imHereHint": "请求帮助时将此处作为你的位置",
     "isHere": "你的位置",
     "reports": "反馈",
-    "results_other": "{{number}} 条结果",
+    "reportCount_other": "{{number}} 条反馈",
     "noReports": "还没有反馈。来分享你的发现吧。",
     "addReport": "添加你的反馈"
   },

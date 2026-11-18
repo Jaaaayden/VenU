@@ -352,7 +352,7 @@
     "imHereHint": "도움을 요청할 때 이곳을 내 위치로 사용합니다",
     "isHere": "내 위치",
     "reports": "제보",
-    "results_other": "{{number}}건",
+    "reportCount_other": "제보 {{number}}건",
     "noReports": "아직 제보가 없습니다. 처음으로 발견한 내용을 공유해 주세요.",
     "addReport": "제보 추가하기"
   },

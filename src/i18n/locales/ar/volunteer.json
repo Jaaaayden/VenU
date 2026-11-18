@@ -28,7 +28,7 @@
     "languageLabel": "لغة المساعدة: {{language}}. تغيير اللغة",
     "locationLabel": "موقعك: {{spot}}، {{venue}}",
     "near": "قرب {{place}}",
-    "locationUnset": "موقعك: لم يُحدَّد بعد، {{venue}}",
+    "locationUnset": "موقعك: {{venue}}، لم تختر مكانًا محددًا بعد",
     "whereAreYou": "أين أنت؟",
     "tapToChoose": "انقر لاختيار مكان",
     "locationHint": "يفتح قائمة بالأماكن في {{venue}}",

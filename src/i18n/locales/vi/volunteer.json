@@ -28,7 +28,7 @@
     "languageLabel": "Hỗ trợ bằng {{language}}. Đổi ngôn ngữ",
     "locationLabel": "Vị trí của bạn: {{spot}}, {{venue}}",
     "near": "Gần {{place}}",
-    "locationUnset": "Vị trí của bạn: chưa chọn, {{venue}}",
+    "locationUnset": "Vị trí của bạn: {{venue}}, chưa chọn chỗ cụ thể",
     "whereAreYou": "Bạn đang ở đâu?",
     "tapToChoose": "Chạm để chọn chỗ",
     "locationHint": "Mở danh sách địa điểm tại {{venue}}",

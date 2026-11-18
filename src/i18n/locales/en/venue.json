@@ -353,8 +353,8 @@
     "imHereHint": "Uses this spot as your location when you ask for help",
     "isHere": "Your location",
     "reports": "Reports",
-    "results_one": "{{number}} result",
-    "results_other": "{{number}} results",
+    "reportCount_one": "{{number}} report",
+    "reportCount_other": "{{number}} reports",
     "noReports": "No reports yet. Be the first to share what you found.",
     "addReport": "Add Your Own Report"
   },

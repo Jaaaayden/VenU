@@ -28,7 +28,7 @@
     "languageLabel": "帮助语言：{{language}}。更改语言",
     "locationLabel": "你的位置：{{spot}}，{{venue}}",
     "near": "{{place}}附近",
-    "locationUnset": "你的位置：尚未选择，{{venue}}",
+    "locationUnset": "你的位置：{{venue}}，尚未选择具体地点",
     "whereAreYou": "你在哪里？",
     "tapToChoose": "点按选择地点",
     "locationHint": "打开 {{venue}} 的地点列表",

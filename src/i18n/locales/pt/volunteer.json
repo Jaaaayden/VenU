@@ -28,7 +28,7 @@
     "languageLabel": "Ajuda em {{language}}. Mudar idioma",
     "locationLabel": "Sua localização: {{spot}}, {{venue}}",
     "near": "Perto de {{place}}",
-    "locationUnset": "Sua localização: ainda não escolhida, {{venue}}",
+    "locationUnset": "Sua localização: {{venue}}, nenhum lugar escolhido ainda",
     "whereAreYou": "Onde você está?",
     "tapToChoose": "Toque para escolher um lugar",
     "locationHint": "Abre a lista de lugares de {{venue}}",

@@ -352,7 +352,7 @@
     "imHereHint": "助けを求めるときに、ここを現在地として使います",
     "isHere": "現在地",
     "reports": "レポート",
-    "results_other": "{{number}}件",
+    "reportCount_other": "レポート{{number}}件",
     "noReports": "レポートはまだありません。最初に気づいたことを共有しましょう。",
     "addReport": "レポートを追加"
   },

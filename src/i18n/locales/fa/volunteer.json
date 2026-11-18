@@ -28,7 +28,7 @@
     "languageLabel": "کمک به زبان {{language}}. تغییر زبان",
     "locationLabel": "مکان شما: {{spot}}، {{venue}}",
     "near": "نزدیک {{place}}",
-    "locationUnset": "مکان شما: هنوز انتخاب نشده، {{venue}}",
+    "locationUnset": "مکان شما: {{venue}}، هنوز جای مشخصی انتخاب نشده",
     "whereAreYou": "کجا هستید؟",
     "tapToChoose": "برای انتخاب مکان ضربه بزنید",
     "locationHint": "فهرست مکان‌های {{venue}} را باز می‌کند",

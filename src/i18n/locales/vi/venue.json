@@ -352,7 +352,7 @@
     "imHereHint": "Dùng chỗ này làm vị trí của bạn khi nhờ giúp đỡ",
     "isHere": "Vị trí của bạn",
     "reports": "Báo cáo",
-    "results_other": "{{number}} kết quả",
+    "reportCount_other": "{{number}} báo cáo",
     "noReports": "Chưa có báo cáo. Hãy là người đầu tiên chia sẻ điều bạn thấy.",
     "addReport": "Thêm báo cáo của bạn"
   },

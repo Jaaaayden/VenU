@@ -106,7 +106,6 @@
     "another": "其他语言",
     "add": "添加其他语言",
     "search": "搜索语言",
-    "fieldLabel": "搜索语言",
     "searchFor": "为{{field}}搜索语言",
     "examples": "例如 中文、Español、ASL",
     "searchExamples": "搜索，例如 中文、Español、ASL",

@@ -193,7 +193,7 @@ export function LanguageMenuField({ value, fieldName, exclude, onSelect, onClear
             accessibilityRole="button"
             accessibilityLabel={value ? t('language.field', { field: fieldName, language: languageName(value) }) : t('language.fieldEmpty', { field: fieldName })}
             accessibilityHint={t('language.openHint')}>
-            <Text style={styles.label}>{t('language.fieldLabel')}</Text>
+            <Text style={styles.label}>{t('language.search')}</Text>
             <Text style={[styles.value, value ? nameDirection : styles.placeholder]} numberOfLines={1}>
               {value ? languageName(value) : t('language.choose')}
             </Text>

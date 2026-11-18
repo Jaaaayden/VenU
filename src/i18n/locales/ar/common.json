@@ -111,7 +111,6 @@
     "another": "لغة أخرى",
     "add": "إضافة لغة أخرى",
     "search": "البحث عن لغة",
-    "fieldLabel": "البحث عن لغة",
     "searchFor": "البحث عن لغة لـ {{field}}",
     "examples": "مثلًا العربية، Español، ASL",
     "searchExamples": "ابحث، مثلًا العربية، Español، ASL",

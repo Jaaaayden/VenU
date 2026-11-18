@@ -106,7 +106,6 @@
     "another": "その他の言語",
     "add": "言語を追加",
     "search": "言語を検索",
-    "fieldLabel": "言語を検索",
     "searchFor": "{{field}}を検索",
     "examples": "例：日本語、Español、ASL",
     "searchExamples": "検索（例：日本語、Español、ASL）",

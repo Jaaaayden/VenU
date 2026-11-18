@@ -107,7 +107,6 @@
     "another": "Another language",
     "add": "Add another language",
     "search": "Search languages",
-    "fieldLabel": "Search Languages",
     "searchFor": "Search languages for {{field}}",
     "examples": "e.g. Español, Korean, ASL",
     "searchExamples": "Search, e.g. Español, Korean, ASL",

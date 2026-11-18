@@ -28,7 +28,7 @@
     "languageLabel": "도움 언어: {{language}}. 언어 변경",
     "locationLabel": "내 위치: {{spot}}, {{venue}}",
     "near": "{{place}} 근처",
-    "locationUnset": "내 위치: 아직 선택 안 함, {{venue}}",
+    "locationUnset": "내 위치: {{venue}}, 아직 장소를 선택하지 않음",
     "whereAreYou": "어디에 계세요?",
     "tapToChoose": "눌러서 장소 선택",
     "locationHint": "{{venue}}의 장소 목록을 엽니다",

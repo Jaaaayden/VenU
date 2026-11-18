@@ -353,8 +353,8 @@
     "imHereHint": "هنگام درخواست کمک، اینجا مکان شما در نظر گرفته می‌شود",
     "isHere": "مکان شما",
     "reports": "گزارش‌ها",
-    "results_one": "{{number}} نتیجه",
-    "results_other": "{{number}} نتیجه",
+    "reportCount_one": "{{number}} گزارش",
+    "reportCount_other": "{{number}} گزارش",
     "noReports": "هنوز گزارشی نیست. اولین نفری باشید که تجربه‌اش را می‌گوید.",
     "addReport": "گزارش خود را اضافه کنید"
   },

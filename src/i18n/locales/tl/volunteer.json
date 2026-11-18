@@ -28,7 +28,7 @@
     "languageLabel": "Tulong sa {{language}}. Palitan ang wika",
     "locationLabel": "Lokasyon mo: {{spot}}, {{venue}}",
     "near": "Malapit sa {{place}}",
-    "locationUnset": "Lokasyon mo: hindi pa napipili, {{venue}}",
+    "locationUnset": "Lokasyon mo: {{venue}}, wala pang napiling lugar",
     "whereAreYou": "Nasaan ka?",
     "tapToChoose": "I-tap para pumili ng lugar",
     "locationHint": "Bubuksan ang listahan ng mga lugar sa {{venue}}",
