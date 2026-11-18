@@ -9,7 +9,7 @@
  */
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors, Face, Fonts } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
 import type { MessageTranslation } from '@/features/translate';
 import { useT } from '@/i18n';
@@ -81,5 +81,5 @@ const styles = StyleSheet.create({
   toggle: { minHeight: 32, justifyContent: 'center' },
   pressed: { opacity: 0.6 },
   note: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted },
-  noteLink: { fontFamily: Fonts.textSemiBold, color: Colors.primary },
+  noteLink: { ...Face.textSemiBold, color: Colors.primary },
 });
