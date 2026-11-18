@@ -78,6 +78,14 @@ export function isSponsored(f: Facility): f is SponsoredStand {
   return !!f.sponsor;
 }
 
+/**
+ * Whether people can post community reports on a facility: not on a sponsored stand, so a paid
+ * listing never carries reports (or gets them written to the database under it).
+ */
+export function takesReports(f: Facility): boolean {
+  return !isSponsored(f);
+}
+
 const stands = new Map<string, SponsoredStand[]>();
 const withStands = new Map<string, Facility[]>();
 

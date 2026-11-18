@@ -9,7 +9,7 @@ import { categoriesAt } from '../categories';
 import { routeFor } from '../directions';
 import { facilityDescription, facilityLocation, facilityName, facilityOffer } from '../labels';
 import { facilitiesFor, getFacility, getVenue, searchFacilities, VENUES } from '../mock';
-import { facilityListLayout, featuredStandFor, isSponsored, sponsoredStandsFor, venueFacilitiesFor, waitingBannerFor } from '../sponsors';
+import { facilityListLayout, featuredStandFor, isSponsored, sponsoredStandsFor, takesReports, venueFacilitiesFor, waitingBannerFor } from '../sponsors';
 import { mapAspect, venueMapFor } from '../venue-maps';
 
 // Same rules as the facility pins (facilities.test.ts): inside the map, clear of every other pin.
@@ -71,6 +71,13 @@ describe('where sponsored stands show', () => {
     }
     expect(sponsoredStandsFor('nowhere')).toEqual([]);
     expect(featuredStandFor('nowhere')).toBeUndefined();
+  });
+
+  it('takes no community reports on a paid listing, only on venue facilities', () => {
+    for (const v of VENUES) {
+      for (const s of sponsoredStandsFor(v.id)) expect({ id: s.id, reports: takesReports(s) }).toEqual({ id: s.id, reports: false });
+      for (const f of facilitiesFor(v.id)) expect({ id: f.id, reports: takesReports(f) }).toEqual({ id: f.id, reports: true });
+    }
   });
 
   it('keeps the same arrays between calls (the venue screen memoizes on them)', () => {

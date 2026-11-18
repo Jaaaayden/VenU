@@ -3,8 +3,8 @@
  * its reports. Directions is the venue's one way to a facility: it draws the route on the map and
  * shows the walk here. A spot the venue doesn't publish gets a note instead, and no "I'm here"
  * (nobody could find you there; see isMeetSpot).
- * A sponsored stand adds its offer (labelled "Sponsored") and has no "I'm here": an ad is never a
- * meeting spot for a volunteer.
+ * A sponsored stand adds its offer (labelled "Sponsored") and has no "I'm here" (an ad is never a
+ * meeting spot for a volunteer) and no reports (community reports never sit under a paid listing).
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, type ComponentRef } from 'react';
@@ -23,7 +23,7 @@ import { DirectionsPanel } from './directions-panel';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
 import { SponsorOffer } from './sponsor-ui';
-import { isSponsored } from './sponsors';
+import { isSponsored, takesReports } from './sponsors';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
@@ -148,31 +148,36 @@ export function FacilityDetail() {
 
         <TagRow tags={facility.tags.map(tag => ({ label: tagLabel(tag, t), tone: tag.tone }))} />
 
-        <View style={styles.reportsHead}>
-          <Text style={venueText.title} accessibilityRole="header">{t('facility.reports')}</Text>
-          <Text style={venueText.caption}>{reports ? t('facility.reportCount', { count: reports.length, number: formatNumber(reports.length, undefined, languageOf(t)) }) : ''}</Text>
-        </View>
-        <View style={styles.reports}>
-          {reports?.map(r => (
-            <ReportCard
-              key={r.id}
-              report={r}
-              fresh={r.id === freshId}
-              onPress={() => {
-                setSnap('up');
-                router.push({ pathname: '/venue/[venueId]/[facilityId]/reports/[reportId]', params: { venueId: venue.id, facilityId: facility.id, reportId: r.id } });
-              }}
-            />
-          ))}
-          {reports && !reports.length ? <Text style={styles.empty}>{t('facility.noReports')}</Text> : null}
-          <Button
-            label={t('facility.addReport')}
-            variant="neutral"
-            icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
-            onPress={addReport}
-            style={styles.addButton}
-          />
-        </View>
+        {/* A paid listing never carries community reports. */}
+        {takesReports(facility) ? (
+          <>
+            <View style={styles.reportsHead}>
+              <Text style={venueText.title} accessibilityRole="header">{t('facility.reports')}</Text>
+              <Text style={venueText.caption}>{reports ? t('facility.reportCount', { count: reports.length, number: formatNumber(reports.length, undefined, languageOf(t)) }) : ''}</Text>
+            </View>
+            <View style={styles.reports}>
+              {reports?.map(r => (
+                <ReportCard
+                  key={r.id}
+                  report={r}
+                  fresh={r.id === freshId}
+                  onPress={() => {
+                    setSnap('up');
+                    router.push({ pathname: '/venue/[venueId]/[facilityId]/reports/[reportId]', params: { venueId: venue.id, facilityId: facility.id, reportId: r.id } });
+                  }}
+                />
+              ))}
+              {reports && !reports.length ? <Text style={styles.empty}>{t('facility.noReports')}</Text> : null}
+              <Button
+                label={t('facility.addReport')}
+                variant="neutral"
+                icon={<FigmaIcon name="add-circle" size={24} color={Colors.ink} />}
+                onPress={addReport}
+                style={styles.addButton}
+              />
+            </View>
+          </>
+        ) : null}
       </SheetScroll>
 
       {submitted ? (
