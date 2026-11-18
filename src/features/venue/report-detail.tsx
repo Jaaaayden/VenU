@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
+import { TranslationNote } from '@/components/translation-note';
 import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
 import { useT, useUiLanguage } from '@/i18n';
@@ -13,6 +14,7 @@ import { friendlyError } from '@/lib/errors';
 import { goBack } from '@/lib/navigation';
 
 import { deleteReport, reportAt, reportAuthor, topicLabel, useReport } from './reports';
+import { useReportTranslation } from './report-translation';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
@@ -24,6 +26,9 @@ export function ReportDetail() {
   const { facilityId, reportId } = useLocalSearchParams<{ facilityId: string; reportId: string }>();
   const stored = useReport(reportId);
   const report = reportAt(stored, venue.id, facilityId);
+  // In the reader's language, like chat, with "Show original".
+  const tr = useReportTranslation(report);
+  const translating = tr.view.kind === 'translated' || tr.view.kind === 'loading' || tr.view.kind === 'failed';
 
   useEffect(() => { setSnap('up'); }, [setSnap]);
 
@@ -37,7 +42,7 @@ export function ReportDetail() {
       ) : (
         <>
           <View style={styles.heading}>
-            <Text style={venueText.title} accessibilityRole="header">{report.title}</Text>
+            <Text style={venueText.title} accessibilityRole="header">{tr.title}</Text>
             <Text style={styles.kind}>{t('report.kind')}</Text>
           </View>
           <TagRow tags={[{ label: topicLabel(report.topic, t), tone: report.topic === 'accessibility' ? 'good' : 'note' }]} />
@@ -46,13 +51,16 @@ export function ReportDetail() {
             <View style={styles.authorText}>
               <Text style={venueText.label}>{reportAuthor(report, t)}</Text>
               <Text style={venueText.caption}>{t('report.submitted', { date: formatDate(report.createdAt) })}</Text>
-              {/* Visitors' words are shown as written; say which language when it isn't the one on screen. */}
-              {report.language && report.language !== onScreen ? (
+              {/* Shown as written (no translation here): say which language when it isn't the one on screen. */}
+              {!translating && report.language && report.language !== onScreen ? (
                 <Text style={venueText.caption}>{t('report.originalLanguage', { language: uiLanguageName(report.language, tp) })}</Text>
               ) : null}
             </View>
           </View>
-          {report.body ? <Text style={styles.body}>{report.body}</Text> : <Text style={styles.noBody}>{t('report.noBody')}</Text>}
+          {report.body ? <Text style={styles.body}>{tr.body}</Text> : <Text style={styles.noBody}>{t('report.noBody')}</Text>}
+          <View style={styles.translation}>
+            <TranslationNote translation={tr.view} reader={tr.reader} original={tr.original} onToggle={tr.toggle} onRetry={tr.retry} quietWhenUnavailable />
+          </View>
           {report.mine ? <DeleteReport id={report.id} onDeleted={back} /> : null}
         </>
       )}
@@ -116,6 +124,7 @@ const styles = StyleSheet.create({
   authorText: { gap: 4 },
   body: { fontFamily: Fonts.text, fontSize: 15, lineHeight: 21, color: Colors.text, marginHorizontal: Spacing.sm },
   noBody: { ...venueText.caption, color: Colors.textMuted, marginHorizontal: Spacing.sm },
+  translation: { marginHorizontal: Spacing.sm, marginTop: -Spacing.sm },
   flex: { flex: 1 },
   deleteLink: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', marginHorizontal: Spacing.sm },
   deleteLinkText: { ...Type.body, color: Colors.danger, textDecorationLine: 'underline' },

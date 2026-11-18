@@ -9,6 +9,7 @@ import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 import { FacilityIcon } from './categories';
 import { eventsLabel, facilityMeta, facilityName } from './labels';
 import { reportAuthor, type FacilityReport } from './reports';
+import { useReportTranslation } from './report-translation';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
 import type { Facility, Venue } from './types';
 import { inset, venueText } from './ui';
@@ -66,20 +67,26 @@ export function ReportCard({ report, onPress, fresh }: { report: FacilityReport;
   const t = useT('venue');
   const tp = useT('profile');
   const { language: onScreen } = useUiLanguage();
+  const tv = useT('volunteer');
   const author = reportAuthor(report, t);
+  // Translated like chat (the detail has "Show original").
+  const tr = useReportTranslation(report);
+  const source = tr.view.kind === 'translated' ? tr.view.source : null;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t('card.label', { title: report.title, author })}
+      accessibilityLabel={t('card.label', { title: tr.title, author })}
       accessibilityHint={t('card.hint')}
       style={({ pressed }) => [styles.report, fresh && styles.reportFresh, pressed && styles.reportPressed]}>
       <View style={styles.reportTop}>
-        <Text style={[venueText.label, styles.flex]} numberOfLines={1}>{report.title}</Text>
+        <Text style={[venueText.label, styles.flex]} numberOfLines={1}>{tr.title}</Text>
         {fresh ? <Text style={styles.newBadge}>{t('card.new')}</Text> : null}
       </View>
-      <Text style={venueText.caption} numberOfLines={2}>{report.body || t('card.by', { author })}</Text>
-      {report.language && report.language !== onScreen ? (
+      <Text style={venueText.caption} numberOfLines={2}>{tr.body || t('card.by', { author })}</Text>
+      {source ? (
+        <Text style={styles.original}>{tv('translation.translatedFrom', { language: uiLanguageName(source, tp) })}</Text>
+      ) : report.language && report.language !== onScreen ? (
         <Text style={styles.original}>{t('report.originalLanguage', { language: uiLanguageName(report.language, tp) })}</Text>
       ) : null}
       <Text style={styles.seeMore}>{t('card.seeMore')}</Text>
