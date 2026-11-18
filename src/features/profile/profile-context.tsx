@@ -7,6 +7,7 @@ import * as auth from '@/lib/auth';
 import { onBeforeSignOut } from '@/lib/before-sign-out';
 import { AVATAR_BUCKET, supabase } from '@/lib/supabase';
 
+import { carryOverDeviceSettings } from './device-settings';
 import { createSettingsSync } from './settings-sync';
 import {
   AVATAR_URL_TTL_S,
@@ -141,6 +142,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     applySession(SIGNED_OUT);
   }, [applySession]);
 
+  const saveSettings = useCallback(
+    (settings: Partial<ProfileSettings>) => {
+      const uid = userIdRef.current;
+      if (!uid) return;
+      setProfile(p => (p && p.id === uid ? { ...p, ...settings } : p));
+      sync.change(settings);
+    },
+    [],
+  );
+
   /**
    * Loads the session and applies it, unless something newer happened meanwhile.
    * `quiet` (background reloads: another tab, after a failed delete) keeps the current screen
@@ -151,7 +162,21 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       const mine = ++generation.current;
       try {
         const s = await loadSession();
-        if (mine === generation.current) applySession(s);
+        if (mine === generation.current) {
+          applySession(s);
+          // Settings saved on this device before they moved to the profile come along once
+          // (compared with what's on screen, so an unsaved change here wins).
+          const loaded = sync.overlay(s.profile);
+          if (loaded) {
+            void carryOverDeviceSettings(loaded, {
+              storage: AsyncStorage,
+              save: saveSettings,
+              idle: () => sync.idle(),
+              pending: () => sync.pending(),
+              isCurrent: () => userIdRef.current === loaded.id,
+            });
+          }
+        }
         return s.profile;
       } catch (e) {
         if (!quiet && mine === generation.current) {
@@ -161,7 +186,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         throw e;
       }
     },
-    [applySession],
+    [applySession, saveSettings],
   );
 
   const refresh = useCallback(() => load(false), [load]);
@@ -251,16 +276,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return saved;
     },
     [userId],
-  );
-
-  const saveSettings = useCallback(
-    (settings: Partial<ProfileSettings>) => {
-      const uid = userIdRef.current;
-      if (!uid) return;
-      setProfile(p => (p && p.id === uid ? { ...p, ...settings } : p));
-      sync.change(settings);
-    },
-    [],
   );
 
   const recheck = useCallback(async () => {
