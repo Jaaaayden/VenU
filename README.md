@@ -49,7 +49,7 @@ DEEPL_API_KEY=...:fx
 
 Then `npm run dev:mock -- --web`. The terminal says which provider it uses (`Translate: anthropic`); without the file it says `offline stub`. Restart after changing the file. Needs Node 22.18+ (it loads the function's `.ts` files directly).
 
-Test hooks on the mock backend: `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow), `-d '{"clockOffsetMs":7200000}'` (two hours on, so a username held by an unconfirmed sign-up is free again).
+Test hooks on the mock backend (port 47330, or your `-- --mock-port N`): `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow), `-d '{"clockOffsetMs":7200000}'` (two hours on, so a username held by an unconfirmed sign-up is free again).
 
 ### Deploy (Supabase project owner)
 

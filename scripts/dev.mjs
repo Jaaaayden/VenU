@@ -8,6 +8,7 @@
 //   npm run stop               end every VenU dev server, including ones started another way
 //
 // Extra flags go after `--`: `npm run dev:mock -- --reset` (wipe fake data), `-- --port 8090`,
+// `-- --mock-port 47331` (a second mock backend next to the first, e.g. from another worktree),
 // and anything else is passed to `expo start` (`-- --web`, `-- --clear`).
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -20,7 +21,6 @@ import { MOCK_SUPABASE_PORT, startMockSupabase } from './mock-supabase.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const RUN_DIR = join(ROOT, '.expo', 'dev-servers'); // one file per running server (git-ignored)
 const MOCK_STATE = join(ROOT, '.expo', 'mock-supabase.json');
-const MOCK_API_PORT = MOCK_SUPABASE_PORT;
 const PORTS = { supabase: 8081, local: 8082, mock: 8083 };
 
 const [mode, ...rest] = process.argv.slice(2);
@@ -40,6 +40,7 @@ if (!(mode in PORTS)) {
 const verify = flag('--verify');
 const reset = flag('--reset');
 const port = Number(option('--port') ?? PORTS[mode]);
+const MOCK_API_PORT = Number(option('--mock-port') ?? MOCK_SUPABASE_PORT);
 const env = { ...process.env };
 const notes = [];
 
@@ -89,7 +90,7 @@ const expo = spawn(process.execPath, [expoCli, 'start', '--port', String(port), 
 
 mkdirSync(RUN_DIR, { recursive: true });
 const runFile = join(RUN_DIR, `${process.pid}.json`);
-writeFileSync(runFile, JSON.stringify({ pid: process.pid, mode, port, startedAt: new Date().toISOString() }));
+writeFileSync(runFile, JSON.stringify({ pid: process.pid, mode, port, mockPort: mode === 'mock' ? MOCK_API_PORT : undefined, startedAt: new Date().toISOString() }));
 
 function cleanup() {
   rmSync(runFile, { force: true });
@@ -137,11 +138,11 @@ async function freePort(p) {
     console.error(`Port ${p} is blocked by the system, not used by a program.`);
     if (process.platform === 'win32') console.error('Reserved ranges: netsh interface ipv4 show excludedportrange protocol=tcp');
     console.error(p === MOCK_API_PORT
-      ? 'Change MOCK_SUPABASE_PORT in scripts/mock-supabase.mjs to a port outside those ranges.'
+      ? 'Pass -- --mock-port N with a port outside those ranges.'
       : 'Pick another port: -- --port <number>.');
     process.exit(1);
   }
-  const ours = runningServers().filter(s => s.port === p || (s.mode === 'mock' && p === MOCK_API_PORT));
+  const ours = runningServers().filter(s => s.port === p || (s.mode === 'mock' && p === (s.mockPort ?? MOCK_SUPABASE_PORT)));
   if (ours.length) {
     for (const s of ours) killTree(s.pid);
     console.log(`Stopped the VenU ${ours.map(s => s.mode).join(', ')} server that was using port ${p}.`);
