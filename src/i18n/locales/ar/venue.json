@@ -389,7 +389,12 @@
     "authorFallback": "زائر VenU",
     "submitted": "أُرسل في {{date}}",
     "originalLanguage": "اللغة الأصلية: {{language}}",
-    "noBody": "لا توجد تفاصيل."
+    "noBody": "لا توجد تفاصيل.",
+    "delete": "حذف بلاغي",
+    "deleteConfirm": "هل تريد حذف هذا البلاغ؟ لن يراه زوار هذا المكان بعد الآن.",
+    "deleteKeep": "الإبقاء عليه",
+    "deleteYes": "حذف",
+    "deleteFailed": "تعذّر حذف البلاغ. {{reason}}"
   },
   "form": {
     "title": "إضافة بلاغ",

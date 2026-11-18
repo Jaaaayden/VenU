@@ -379,7 +379,12 @@
     "authorFallback": "Khách tham quan VenU",
     "submitted": "Gửi ngày {{date}}",
     "originalLanguage": "Ngôn ngữ gốc: {{language}}",
-    "noBody": "Không có chi tiết."
+    "noBody": "Không có chi tiết.",
+    "delete": "Xóa báo cáo của tôi",
+    "deleteConfirm": "Xóa báo cáo này? Khách tại địa điểm này sẽ không thấy nó nữa.",
+    "deleteKeep": "Giữ lại",
+    "deleteYes": "Xóa",
+    "deleteFailed": "Không xóa được báo cáo. {{reason}}"
   },
   "form": {
     "title": "Thêm báo cáo",

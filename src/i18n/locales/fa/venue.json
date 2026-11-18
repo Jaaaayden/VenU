@@ -381,7 +381,12 @@
     "authorFallback": "بازدیدکننده VenU",
     "submitted": "ارسال‌شده در {{date}}",
     "originalLanguage": "زبان اصلی: {{language}}",
-    "noBody": "جزئیاتی اضافه نشده."
+    "noBody": "جزئیاتی اضافه نشده.",
+    "delete": "حذف گزارش من",
+    "deleteConfirm": "این گزارش حذف شود؟ بازدیدکنندگان این مکان دیگر آن را نمی‌بینند.",
+    "deleteKeep": "نگه داشتن",
+    "deleteYes": "حذف",
+    "deleteFailed": "گزارش حذف نشد. {{reason}}"
   },
   "form": {
     "title": "افزودن گزارش",

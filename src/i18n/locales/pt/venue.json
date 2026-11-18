@@ -383,7 +383,12 @@
     "authorFallback": "Visitante do VenU",
     "submitted": "Enviado em {{date}}",
     "originalLanguage": "Idioma original: {{language}}",
-    "noBody": "Sem detalhes."
+    "noBody": "Sem detalhes.",
+    "delete": "Excluir meu relato",
+    "deleteConfirm": "Excluir este relato? Os visitantes deste local não vão mais vê-lo.",
+    "deleteKeep": "Manter",
+    "deleteYes": "Excluir",
+    "deleteFailed": "Não foi possível excluir o relato. {{reason}}"
   },
   "form": {
     "title": "Novo relato",
