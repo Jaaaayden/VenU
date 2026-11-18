@@ -43,3 +43,19 @@ Answers from Jayden before the run, and calls made during it. Each line: decisio
 5. Tell Krisha: matching can use profiles (role = volunteer, verified, availability = 'free', availability_updated_at, notification_prefs->>'volunteer'); new public functions must revoke anon/public EXECUTE (Supabase's default privileges grant it).
 6. Figma options that need a migration + matching work, not built: a "Find a facility" help type, helper age bands 20-30 / 30-40, "Speech impairment" need.
 7. Review and open PRs from jayden/night-batch (not pushed).
+
+## Intuit Dome map fixes (branch jayden/intuit-map)
+From the three vetters' brief (pins, facts, demo walkthrough). Decisions:
+- Pins moved to where the seating chart, laid over the exterior map, puts their sections: First Aid Floor (Wall 19, east tunnel), Answers Portal Terrace (Terrace 18), First Aid Terrace (Terrace 27), First Aid Main (Main 6). Added Infant Care Room Terrace (Terrace Wall 16) and Elevators (lobby by the Main Entrance).
+- Spots the venue doesn't publish (Sensory Room, Elevators) are `approximate`: the pin stays as a placeholder, there's no route, the detail says to ask staff, and the list says "Spot not published". An "I'm here" on one of them doesn't start walks (they start at the way in).
+- Walk times everywhere use the route panel's calculation (from the visitor's spot, else the way in), so the stand-in `walkMinutes` in mock.ts is only a fallback now. The start itself reads "Walks start here" / "You're here". Some numbers changed a lot (Answers Portal Terrace 9 → 4 min): it's the straight-line estimate the route already showed.
+- Chips with no facilities at the venue are hidden (the selected one stays). No venue lists food, so "Food & Drinks" is gone at all three until food stands are added (if the sponsors branch adds them, the chip comes back on its own).
+- Search also matches category and tag labels (English and the app language) plus a few English everyday words ("bathroom", "toilet", "elevator", "wheelchair").
+- Published map images stop zooming out once they fit (it was 75% of fit: a grey field with the pins piled up). The schematic Crypto.com Arena keeps its margin. Intuit Dome's map area is near-black like the image. No pin clustering.
+- While a pin card shows, the map may pan up until the image's bottom meets the card, so a tapped pin at the bottom (First Aid Terrace) is lifted clear of it.
+- Directions and I'm here moved right under the facility name (Figma has them after the tags), so they show on the half-open sheet.
+- "From Main Entrance." drops "the main way in" through a per-map flag (`arrivalNamedMain`) and a new string `directions.fromArrivalPlain` in 13 languages.
+- Garages: a new "Pass needed" tag replaces "Permit needed"; both garages count as accessible (accessible spaces are sold with a parking pass).
+- Contact: Intuit Dome's event-day text line +1 310-282-5779 (FAQ), so "Text venue staff" shows in the emergency dialog, as it does for SoFi.
+
+Left: ru "Отзывы" → "Сообщения" (about 12 ru strings call reports "отзыв", so renaming one would be inconsistent; needs a native pass). Also left: scrolling a selected chip at the row's end into view, and a pin under the − button when zoomed in. Sensory Room keeps the wheelchair icon and Infant Care the restroom icon, and routes stay straight lines through the bowl.
