@@ -57,7 +57,8 @@ export function VolunteerHome({ profile }: { profile: HomeProfile }) {
       {assignment ? <ActiveRequest assignment={assignment} unread={unread} /> : null}
 
       <LocationCard />
-      <StatusCard status={status} onChange={setStatus} />
+      {/* While helping, the line says so; the stored Free / Busy / Off stays for after. */}
+      <StatusCard status={status} onChange={setStatus} helping={assignment?.visitorName ?? null} />
       <HelpWithCard profile={profile} />
 
       {assignment ? null : status === 'free' ? (

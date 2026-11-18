@@ -7,7 +7,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import * as backendModule from '../backend';
 import { AlreadyTakenError, createMockBackend } from '../backend';
 import { createDeskStore } from '../desk-store';
-import { createRequestStore, reduce, type NewRequest } from '../request-store';
+import { createRequestStore, reduce, SEARCH_TIMEOUT_MS, type NewRequest } from '../request-store';
 import {
   CONNECT_GRACE_MS,
   createLiveBackend,
@@ -160,6 +160,17 @@ function fakeServer({ realtime = true } = {}) {
         const next: RequestRow = { ...r, status, closed_by: who, closed_at: now() };
         requests.set(id, next);
         changed(next);
+      },
+      // withdraw_open_request: cancels only while open; the row either way, null when not yours.
+      async withdraw(id) {
+        await Promise.resolve();
+        const r = requests.get(id);
+        if (!r || r.visitor_id !== who) return null;
+        if (r.status !== 'open') return { ...r };
+        const next: RequestRow = { ...r, status: 'cancelled', closed_by: who, closed_at: now() };
+        requests.set(id, next);
+        changed(next);
+        return { ...next };
       },
       async release(id) {
         const r = requests.get(id);
@@ -777,6 +788,123 @@ describe('the Supabase calls', () => {
     await expect(supabaseHelpDb(failing('42501')).insertFeedback(rating)).rejects.toMatchObject({ code: '42501' });
     await expect(supabaseHelpDb(failing('23505')).insertFeedback({ ...rating, kind: 'problem', stars: null, problem: 'rude' }))
       .rejects.toMatchObject({ code: '23505' });
+  });
+
+  it('withdraws through withdraw_open_request and reads a null row (all nulls) as none', async () => {
+    const row = { id: 'r1', status: 'matched' };
+    const rpc = jest.fn<(...args: unknown[]) => Promise<{ data: unknown; error: null }>>()
+      .mockResolvedValueOnce({ data: row, error: null })
+      .mockResolvedValueOnce({ data: { id: null, status: null }, error: null })
+      .mockResolvedValueOnce({ data: null, error: null });
+    const db = supabaseHelpDb({ rpc } as unknown as SupabaseClient);
+    expect(await db.withdraw('r1')).toEqual(row);
+    expect(await db.withdraw('r1')).toBeNull();
+    expect(await db.withdraw('r1')).toBeNull();
+    expect(rpc).toHaveBeenCalledWith('withdraw_open_request', { p_request_id: 'r1' });
+  });
+});
+
+// Found by the two-browser test on 2026-11-18 (findings-visitor F3/F16/F18, findings-volunteer F5/F11/F14/F23).
+describe('help request lifecycle', () => {
+  beforeEach(() => { jest.useFakeTimers(); });
+  afterEach(() => { jest.useRealTimers(); });
+
+  it('a search timer that fires late, after a volunteer accepted, shows the match and leaves the volunteer’s chat alone', async () => {
+    const server = fakeServer();
+    // The visitor's phone is asleep: its polls and Realtime never see the Accept.
+    const asleep: HelpDb = { ...server.dbFor('rosa'), subscribe: () => () => {}, getRequest: () => new Promise(() => {}) };
+    const visitor = createRequestStore(createLiveBackend(asleep));
+    const sam = createDeskStore(createLiveBackend(server.dbFor('sam')));
+    await sam.setUser('sam');
+    sam.watchOpen();
+    void visitor.sendRequest(rosaNeedsHelp);
+    await settle();
+    const id = visitor.getState().request!.id;
+    await settle(SEARCH_TIMEOUT_MS - 5000);
+    expect(await sam.accept(id)).toBe(true); // 1:55 in
+    await settle(5000); // the visitor's 2-minute timer fires: too late to withdraw it
+
+    expect(server.requests.get(id)).toMatchObject({ status: 'matched', volunteer_id: 'sam', closed_by: null });
+    expect(visitor.getState()).toMatchObject({ status: 'matched', match: { volunteer: { firstName: 'Sam' } } });
+    expect(sam.getState()).toMatchObject({ assignment: { id }, notice: null });
+    // And they can talk.
+    sam.sendMessage('On my way');
+    await settle(POLL_MS);
+    expect(sam.getState().assignment?.id).toBe(id);
+  });
+
+  it('a search nobody took is withdrawn on time: off the list, and a late Accept hears it was withdrawn', async () => {
+    const server = fakeServer();
+    const { visitor, sam } = devices(server);
+    await sam.setUser('sam');
+    sam.watchOpen();
+    void visitor.sendRequest(rosaNeedsHelp);
+    await settle();
+    const id = visitor.getState().request!.id;
+    await settle(SEARCH_TIMEOUT_MS);
+    expect(visitor.getState().status).toBe('notFound');
+    expect(server.requests.get(id)).toMatchObject({ status: 'cancelled', closed_by: 'rosa' });
+    expect(await sam.accept(id)).toBe(false);
+    expect(sam.getState().notice?.key).toBe('withdrawn');
+  });
+
+  it('“Can’t make it” hands the request back: the visitor searches again (no rating), and another volunteer takes it', async () => {
+    const { visitor, sam, ana, id, server } = await matched();
+    expect(await sam.handBack()).toBe(true);
+    expect(sam.getState()).toMatchObject({ assignment: null, notice: { tone: 'success', key: 'handedBack', params: { name: 'Rosa' } } });
+    await settle();
+    expect(server.requests.get(id)).toMatchObject({ status: 'open', volunteer_id: null, closed_by: null });
+    expect(visitor.getState()).toMatchObject({ status: 'searching', match: null, notice: { key: 'volunteerLeft' } });
+    // Not back on Sam's own list; Ana gets it.
+    await settle(OPEN_REFRESH_MS);
+    expect(sam.getState().open.map(r => r.id)).not.toContain(id);
+    await ana.setUser('ana');
+    ana.watchOpen();
+    await settle();
+    expect(await ana.accept(id)).toBe(true);
+    await settle();
+    expect(visitor.getState()).toMatchObject({ status: 'matched', match: { volunteer: { firstName: 'Ana' } } });
+  });
+
+  it('a hand-back that fails (offline) keeps the request on the card', async () => {
+    const server = fakeServer();
+    const flaky: HelpDb = { ...server.dbFor('sam'), release: async () => { throw new Error('offline'); } };
+    const visitor = createRequestStore(createLiveBackend(server.dbFor('rosa')));
+    const sam = createDeskStore(createLiveBackend(flaky));
+    await sam.setUser('sam');
+    void visitor.sendRequest(rosaNeedsHelp);
+    await settle();
+    const id = visitor.getState().request!.id;
+    expect(await sam.accept(id)).toBe(true);
+    expect(await sam.handBack()).toBe(false);
+    expect(sam.getState().assignment?.id).toBe(id);
+    expect(server.requests.get(id)?.status).toBe('matched');
+  });
+
+  it('the volunteer ending the chat tells the visitor who ended it, above the rating', async () => {
+    const { visitor, sam } = await matched();
+    sam.endChat();
+    await settle();
+    expect(visitor.getState()).toMatchObject({ status: 'done', notice: { tone: 'success', key: 'volunteerEnded', params: { name: 'Sam' } } });
+    visitor.skipFeedback();
+    expect(visitor.getState()).toMatchObject({ status: 'idle', notice: null });
+  });
+
+  it('marking help as done yourself shows no “ended the chat” note', async () => {
+    const { visitor } = await matched();
+    visitor.endHelp();
+    await settle();
+    expect(visitor.getState()).toMatchObject({ status: 'done', notice: null });
+  });
+
+  it('a request called off by neither person (account deleted) doesn’t blame the visitor', async () => {
+    const server = fakeServer({ realtime: false });
+    const { visitor, sam, id } = await matched(server);
+    void visitor;
+    // 20261118030000_account_deletion.sql: cancelled with no closed_by.
+    server.requests.set(id, { ...server.requests.get(id)!, status: 'cancelled', closed_at: new Date().toISOString(), visitor_id: null as never });
+    await settle(POLL_MS);
+    expect(sam.getState()).toMatchObject({ assignment: null, notice: { key: 'closed', params: { name: 'Rosa' } } });
   });
 });
 

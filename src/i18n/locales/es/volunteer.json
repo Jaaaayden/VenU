@@ -70,15 +70,16 @@
   "notice": {
     "searchFailed": "No pudimos contactar con un voluntario. Revisa tu conexión e inténtalo de nuevo.",
     "thanks": "¡Gracias! Tu opinión ayuda a {{name}} y al equipo de LA28.",
-    "volunteerLeft": "Tu voluntario tuvo que irse. Estamos buscando a otra persona."
+    "volunteerLeft": "Tu voluntario tuvo que irse. Estamos buscando a otra persona.",
+    "volunteerEnded": "{{name}} terminó el chat. ¿Aún necesitas ayuda? Toca Omitir y envía una nueva solicitud."
   },
   "searching": {
     "title": "Buscando voluntario",
     "subtitle": "Suele tardar menos de un minuto · Quédate donde estás",
     "askedFor": "Pediste",
     "notFoundTitle": "Ahora mismo no hay voluntarios libres",
-    "notFoundBody": "Guardamos tu solicitud. Sigue buscando o llama al personal del recinto para pedir ayuda.",
-    "keepSearching": "Seguir buscando"
+    "notFoundBody": "No había nadie libre, así que retiramos tu solicitud. Busca de nuevo o llama al personal del recinto para pedir ayuda.",
+    "keepSearching": "Buscar de nuevo"
   },
   "match": {
     "title": "Voluntario encontrado",
@@ -232,15 +233,23 @@
     "end": "Terminar chat",
     "endHint": "Marca la ayuda como terminada para ti y para {{name}}",
     "confirmEnd": "¿Terminar tu chat con {{name}}? Esto marca la ayuda como terminada.",
-    "yesEnd": "Sí, terminar chat"
+    "yesEnd": "Sí, terminar chat",
+    "handBack": "No puedo ir",
+    "handBackHint": "Devuelve la solicitud para que otro voluntario ayude a {{name}}",
+    "confirmHandBack": "¿No puedes ir? Buscaremos otro voluntario para {{name}}.",
+    "keepHelping": "Seguir ayudando",
+    "yesHandBack": "Devolverla",
+    "handBackFailed": "No se pudo devolver la solicitud. Revisa tu conexión e inténtalo de nuevo."
   },
   "desk": {
     "taken": "Otra persona ya aceptó esta solicitud.",
     "acceptFailed": "No se pudo aceptar la solicitud. Revisa tu conexión e inténtalo de nuevo.",
     "notVerified": "Podrás aceptar solicitudes cuando LA28 te verifique.",
     "cancelled": "{{name}} canceló la solicitud.",
+    "closed": "La solicitud de {{name}} se cerró.",
     "done": "{{name}} marcó la ayuda como terminada. ¡Gracias!",
     "ended": "Chat terminado. ¡Gracias por ayudar a {{name}}!",
+    "handedBack": "Devolviste la solicitud de {{name}}. Otro voluntario puede tomarla.",
     "withdrawn": "Esta solicitud fue retirada."
   },
   "home": {
@@ -259,7 +268,8 @@
     "statusLine": {
       "free": "Recibirás solicitudes cercanas. En un descanso, cambia a Ocupado o Fuera y las solicitudes no te llegarán.",
       "busy": "Estás ocupado por ahora. Las nuevas solicitudes no te llegarán hasta que vuelvas a Libre.",
-      "off": "Estás fuera de turno. Las solicitudes no te llegarán hasta que cambies a Libre."
+      "off": "Estás fuera de turno. Las solicitudes no te llegarán hasta que cambies a Libre.",
+      "helping": "Estás ayudando a {{name}}. Las nuevas solicitudes esperarán hasta que termines."
     },
     "helpTitle": "En qué puedes ayudar",
     "editLabel": "Editar en qué puedes ayudar",

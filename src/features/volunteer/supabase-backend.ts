@@ -97,6 +97,11 @@ export interface HelpDb {
    */
   accept(id: string): Promise<RequestRow>;
   close(id: string, status: ClosedStatus): Promise<void>;
+  /**
+   * withdraw_open_request: cancels the request only while it's still open, and returns it either
+   * way ('matched' when a volunteer took it first); null when it isn't the caller's.
+   */
+  withdraw(id: string): Promise<RequestRow | null>;
   /** release_help_request: the matched volunteer hands the request back, and it's open again. */
   release(id: string): Promise<void>;
   /** The messages on a request you may read, oldest first; with `sinceIso`, only those created at or after it. */
@@ -378,6 +383,12 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
     cancelRequest: requestId => close(requestId, 'cancelled'),
     endHelp: requestId => close(requestId, 'done'),
 
+    async withdrawRequest(requestId) {
+      await inserting.get(requestId)?.catch(() => {});
+      const row = await db.withdraw(requestId);
+      return row?.status === 'matched' ? rowToMatch(row) : null;
+    },
+
     async sendMessage(requestId, text, lang) {
       await db.sendMessage({ request_id: requestId, text, language: lang ?? null });
     },
@@ -413,7 +424,7 @@ export function createLiveBackend(db: HelpDb): VolunteerBackend {
         return watchRow(requestId, row => {
           if (told || !isClosed(row.status)) return;
           told = true;
-          listener({ status: row.status, byMe: row.closed_by === me });
+          listener({ status: row.status, byMe: row.closed_by === me, bySystem: row.closed_by == null });
         });
       });
     },
@@ -528,6 +539,13 @@ export function supabaseHelpDb(client: SupabaseClient): HelpDb {
     async close(id, status) {
       const { error } = await client.rpc('close_help_request', { p_request_id: id, p_status: status });
       if (error) fail(error);
+    },
+    async withdraw(id) {
+      const { data, error } = await client.rpc('withdraw_open_request', { p_request_id: id });
+      if (error) fail(error);
+      // A function returning a row type answers a null row as an object of nulls.
+      const row = data as RequestRow | null;
+      return row?.id ? row : null;
     },
     async release(id) {
       const { error } = await client.rpc('release_help_request', { p_request_id: id });

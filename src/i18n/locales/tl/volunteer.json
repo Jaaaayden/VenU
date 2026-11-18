@@ -70,15 +70,16 @@
   "notice": {
     "searchFailed": "Hindi makakonekta sa volunteer. Tingnan ang koneksyon mo at subukan ulit.",
     "thanks": "Salamat! Nakakatulong ang feedback mo kay {{name}} at sa LA28 team.",
-    "volunteerLeft": "Kinailangang umalis ng iyong volunteer. Naghahanap ng iba."
+    "volunteerLeft": "Kinailangang umalis ng iyong volunteer. Naghahanap ng iba.",
+    "volunteerEnded": "Tinapos ni {{name}} ang chat. Kailangan mo pa ng tulong? I-tap ang Laktawan at magpadala ng bagong request."
   },
   "searching": {
     "title": "Naghahanap ng volunteer",
     "subtitle": "Karaniwang wala pang isang minuto · Manatili ka lang diyan",
     "askedFor": "Hiniling mo",
     "notFoundTitle": "Walang bakanteng volunteer ngayon",
-    "notFoundBody": "Naka-save ang request mo. Patuloy na maghanap, o tawagan ang staff ng venue para sa tulong.",
-    "keepSearching": "Patuloy na maghanap"
+    "notFoundBody": "Walang bakante, kaya binawi ang request mo. Maghanap ulit, o tawagan ang staff ng venue para sa tulong.",
+    "keepSearching": "Maghanap ulit"
   },
   "match": {
     "title": "May nahanap na volunteer",
@@ -230,15 +231,23 @@
     "end": "Tapusin ang chat",
     "endHint": "Mamarkahang tapos na ang tulong para sa iyo at kay {{name}}",
     "confirmEnd": "Tapusin ang chat ninyo ni {{name}}? Mamarkahang tapos na ang tulong.",
-    "yesEnd": "Oo, tapusin"
+    "yesEnd": "Oo, tapusin",
+    "handBack": "Hindi ako makakapunta",
+    "handBackHint": "Ibinabalik ang request para ibang volunteer ang tumulong kay {{name}}",
+    "confirmHandBack": "Hindi ka makakapunta? Hahanap kami ng ibang volunteer para kay {{name}}.",
+    "keepHelping": "Patuloy na tumulong",
+    "yesHandBack": "Ibalik ito",
+    "handBackFailed": "Hindi maibalik ang request. Tingnan ang koneksyon mo at subukan ulit."
   },
   "desk": {
     "taken": "May iba nang tumanggap sa request na ito.",
     "acceptFailed": "Hindi matanggap ang request. Tingnan ang koneksyon mo at subukan ulit.",
     "notVerified": "Puwede kang tumanggap ng request kapag na-verify ka na ng LA28.",
     "cancelled": "Kinansela ni {{name}} ang request.",
+    "closed": "Isinara ang request ni {{name}}.",
     "done": "Minarkahan ni {{name}} na tapos na ang tulong. Salamat!",
     "ended": "Tapos na ang chat. Salamat sa pagtulong kay {{name}}!",
+    "handedBack": "Ibinalik mo ang request ni {{name}}. Puwede itong kunin ng ibang volunteer.",
     "withdrawn": "Binawi na ang request na ito."
   },
   "home": {
@@ -257,7 +266,8 @@
     "statusLine": {
       "free": "Makakatanggap ka ng mga request sa malapit. Kapag naka-break, lumipat sa Abala o Pahinga at lalaktawan ka ng mga request.",
       "busy": "Abala ka muna. Lalaktawan ka ng mga bagong request hanggang bumalik ka sa Bakante.",
-      "off": "Naka-pahinga ka. Lalaktawan ka ng mga request hanggang lumipat ka sa Bakante."
+      "off": "Naka-pahinga ka. Lalaktawan ka ng mga request hanggang lumipat ka sa Bakante.",
+      "helping": "Tinutulungan mo si {{name}}. Maghihintay ang mga bagong request hanggang matapos ka."
     },
     "helpTitle": "Mga maitutulong mo",
     "editLabel": "I-edit ang mga maitutulong mo",
