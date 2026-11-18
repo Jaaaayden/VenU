@@ -342,6 +342,28 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
     emit();
   }
 
+  /** Follows a match the service already made (after a restart). */
+  function resumeMatch(requestId: string, match: Match) {
+    backend.resume?.(requestId, match);
+    listen(requestId);
+  }
+
+  /**
+   * Withdraws a restored request whose wait ran out while the app was closed. A volunteer who
+   * accepted it meanwhile wins: "No volunteer is free" turns into their match. If the visitor has
+   * moved on by then (searched again, cancelled, signed out), that late match is called off instead.
+   */
+  async function withdrawExpired(requestId: string, mine: number) {
+    const match = await withdraw(requestId);
+    if (!match) return;
+    if (mine === generation && state.status === 'notFound' && state.request?.id === requestId) {
+      dispatch({ type: 'restore', state: { ...state, status: 'matched', match, notice: null } });
+      resumeMatch(requestId, match);
+    } else {
+      backend.cancelRequest(requestId).catch(() => {});
+    }
+  }
+
   /** Puts back the request saved for `userId`, unless something newer already happened. */
   async function restore(userId: string) {
     if (!persist) return;
@@ -353,22 +375,15 @@ export function createRequestStore(backend: VolunteerBackend, persist?: Persiste
       const untouched = state.status === 'idle' && !state.draft;
       if (!saved || mine !== generation || owner !== userId || !untouched) return;
       if (saved.status === 'searching') searchSince = savedSince(raw) ?? Date.now();
-      // The wait ran out while the app was closed: withdraw it and say nobody was free rather than
-      // silently start over, unless a volunteer accepted it meanwhile: then that's the match.
+      // The wait ran out while the app was closed: say nobody was free rather than silently start
+      // over, and withdraw it in the background, so the tab shows right away even on a slow network.
       const expired = saved.status === 'searching' && Date.now() - searchSince >= SEARCH_TIMEOUT_MS;
-      let next = saved;
-      if (expired && saved.request) {
-        const match = await withdraw(saved.request.id);
-        if (mine !== generation || owner !== userId || state.status !== 'idle' || state.draft) return;
-        next = match ? { ...saved, status: 'matched', match } : { ...saved, status: 'notFound' };
-      }
+      const next: RequestState = expired ? { ...saved, status: 'notFound' } : saved;
       dispatch({ type: 'restore', state: next });
       // Pick up where it left off: keep waiting for a volunteer, or keep listening to the chat.
-      if (next.status === 'searching' && next.request) void runSearch(next.request);
-      else if (next.status === 'matched' && next.request && next.match) {
-        backend.resume?.(next.request.id, next.match);
-        listen(next.request.id);
-      }
+      if (expired && next.request) void withdrawExpired(next.request.id, mine);
+      else if (next.status === 'searching' && next.request) void runSearch(next.request);
+      else if (next.status === 'matched' && next.request && next.match) resumeMatch(next.request.id, next.match);
     } catch {
       // Unreadable storage: start from the empty form.
     } finally {

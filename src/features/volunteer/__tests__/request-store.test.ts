@@ -584,9 +584,48 @@ describe('no volunteer free in time', () => {
       storage.data.set(KEY, JSON.stringify({ v: 1, owner: 'rosa', state: { ...INITIAL_STATE, status: 'searching', request }, since: request.createdAt }));
       const store = createRequestStore(backend, { storage, key: KEY });
       await store.setUser('rosa');
+      await advance(0);
       expect(store.getState()).toMatchObject({ status: 'matched', match: { volunteer: { firstName: 'Sam' } } });
       expect(backend.withdrawRequest).toHaveBeenCalledWith('req-1');
       expect(backend.cancelRequest).not.toHaveBeenCalled();
+    });
+
+    /** A search saved before the app closed, whose wait has run out by the time it opens again. */
+    function expiredSave() {
+      const storage = memoryStorage();
+      const request: HelpRequest = { ...rosaNeedsHelp, id: 'req-1', createdAt: Date.now() - SEARCH_TIMEOUT_MS - 1000 };
+      storage.data.set(KEY, JSON.stringify({ v: 1, owner: 'rosa', state: { ...INITIAL_STATE, status: 'searching', request }, since: request.createdAt }));
+      return storage;
+    }
+
+    it('after a restart on a slow network, shows "No volunteer is free" at once while the withdraw is on its way', async () => {
+      let answer: (m: Match | null) => void = () => {};
+      const { backend } = lateBackend(() => new Promise(r => { answer = r; }));
+      const store = createRequestStore(backend, { storage: expiredSave(), key: KEY });
+      await store.setUser('rosa');
+      expect(store.isRestored()).toBe(true);
+      expect(store.getState().status).toBe('notFound');
+
+      answer(sam); // a volunteer had accepted it after all: that's the match
+      await advance(0);
+      expect(store.getState()).toMatchObject({ status: 'matched', match: { volunteer: { firstName: 'Sam' } } });
+      expect(backend.onMessage).toHaveBeenCalledWith('req-1', expect.any(Function), undefined);
+      expect(backend.cancelRequest).not.toHaveBeenCalled();
+    });
+
+    it('after a restart, a late match for a request the visitor already searched again for is called off', async () => {
+      let answer: (m: Match | null) => void = () => {};
+      const { backend } = lateBackend(() => new Promise(r => { answer = r; }));
+      const store = createRequestStore(backend, { storage: expiredSave(), key: KEY });
+      await store.setUser('rosa');
+      void store.keepSearching();
+      const again = store.getState().request!.id;
+      expect(again).not.toBe('req-1');
+
+      answer(sam);
+      await advance(0);
+      expect(store.getState()).toMatchObject({ status: 'searching', request: { id: again } });
+      expect(backend.cancelRequest).toHaveBeenCalledWith('req-1');
     });
   });
 
