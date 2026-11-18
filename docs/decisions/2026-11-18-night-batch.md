@@ -43,3 +43,15 @@ Answers from Jayden before the run, and calls made during it. Each line: decisio
 5. Tell Krisha: matching can use profiles (role = volunteer, verified, availability = 'free', availability_updated_at, notification_prefs->>'volunteer'); new public functions must revoke anon/public EXECUTE (Supabase's default privileges grant it).
 6. Figma options that need a migration + matching work, not built: a "Find a facility" help type, helper age bands 20-30 / 30-40, "Speech impairment" need.
 7. Review and open PRs from jayden/night-batch (not pushed).
+
+## Sponsored stands demo
+For the Intuit demo: sponsored stands on the map, one promoted list card, an offer on the stand, and one ad slot on the waiting screen. Data and helpers in `src/features/venue/sponsors.ts`, look in `sponsor-ui.tsx`, banner in `src/components/volunteer/sponsor-banner.tsx`.
+- Demo placements only, not partnerships: real brand names as plain text (Coca-Cola at all three venues, Panda Express at Intuit Dome, Ben & Jerry's at SoFi), no logos or brand colours. Said in the data file's header comment; no UI copy claims endorsement.
+- An optional `sponsor` field (brand, offer) on food facilities, not a new category: no new chips or empty-state strings, and the Food & Drinks chip shows the stands.
+- Stands are kept out of `facilitiesFor()` (the meeting-spot picker, help requests, emergency screens read it); only the venue screen adds them (`venueFacilitiesFor`). Their page has no "I'm here", so an ad never becomes a meeting spot. Kept `mock.ts` untouched for the Intuit data fix.
+- Look: VenU's own glyph (a tag with a star cut out, drawn like the Figma icon sheet) in the theme accent (orange "U") on its soft tint; "Sponsored" pill on every pin card, row, card and banner, and "Sponsored" first in every screen-reader label.
+- Promoted card: one per venue (the featured stand, first in its list), only for "All" and "Food & Drinks" and only while the stand matches the search. Browsing: first in the list. Searching: after the first result, so the best match stays on top. The stand isn't listed twice; other sponsored stands are normal rows with the pill.
+- Offer on the pin card (pill, name, two-line offer instead of walk and wait) and in a tinted box on the stand's page, with "Show this screen at the stand" and "Paid listing, not venue information".
+- Waiting banner: below Cancel in the page flow, so it never covers the request, notices or Cancel; only for a visitor whose request is searching (`waitingBannerFor`, tested), never on match, chat, feedback, volunteer or emergency screens. Tapping opens the stand (Back and the Volunteer tab return to the search, which keeps running); × hides it for that request. The walk is from the visitor's spot, else the main way in.
+- Stand `walkMinutes` equal the route from the venue's main way in (tested), so the list, the page and the banner agree.
+- No tap or impression counting (no DB tables, the mock server untouched). Next step if the pitch wants numbers: a small `sponsor_events` table (stand id, kind, time) with insert-only RLS.
