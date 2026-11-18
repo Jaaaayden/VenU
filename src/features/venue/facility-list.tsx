@@ -34,7 +34,7 @@ export function FacilityList() {
     if (snap === 'down') setSnap('mid');
     router.push({ pathname: '/venue/[venueId]/[facilityId]', params: { venueId: venue.id, facilityId: f.id } });
   };
-  const card = promoted ? <PromotedCard key={`promoted-${promoted.id}`} stand={promoted} onPress={() => open(promoted)} /> : null;
+  const card = promoted ? <PromotedCard key={`promoted-${promoted.id}`} stand={promoted} walk={walks.get(promoted.id)} onPress={() => open(promoted)} /> : null;
 
   // Back on the list = the user left the facility, so a just-submitted report is no longer "New".
   useEffect(() => { setFreshReport(null); }, [setFreshReport]);

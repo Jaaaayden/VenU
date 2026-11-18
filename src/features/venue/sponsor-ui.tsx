@@ -12,7 +12,7 @@ import { Colors, Face, Fonts, Radius, Shadow, Spacing } from '@/constants/theme'
 import { useLayoutRtl, useT } from '@/i18n';
 
 import { FacilityIcon } from './categories';
-import { facilityMeta, facilityName, facilityOffer } from './labels';
+import { facilityMeta, facilityName, facilityOffer, type FacilityWalk } from './labels';
 import type { SponsoredStand } from './sponsors';
 import type { Facility } from './types';
 import { venueText } from './ui';
@@ -84,13 +84,16 @@ export function SponsorOffer({ stand }: { stand: SponsoredStand }) {
   );
 }
 
-/** The facility list's promoted card: one per venue (see facilityListLayout). */
-export function PromotedCard({ stand, onPress }: { stand: SponsoredStand; onPress: () => void }) {
+/**
+ * The facility list's promoted card: one per venue (see facilityListLayout). `walk` is the same
+ * walk the list's rows show (walkTo: from the visitor's spot, else the way in).
+ */
+export function PromotedCard({ stand, walk, onPress }: { stand: SponsoredStand; walk: FacilityWalk | null | undefined; onPress: () => void }) {
   const t = useT('venue');
   const rtl = useLayoutRtl();
   const name = facilityName(stand, t);
   const offer = facilityOffer(stand, t);
-  const meta = facilityMeta(stand, t);
+  const meta = facilityMeta(stand, t, walk);
   return (
     <Pressable
       onPress={onPress}
