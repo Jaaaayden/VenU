@@ -35,7 +35,7 @@
     "question": "どんなサポートが必要ですか？",
     "notePlaceholder": "例：2番スロープの近くで動けません",
     "photoOff": "写真へのアクセスがオフです。設定でオンにしてください。",
-    "pickOne": "必要なサポートを1つ以上選んでください。",
+    "pickOne": "必要なサポートを選んでください。",
     "send": "リクエストを送信"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "メモを音声で入力",
     "placeholder": "テキストを入力",
     "attached": "添付した写真",
-    "remove": "写真を削除"
+    "remove": "写真を削除",
+    "count": "{{used}} / {{max}} 文字"
   },
   "emergency": {
     "title": "緊急ですか？",
@@ -133,7 +134,9 @@
     "stickers": "スタンプ",
     "stickersSoon": "スタンプは近日対応予定です。",
     "record": "音声でメッセージを入力",
-    "emptyVolunteer": "{{name}} さんにあいさつして、向かっていることを伝えましょう。"
+    "emptyVolunteer": "{{name}} さんにあいさつして、向かっていることを伝えましょう。",
+    "yourRequest": "あなたのリクエスト",
+    "requestFrom": "{{name}} さんからのリクエスト"
   },
   "translation": {
     "translatedFrom": "{{language}}から翻訳",

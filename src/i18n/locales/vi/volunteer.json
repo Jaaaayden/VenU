@@ -35,7 +35,7 @@
     "question": "Bạn cần giúp gì?",
     "notePlaceholder": "VD: Tôi bị kẹt gần dốc số 2",
     "photoOff": "Quyền truy cập ảnh đang tắt. Hãy bật trong Cài đặt.",
-    "pickOne": "Hãy chọn ít nhất một việc bạn cần giúp.",
+    "pickOne": "Hãy chọn việc bạn cần giúp.",
     "send": "Gửi yêu cầu"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "Nói ghi chú của bạn",
     "placeholder": "Nhập nội dung",
     "attached": "Ảnh đã đính kèm",
-    "remove": "Xóa ảnh"
+    "remove": "Xóa ảnh",
+    "count": "{{used}}/{{max}} ký tự"
   },
   "emergency": {
     "title": "Khẩn cấp?",
@@ -133,7 +134,9 @@
     "stickers": "Nhãn dán",
     "stickersSoon": "Nhãn dán sắp ra mắt.",
     "record": "Nói tin nhắn",
-    "emptyVolunteer": "Hãy chào {{name}} và cho họ biết bạn đang đến."
+    "emptyVolunteer": "Hãy chào {{name}} và cho họ biết bạn đang đến.",
+    "yourRequest": "Yêu cầu của bạn",
+    "requestFrom": "Yêu cầu của {{name}}"
   },
   "translation": {
     "translatedFrom": "Dịch từ {{language}}",
@@ -156,7 +159,7 @@
   },
   "bubble": {
     "mine": "Bạn, {{time}}: {{text}}",
-    "listen": "nghe",
+    "listen": "Nghe",
     "listenLabel": "Nghe tin nhắn này",
     "from": "{{name}}, {{time}}: {{text}}",
     "fromTranslated": "{{name}}, {{time}}: {{text}} (dịch từ {{language}})",

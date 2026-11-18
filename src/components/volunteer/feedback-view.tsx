@@ -1,6 +1,6 @@
 /** "Volunteer feedback report" (Figma 235:26589): stars, what went well, a note, Submit. */
-import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
@@ -89,6 +89,15 @@ function ReportProblem() {
   const [note, setNote] = useState('');
   const [state, setState] = useState<'editing' | 'sending' | 'sent'>('editing');
   const [error, setError] = useState<string | null>(null);
+  const panel = useRef<ComponentRef<typeof View>>(null);
+
+  // It opens at the bottom of the page, under the tab bar: bring it into view. On web a View is
+  // its DOM element; native keeps its place (the page scrolls by hand).
+  useEffect(() => {
+    if (!open || Platform.OS !== 'web') return;
+    const el = panel.current as unknown as { scrollIntoView?: (o: object) => void } | null;
+    el?.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
+  }, [open]);
 
   async function send() {
     if (!kind) return setError(t('report.pickKind'));
@@ -119,7 +128,7 @@ function ReportProblem() {
     );
   }
   return (
-    <View style={styles.report}>
+    <View ref={panel} style={styles.report}>
       <Text style={styles.reportTitle} accessibilityRole="header">{t('report.title')}</Text>
       <ChipGroup options={kindOptions} value={kind} onChange={k => { setKind(k); setError(null); }} accessibilityLabel={t('report.kindLabel')} />
       <TextField value={note} onChangeText={setNote} multiline placeholder={t('report.notePlaceholder')} accessibilityLabel={t('report.notePlaceholder')} maxLength={1000} />

@@ -35,7 +35,7 @@
     "question": "¿Con qué necesitas ayuda?",
     "notePlaceholder": "p. ej., Necesito ayuda en la rampa 2",
     "photoOff": "El acceso a fotos está desactivado. Actívalo en Ajustes.",
-    "pickOne": "Elige al menos una cosa con la que necesites ayuda.",
+    "pickOne": "Elige con qué necesitas ayuda.",
     "send": "Enviar solicitud"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "Dicta tu nota",
     "placeholder": "Escribe aquí",
     "attached": "Foto adjunta",
-    "remove": "Quitar foto"
+    "remove": "Quitar foto",
+    "count": "{{used}} de {{max}} caracteres"
   },
   "emergency": {
     "title": "¿Emergencia?",
@@ -135,7 +136,9 @@
     "stickers": "Stickers",
     "stickersSoon": "Los stickers llegarán pronto.",
     "record": "Dictar un mensaje",
-    "emptyVolunteer": "Saluda a {{name}} y dile que vas en camino."
+    "emptyVolunteer": "Saluda a {{name}} y dile que vas en camino.",
+    "yourRequest": "Tu solicitud",
+    "requestFrom": "Solicitud de {{name}}"
   },
   "translation": {
     "translatedFrom": "Traducido del {{language}}",
@@ -158,7 +161,7 @@
   },
   "bubble": {
     "mine": "Tú, {{time}}: {{text}}",
-    "listen": "escuchar",
+    "listen": "Escuchar",
     "listenLabel": "Escuchar este mensaje",
     "from": "{{name}}, {{time}}: {{text}}",
     "fromTranslated": "{{name}}, {{time}}: {{text}} (traducido del {{language}})",

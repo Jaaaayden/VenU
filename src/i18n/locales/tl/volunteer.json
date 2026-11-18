@@ -35,7 +35,7 @@
     "question": "Saan mo kailangan ng tulong?",
     "notePlaceholder": "hal. Naipit ako malapit sa ramp 2",
     "photoOff": "Naka-off ang access sa larawan. I-on ito sa Settings.",
-    "pickOne": "Pumili ng kahit isang bagay na kailangan mo ng tulong.",
+    "pickOne": "Piliin kung saan mo kailangan ng tulong.",
     "send": "Ipadala ang Request"
   },
   "where": {
@@ -52,7 +52,8 @@
     "speak": "Sabihin ang iyong note",
     "placeholder": "Mag-type dito",
     "attached": "Nakalakip na larawan",
-    "remove": "Alisin ang larawan"
+    "remove": "Alisin ang larawan",
+    "count": "{{used}} sa {{max}} na character"
   },
   "emergency": {
     "title": "May emerhensiya?",
@@ -134,7 +135,9 @@
     "stickers": "Mga sticker",
     "stickersSoon": "Malapit nang dumating ang stickers.",
     "record": "Magsalita ng mensahe",
-    "emptyVolunteer": "Batiin si {{name}} at sabihing papunta ka na."
+    "emptyVolunteer": "Batiin si {{name}} at sabihing papunta ka na.",
+    "yourRequest": "Ang iyong request",
+    "requestFrom": "Request ni {{name}}"
   },
   "translation": {
     "translatedFrom": "Isinalin mula sa {{language}}",
@@ -157,7 +160,7 @@
   },
   "bubble": {
     "mine": "Ikaw, {{time}}: {{text}}",
-    "listen": "pakinggan",
+    "listen": "Pakinggan",
     "listenLabel": "Pakinggan ang mensaheng ito",
     "from": "{{name}}, {{time}}: {{text}}",
     "fromTranslated": "{{name}}, {{time}}: {{text}} (isinalin mula sa {{language}})",

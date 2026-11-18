@@ -26,11 +26,9 @@ import { chosenHelpType, HelpRow } from './help-card';
 import { Hint, useHint } from './hint';
 import { LocationPicker } from './location-picker';
 import { NoteBanner } from './note-banner';
-import { NoteBox } from './note-box';
+import { NOTE_MAX, NoteBox } from './note-box';
 import { NoteToggle } from './note-toggle';
 
-/** NoteBox's maxLength; dictation can run past it, so it's cut here too. */
-const NOTE_MAX = 500;
 
 interface RequestFormProps {
   visitorName: string;

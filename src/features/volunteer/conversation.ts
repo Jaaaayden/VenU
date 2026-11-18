@@ -5,7 +5,7 @@ import { chatLanguage } from '@/features/translate/languages';
 
 import { useDeskRestored, useVolunteerDesk, volunteerDesk } from './desk-store';
 import { useVolunteerRequest, useVolunteerRestored, volunteerRequests } from './request-store';
-import type { ChatMessage, MeetPoint } from './types';
+import type { ChatMessage, HelpTypeId, MeetPoint } from './types';
 
 export interface Conversation {
   side: 'visitor' | 'volunteer';
@@ -19,6 +19,8 @@ export interface Conversation {
   etaMinutes: number | null;
   /** For the volunteer: where the visitor is waiting. */
   meetPoint: MeetPoint | null;
+  /** What the visitor asked for, shown at the top of the chat. `mine`: the visitor's own (not translated). */
+  request: { id: string; helpTypes: HelpTypeId[]; note: string; mine: boolean };
   send(text: string): void;
   /** Sends a message that failed ("Not sent · Tap to retry") again, by id. */
   retry(messageId: string): void;
@@ -49,6 +51,7 @@ export function useConversation(id: string | undefined): { conversation: Convers
         typing: visitor.typing,
         etaMinutes: match.etaMinutes,
         meetPoint: null,
+        request: { id: request.id, helpTypes: request.helpTypes, note: request.note, mine: true },
         send: volunteerRequests.sendMessage,
         retry: volunteerRequests.retryMessage,
         markRead: volunteerRequests.markRead,
@@ -68,6 +71,7 @@ export function useConversation(id: string | undefined): { conversation: Convers
         typing: false,
         etaMinutes: null,
         meetPoint: a.location,
+        request: { id: a.id, helpTypes: a.helpTypes, note: a.note, mine: false },
         send: volunteerDesk.sendMessage,
         retry: volunteerDesk.retryMessage,
         markRead: volunteerDesk.markRead,

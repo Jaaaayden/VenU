@@ -17,6 +17,7 @@ import { useT } from '@/i18n';
 import { HelpIcon } from './help-icon';
 import { MeetPlaceText } from './meet-place';
 import { MessageButton } from './message-button';
+import { RequestNote } from './request-note';
 
 export function ActiveRequest({ assignment: a, unread }: { assignment: Assignment; unread: number }) {
   const t = useT('volunteer');
@@ -55,7 +56,7 @@ export function ActiveRequest({ assignment: a, unread }: { assignment: Assignmen
           <Text style={Type.bodyStrong}>{help}</Text>
           <MeetPlaceText point={a.location} style={styles.line} />
           <Text style={styles.line}>{t('helpIn', { language: uiLanguageName(a.language, tp) })}</Text>
-          {a.note ? <Text style={styles.line}>{t('quoted', { text: a.note })}</Text> : null}
+          {a.note ? <RequestNote requestId={a.id} note={a.note} style={styles.line} /> : null}
         </View>
       </View>
 

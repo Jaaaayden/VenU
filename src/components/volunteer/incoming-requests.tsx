@@ -24,6 +24,7 @@ import { HelpIcon } from './help-icon';
 import { Hint, useHint } from './hint';
 import { MeetPlaceText } from './meet-place';
 import { DeskBanner } from './note-banner';
+import { RequestNote } from './request-note';
 
 /** `verified`: from the volunteer's profile; false keeps Accept off (the server refuses it too). */
 export function IncomingRequests({ verified = true }: { verified?: boolean }) {
@@ -126,7 +127,8 @@ function RequestCard({ request: r, children }: { request: IncomingRequest; child
               ? t('incoming.meta', { distance: formatDistance(r.distanceFeet, lng), minutes, language })
               : t('incoming.metaLive', { minutes, language })}
           </Text>
-          {r.note ? <Text style={styles.note}>{t('quoted', { text: r.note })}</Text> : null}
+          {/* In the volunteer's language, so they can read it before accepting. */}
+          {r.note ? <RequestNote requestId={r.id} note={r.note} style={styles.note} /> : null}
         </View>
       </View>
       {children}
