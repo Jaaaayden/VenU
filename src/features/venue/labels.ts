@@ -59,6 +59,13 @@ export function facilityLocation(f: Facility, t: VenueT = venueT()): string {
   return isKnown(id) ? t(`facilityText.${id}.location`) : f.location;
 }
 
+/** A sponsored stand's offer, translated like the description; '' for a facility without a sponsor. */
+export function facilityOffer(f: Facility, t: VenueT = venueT()): string {
+  if (!f.sponsor) return '';
+  const id = f.id;
+  return isKnown(id) && 'offer' in FACILITY_TEXT[id] ? t(`facilityText.${id}.offer` as never) : f.sponsor.offer;
+}
+
 /** Longest search text echoed back in an empty-results line before it's cut with "…". */
 export const ECHO_MAX = 40;
 

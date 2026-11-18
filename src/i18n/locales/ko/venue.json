@@ -105,6 +105,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, 휠체어 이용 가능"
   },
+  "sponsor": {
+    "label": "광고",
+    "pin": "광고: 지도의 {{name}}",
+    "row": "광고: {{name}}, {{meta}}",
+    "card": "광고: {{name}}. {{offer}}. {{meta}}",
+    "heading": "광고: {{name}}",
+    "showScreen": "매대에서 이 화면을 보여 주세요",
+    "disclosure": "유료 광고이며 경기장 안내가 아닙니다",
+    "banner": "광고: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "매대를 엽니다. 요청은 계속 검색됩니다.",
+    "hide": "광고 메시지 숨기기"
+  },
   "tags": {
     "label": "태그:",
     "accessible": "무장애",
@@ -128,6 +140,36 @@
     "changing_table": "기저귀 교환대"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Coca-Cola Refresh 매대",
+      "description": "차가운 Coca-Cola 음료, 생수, 간식.",
+      "location": "광장, 야외 코트 옆",
+      "offer": "VenU로 모든 Coca-Cola 음료 $1 할인"
+    },
+    "panda-express-intuit": {
+      "name": "Panda Express 매대",
+      "description": "오렌지 치킨, 차우멘, 라이스 볼.",
+      "location": "Main 레벨 콘코스, The Wall 입구 지나서",
+      "offer": "볼 주문 시 에그롤 무료"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Coca-Cola Refresh 매대",
+      "description": "차가운 Coca-Cola 음료, 생수, 간식.",
+      "location": "1층, 1번·2번 입구 안쪽",
+      "offer": "VenU로 모든 Coca-Cola 음료 $1 할인"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Ben & Jerry’s 아이스크림 매대",
+      "description": "컵·콘 아이스크림.",
+      "location": "American Airlines Plaza",
+      "offer": "모든 스쿱에 토핑 무료"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Coca-Cola Refresh 매대",
+      "description": "차가운 Coca-Cola 음료, 생수, 간식.",
+      "location": "메인 콘코스, Figueroa 쪽",
+      "offer": "VenU로 모든 Coca-Cola 음료 $1 할인"
+    },
     "entry-3": {
       "name": "3번 입구",
       "description": "북쪽 입구. 모든 입구에 무장애 통로가 있고 무료 휠체어 동행 서비스를 제공합니다.",

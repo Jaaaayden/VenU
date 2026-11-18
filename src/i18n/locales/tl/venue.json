@@ -106,6 +106,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, para sa may kapansanan"
   },
+  "sponsor": {
+    "label": "May sponsor",
+    "pin": "May sponsor: {{name}} sa mapa",
+    "row": "May sponsor: {{name}}, {{meta}}",
+    "card": "May sponsor: {{name}}. {{offer}}. {{meta}}",
+    "heading": "May sponsor: {{name}}",
+    "showScreen": "Ipakita ang screen na ito sa stand",
+    "disclosure": "Bayad na listing, hindi impormasyon ng venue",
+    "banner": "May sponsor: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Binubuksan ang stand. Patuloy ang paghahanap para sa request mo.",
+    "hide": "Itago ang mensaheng may sponsor"
+  },
   "tags": {
     "label": "Mga tag:",
     "accessible": "Para sa may kapansanan",
@@ -129,6 +141,36 @@
     "changing_table": "Palitan ng lampin"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Puwesto ng Coca-Cola Refresh",
+      "description": "Malamig na inuming Coca-Cola, de-boteng tubig at meryenda.",
+      "location": "Sa plaza, malapit sa outdoor court",
+      "offer": "$1 bawas sa anumang inuming Coca-Cola gamit ang VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Puwesto ng Panda Express",
+      "description": "Orange chicken, chow mein at rice bowl.",
+      "location": "Concourse ng Main Level, lampas sa Pasukan ng The Wall",
+      "offer": "Libreng egg roll sa bawat bowl"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Puwesto ng Coca-Cola Refresh",
+      "description": "Malamig na inuming Coca-Cola, de-boteng tubig at meryenda.",
+      "location": "Level 1, sa loob ng Pasukan 1 at 2",
+      "offer": "$1 bawas sa anumang inuming Coca-Cola gamit ang VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Puwesto ng ice cream ng Ben & Jerry’s",
+      "description": "Ice cream sa tasa at apa.",
+      "location": "American Airlines Plaza",
+      "offer": "Libreng topping sa bawat scoop"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Puwesto ng Coca-Cola Refresh",
+      "description": "Malamig na inuming Coca-Cola, de-boteng tubig at meryenda.",
+      "location": "Main Concourse, sa gilid ng Figueroa",
+      "offer": "$1 bawas sa anumang inuming Coca-Cola gamit ang VenU"
+    },
     "entry-3": {
       "name": "Pasukan 3",
       "description": "Hilagang pasukan. May accessible na daan at libreng wheelchair escort sa bawat pasukan.",

@@ -107,6 +107,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, accessible"
   },
+  "sponsor": {
+    "label": "Sponsorisé",
+    "pin": "Sponsorisé : {{name}} sur le plan",
+    "row": "Sponsorisé : {{name}}, {{meta}}",
+    "card": "Sponsorisé : {{name}}. {{offer}}. {{meta}}",
+    "heading": "Sponsorisé : {{name}}",
+    "showScreen": "Montrez cet écran au stand",
+    "disclosure": "Annonce payante, pas une information du site",
+    "banner": "Sponsorisé : {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Ouvre le stand. Votre demande reste en cours.",
+    "hide": "Masquer le message sponsorisé"
+  },
   "tags": {
     "label": "Étiquettes :",
     "accessible": "Accessible",
@@ -130,6 +142,36 @@
     "changing_table": "Table à langer"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Stand Coca-Cola Refresh",
+      "description": "Boissons Coca-Cola fraîches, eau en bouteille et en-cas.",
+      "location": "Sur la place, près du terrain extérieur",
+      "offer": "1 $ de réduction sur toute boisson Coca-Cola avec VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Stand Panda Express",
+      "description": "Poulet à l’orange, chow mein et bols de riz.",
+      "location": "Coursive du niveau Main, après l’entrée The Wall",
+      "offer": "Rouleau impérial offert avec tout bol"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Stand Coca-Cola Refresh",
+      "description": "Boissons Coca-Cola fraîches, eau en bouteille et en-cas.",
+      "location": "Niveau 1, après les entrées 1 et 2",
+      "offer": "1 $ de réduction sur toute boisson Coca-Cola avec VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Stand de glaces Ben & Jerry’s",
+      "description": "Glaces en pot et en cornet.",
+      "location": "American Airlines Plaza",
+      "offer": "Garniture offerte sur toute boule"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Stand Coca-Cola Refresh",
+      "description": "Boissons Coca-Cola fraîches, eau en bouteille et en-cas.",
+      "location": "Coursive principale, côté Figueroa",
+      "offer": "1 $ de réduction sur toute boisson Coca-Cola avec VenU"
+    },
     "entry-3": {
       "name": "Entrée 3",
       "description": "Entrée nord. Chaque entrée a un accès adapté et un accompagnement gratuit en fauteuil roulant.",
