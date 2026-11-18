@@ -1,6 +1,8 @@
 /**
  * Sheet content: one facility (name, distance and wait, tags, Directions, I'm here) and its reports.
  * Directions is the venue's one way to a facility: it draws the route on the map and shows the walk here.
+ * A sponsored stand adds its offer (labelled "Sponsored") and has no "I'm here": an ad is never a
+ * meeting spot for a volunteer.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, type ComponentRef } from 'react';
@@ -18,6 +20,8 @@ import { setCurrentSpot, setCurrentVenue, useWhereAmI } from './current';
 import { DirectionsPanel } from './directions-panel';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, tagLabel } from './labels';
 import { useFacilityReports } from './reports';
+import { SponsorOffer } from './sponsor-ui';
+import { isSponsored } from './sponsors';
 import { SheetScroll, useVenueScreen } from './venue-map-screen';
 import { BackArrow, TagRow, venueText } from './ui';
 
@@ -70,6 +74,7 @@ export function FacilityDetail() {
   const location = facilityLocation(facility, t);
   const name = facilityName(facility, t);
   const isMySpot = where.venueId === venue.id && where.facilityId === facility.id;
+  const sponsored = isSponsored(facility);
 
   const addReport = () => {
     setSnap('up');
@@ -92,13 +97,15 @@ export function FacilityDetail() {
         </View>
 
         <View style={styles.heading}>
-          <Text style={venueText.title} accessibilityRole="header">{name}</Text>
+          <Text style={venueText.title} accessibilityRole="header" accessibilityLabel={sponsored ? t('sponsor.heading', { name }) : undefined}>{name}</Text>
           <Text style={venueText.caption}>{facilityDescription(facility, t)}</Text>
           <View style={styles.meta}>
             <FigmaIcon name="clock" size={16} color={Colors.textMuted} />
             <Text style={styles.metaText}>{`${facilityMeta(facility, t)} · ${location}`}</Text>
           </View>
         </View>
+
+        {sponsored ? <SponsorOffer stand={facility} /> : null}
 
         {/* Up top, so it shows above the fold while the map shows the route. */}
         {route ? (
@@ -124,14 +131,14 @@ export function FacilityDetail() {
             style={styles.directionsButton}
           />
           {/* Sets the spot the help request uses ("Near Entry 4"); shows a check once it's yours. */}
-          <Button
+          {sponsored ? null : <Button
             label={isMySpot ? t('facility.isHere') : t('facility.imHere')}
             variant="outline"
             icon={<FigmaIcon name={isMySpot ? 'check-circle' : 'location-on'} size={22} color={Colors.primary} />}
             onPress={() => { setCurrentVenue(venue.id); setCurrentSpot(facility.id); }}
             accessibilityHint={isMySpot ? undefined : t('facility.imHereHint')}
             style={styles.directionsButton}
-          />
+          />}
         </View>
 
         <View style={styles.reportsHead}>

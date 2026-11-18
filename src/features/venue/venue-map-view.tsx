@@ -21,6 +21,7 @@ import { FacilityIcon } from './categories';
 import { startMarker, type Route } from './directions';
 import { facilityName } from './labels';
 import { clampView, contentSize, mapUpdate, zoomAt, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
+import { SPONSOR_ACCENT, SPONSOR_SOFT, SponsoredIcon } from './sponsor-ui';
 import { VenueDrawing } from './stadium-map';
 import type { Facility } from './types';
 import { mapAspect, type VenueMap } from './venue-maps';
@@ -296,17 +297,23 @@ function Pin({ facility, left, top, counterScale, big, tinted, hidden, onPress }
   const t = useT('venue');
   if (hidden) return null;
   const size = big ? PIN_BIG : PIN;
-  const fill = big ? Colors.inkDeep : tinted ? Colors.primary : Colors.surface;
+  const filled = big || tinted;
+  // A sponsored stand: the Sponsored glyph in the sponsor accent, so it never reads as a venue facility.
+  const sponsored = !!facility.sponsor;
+  const fill = sponsored ? (filled ? SPONSOR_ACCENT : SPONSOR_SOFT) : big ? Colors.inkDeep : tinted ? Colors.primary : Colors.surface;
+  const name = facilityName(facility, t);
   return (
     <Animated.View style={[styles.pinBox, { left: left - HIT / 2, top: top - HIT / 2 }, big && styles.onTop, counterScale]}>
       <Pressable
         onPress={() => onPress(facility)}
         style={styles.hit}
         accessibilityRole="button"
-        accessibilityLabel={t('map.pin', { name: facilityName(facility, t) })}
+        accessibilityLabel={sponsored ? t('sponsor.pin', { name }) : t('map.pin', { name })}
         accessibilityState={{ selected: big }}>
-        <View style={[styles.pin, { width: size, height: size, borderRadius: size / 2, backgroundColor: fill }, (big || tinted) && styles.pinFilled, big && styles.pinBig]}>
-          <FacilityIcon category={facility.category} size={big ? 22 : 17} color={big || tinted ? Colors.onPrimary : Colors.ink} background={fill} />
+        <View style={[styles.pin, { width: size, height: size, borderRadius: size / 2, backgroundColor: fill }, filled && styles.pinFilled, sponsored && !filled && styles.pinSponsored, big && styles.pinBig]}>
+          {sponsored
+            ? <SponsoredIcon size={big ? 24 : 19} color={filled ? Colors.onPrimary : SPONSOR_ACCENT} background={fill} />
+            : <FacilityIcon category={facility.category} size={big ? 22 : 17} color={filled ? Colors.onPrimary : Colors.ink} background={fill} />}
         </View>
       </Pressable>
     </Animated.View>
@@ -371,6 +378,7 @@ const styles = StyleSheet.create({
   onTop: { zIndex: 2 },
   pin: { alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: Colors.ink, ...Shadow.card },
   pinFilled: { borderColor: Colors.surface, borderWidth: 2 },
+  pinSponsored: { borderColor: SPONSOR_ACCENT, borderWidth: 2 },
   pinBig: { borderWidth: 3 },
   youHalo: { position: 'absolute', width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.primary, opacity: 0.22 },
   youDot: { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.primary, borderWidth: 3, borderColor: Colors.surface, ...Shadow.card },

@@ -105,6 +105,18 @@
     "label": "{{name}}、{{meta}}",
     "labelAccessible": "{{name}}、{{meta}}、バリアフリー"
   },
+  "sponsor": {
+    "label": "広告",
+    "pin": "広告：地図上の{{name}}",
+    "row": "広告：{{name}}、{{meta}}",
+    "card": "広告：{{name}}。{{offer}}。{{meta}}",
+    "heading": "広告：{{name}}",
+    "showScreen": "売店でこの画面を見せてください",
+    "disclosure": "有料掲載です。会場の案内ではありません",
+    "banner": "広告：{{name}}、{{walk}}。{{offer}}",
+    "bannerHint": "売店を開きます。リクエストの検索は続きます。",
+    "hide": "広告メッセージを非表示"
+  },
   "tags": {
     "label": "タグ：",
     "accessible": "バリアフリー",
@@ -128,6 +140,36 @@
     "changing_table": "おむつ交換台"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Coca-Cola Refresh スタンド",
+      "description": "冷たい Coca-Cola のドリンク、ボトル入りの水、軽食。",
+      "location": "プラザ内、屋外コートのそば",
+      "offer": "VenU で Coca-Cola のドリンクが全品 $1 引き"
+    },
+    "panda-express-intuit": {
+      "name": "Panda Express スタンド",
+      "description": "オレンジチキン、チャーメン、ライスボウル。",
+      "location": "Main 階コンコース、The Wall 入口の先",
+      "offer": "ボウルご注文でエッグロール1本無料"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Coca-Cola Refresh スタンド",
+      "description": "冷たい Coca-Cola のドリンク、ボトル入りの水、軽食。",
+      "location": "1階、1番・2番入口の内側",
+      "offer": "VenU で Coca-Cola のドリンクが全品 $1 引き"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Ben & Jerry’s アイスクリームスタンド",
+      "description": "カップとコーンのアイスクリーム。",
+      "location": "American Airlines Plaza",
+      "offer": "どのスクープもトッピング1つ無料"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Coca-Cola Refresh スタンド",
+      "description": "冷たい Coca-Cola のドリンク、ボトル入りの水、軽食。",
+      "location": "メインコンコース、Figueroa 側",
+      "offer": "VenU で Coca-Cola のドリンクが全品 $1 引き"
+    },
     "entry-3": {
       "name": "3番入口",
       "description": "北側の入口。すべての入口にバリアフリーの通路があり、無料の車いす介助を受けられます。",

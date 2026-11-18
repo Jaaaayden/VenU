@@ -107,6 +107,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, accesible"
   },
+  "sponsor": {
+    "label": "Patrocinado",
+    "pin": "Patrocinado: {{name}} en el mapa",
+    "row": "Patrocinado: {{name}}, {{meta}}",
+    "card": "Patrocinado: {{name}}. {{offer}}. {{meta}}",
+    "heading": "Patrocinado: {{name}}",
+    "showScreen": "Muestra esta pantalla en el puesto",
+    "disclosure": "Anuncio pagado, no es información del recinto",
+    "banner": "Patrocinado: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Abre el puesto. Tu solicitud sigue buscando.",
+    "hide": "Ocultar mensaje patrocinado"
+  },
   "tags": {
     "label": "Etiquetas:",
     "accessible": "Accesible",
@@ -130,6 +142,36 @@
     "changing_table": "Cambiador"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Puesto Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola frías, agua embotellada y refrigerios.",
+      "location": "En la plaza, junto a la cancha exterior",
+      "offer": "$1 de descuento en cualquier bebida Coca-Cola con VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Puesto Panda Express",
+      "description": "Pollo a la naranja, chow mein y tazones de arroz.",
+      "location": "Explanada del nivel Main, pasando la Entrada de The Wall",
+      "offer": "Rollito primavera gratis con cualquier tazón"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Puesto Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola frías, agua embotellada y refrigerios.",
+      "location": "Nivel 1, pasando las Entradas 1 y 2",
+      "offer": "$1 de descuento en cualquier bebida Coca-Cola con VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Puesto de helados Ben & Jerry’s",
+      "description": "Helado en vaso y en cono.",
+      "location": "American Airlines Plaza",
+      "offer": "Cobertura gratis en cualquier bola de helado"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Puesto Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola frías, agua embotellada y refrigerios.",
+      "location": "Explanada principal, lado de Figueroa",
+      "offer": "$1 de descuento en cualquier bebida Coca-Cola con VenU"
+    },
     "entry-3": {
       "name": "Entrada 3",
       "description": "Entrada norte. Todas las entradas tienen un camino accesible y acompañamiento gratuito en silla de ruedas.",

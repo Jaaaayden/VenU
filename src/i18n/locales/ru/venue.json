@@ -108,6 +108,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, доступно"
   },
+  "sponsor": {
+    "label": "Реклама",
+    "pin": "Реклама: {{name}} на карте",
+    "row": "Реклама: {{name}}, {{meta}}",
+    "card": "Реклама: {{name}}. {{offer}}. {{meta}}",
+    "heading": "Реклама: {{name}}",
+    "showScreen": "Покажите этот экран на стойке",
+    "disclosure": "Платное размещение, не информация площадки",
+    "banner": "Реклама: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Открывает стойку. Поиск по вашему запросу продолжается.",
+    "hide": "Скрыть рекламу"
+  },
   "tags": {
     "label": "Метки:",
     "accessible": "Доступно",
@@ -131,6 +143,36 @@
     "changing_table": "Пеленальный столик"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Стойка Coca-Cola Refresh",
+      "description": "Холодные напитки Coca-Cola, вода в бутылках и снеки.",
+      "location": "На площади, у уличной площадки",
+      "offer": "Скидка $1 на любой напиток Coca-Cola с VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Стойка Panda Express",
+      "description": "Курица в апельсиновом соусе, чау-мейн и боулы с рисом.",
+      "location": "Вестибюль уровня Main, за входом The Wall",
+      "offer": "Яичный ролл в подарок к любому боулу"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Стойка Coca-Cola Refresh",
+      "description": "Холодные напитки Coca-Cola, вода в бутылках и снеки.",
+      "location": "Уровень 1, за входами 1 и 2",
+      "offer": "Скидка $1 на любой напиток Coca-Cola с VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Стойка мороженого Ben & Jerry’s",
+      "description": "Мороженое в стаканчиках и рожках.",
+      "location": "American Airlines Plaza",
+      "offer": "Бесплатный топпинг к любому шарику"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Стойка Coca-Cola Refresh",
+      "description": "Холодные напитки Coca-Cola, вода в бутылках и снеки.",
+      "location": "Главный вестибюль, со стороны Figueroa",
+      "offer": "Скидка $1 на любой напиток Coca-Cola с VenU"
+    },
     "entry-3": {
       "name": "Вход 3",
       "description": "Северный вход. У каждого входа есть доступный путь и бесплатное сопровождение на коляске.",

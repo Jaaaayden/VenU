@@ -106,6 +106,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, accessible"
   },
+  "sponsor": {
+    "label": "Sponsored",
+    "pin": "Sponsored: {{name}} on the map",
+    "row": "Sponsored: {{name}}, {{meta}}",
+    "card": "Sponsored: {{name}}. {{offer}}. {{meta}}",
+    "heading": "Sponsored: {{name}}",
+    "showScreen": "Show this screen at the stand",
+    "disclosure": "Paid listing, not venue information",
+    "banner": "Sponsored: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Opens the stand. Your request keeps searching.",
+    "hide": "Hide sponsored message"
+  },
   "tags": {
     "label": "Tags:",
     "accessible": "Accessible",
@@ -129,6 +141,36 @@
     "changing_table": "Changing table"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Coca-Cola Refresh Stand",
+      "description": "Cold Coca-Cola drinks, bottled water and snacks.",
+      "location": "On the plaza, by the outdoor court",
+      "offer": "$1 off any Coca-Cola drink with VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Panda Express Stand",
+      "description": "Orange chicken, chow mein and rice bowls.",
+      "location": "Main Level concourse, past The Wall Entrance",
+      "offer": "Free egg roll with any bowl"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Coca-Cola Refresh Stand",
+      "description": "Cold Coca-Cola drinks, bottled water and snacks.",
+      "location": "Level 1, inside Entries 1 and 2",
+      "offer": "$1 off any Coca-Cola drink with VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Ben & Jerry’s Scoop Stand",
+      "description": "Ice cream cups and cones.",
+      "location": "American Airlines Plaza",
+      "offer": "Free topping on any scoop"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Coca-Cola Refresh Stand",
+      "description": "Cold Coca-Cola drinks, bottled water and snacks.",
+      "location": "Main Concourse, Figueroa side",
+      "offer": "$1 off any Coca-Cola drink with VenU"
+    },
     "entry-3": {
       "name": "Entry 3",
       "description": "North entrance. Every entry has an accessible path and free wheelchair escorts.",

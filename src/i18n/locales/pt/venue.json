@@ -107,6 +107,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, acessível"
   },
+  "sponsor": {
+    "label": "Patrocinado",
+    "pin": "Patrocinado: {{name}} no mapa",
+    "row": "Patrocinado: {{name}}, {{meta}}",
+    "card": "Patrocinado: {{name}}. {{offer}}. {{meta}}",
+    "heading": "Patrocinado: {{name}}",
+    "showScreen": "Mostre esta tela no quiosque",
+    "disclosure": "Anúncio pago, não é informação do local",
+    "banner": "Patrocinado: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Abre o quiosque. Seu pedido continua na busca.",
+    "hide": "Ocultar mensagem patrocinada"
+  },
   "tags": {
     "label": "Etiquetas:",
     "accessible": "Acessível",
@@ -130,6 +142,36 @@
     "changing_table": "Trocador"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Quiosque Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola geladas, água e lanches.",
+      "location": "Na praça, perto da quadra externa",
+      "offer": "US$ 1 de desconto em qualquer bebida Coca-Cola com o VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Quiosque Panda Express",
+      "description": "Frango com laranja, chow mein e tigelas de arroz.",
+      "location": "Corredor do nível Main, depois da Entrada The Wall",
+      "offer": "Rolinho primavera grátis com qualquer tigela"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Quiosque Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola geladas, água e lanches.",
+      "location": "Nível 1, depois das Entradas 1 e 2",
+      "offer": "US$ 1 de desconto em qualquer bebida Coca-Cola com o VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Quiosque de sorvete Ben & Jerry’s",
+      "description": "Sorvete no copinho ou na casquinha.",
+      "location": "American Airlines Plaza",
+      "offer": "Cobertura grátis em qualquer bola"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Quiosque Coca-Cola Refresh",
+      "description": "Bebidas Coca-Cola geladas, água e lanches.",
+      "location": "Corredor principal, lado da Figueroa",
+      "offer": "US$ 1 de desconto em qualquer bebida Coca-Cola com o VenU"
+    },
     "entry-3": {
       "name": "Entrada 3",
       "description": "Entrada norte. Todas as entradas têm caminho acessível e acompanhamento gratuito em cadeira de rodas.",

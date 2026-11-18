@@ -105,6 +105,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, hỗ trợ tiếp cận"
   },
+  "sponsor": {
+    "label": "Được tài trợ",
+    "pin": "Được tài trợ: {{name}} trên bản đồ",
+    "row": "Được tài trợ: {{name}}, {{meta}}",
+    "card": "Được tài trợ: {{name}}. {{offer}}. {{meta}}",
+    "heading": "Được tài trợ: {{name}}",
+    "showScreen": "Đưa màn hình này tại quầy",
+    "disclosure": "Tin trả phí, không phải thông tin của địa điểm",
+    "banner": "Được tài trợ: {{name}}, {{walk}}. {{offer}}",
+    "bannerHint": "Mở quầy. Yêu cầu của bạn vẫn đang được tìm.",
+    "hide": "Ẩn tin được tài trợ"
+  },
   "tags": {
     "label": "Nhãn:",
     "accessible": "Hỗ trợ tiếp cận",
@@ -128,6 +140,36 @@
     "changing_table": "Bàn thay tã"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Quầy Coca-Cola Refresh",
+      "description": "Đồ uống Coca-Cola lạnh, nước đóng chai và đồ ăn vặt.",
+      "location": "Trên quảng trường, cạnh sân ngoài trời",
+      "offer": "Giảm $1 cho mọi đồ uống Coca-Cola với VenU"
+    },
+    "panda-express-intuit": {
+      "name": "Quầy Panda Express",
+      "description": "Gà sốt cam, mì xào và cơm tô.",
+      "location": "Hành lang tầng Main, qua Lối vào The Wall",
+      "offer": "Tặng chả giò khi mua tô bất kỳ"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Quầy Coca-Cola Refresh",
+      "description": "Đồ uống Coca-Cola lạnh, nước đóng chai và đồ ăn vặt.",
+      "location": "Tầng 1, bên trong Lối vào 1 và 2",
+      "offer": "Giảm $1 cho mọi đồ uống Coca-Cola với VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Quầy kem Ben & Jerry’s",
+      "description": "Kem ly và kem ốc quế.",
+      "location": "American Airlines Plaza",
+      "offer": "Miễn phí topping cho mọi viên kem"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Quầy Coca-Cola Refresh",
+      "description": "Đồ uống Coca-Cola lạnh, nước đóng chai và đồ ăn vặt.",
+      "location": "Hành lang chính, phía Figueroa",
+      "offer": "Giảm $1 cho mọi đồ uống Coca-Cola với VenU"
+    },
     "entry-3": {
       "name": "Lối vào 3",
       "description": "Lối vào phía bắc. Mọi lối vào đều có lối đi hỗ trợ tiếp cận và người hỗ trợ xe lăn miễn phí.",

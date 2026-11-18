@@ -106,6 +106,18 @@
     "label": "{{name}}, {{meta}}",
     "labelAccessible": "{{name}}, {{meta}}, մատչելի"
   },
+  "sponsor": {
+    "label": "Գովազդ",
+    "pin": "Գովազդ՝ {{name}}-ը քարտեզի վրա",
+    "row": "Գովազդ՝ {{name}}, {{meta}}",
+    "card": "Գովազդ՝ {{name}}։ {{offer}}։ {{meta}}",
+    "heading": "Գովազդ՝ {{name}}",
+    "showScreen": "Ցույց տվեք այս էկրանը կրպակում",
+    "disclosure": "Վճարովի տեղադրում, ոչ թե վայրի տեղեկություն",
+    "banner": "Գովազդ՝ {{name}}, {{walk}}։ {{offer}}",
+    "bannerHint": "Բացում է կրպակը։ Ձեր հարցման որոնումը շարունակվում է։",
+    "hide": "Թաքցնել գովազդային հաղորդագրությունը"
+  },
   "tags": {
     "label": "Պիտակներ՝",
     "accessible": "Մատչելի",
@@ -129,6 +141,36 @@
     "changing_table": "Փաթաթելու սեղան"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Coca-Cola Refresh կրպակ",
+      "description": "Սառը Coca-Cola ըմպելիքներ, շշալցված ջուր և խորտիկներ։",
+      "location": "Հրապարակում, բացօթյա խաղադաշտի մոտ",
+      "offer": "$1 զեղչ ցանկացած Coca-Cola ըմպելիքի համար VenU-ով"
+    },
+    "panda-express-intuit": {
+      "name": "Panda Express կրպակ",
+      "description": "Նարնջով հավ, չաու մեյն և բրնձով ամաններ։",
+      "location": "Main հարկի միջանցք, The Wall մուտքից հետո",
+      "offer": "Անվճար ձվով ռոլ ցանկացած ամանի հետ"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Coca-Cola Refresh կրպակ",
+      "description": "Սառը Coca-Cola ըմպելիքներ, շշալցված ջուր և խորտիկներ։",
+      "location": "1-ին հարկ, 1-ին և 2-րդ մուտքերից ներս",
+      "offer": "$1 զեղչ ցանկացած Coca-Cola ըմպելիքի համար VenU-ով"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Ben & Jerry’s պաղպաղակի կրպակ",
+      "description": "Պաղպաղակ բաժակով և կոնով։",
+      "location": "American Airlines Plaza",
+      "offer": "Անվճար հավելում ցանկացած գնդիկի վրա"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Coca-Cola Refresh կրպակ",
+      "description": "Սառը Coca-Cola ըմպելիքներ, շշալցված ջուր և խորտիկներ։",
+      "location": "Գլխավոր միջանցք, Figueroa-ի կողմում",
+      "offer": "$1 զեղչ ցանկացած Coca-Cola ըմպելիքի համար VenU-ով"
+    },
     "entry-3": {
       "name": "Մուտք 3",
       "description": "Հյուսիսային մուտք։ Յուրաքանչյուր մուտք ունի մատչելի ճանապարհ և անվճար ուղեկցում սայլակով։",

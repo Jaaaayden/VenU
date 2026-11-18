@@ -21,9 +21,9 @@ import { CategoryChips } from './category-chips';
 import { useWhereAmI } from './current';
 import { routeFor, type Route } from './directions';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
-import { facilitiesFor } from './mock';
 import { PinCard } from './pin-card';
 import { snapPositions, type SheetSnap } from './sheet';
+import { venueFacilitiesFor } from './sponsors';
 import { MAP_BACKGROUND, SHEET_HANDLE } from './stadium-map';
 import type { Facility, FacilityCategory, Venue } from './types';
 import { BackArrow, venueText } from './ui';
@@ -93,7 +93,8 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
   const t = useT('venue');
   const insets = useSafeAreaInsets();
   const { facilityId } = useGlobalSearchParams<{ facilityId?: string }>();
-  const facilities = useMemo(() => facilitiesFor(venue.id), [venue.id]);
+  // The venue's facilities and its sponsored stands (./sponsors.ts).
+  const facilities = useMemo(() => venueFacilitiesFor(venue.id), [venue.id]);
   const map = venueMapFor(venue); // the same object per venue
   const [category, setCategory] = useState<FacilityCategory | null>(null);
   // Start low, so most of the map shows; the map fits its view into the part the sheet leaves.

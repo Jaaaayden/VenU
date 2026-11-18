@@ -54,6 +54,17 @@ export interface FacilityTag {
 
 export type WaitLevel = 'none' | 'short' | 'long';
 
+/**
+ * A paid placement on a stand (./sponsors.ts): always shown labelled "Sponsored", with VenU's own
+ * Sponsored icon and theme colours, never the brand's logo or colours.
+ */
+export interface FacilitySponsor {
+  /** The brand as plain text, e.g. "Coca-Cola". A proper name, so never translated. */
+  brand: string;
+  /** English; screens show venue:facilityText.<id>.offer, e.g. "$1 off any Coca-Cola drink with VenU". */
+  offer: string;
+}
+
 export interface Facility {
   /** Unique within its venue; used in the URL (/venue/sofi/entry-4). */
   id: string;
@@ -74,4 +85,6 @@ export interface Facility {
   y: number;
   /** A photo of the spot, hotlinked from the venue's site; the pin card shows the category icon without one. */
   photo?: string;
+  /** Set on sponsored stands only: they get the Sponsored pin, an offer and the promoted list card. */
+  sponsor?: FacilitySponsor;
 }

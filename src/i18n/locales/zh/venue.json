@@ -105,6 +105,18 @@
     "label": "{{name}}，{{meta}}",
     "labelAccessible": "{{name}}，{{meta}}，无障碍"
   },
+  "sponsor": {
+    "label": "广告",
+    "pin": "广告：地图上的{{name}}",
+    "row": "广告：{{name}}，{{meta}}",
+    "card": "广告：{{name}}。{{offer}}。{{meta}}",
+    "heading": "广告：{{name}}",
+    "showScreen": "请在摊位出示此屏幕",
+    "disclosure": "付费推广，非场馆信息",
+    "banner": "广告：{{name}}，{{walk}}。{{offer}}",
+    "bannerHint": "打开该摊位。你的请求仍在继续匹配。",
+    "hide": "隐藏广告消息"
+  },
   "tags": {
     "label": "标签：",
     "accessible": "无障碍",
@@ -128,6 +140,36 @@
     "changing_table": "尿布台"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "Coca-Cola Refresh 摊位",
+      "description": "冰镇 Coca-Cola 饮料、瓶装水和零食。",
+      "location": "广场上，户外球场旁",
+      "offer": "使用 VenU 购买任意 Coca-Cola 饮料立减 $1"
+    },
+    "panda-express-intuit": {
+      "name": "Panda Express 摊位",
+      "description": "陈皮鸡、炒面和米饭碗。",
+      "location": "Main 层大厅，过了 The Wall 入口",
+      "offer": "点任意米饭碗送一个春卷"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "Coca-Cola Refresh 摊位",
+      "description": "冰镇 Coca-Cola 饮料、瓶装水和零食。",
+      "location": "1 层，1 号和 2 号入口内",
+      "offer": "使用 VenU 购买任意 Coca-Cola 饮料立减 $1"
+    },
+    "ben-jerrys-sofi": {
+      "name": "Ben & Jerry’s 冰淇淋摊位",
+      "description": "杯装和甜筒冰淇淋。",
+      "location": "American Airlines Plaza",
+      "offer": "任意一球冰淇淋免费加一份配料"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "Coca-Cola Refresh 摊位",
+      "description": "冰镇 Coca-Cola 饮料、瓶装水和零食。",
+      "location": "主大厅，Figueroa 一侧",
+      "offer": "使用 VenU 购买任意 Coca-Cola 饮料立减 $1"
+    },
     "entry-3": {
       "name": "3 号入口",
       "description": "北入口。每个入口都有无障碍通道，并提供免费轮椅陪同服务。",

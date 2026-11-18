@@ -106,6 +106,18 @@
     "label": "{{name}}، {{meta}}",
     "labelAccessible": "{{name}}، {{meta}}، دسترس‌پذیر"
   },
+  "sponsor": {
+    "label": "تبلیغ",
+    "pin": "تبلیغ: {{name}} روی نقشه",
+    "row": "تبلیغ: {{name}}، {{meta}}",
+    "card": "تبلیغ: {{name}}. {{offer}}. {{meta}}",
+    "heading": "تبلیغ: {{name}}",
+    "showScreen": "این صفحه را در غرفه نشان دهید",
+    "disclosure": "آگهی پولی، نه اطلاعات محل برگزاری",
+    "banner": "تبلیغ: {{name}}، {{walk}}. {{offer}}",
+    "bannerHint": "غرفه را باز می‌کند. جستجو برای درخواست شما ادامه دارد.",
+    "hide": "پنهان کردن پیام تبلیغاتی"
+  },
   "tags": {
     "label": "برچسب‌ها:",
     "accessible": "دسترس‌پذیر",
@@ -129,6 +141,36 @@
     "changing_table": "میز تعویض پوشک"
   },
   "facilityText": {
+    "coca-cola-refresh-intuit": {
+      "name": "غرفه Coca-Cola Refresh",
+      "description": "نوشیدنی‌های سرد Coca-Cola، آب بطری و تنقلات.",
+      "location": "در میدان، کنار زمین روباز",
+      "offer": "۱ دلار تخفیف برای هر نوشیدنی Coca-Cola با VenU"
+    },
+    "panda-express-intuit": {
+      "name": "غرفه Panda Express",
+      "description": "مرغ پرتقالی، چاو مین و کاسه‌های برنج.",
+      "location": "سالن طبقه Main، بعد از ورودی The Wall",
+      "offer": "یک اگ‌رول رایگان با هر کاسه"
+    },
+    "coca-cola-refresh-sofi": {
+      "name": "غرفه Coca-Cola Refresh",
+      "description": "نوشیدنی‌های سرد Coca-Cola، آب بطری و تنقلات.",
+      "location": "طبقه ۱، بعد از ورودی‌های ۱ و ۲",
+      "offer": "۱ دلار تخفیف برای هر نوشیدنی Coca-Cola با VenU"
+    },
+    "ben-jerrys-sofi": {
+      "name": "غرفه بستنی Ben & Jerry’s",
+      "description": "بستنی لیوانی و قیفی.",
+      "location": "American Airlines Plaza",
+      "offer": "تاپینگ رایگان روی هر اسکوپ"
+    },
+    "coca-cola-refresh-crypto": {
+      "name": "غرفه Coca-Cola Refresh",
+      "description": "نوشیدنی‌های سرد Coca-Cola، آب بطری و تنقلات.",
+      "location": "سالن اصلی، سمت Figueroa",
+      "offer": "۱ دلار تخفیف برای هر نوشیدنی Coca-Cola با VenU"
+    },
     "entry-3": {
       "name": "ورودی ۳",
       "description": "ورودی شمالی. همه ورودی‌ها مسیر دسترس‌پذیر و همراهی رایگان با ویلچر دارند.",

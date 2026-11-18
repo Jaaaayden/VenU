@@ -6,10 +6,10 @@ import { Colors, Face, Fonts, Radius, Shadow, Spacing } from '@/constants/theme'
 import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 
-import { FacilityIcon } from './categories';
 import { eventsLabel, facilityMeta, facilityName } from './labels';
 import { reportAuthor, type FacilityReport } from './reports';
 import { useReportTranslation } from './report-translation';
+import { SponsoredTag, StandIcon } from './sponsor-ui';
 import { MAP_BACKGROUND, VenueDrawing } from './stadium-map';
 import type { Facility, Venue } from './types';
 import { inset, venueText } from './ui';
@@ -35,7 +35,10 @@ export function StadiumCard({ venue, onPress }: { venue: Venue; onPress: () => v
   );
 }
 
-/** White row: category icon, name, distance and wait, chevron (pointing left in RTL). */
+/**
+ * White row: category icon, name, distance and wait, chevron (pointing left in RTL). A sponsored
+ * stand gets the Sponsored glyph and pill, and "Sponsored" first in its screen-reader label.
+ */
 export function FacilityRow({ facility, onPress }: { facility: Facility; onPress: () => void }) {
   const t = useT('venue');
   const rtl = useLayoutRtl();
@@ -45,12 +48,13 @@ export function FacilityRow({ facility, onPress }: { facility: Facility; onPress
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name, meta })}
+      accessibilityLabel={facility.sponsor ? t('sponsor.row', { name, meta }) : t(facility.accessible ? 'row.labelAccessible' : 'row.label', { name, meta })}
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <View style={styles.rowIcon}>
-        <FacilityIcon category={facility.category} size={30} />
+        <StandIcon facility={facility} size={30} />
       </View>
       <View style={styles.rowText}>
+        {facility.sponsor ? <SponsoredTag /> : null}
         <Text style={styles.rowTitle} numberOfLines={2}>{name}</Text>
         <Text style={venueText.caption} numberOfLines={2}>{meta}</Text>
       </View>
