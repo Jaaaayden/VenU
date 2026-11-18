@@ -547,7 +547,8 @@ const helpStores = new WeakMap();
 const HELP_TYPE_IDS = ['physical', 'directions', 'language', 'quiet', 'lost', 'other'];
 const HELP_ROUTES = new Set([
   '/__help', '/rest/v1/help_requests', '/rest/v1/messages', '/rest/v1/rpc/accept_help_request',
-  '/rest/v1/rpc/close_help_request', '/rest/v1/rpc/release_help_request', '/rest/v1/rpc/open_help_requests',
+  '/rest/v1/rpc/close_help_request', '/rest/v1/rpc/withdraw_open_request', '/rest/v1/rpc/release_help_request',
+  '/rest/v1/rpc/open_help_requests',
 ]);
 /** open_help_requests(): requests opened within this long are listed. */
 const OPEN_WINDOW_MS = 5 * 60 * 1000;
@@ -722,6 +723,15 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
       && (r.visitor_id === uid || (r.volunteer_id === uid && r.status === 'matched' && status === 'done'));
     if (allowed) Object.assign(r, { status, closed_by: uid, closed_at: now() });
     return send(res, 204);
+  }
+  // withdraw_open_request (20261118040000_help_flow_fixes.sql): the visitor's search gave up. Cancels
+  // only a request that's still open and answers with the row either way ('matched' when a volunteer
+  // took it first), or null when it isn't the caller's.
+  if (p === '/rest/v1/rpc/withdraw_open_request') {
+    const r = store.requests.get(input?.p_request_id);
+    if (!r || r.visitor_id !== uid) return send(res, 200, null);
+    if (r.status === 'open') Object.assign(r, { status: 'cancelled', closed_by: uid, closed_at: now() });
+    return send(res, 200, r);
   }
   if (p === '/rest/v1/rpc/release_help_request') {
     const r = store.requests.get(input?.p_request_id);
