@@ -207,7 +207,8 @@ export function createLiveReportStore(db: ReportDb, seed: FacilityReport[] = [])
   const samples = createMemoryReportStore(seed);
   return {
     async list(venueId, facilityId) {
-      const [rows, fromSeed] = await Promise.all([db.list(venueId, facilityId), samples.list(venueId, facilityId)]);
+      // Offline (or signed out): the sample reports still show.
+      const [rows, fromSeed] = await Promise.all([db.list(venueId, facilityId).catch(() => []), samples.list(venueId, facilityId)]);
       return [...rows.map(rowToReport), ...fromSeed].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     },
     async get(id) {

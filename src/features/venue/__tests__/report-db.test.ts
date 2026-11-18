@@ -103,10 +103,17 @@ describe('live report store (supabase and mock modes)', () => {
     expect(await lee.list('sofi', 'entry-4')).toEqual([]);
   });
 
-  it('passes a database error through (the screen shows its own message)', async () => {
+  it('passes a save error through (the screen shows its own message)', async () => {
     const store = createLiveReportStore(fakeTable().dbFor(null), SEED_REPORTS);
-    await expect(store.list('sofi', 'entry-4')).rejects.toThrow('permission denied');
     await expect(store.add({ venueId: 'sofi', facilityId: 'entry-4', authorName: '', draft: good })).rejects.toThrow('permission denied');
+  });
+
+  it('still lists the sample reports when the database can’t be reached', async () => {
+    const db = fakeTable().dbFor('rosa');
+    jest.spyOn(db, 'list').mockRejectedValue(new TypeError('Failed to fetch'));
+    const store = createLiveReportStore(db, SEED_REPORTS);
+    expect((await store.list('sofi', 'entry-4')).map(r => r.id)).toEqual(['seed-bags']);
+    expect(await createLiveReportStore(fakeTable().dbFor(null), SEED_REPORTS).list('sofi', 'pedestrian-ramp')).toEqual([expect.objectContaining({ id: 'seed-ramp' })]);
   });
 });
 
