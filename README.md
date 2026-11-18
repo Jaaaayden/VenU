@@ -88,7 +88,7 @@ DeepL can't translate into Tagalog, Vietnamese, Armenian or Persian (and some ot
 
 ## End-to-end API test
 
-`scripts/e2e.mjs` runs the core flow as two users against any backend and prints PASS / FAIL / SKIP per step (exit code 1 on any FAIL): sign in (username through `username-sign-in`, or email), read profiles, open a help request, the volunteer finds and accepts it, both chat (Realtime delivery when the backend has it), translate, close.
+`scripts/e2e.mjs` runs the core flow as two users against any backend and prints PASS / FAIL / SKIP per step (exit code 1 on any FAIL): sign in (username through `username-sign-in`, or email), read profiles, open a help request, the volunteer finds and accepts it, both chat (Realtime delivery when the backend has it), translate, rate, file a facility report, close.
 
 ```bash
 # the mock (start it first with npm run dev:mock); --signup creates two throwaway accounts
@@ -97,7 +97,7 @@ node scripts/e2e.mjs --url http://localhost:47330 --anon mock-publishable-key --
 node scripts/e2e.mjs --url https://<ref>.supabase.co --anon <publishable key> --visitor rosa_m:<pw> --volunteer sam_helps:<pw>
 ```
 
-- Safe on a shared project: it creates accounts only with `--signup`, writes only rows it created (one request, its messages, the `--signup` profiles), deletes nothing, and cancels its own request if a step fails.
+- Safe on a shared project: it creates accounts only with `--signup`, writes only rows it created (one request, its messages and rating, the `--signup` profiles), deletes only the facility report it filed, and cancels its own request if a step fails. An unverified volunteer must be refused; the mock then verifies it through `/__control`, a real project needs `profiles.verified = true` set in the dashboard first.
 - SKIP means "not checkable here": no Realtime on the mock, `translate` not deployed (404) or without a provider (503), or a feature not built yet (TODO steps).
 - New feature, new step: add `{ id, needs, run }` to `STEPS` in `scripts/e2e.mjs`; `run` throws to FAIL or returns `{ skip: 'why' }`.
 

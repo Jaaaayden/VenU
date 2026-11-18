@@ -6,12 +6,14 @@
 //
 // Flow: sign in both (username → username-sign-in function, email → password sign-in), read their
 // profiles, the visitor opens a help request, the volunteer finds it in open_help_requests() and
-// accepts, both chat (realtime delivery within --wait seconds when the backend has Realtime), the
-// volunteer translates the visitor's Spanish message, the visitor closes it, both see it done.
+// accepts (refused first while unverified; the mock verifies through /__control, a real project needs
+// staff to set profiles.verified), both chat (realtime delivery within --wait seconds when the backend
+// has Realtime), the volunteer translates the visitor's Spanish message, the visitor rates the help and
+// files a facility report (deleted again right away), the visitor closes it, both see it done.
 //
 // Safe on a shared project: it creates accounts only with --signup, writes only rows it created
-// (one help request, its messages, and with --signup the two new profiles), never deletes anything,
-// and cancels its own request if a step fails midway. Never prints passwords or tokens.
+// (one help request, its messages and rating, and with --signup the two new profiles), deletes only
+// the facility report it filed, and cancels its own request if a step fails midway. Never prints passwords or tokens.
 //
 // Adding a step: put a { id, needs, run } object in STEPS where it belongs in the flow. run() throws
 // to FAIL, returns { skip: 'why' } to SKIP, or returns nothing / a short note to PASS. The TODO
@@ -252,8 +254,22 @@ const STEPS = [
   {
     id: 'verified-gate',
     needs: ['request', 'volunteer'],
-    todo: 'an unverified volunteer gets not_verified from accept_help_request (lands with profiles.verified enforcement)',
-    async run() {},
+    async run(ctx) {
+      if (ctx.volunteer.profile?.verified) return { skip: 'the volunteer is already verified' };
+      const { error } = await ctx.volunteer.client.rpc('accept_help_request', { p_request_id: ctx.request.id });
+      if (!error) {
+        ctx.request.status = 'matched';
+        throw new Error("an unverified volunteer could accept (profiles.verified isn't enforced)");
+      }
+      if (!/not_verified/.test(error.message)) throw new Error(`expected not_verified, got: ${error.message}`);
+      // The mock verifies through its control hook, as LA28 staff do in the dashboard on a real project.
+      const login = ctx.accounts.volunteer?.login;
+      const res = await fetch(`${opts.url}/__control`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ verify: login }),
+      }).catch(() => null);
+      if (res?.ok) return 'refused while unverified, then verified through the mock /__control hook';
+      throw new Error(`refused while unverified (good), but ${login} can't accept until staff set profiles.verified = true in the dashboard`);
+    },
   },
   {
     id: 'request-accept',
@@ -326,18 +342,42 @@ const STEPS = [
     },
   },
 
-  // ---- after the chat (features not built yet: fill in run() and drop `todo`)
+  // ---- after the chat
   {
     id: 'rating',
     needs: ['matched'],
-    todo: 'the visitor rates the volunteer after help (ratings table not built yet)',
-    async run() {},
+    async run(ctx) {
+      const row = { request_id: ctx.request.id, kind: 'rating', stars: 5, tags: ['patient', 'helpful'], problem: null, note: 'e2e: thank you' };
+      const { error } = await ctx.visitor.client.from('help_feedback').insert(row);
+      if (error) throw new Error(`the visitor can't rate: ${error.message}`);
+      // The volunteer reads ratings of requests they helped (for their stats).
+      const seen = await waitFor(async () => {
+        const { data } = await ctx.volunteer.client.from('help_feedback').select('stars, kind').eq('request_id', ctx.request.id);
+        return (data ?? []).find(r => r.kind === 'rating');
+      }, opts.waitMs);
+      if (!seen) throw new Error("the volunteer can't read the rating");
+      return `${seen.stars} stars, seen by the volunteer`;
+    },
   },
   {
     id: 'facility-report',
-    needs: ['visitor'],
-    todo: 'the visitor files a facility report for sofi/entry-3 (facility reports not built yet)',
-    async run() {},
+    needs: ['visitor', 'volunteer'],
+    async run(ctx) {
+      // Reports are public to everyone at the venue, so this one is deleted again right after.
+      const row = { venue_id: 'sofi', facility_id: 'entry-3', title: 'e2e test report', topic: 'other', body: 'e2e: deleted right away', language: 'en' };
+      const { data, error } = await ctx.visitor.client.from('facility_reports').insert(row).select('id, author_name').single();
+      if (error) throw new Error(`the visitor can't file a report: ${error.message}`);
+      try {
+        const { data: seen } = await ctx.volunteer.client.from('facility_reports').select('id').eq('id', data.id).maybeSingle();
+        if (!seen) throw new Error("the volunteer can't see the report");
+        const { error: del } = await ctx.volunteer.client.from('facility_reports').delete().eq('id', data.id);
+        const { data: still } = await ctx.visitor.client.from('facility_reports').select('id').eq('id', data.id).maybeSingle();
+        if (!del && !still) throw new Error("the volunteer deleted someone else's report");
+      } finally {
+        await ctx.visitor.client.from('facility_reports').delete().eq('id', data.id);
+      }
+      return `filed as "${data.author_name}", seen by the volunteer, deleted again`;
+    },
   },
 
   // ---- close
