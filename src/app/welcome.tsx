@@ -14,7 +14,7 @@ import { useT } from '@/i18n';
 const ROLES: Role[] = ['visitor', 'volunteer'];
 
 /**
- * First screen for signed-out users (Figma Onboarding 2.0, 473:31895): visitor or volunteer, then
+ * First screen for signed-out users (Figma role choice 530:10212): visitor or volunteer, then
  * the landing page (Create Account / Sign In). The choice is kept for setup, which then skips its
  * own role question; it doesn't change an account that already has a profile.
  */
@@ -73,7 +73,8 @@ export default function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: 'center', marginTop: 72, gap: Spacing.lg },
+  // Figma 530:10212: the logo sits about 160pt from the top, the cards 72pt under "VenU".
+  hero: { alignItems: 'center', marginTop: 100, gap: Spacing.xl },
   name: { fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
   choices: { alignItems: 'center', marginTop: 72 },
   choiceWrap: { alignItems: 'center', gap: Spacing.md, marginTop: Spacing.md },
