@@ -28,7 +28,7 @@
     "languageLabel": "Help in {{language}}. Change language",
     "locationLabel": "Your location: {{spot}}, {{venue}}",
     "near": "Near {{place}}",
-    "locationUnset": "Your location: not chosen yet, {{venue}}",
+    "locationUnset": "Your location: {{venue}}, no spot chosen yet",
     "whereAreYou": "Where are you?",
     "tapToChoose": "Tap to choose a spot",
     "locationHint": "Opens a list of places at {{venue}}",
@@ -267,7 +267,7 @@
       "off": "Off"
     },
     "statusLine": {
-      "free": "You’ll get nearby requests. Switch to Busy or Off on a break and requests will skip you.",
+      "free": "You’ll get nearby requests. Switch to Busy or Off and requests will skip you.",
       "busy": "You’re busy for now. New requests skip you until you switch back to Free.",
       "off": "You’re off duty. Requests skip you until you switch to Free.",
       "helping": "You’re helping {{name}}. New requests wait until you finish."
@@ -277,7 +277,7 @@
     "languages": "Fluent languages",
     "training": "Training",
     "noTraining": "No training added yet",
-    "paused": "Requests are paused while you’re on a break. Switch to Free to see who needs help nearby."
+    "paused": "Requests are paused while you’re busy or off duty. Switch to Free to see who needs help nearby."
   },
   "mock": {
     "greeting": "Hi {{name}}! I'm {{volunteer}}, your LA28 volunteer. I'm heading to you now. Meeting point: {{spot}}.",

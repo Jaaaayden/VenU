@@ -7,7 +7,7 @@ import { Button } from '@/components/button';
 import { FormSection, StepHeader } from '@/components/form-section';
 import { TextField } from '@/components/text-field';
 import { BackLink } from '@/components/top-bar';
-import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { APP_FEEDBACK_MAX, sendAppFeedback } from '@/features/settings/app-feedback';
 import { useT, useUiLanguage } from '@/i18n';
 import { friendlyError } from '@/lib/errors';
@@ -127,6 +127,6 @@ const styles = StyleSheet.create({
 
   form: { gap: Spacing.md },
   thanks: { gap: Spacing.xs, padding: Spacing.lg, borderRadius: Radius.md, backgroundColor: Colors.successSoft },
-  thanksTitle: { fontFamily: Fonts.displayMedium, fontSize: 17, lineHeight: 22, color: Colors.text },
+  thanksTitle: { ...Face.displayMedium, fontSize: 17, lineHeight: 22, color: Colors.text },
   more: { alignSelf: 'flex-start' },
 });

@@ -2,7 +2,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FigmaIcon } from '@/components/icons/figma-icon';
-import { Colors, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Shadow, Spacing } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
 import { useLayoutRtl, useT, useUiLanguage } from '@/i18n';
 
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   tileTag: {
     position: 'absolute',
     bottom: 10,
-    fontFamily: Fonts.textSemiBold,
+    ...Face.textSemiBold,
     fontSize: 13,
     color: Colors.ink,
     backgroundColor: Colors.surface,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   reportFresh: { borderWidth: 2, borderColor: Colors.primary },
   reportPressed: { backgroundColor: Colors.border },
   reportTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  newBadge: { fontFamily: Fonts.textBold, fontSize: 13, color: Colors.onPrimary, backgroundColor: Colors.primary, paddingHorizontal: 8, paddingVertical: 1, borderRadius: 6, overflow: 'hidden' },
+  newBadge: { ...Face.textBold, fontSize: 13, color: Colors.onPrimary, backgroundColor: Colors.primary, paddingHorizontal: 8, paddingVertical: 1, borderRadius: 6, overflow: 'hidden' },
   seeMore: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 17, color: Colors.text, marginTop: 12 },
   original: { fontFamily: Fonts.text, fontSize: 12, lineHeight: 16, color: Colors.textMuted, marginTop: 4 },
 

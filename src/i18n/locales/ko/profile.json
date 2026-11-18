@@ -22,6 +22,7 @@
   "edit": {
     "title": "프로필 편집",
     "subtitle": "변경 사항은 다음 도움 요청부터 적용됩니다.",
+    "subtitleVolunteer": "다음에 도움을 줄 때부터 방문객에게 변경 사항이 보여요.",
     "submit": "변경 사항 저장",
     "discardTitle": "저장하지 않고 나갈까요? 변경 내용이 사라집니다.",
     "keepEditing": "계속 수정",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "자원봉사자 소식",
-        "hint": "예: Daniel이 수락하고 오는 중입니다"
+        "hint": "예: Daniel이 수락하고 오는 중입니다",
+        "labelVolunteer": "도움 요청",
+        "hintVolunteer": "예: 근처 방문객이 도움을 요청했어요"
       },
       "chat": {
         "label": "채팅 메시지",

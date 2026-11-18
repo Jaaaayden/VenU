@@ -28,7 +28,7 @@
     "languageLabel": "Ayuda en {{language}}. Cambiar idioma",
     "locationLabel": "Tu ubicación: {{spot}}, {{venue}}",
     "near": "Cerca de {{place}}",
-    "locationUnset": "Tu ubicación: aún sin elegir, {{venue}}",
+    "locationUnset": "Tu ubicación: {{venue}}, aún sin lugar elegido",
     "whereAreYou": "¿Dónde estás?",
     "tapToChoose": "Toca para elegir un lugar",
     "locationHint": "Abre una lista de lugares de {{venue}}",
@@ -269,7 +269,7 @@
       "off": "Fuera"
     },
     "statusLine": {
-      "free": "Recibirás solicitudes cercanas. En un descanso, cambia a Ocupado o Fuera y las solicitudes no te llegarán.",
+      "free": "Recibirás solicitudes cercanas. Cambia a Ocupado o Fuera y las solicitudes no te llegarán.",
       "busy": "Estás ocupado por ahora. Las nuevas solicitudes no te llegarán hasta que vuelvas a Libre.",
       "off": "Estás fuera de turno. Las solicitudes no te llegarán hasta que cambies a Libre.",
       "helping": "Estás ayudando a {{name}}. Las nuevas solicitudes esperarán hasta que termines."
@@ -279,7 +279,7 @@
     "languages": "Idiomas que dominas",
     "training": "Formación",
     "noTraining": "Aún no has añadido formación",
-    "paused": "Las solicitudes están en pausa mientras descansas. Cambia a Libre para ver quién necesita ayuda cerca."
+    "paused": "Las solicitudes están en pausa mientras estás ocupado o fuera de turno. Cambia a Libre para ver quién necesita ayuda cerca."
   },
   "mock": {
     "greeting": "¡Hola, {{name}}! Soy {{volunteer}}, del equipo de voluntarios de LA28. Voy hacia ti ahora. Punto de encuentro: {{spot}}.",

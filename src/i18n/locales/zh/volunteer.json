@@ -28,7 +28,7 @@
     "languageLabel": "帮助语言：{{language}}。更改语言",
     "locationLabel": "你的位置：{{spot}}，{{venue}}",
     "near": "{{place}}附近",
-    "locationUnset": "你的位置：尚未选择，{{venue}}",
+    "locationUnset": "你的位置：{{venue}}，尚未选择具体地点",
     "whereAreYou": "你在哪里？",
     "tapToChoose": "点按选择地点",
     "locationHint": "打开 {{venue}} 的地点列表",
@@ -265,7 +265,7 @@
       "off": "离线"
     },
     "statusLine": {
-      "free": "你会收到附近的请求。休息时切换到“忙碌”或“离线”，请求就会跳过你。",
+      "free": "你会收到附近的请求。切换到“忙碌”或“离线”，请求就会跳过你。",
       "busy": "你现在正忙。切换回“空闲”之前，新请求会跳过你。",
       "off": "你已离线。切换到“空闲”之前，请求会跳过你。",
       "helping": "你正在帮助 {{name}}。完成之前不会收到新的请求。"
@@ -275,7 +275,7 @@
     "languages": "流利的语言",
     "training": "培训",
     "noTraining": "尚未添加培训",
-    "paused": "休息期间请求已暂停。切换到“空闲”即可查看附近需要帮助的人。"
+    "paused": "你处于“忙碌”或“离线”时，请求会暂停。切换到“空闲”即可查看附近需要帮助的人。"
   },
   "mock": {
     "greeting": "{{name}}，你好！我是 {{volunteer}}，LA28 志愿者。我现在就过去找你。会合地点：{{spot}}。",

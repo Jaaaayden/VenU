@@ -22,6 +22,7 @@
   "edit": {
     "title": "编辑资料",
     "subtitle": "更改将用于你的下一次求助。",
+    "subtitleVolunteer": "你下次提供帮助时，访客就会看到这些更改。",
     "submit": "保存更改",
     "discardTitle": "不保存就离开？你的修改将会丢失。",
     "keepEditing": "继续编辑",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "志愿者动态",
-        "hint": "例如 Daniel 已接受，正在赶来"
+        "hint": "例如 Daniel 已接受，正在赶来",
+        "labelVolunteer": "求助请求",
+        "hintVolunteer": "例如 你附近有访客需要帮助"
       },
       "chat": {
         "label": "聊天消息",

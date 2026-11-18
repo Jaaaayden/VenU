@@ -6,7 +6,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Avatar } from '@/components/avatar';
 import { Button } from '@/components/button';
 import { TranslationNote } from '@/components/translation-note';
-import { Colors, Fonts, Radius, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Radius, Spacing, Type } from '@/constants/theme';
 import { uiLanguageName } from '@/features/profile/summary';
 import { useT, useUiLanguage } from '@/i18n';
 import { formatDate } from '@/i18n/format';
@@ -108,7 +108,7 @@ function DeleteReport({ id, onDeleted }: { id: string; onDeleted: () => void }) 
 const styles = StyleSheet.create({
   content: { gap: Spacing.lg },
   heading: { gap: 8, marginTop: Spacing.sm },
-  kind: { fontFamily: Fonts.displayMedium, fontSize: 15, lineHeight: 20, color: Colors.text },
+  kind: { ...Face.displayMedium, fontSize: 15, lineHeight: 20, color: Colors.text },
   author: {
     flexDirection: 'row',
     alignItems: 'center',

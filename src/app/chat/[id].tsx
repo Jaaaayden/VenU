@@ -27,7 +27,7 @@ import { Hint, useHint } from '@/components/volunteer/hint';
 import { MeetPlaceText } from '@/components/volunteer/meet-place';
 import { RequestSummary } from '@/components/volunteer/request-note';
 import { useStartAligned } from '@/components/volunteer/start-aligned';
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Colors, Face, Fonts, Spacing } from '@/constants/theme';
 import { toggleState } from '@/features/voice/announce';
 import { useDictation } from '@/features/voice/use-dictation';
 import { composerButton, useSendHold } from '@/features/volunteer/composer';
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   messages: { flex: 1, backgroundColor: Colors.surfaceAlt },
   messagesContent: { gap: Spacing.xl, paddingHorizontal: Spacing.gutter - 6, paddingVertical: Spacing.lg },
   empty: { fontFamily: Fonts.text, fontSize: 14, color: Colors.textMuted, textAlign: 'center', marginTop: Spacing.xl },
-  separator: { fontFamily: Fonts.textSemiBold, fontSize: 13, lineHeight: 16, color: Colors.textMuted, textAlign: 'center' },
+  separator: { ...Face.textSemiBold, fontSize: 13, lineHeight: 16, color: Colors.textMuted, textAlign: 'center' },
   // Sits under the last bubble, lined up with the incoming bubbles' text.
   typing: { fontFamily: Fonts.text, fontSize: 13, lineHeight: 16, color: Colors.textMuted, marginTop: -Spacing.sm, paddingStart: Spacing.lg },
   bar: {
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   // "Listening… tap to stop" sits on top of the bar and takes over its top border.
   listeningLabel: {
-    fontFamily: Fonts.textSemiBold,
+    ...Face.textSemiBold,
     fontSize: 13,
     lineHeight: 16,
     color: Colors.primary,

@@ -22,6 +22,7 @@
   "edit": {
     "title": "I-edit ang profile",
     "subtitle": "Gagamitin ang mga pagbabago sa susunod mong paghingi ng tulong.",
+    "subtitleVolunteer": "Makikita ng mga bisita ang mga pagbabagong ito sa susunod mong pagtulong.",
     "submit": "I-save ang mga pagbabago",
     "discardTitle": "Umalis nang hindi nagse-save? Mawawala ang mga binago mo.",
     "keepEditing": "Ituloy ang pag-edit",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "Balita mula sa volunteer",
-        "hint": "hal. Tinanggap ni Daniel at papunta na siya"
+        "hint": "hal. Tinanggap ni Daniel at papunta na siya",
+        "labelVolunteer": "Mga request ng tulong",
+        "hintVolunteer": "hal. May bisitang malapit sa iyo na kailangan ng tulong"
       },
       "chat": {
         "label": "Mga mensahe sa chat",

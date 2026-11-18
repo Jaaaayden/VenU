@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
 import { FIGMA_ICONS } from '@/components/icons/figma-icons';
-import { Colors, Fonts } from '@/constants/theme';
+import { Colors, Face } from '@/constants/theme';
 
 /** "VenU" with the blue "Ven" and orange "U" from the mockups. */
 export function Wordmark({ size = 22 }: { size?: number }) {
@@ -48,6 +48,6 @@ export function LogoMark({ size = 100 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  base: { fontFamily: Fonts.displaySemiBold, color: Colors.primary },
+  base: { ...Face.displaySemiBold, color: Colors.primary },
   u: { color: Colors.accent },
 });

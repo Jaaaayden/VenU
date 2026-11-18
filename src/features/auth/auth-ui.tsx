@@ -10,7 +10,7 @@ import { FIGMA_ICONS } from '@/components/icons/figma-icons';
 import { LanguagePill } from '@/components/language-pill';
 import { LanguageSearchModal } from '@/components/language-picker';
 import { TextField } from '@/components/text-field';
-import { Colors, Fonts, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Fonts, Spacing, Type } from '@/constants/theme';
 import { languageName } from '@/features/profile/options';
 import { UNTRANSLATED, useT, useUiLanguage } from '@/i18n';
 import { choosePendingLanguage } from '@/i18n/pending-language';
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   checkTarget: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', marginStart: -7 },
   box: { width: 22, height: 22, borderRadius: 3, backgroundColor: Colors.ink, alignItems: 'center', justifyContent: 'center' },
   boxError: { backgroundColor: Colors.danger },
-  tick: { color: Colors.onPrimary, fontFamily: Fonts.textBold, fontSize: 15, lineHeight: 18 },
+  tick: { color: Colors.onPrimary, ...Face.textBold, fontSize: 15, lineHeight: 18 },
   checkLabel: { flex: 1 },
   error: { ...Type.caption, color: Colors.danger },
 

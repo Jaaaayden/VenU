@@ -30,8 +30,10 @@ export default function NotificationsScreen() {
         {prefs && (
           <View style={styles.card}>
             {NOTIFICATION_OPTIONS.map(({ kind }, i) => {
-              const label = t(`notifications.options.${kind}.label`);
-              const hint = t(`notifications.options.${kind}.hint`);
+              // A volunteer's "volunteer updates" are new requests near them, not a helper on the way.
+              const helper = kind === 'volunteer' && profile?.role === 'volunteer';
+              const label = helper ? t('notifications.options.volunteer.labelVolunteer') : t(`notifications.options.${kind}.label`);
+              const hint = helper ? t('notifications.options.volunteer.hintVolunteer') : t(`notifications.options.${kind}.hint`);
               return (
                 <View key={kind}>
                   {/* The whole row is the switch; the Switch itself only shows the state. */}

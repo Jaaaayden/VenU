@@ -28,7 +28,7 @@
     "languageLabel": "Aide en {{language}}. Changer de langue",
     "locationLabel": "Votre position : {{spot}}, {{venue}}",
     "near": "Près de {{place}}",
-    "locationUnset": "Votre position : pas encore choisie, {{venue}}",
+    "locationUnset": "Votre position : {{venue}}, aucun endroit choisi pour l’instant",
     "whereAreYou": "Où êtes-vous ?",
     "tapToChoose": "Touchez pour choisir un endroit",
     "locationHint": "Ouvre la liste des lieux de {{venue}}",
@@ -269,7 +269,7 @@
       "off": "Absent"
     },
     "statusLine": {
-      "free": "Vous recevrez les demandes à proximité. Pendant une pause, passez en Occupé ou Absent et les demandes vous éviteront.",
+      "free": "Vous recevrez les demandes à proximité. Passez en Occupé ou Absent et les demandes vous éviteront.",
       "busy": "Vous êtes occupé pour l’instant. Les nouvelles demandes vous évitent jusqu’à ce que vous repassiez en Libre.",
       "off": "Vous n’êtes pas en service. Les demandes vous évitent jusqu’à ce que vous passiez en Libre.",
       "helping": "Vous aidez {{name}}. Les nouvelles demandes attendent que vous ayez fini."
@@ -279,7 +279,7 @@
     "languages": "Langues parlées couramment",
     "training": "Formation",
     "noTraining": "Aucune formation ajoutée pour l’instant",
-    "paused": "Les demandes sont suspendues pendant votre pause. Passez en Libre pour voir qui a besoin d’aide à proximité."
+    "paused": "Les demandes sont suspendues tant que vous êtes occupé ou absent. Passez en Libre pour voir qui a besoin d’aide à proximité."
   },
   "mock": {
     "greeting": "Bonjour {{name}} ! Je suis {{volunteer}}, bénévole LA28. J’arrive. Point de rendez-vous : {{spot}}.",

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LogoMark } from '@/components/wordmark';
-import { Colors, Fonts, Radius, Shadow, Spacing, Type } from '@/constants/theme';
+import { Colors, Face, Radius, Shadow, Spacing, Type } from '@/constants/theme';
 import { WelcomeLanguagePill } from '@/features/auth/auth-ui';
 import { OnboardingScreen, PrimaryAction } from '@/features/auth/onboarding-screen';
 import { readPendingSetup, rememberPendingRole } from '@/features/auth/pending-setup';
@@ -83,7 +83,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   // Figma 530:10212: the logo sits about 160pt from the top, the cards 72pt under "VenU".
   hero: { alignItems: 'center', marginTop: 100, gap: Spacing.xl },
-  name: { fontFamily: Fonts.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
+  name: { ...Face.displaySemiBold, fontSize: 25, lineHeight: 30, color: Colors.text },
   deleted: { ...Type.caption, textAlign: 'center', marginTop: Spacing.xl, marginBottom: -Spacing.xxl },
   choices: { alignItems: 'center', marginTop: 72 },
   choiceWrap: { alignItems: 'center', gap: Spacing.md, marginTop: Spacing.md },

@@ -22,6 +22,7 @@
   "edit": {
     "title": "Editar perfil",
     "subtitle": "As mudanças valem para seu próximo pedido de ajuda.",
+    "subtitleVolunteer": "Os visitantes verão essas mudanças na próxima vez que você ajudar.",
     "submit": "Salvar alterações",
     "discardTitle": "Sair sem salvar? Suas alterações serão perdidas.",
     "keepEditing": "Continuar editando",
@@ -217,7 +218,9 @@
     "options": {
       "volunteer": {
         "label": "Novidades do voluntário",
-        "hint": "ex.: Daniel aceitou e está a caminho"
+        "hint": "ex.: Daniel aceitou e está a caminho",
+        "labelVolunteer": "Pedidos de ajuda",
+        "hintVolunteer": "ex.: Um visitante perto de você precisa de ajuda"
       },
       "chat": {
         "label": "Mensagens do chat",
