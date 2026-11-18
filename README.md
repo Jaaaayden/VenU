@@ -37,7 +37,7 @@ The provider is one secret, so switching is a one-line change: `TRANSLATE_PROVID
 
 ### Try a real provider on your machine
 
-Create `.env.server.local` in the repo root (git-ignored; only the mock backend reads it, never the app bundle):
+Put the keys in `.env.local` (or `.env.server.local`, which wins per key). Both are git-ignored; the mock backend reads only these three keys, on the server, and the app bundle never sees them:
 
 ```bash
 TRANSLATE_PROVIDER=anthropic
@@ -47,7 +47,10 @@ TRANSLATE_PROVIDER=deepl
 DEEPL_API_KEY=...:fx
 ```
 
-Then `npm run dev:mock -- --web`. The terminal says which provider it uses (`Translate: anthropic`); without the file it says `offline stub`. Restart after changing the file. Needs Node 22.18+ (it loads the function's `.ts` files directly).
+Then `npm run dev:mock -- --web`. The terminal says which provider it uses: `Translate: anthropic, keys from .env.local`, or `offline stub` without keys. Restart after changing a file. Needs Node 22.18+ (it loads the function's `.ts` files directly).
+
+- `npm run dev:mock -- --stub-translate`: offline stub even with keys (tests, no network, no cost).
+- `npm run dev:mock -- --env-file ../VenU/.env.local`: keys from another file, e.g. the main checkout's when you work in a worktree.
 
 Test hooks on the mock backend (port 47330, or your `-- --mock-port N`): `curl -X POST localhost:47330/__control -d '{"failTranslate":2}'` (next 2 calls fail), `-d '{"translateDelayMs":4000}'` (slow), `-d '{"clockOffsetMs":7200000}'` (two hours on, so a username held by an unconfirmed sign-up is free again).
 
@@ -58,10 +61,11 @@ supabase login
 supabase link --project-ref <project-ref>
 supabase secrets set TRANSLATE_PROVIDER=anthropic ANTHROPIC_API_KEY=sk-ant-...
 #   or: supabase secrets set TRANSLATE_PROVIDER=deepl DEEPL_API_KEY=...
-supabase functions deploy translate
+supabase functions deploy translate --no-verify-jwt
 ```
 
-- Only signed-in users can call it (the function checks the token; the anon key and anonymous sign-ins get 401). If calls fail at the gateway with the new signing keys, redeploy with `--no-verify-jwt`: the function verifies the token itself.
+- Only signed-in users can call it: the function checks the token itself (the anon key and anonymous sign-ins get 401), so the gateway check stays off; it can reject valid sessions under the new JWT signing keys.
+- Dashboard instead of the CLI: Edge Functions → Deploy a new function → Via Editor, name it `translate`, add `index.ts`, `handler.ts`, `core.ts`, `anthropic.ts`, `deepl.ts` and `deno.json` from `supabase/functions/translate/`, and turn off "Verify JWT" (the function checks the token itself). Secrets go in Edge Functions → Secrets.
 - Limits: 2,000 characters per message, 16 messages and 8,000 characters per request.
 - Switch providers later with `supabase secrets set TRANSLATE_PROVIDER=deepl DEEPL_API_KEY=...`; no redeploy or app update needed.
 

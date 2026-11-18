@@ -5,9 +5,11 @@
 //
 // It also serves the `translate` Edge Function (POST /functions/v1/translate), running the same code
 // as supabase/functions/translate. Without keys it uses the offline stub; with TRANSLATE_PROVIDER and
-// a key in .env.server.local (git-ignored, never bundled into the app) it calls the real provider:
+// a key in .env.server.local or .env.local (both git-ignored) it calls the real provider:
 //   TRANSLATE_PROVIDER=anthropic            or   TRANSLATE_PROVIDER=deepl
 //   ANTHROPIC_API_KEY=sk-ant-...                 DEEPL_API_KEY=...:fx
+// Only those three keys are read (scripts/server-env.ts), here on the server; the app bundle never
+// sees them. translate: 'stub' (`--stub-translate`) keeps the stub even when keys are there.
 //
 // Test hooks: GET /__state (everything stored), POST /__control { dropNextProfileWrite: n }
 // (drop the next n profile-save responses, to test lost connections), { failTranslate: n } (the next
@@ -23,6 +25,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const SERVER_ENV_FILE = join(ROOT, '.env.server.local');
+export const ENV_LOCAL_FILE = join(ROOT, '.env.local');
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 
@@ -31,11 +34,14 @@ const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export const MOCK_SUPABASE_PORT = 47330;
 
 /**
- * @param {{ port: number, confirmEmail?: boolean, stateFile?: string, log?: (line: string) => void }} options
+ * @param {{ port: number, confirmEmail?: boolean, stateFile?: string, translate?: 'auto' | 'stub', envFile?: string, log?: (line: string) => void }} options
  *   confirmEmail: sign-up sends a (printed) confirmation link instead of signing straight in.
  *   stateFile: keep accounts, profiles and photos here between runs.
+ *   translate: 'auto' uses a real provider when the env files have keys; 'stub' always the offline stub.
+ *   envFile: read the translate keys from this file instead of .env.local (e.g. the main checkout's,
+ *     from a worktree). .env.server.local still comes first.
  */
-export function startMockSupabase({ port, confirmEmail = false, stateFile, log = console.log }) {
+export function startMockSupabase({ port, confirmEmail = false, stateFile, translate: translateMode = 'auto', envFile, log = console.log }) {
   const users = new Map(); // email -> { id, email, password, confirmed, createdAt, username?, wantedUsername? }
   const profiles = new Map(); // user id -> row
   const files = new Map(); // path -> { bytes: Buffer, type }
@@ -342,7 +348,8 @@ export function startMockSupabase({ port, confirmEmail = false, stateFile, log =
     send(res, 404, { message: `mock supabase: no route for ${req.method} ${p}` });
   });
 
-  const translate = createTranslate({ verifyUser: async token => userIdOfToken(token), control, log }).catch(e => {
+  const envFiles = [SERVER_ENV_FILE, envFile ? resolve(envFile) : ENV_LOCAL_FILE];
+  const translate = createTranslate({ verifyUser: async token => userIdOfToken(token), control, log, stub: translateMode === 'stub', envFiles }).catch(e => {
     log(`mock supabase: translate is off (${e.message}). It needs Node 22.18+, which loads the shared .ts files.`);
     return null;
   });
@@ -529,15 +536,17 @@ function helpRoute({ req, res, p, url, body, uid, profiles, send, pgErr }, store
   }
 }
 
-/** KEY=value lines from .env.server.local (git-ignored), or {} when there's no such file. */
-export function readServerEnv(file = SERVER_ENV_FILE) {
-  if (!existsSync(file)) return {};
-  const out = {};
-  for (const line of readFileSync(file, 'utf8').split(/\r?\n/)) {
-    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
-    if (m) out[m[1]] = m[2].replace(/^(['"])(.*)\1$/, '$2');
-  }
-  return out;
+/**
+ * The translate keys from `files` (per key, the first file that sets it wins) and the file
+ * TRANSLATE_PROVIDER came from. Keeps only TRANSLATE_PROVIDER, ANTHROPIC_API_KEY and DEEPL_API_KEY.
+ */
+export async function readTranslateEnv(files = [SERVER_ENV_FILE, ENV_LOCAL_FILE]) {
+  const { parseEnvText, pickTranslateEnv } = await importShared('scripts/server-env.ts');
+  const sources = files.filter(f => existsSync(f)).map(f => ({
+    name: f.startsWith(ROOT) ? f.slice(ROOT.length + 1) : f,
+    vars: parseEnvText(readFileSync(f, 'utf8')),
+  }));
+  return pickTranslateEnv(sources);
 }
 
 /**
@@ -572,22 +581,24 @@ function stubCatalog(flattenStrings, placeNames) {
   return catalog;
 }
 
-/** The translate function's handler with the provider from .env.server.local, else the stub. */
-async function createTranslate({ verifyUser, control, log }) {
+/** The translate function's handler with the provider from the env files, else (or with `stub`) the stub. */
+async function createTranslate({ verifyUser, control, log, stub, envFiles }) {
   const { chooseProvider, createHandler } = await importShared('supabase/functions/translate/handler.ts');
   const { createStub, flattenStrings, placeNames } = await importShared('src/features/translate/stub.ts');
-  const env = readServerEnv();
+  const { env, from } = stub ? { env: {}, from: null } : await readTranslateEnv(envFiles);
   let translator = null;
   if (env.TRANSLATE_PROVIDER) {
     const Anthropic = env.TRANSLATE_PROVIDER.trim().toLowerCase() === 'anthropic' ? (await import('@anthropic-ai/sdk')).default : null;
     const choice = chooseProvider(env, apiKey => new Anthropic({ apiKey, timeout: 20_000, maxRetries: 2 }));
     if (choice.ok) translator = choice.translator;
-    else log(`mock supabase: ${choice.reason} in .env.server.local; using the stub translator`);
+    else log(`mock supabase: ${choice.reason} in ${from}; using the stub translator`);
   }
   translator ??= createStub(stubCatalog(flattenStrings, placeNames)).translator;
-  log(translator.name === 'stub'
-    ? 'Translate: offline stub (knows the mock volunteer lines). Real provider: see README "Chat translation".'
-    : `Translate: ${translator.name}, keys from .env.server.local`);
+  log(translator.name !== 'stub'
+    ? `Translate: ${translator.name}, keys from ${from} (-- --stub-translate for the offline stub)`
+    : stub
+      ? 'Translate: offline stub (--stub-translate; it knows only the mock volunteer lines).'
+      : 'Translate: offline stub (knows the mock volunteer lines). Real provider: see README "Chat translation".');
 
   const real = translator;
   const controlled = {
@@ -604,9 +615,14 @@ async function createTranslate({ verifyUser, control, log }) {
   return createHandler({ verifyUser, translator: controlled, log: line => log(`mock supabase: ${line}`) });
 }
 
-// Run on its own: node scripts/mock-supabase.mjs [port] [--confirm-email]
+// Run on its own: node scripts/mock-supabase.mjs [port] [--confirm-email] [--stub-translate] [--env-file <path>]
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const port = Number(process.argv.find(a => /^\d+$/.test(a)) ?? MOCK_SUPABASE_PORT);
-  const server = await startMockSupabase({ port, confirmEmail: process.argv.includes('--confirm-email') });
+  const args = process.argv.slice(2);
+  const envAt = args.indexOf('--env-file');
+  const envFile = envAt === -1 ? undefined : args.splice(envAt, 2)[1];
+  const port = Number(args.find(a => /^\d+$/.test(a)) ?? MOCK_SUPABASE_PORT);
+  const server = await startMockSupabase({
+    port, confirmEmail: args.includes('--confirm-email'), translate: args.includes('--stub-translate') ? 'stub' : 'auto', envFile,
+  });
   console.log(`mock supabase on http://localhost:${server.address().port}`); // port 0 picks a free one
 }
