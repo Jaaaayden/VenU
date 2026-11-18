@@ -9,6 +9,8 @@
 //
 // Extra flags go after `--`: `npm run dev:mock -- --reset` (wipe fake data), `-- --port 8090`,
 // `-- --mock-port 47331` (a second mock backend next to the first, e.g. from another worktree),
+// `-- --stub-translate` (mock: offline stub translator even when .env.local has keys),
+// `-- --env-file ../VenU/.env.local` (mock: translate keys from that file instead of .env.local),
 // and anything else is passed to `expo start` (`-- --web`, `-- --clear`).
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -41,6 +43,8 @@ const verify = flag('--verify');
 const reset = flag('--reset');
 const port = Number(option('--port') ?? PORTS[mode]);
 const MOCK_API_PORT = Number(option('--mock-port') ?? MOCK_SUPABASE_PORT);
+const stubTranslate = flag('--stub-translate');
+const envFile = option('--env-file');
 const env = { ...process.env };
 const notes = [];
 
@@ -70,7 +74,10 @@ let mockServer = null;
 if (mode === 'mock') {
   if (reset) rmSync(MOCK_STATE, { force: true });
   await freePort(MOCK_API_PORT);
-  mockServer = await startMockSupabase({ port: MOCK_API_PORT, confirmEmail: verify, stateFile: MOCK_STATE });
+  // Translate keys are read on this server only; the app still gets none of .env.local (EXPO_NO_DOTENV).
+  mockServer = await startMockSupabase({
+    port: MOCK_API_PORT, confirmEmail: verify, stateFile: MOCK_STATE, translate: stubTranslate ? 'stub' : 'auto', envFile: envFile ?? undefined,
+  });
   env.EXPO_PUBLIC_SUPABASE_URL = `http://localhost:${MOCK_API_PORT}`;
   env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'mock-publishable-key';
   notes.push(`Backend:  fake Supabase at http://localhost:${MOCK_API_PORT}, saved in .expo/mock-supabase.json (-- --reset wipes it)`);
