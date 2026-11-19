@@ -16,9 +16,12 @@ import type { Facility, FacilityCategory } from './types';
 export const CATEGORIES: FacilityCategory[] = ['gate', 'restroom', 'food', 'first_aid', 'lost_found', 'info', 'accessible', 'parking'];
 
 /**
- * The chips worth showing at a venue: those with at least one facility there (see matchesCategory),
- * in CATEGORIES order, so a chip never empties the map. `keep` stays even when empty (the chip
- * that's selected). e.g. Intuit Dome has no food stand listed, so no "Food & Drinks" chip.
+ * The chips worth showing for a list of facilities: those with at least one of them (see
+ * matchesCategory), in CATEGORIES order, so a chip never empties the map. `keep` stays even when
+ * empty (the chip that's selected).
+ * e.g. Intuit Dome's own facilities list no food, so the "Where are you?" picker has no
+ * "Food & Drinks" chip; the venue screen adds the sponsored stands (venueFacilitiesFor in
+ * ./sponsors.ts), so its "Food & Drinks" chip shows and lists those stands, each marked Sponsored.
  */
 export function categoriesAt(facilities: Facility[], keep: FacilityCategory | null = null): FacilityCategory[] {
   return CATEGORIES.filter(c => c === keep || facilities.some(f => matchesCategory(f, c)));

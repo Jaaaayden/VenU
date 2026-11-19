@@ -8,6 +8,7 @@ import { routeFor, routeStart, walkFrom, walkFromStart, walkOrder } from '../dir
 import { categoryLabel, facilityMeta, withoutFinalStop } from '../labels';
 import { pinsFor } from '../map-geometry';
 import { facilitiesFor, getFacility, getVenue, matchesCategory, searchFacilities } from '../mock';
+import { venueFacilitiesFor } from '../sponsors';
 import { venueMapFor } from '../venue-maps';
 
 // mock.ts reaches reports.ts through labels, and reports.ts builds its store on AsyncStorage.
@@ -69,7 +70,11 @@ describe('category chips', () => {
       const list = facilitiesFor(venueId);
       for (const c of categoriesAt(list)) expect({ venueId, c, empty: pinsFor(list, c).length === 0 }).toEqual({ venueId, c, empty: false });
     }
-    expect(categoriesAt(intuit)).not.toContain('food');
+    expect(categoriesAt(intuit)).not.toContain('food'); // the spot picker: no food listed
+    // The venue screen adds the sponsored stands, so its Food & Drinks chip shows them (and only them).
+    const venueScreen = venueFacilitiesFor('intuit-dome');
+    expect(categoriesAt(venueScreen)).toContain('food');
+    expect(pinsFor(venueScreen, 'food').every(x => !!x.sponsor)).toBe(true);
     expect(categoriesAt(intuit)).toEqual(expect.arrayContaining(['gate', 'restroom', 'first_aid', 'lost_found', 'info', 'accessible', 'parking']));
     expect(categoriesAt(intuit, 'food')).toContain('food');
     expect(categoriesAt(intuit).every((c, i, all) => i === 0 || CATEGORIES.indexOf(all[i - 1]) < CATEGORIES.indexOf(c))).toBe(true);
