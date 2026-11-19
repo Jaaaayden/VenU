@@ -20,7 +20,7 @@ import { useT } from '@/i18n';
 import { FacilityIcon } from './categories';
 import { startMarker, type Route } from './directions';
 import { facilityName } from './labels';
-import { clampView, contentSize, IMAGE_ZOOM_OUT_SLACK, isStrayPress, mapUpdate, zoomAt, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
+import { clampView, contentSize, IMAGE_ZOOM_OUT_SLACK, isStrayPress, mapUpdate, zoomAt, ZOOM_STEP, zoomStep, type Box, type MapLayout, type MapRect, type MapView } from './map-geometry';
 import { SPONSOR_ACCENT, SPONSOR_SOFT, SponsoredIcon } from './sponsor-ui';
 import { VenueDrawing } from './stadium-map';
 import type { Facility } from './types';
@@ -33,7 +33,6 @@ const HIT = 44;
 const HIT_BUTTONS = 44 + 8;
 /** The source bar across the map's top edge. */
 const SOURCE_BAR = 40;
-const ZOOM_STEP = 1.6;
 const DOUBLE_TAP_ZOOM = 2;
 const TIMING = { duration: 320 };
 /** Fits keep pins below the source bar and left of the zoom buttons. */
@@ -137,9 +136,10 @@ export function VenueMapView(props: VenueMapViewProps) {
     onPinPress(f);
   };
 
+  // Clamped like the gestures (reach), so a pin lifted clear of the card stays clear.
   const zoomBy = (factor: number) => {
     moved.set(true);
-    go(zoomAt(current(), factor, { x: width / 2, y: viewport.h / 2 }, content, viewport));
+    go(zoomStep(current(), factor, content, reach));
   };
 
   const pan = usePanGesture({

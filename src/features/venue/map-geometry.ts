@@ -99,6 +99,17 @@ export function zoomAt(view: MapView, factor: number, at: MapPoint, content: Box
   return clampView({ s, x: at.x - (at.x - view.x) * k, y: at.y - (at.y - view.y) * k }, content, viewport);
 }
 
+/** How much one press of the map's + button zooms in (− zooms out by 1 / ZOOM_STEP). */
+export const ZOOM_STEP = 1.6;
+
+/**
+ * A +/− button press: zooms about the middle of the viewport, clamped to the same box as pan, pinch
+ * and the wheel (`reach`, with the pin card's inset), so a pin lifted clear of the card stays clear.
+ */
+export function zoomStep(view: MapView, factor: number, content: Box, reach: Box): MapView {
+  return zoomAt(view, factor, { x: reach.w / 2, y: reach.h / 2 }, content, reach);
+}
+
 /** How long after a pan ends a press still counts as part of it (web fires the click on release). */
 export const PAN_PRESS_GRACE_MS = 250;
 

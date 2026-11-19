@@ -12,6 +12,8 @@ import {
   minScale,
   PAN_PRESS_GRACE_MS,
   zoomAt,
+  zoomStep,
+  ZOOM_STEP,
 } from '../map-geometry';
 import { getFacility, getVenue } from '../mock';
 import { mapAspect, venueMapFor } from '../venue-maps';
@@ -53,5 +55,23 @@ describe('map behaviour', () => {
     // It only went as far as the card's top edge allows.
     expect(update!.view).toEqual(clampView(update!.view, content, { ...viewport, inset: card }));
     expect(centreOn(pin, { x: 195, y: room.h / 2 }, view, content, viewport).y).toBeGreaterThan(update!.view.y);
+  });
+
+  it('keeps a lifted pin clear of the card after a +/− button zoom, as pan and pinch do', () => {
+    const content = contentSize(mapAspect(intuitMap), 390, IMAGE_ZOOM_OUT_SLACK);
+    const viewport = { w: 390, h: 510 };
+    const fit = { rect: intuitMap.focus, max: 6, pad: 24, insets: { top: 48, right: 52 } };
+    const view = fitRect(fit.rect, content, viewport, fit.pad, fit.max, fit.insets);
+    const pin = f('first-aid-terrace');
+    const card = 104;
+    const room = { w: 390, h: viewport.h - card };
+    const layout = { key: 'focus', vh: 510, w: 390, reveal: null };
+    const lifted = mapUpdate({ prev: layout, next: { ...layout, reveal: pin.id }, moved: false, view, content, viewport, fit, revealPin: pin, revealInset: card })!.view;
+    const reach = { ...viewport, inset: card }; // what the gestures clamp to while the card shows
+    const out = zoomStep(lifted, 1 / ZOOM_STEP, content, reach);
+    expect(isVisible(pin, content, out, room, 32)).toBe(true);
+    expect(out).toEqual(clampView(out, content, reach));
+    // Clamped to the viewport without the card's inset (the old − button), it sank back under the card.
+    expect(isVisible(pin, content, zoomAt(lifted, 1 / ZOOM_STEP, { x: 195, y: 255 }, content, viewport), room, 32)).toBe(false);
   });
 });
