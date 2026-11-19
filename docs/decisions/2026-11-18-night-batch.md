@@ -86,3 +86,13 @@ From the three vetters' brief (pins, facts, demo walkthrough). Decisions:
 - Contact: Intuit Dome's event-day text line +1 310-282-5779 (FAQ), so "Text venue staff" shows in the emergency dialog, as it does for SoFi.
 
 Left: ru "Отзывы" → "Сообщения" (about 12 ru strings call reports "отзыв", so renaming one would be inconsistent; needs a native pass). Also left: scrolling a selected chip at the row's end into view, and a pin under the − button when zoomed in. Sensory Room keeps the wheelchair icon and Infant Care the restroom icon, and routes stay straight lines through the bowl.
+
+## Demo review fixes (branch jayden/demo-review-fixes)
+From the code review of the sponsors + Intuit Dome map merge. Decisions:
+- Ads never answer accessibility or safety: a sponsored stand matches search only on its name, brand, offer, description and food words, never tag or "wheelchair" words, and only the Food & Drinks chip (not Accessibility). Its page keeps the wheelchair badge. Search "wheelchair" → no Sponsored card or rows; "drinks", "egg roll", "Panda" still find stands.
+- No reports on a paid listing: a stand's page has no Reports block or Add report, and `/reports/new` for a stand reads "not found".
+- Unpublished spots (Elevators, Sensory Room) have no "I'm here" and aren't in the "Where are you?" picker (`isMeetSpot`, `meetSpotsFor`). One saved before this is dropped on load, keeping the venue ("I'm not sure"); requests already sent keep naming it.
+- Kept the Food & Drinks chip on the venue screen, though at Intuit Dome it lists only the two stands (each marked Sponsored): it is how the demo shows them. Fixed the comment that said the chip was gone. Revisit once real food stands are listed.
+- One walk everywhere: the promoted card and the waiting banner use the list's walk (`walkTo`) and its wording (`walkLabel`), so after "I'm here" at First Aid Terrace the card says 5 min, not 1. The card stays first while browsing, as before.
+- +/− zoom clamps like pan and pinch, so a pin lifted clear of the pin card stays clear. The start spot reads "Walks start here" / "You're here" before "Spot not published".
+- The list finds the walk start once per render and caches each facility's search text per language.
