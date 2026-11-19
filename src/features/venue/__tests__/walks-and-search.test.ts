@@ -4,7 +4,7 @@ import i18n from '@/i18n';
 import { resources } from '@/i18n/locales';
 
 import { categoriesAt, CATEGORIES } from '../categories';
-import { routeFor, routeStart, walkFromStart, walkOrder } from '../directions';
+import { routeFor, routeStart, walkFrom, walkFromStart, walkOrder } from '../directions';
 import { categoryLabel, facilityMeta, withoutFinalStop } from '../labels';
 import { pinsFor } from '../map-geometry';
 import { facilitiesFor, getFacility, getVenue, matchesCategory, searchFacilities } from '../mock';
@@ -42,6 +42,19 @@ describe('search', () => {
   it('still lists everything for an empty search', () => {
     expect(searchFacilities(intuit, '  ', null)).toHaveLength(intuit.length);
   });
+
+  it('builds each facility\'s search text once per language, not again on every keystroke', () => {
+    const es = i18n.getFixedT('es', 'venue');
+    let calls = 0;
+    const counted = Object.assign(((...args: Parameters<typeof es>) => { calls += 1; return es(...args); }) as typeof es, { lng: 'es' });
+    const fresh = intuit.map(x => ({ ...x })); // not yet searched
+    expect(ids(searchFacilities(fresh, 'r', null, counted)).length).toBeGreaterThan(0);
+    expect(calls).toBeGreaterThan(0);
+    calls = 0;
+    expect(ids(searchFacilities(fresh, categoryLabel('restroom', es), null, counted))).toEqual(['infant-care-room', 'infant-care-terrace']);
+    expect(ids(searchFacilities(fresh, 'rampa', null, counted))).toEqual(ids(searchFacilities(intuit, 'rampa', null, es)));
+    expect(calls).toBe(0);
+  });
 });
 
 describe('category chips', () => {
@@ -78,6 +91,13 @@ describe('walk times', () => {
           expect({ id: to.id, walk }).toEqual({ id: to.id, walk: { kind: 'walk', minutes: route!.walk.minutes } });
         }
       }
+    }
+  });
+
+  it('gives the same walks from a start found once (the venue screen\'s walkTo)', () => {
+    for (const where of [nowhere, { venueId: 'intuit-dome', facilityId: 'first-aid-terrace' }]) {
+      const start = routeStart(intuitMap, intuit, where, 'intuit-dome');
+      for (const to of intuit) expect({ id: to.id, walk: walkFrom(intuitMap, start, to) }).toEqual({ id: to.id, walk: walkFromStart(intuitMap, intuit, where, 'intuit-dome', to) });
     }
   });
 

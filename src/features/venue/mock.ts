@@ -10,6 +10,8 @@
  * - `walkMinutes` and `wait` are stand-ins for live data, e.g. a gate is a "Long wait" before doors.
  * - `accessible` = the guide says it's step-free or reachable by the venue's elevators/ramp.
  */
+import { languageOf } from '@/i18n';
+
 import { categoryLabel, eventsLabel, facilityDescription, facilityLocation, facilityName, facilityOffer, tagLabel, venueT, type VenueT } from './labels';
 import type { Facility, FacilityCategory, Venue } from './types';
 
@@ -432,6 +434,19 @@ function searchText(f: Facility, t: VenueT, en: VenueT): string {
   return searchKey(`${f.name} ${f.description} ${f.location} ${facilityName(f, t)} ${facilityDescription(f, t)} ${facilityLocation(f, t)} ${labels.join(' ')}`);
 }
 
+// Each facility's search text per language, built on its first search: the list searches again on
+// every keystroke. Facilities are the same objects every call (facilitiesFor, venueFacilitiesFor).
+const searchTexts = new WeakMap<Facility, Map<string, string>>();
+
+function cachedSearchText(f: Facility, t: VenueT, en: VenueT): string {
+  let texts = searchTexts.get(f);
+  if (!texts) searchTexts.set(f, (texts = new Map()));
+  const language = languageOf(t);
+  let text = texts.get(language);
+  if (text === undefined) texts.set(language, (text = searchText(f, t, en)));
+  return text;
+}
+
 /**
  * Matches name, description, location, category and tag labels, in English and in `t`'s language
  * (see searchKey), so "restroom" finds the infant care room and "wheelchair" an escort desk.
@@ -439,11 +454,11 @@ function searchText(f: Facility, t: VenueT, en: VenueT): string {
  */
 export function searchFacilities(facilities: Facility[], query: string, category: FacilityCategory | null, t: VenueT = venueT()): Facility[] {
   const words = searchWords(query);
+  if (!words.length) return facilities.filter(f => matchesCategory(f, category));
   const en = venueT('en');
   return facilities.filter(f => {
     if (!matchesCategory(f, category)) return false;
-    if (!words.length) return true;
-    const hay = searchText(f, t, en);
+    const hay = cachedSearchText(f, t, en);
     return words.every(w => hay.includes(w));
   });
 }

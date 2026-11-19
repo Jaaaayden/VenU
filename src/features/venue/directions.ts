@@ -67,7 +67,14 @@ export function routeFor(
  * e.g. walkFromStart(intuitMap, intuitFacilities, nowhere, 'intuit-dome', mainEntrance) → { kind: 'start' }
  */
 export function walkFromStart(map: VenueMap, facilities: Facility[], where: WhereAmI, venueId: string, to: Facility): FacilityWalk | null {
-  const start = routeStart(map, facilities, where, venueId);
+  return walkFrom(map, routeStart(map, facilities, where, venueId), to);
+}
+
+/**
+ * walkFromStart with the start already found (routeStart), for a screen that measures many
+ * facilities from the same start: find it once per render, not once per facility.
+ */
+export function walkFrom(map: VenueMap, start: ReturnType<typeof routeStart>, to: Facility): FacilityWalk | null {
   // The start first: it reads "Walks start here" / "You're here" even if its own pin is a placeholder.
   if (start && start.from.id === to.id) return { kind: start.mine ? 'mine' : 'start' };
   if (to.approximate) return { kind: 'ask' };

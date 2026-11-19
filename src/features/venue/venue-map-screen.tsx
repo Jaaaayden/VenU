@@ -20,7 +20,7 @@ import { useT } from '@/i18n';
 import { categoriesAt } from './categories';
 import { CategoryChips } from './category-chips';
 import { useWhereAmI } from './current';
-import { routeFor, walkFromStart, type Route } from './directions';
+import { routeFor, routeStart, walkFrom, type Route } from './directions';
 import type { FacilityWalk } from './labels';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { PinCard } from './pin-card';
@@ -122,7 +122,9 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
     setRouteState(id);
     if (id) setCardState(null);
   };
-  const walkTo = (f: Facility) => walkFromStart(map, facilities, where, venue.id, f);
+  // Where walks start, found once per render: the list measures every facility from it.
+  const walkStart = routeStart(map, facilities, where, venue.id);
+  const walkTo = (f: Facility) => walkFrom(map, walkStart, f);
 
   const tabClearance = NAV_BAR_CLEARANCE - 24 + Math.max(insets.bottom, 0);
   const positions = useMemo(() => snapPositions(box.h, tabClearance), [box.h, tabClearance]);
