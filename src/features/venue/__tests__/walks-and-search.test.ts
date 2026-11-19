@@ -47,7 +47,8 @@ describe('search', () => {
   it('builds each facility\'s search text once per language, not again on every keystroke', () => {
     const es = i18n.getFixedT('es', 'venue');
     let calls = 0;
-    const counted = Object.assign(((...args: Parameters<typeof es>) => { calls += 1; return es(...args); }) as typeof es, { lng: 'es' });
+    const call = es as unknown as (...args: unknown[]) => string;
+    const counted = Object.assign((...args: unknown[]) => { calls += 1; return call(...args); }, { lng: 'es' }) as unknown as typeof es;
     const fresh = intuit.map(x => ({ ...x })); // not yet searched
     expect(ids(searchFacilities(fresh, 'r', null, counted)).length).toBeGreaterThan(0);
     expect(calls).toBeGreaterThan(0);
