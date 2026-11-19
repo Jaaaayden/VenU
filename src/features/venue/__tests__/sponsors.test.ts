@@ -6,7 +6,7 @@ import i18n, { type UiLanguage } from '@/i18n';
 import { resources } from '@/i18n/locales';
 
 import { categoriesAt } from '../categories';
-import { routeFor } from '../directions';
+import { nearestFirst, routeFor, walkFromStart } from '../directions';
 import { facilityDescription, facilityLocation, facilityMeta, facilityName, facilityOffer, walkLabel } from '../labels';
 import { facilitiesFor, getFacility, getVenue, searchFacilities, VENUES } from '../mock';
 import { facilityListLayout, featuredStandFor, isSponsored, sponsoredStandsFor, takesReports, venueFacilitiesFor, waitingBannerFor } from '../sponsors';
@@ -145,8 +145,18 @@ describe('facilityListLayout (the promoted card)', () => {
   const all = venueFacilitiesFor(venueId);
   const featured = featuredStandFor(venueId)!;
   const en = i18n.getFixedT('en', 'venue');
-  const layout = (query: string, category: Parameters<typeof searchFacilities>[2]) =>
-    facilityListLayout(searchFacilities(all, query, category, en).sort((a, b) => a.walkMinutes - b.walkMinutes), featured, query, category);
+  const map = venueMapFor(venueOf(venueId));
+  // In the list's own order (FacilityList): nearestFirst by the screen's walkTo.
+  const layout = (query: string, category: Parameters<typeof searchFacilities>[2], where = { venueId, facilityId: null as string | null }) =>
+    facilityListLayout(nearestFirst(searchFacilities(all, query, category, en), f => walkFromStart(map, all, where, venueId, f)).map(r => r.f), featured, query, category);
+
+  it('orders the rows by the walk from the visitor\'s spot, as the list does', () => {
+    expect(layout('', null).rows[0].id).toBe('main-entrance'); // walks start here
+    const far = layout('', null, { venueId, facilityId: 'first-aid-terrace' });
+    expect(far.rows[0].id).toBe('first-aid-terrace'); // you're here
+    expect(far.rows.slice(-2).map(f => f.id).sort()).toEqual(['elevators', 'sensory-room']); // spots not published last
+    expect(layout('stand', null, { venueId, facilityId: 'first-aid-terrace' })).toMatchObject({ promoted: featured, promotedAt: 1 });
+  });
 
   it('puts one card first while browsing "All", and leaves the stand out of the rows', () => {
     const l = layout('', null);

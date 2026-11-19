@@ -11,7 +11,7 @@ import { useT } from '@/i18n';
 
 import { FacilityRow } from './cards';
 import { emptyFacilitiesMessage } from './categories';
-import { walkOrder } from './directions';
+import { nearestFirst } from './directions';
 import { categoryLabel } from './labels';
 import { searchFacilities } from './mock';
 import { PromotedCard } from './sponsor-ui';
@@ -25,9 +25,7 @@ export function FacilityList() {
   const { venue, facilities, category, setCategory, snap, setSnap, setFreshReport, walkTo } = useVenueScreen();
   const [query, setQuery] = useState('');
   // Nearest first, by the same walk the route panel shows (from the visitor's spot or the way in).
-  const results = searchFacilities(facilities, query, category, t)
-    .map(f => ({ f, walk: walkTo(f) }))
-    .sort((a, b) => walkOrder(a.walk) - walkOrder(b.walk));
+  const results = nearestFirst(searchFacilities(facilities, query, category, t), walkTo);
   const walks = new Map(results.map(r => [r.f.id, r.walk]));
   const { rows, promoted, promotedAt } = facilityListLayout(results.map(r => r.f), featuredStandFor(venue.id), query, category);
   const open = (f: Facility) => {

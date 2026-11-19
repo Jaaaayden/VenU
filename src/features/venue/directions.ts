@@ -87,3 +87,11 @@ export function walkOrder(w: FacilityWalk | null): number {
   if (!w) return Number.MAX_SAFE_INTEGER;
   return w.kind === 'walk' ? w.minutes : w.kind === 'ask' ? Number.MAX_SAFE_INTEGER - 1 : -1;
 }
+
+/**
+ * The facility list's order: each facility with its walk (`walkOf`, the screen's walkTo), nearest
+ * first by walkOrder; equal walks keep their order.
+ */
+export function nearestFirst(facilities: Facility[], walkOf: (f: Facility) => FacilityWalk | null): { f: Facility; walk: FacilityWalk | null }[] {
+  return facilities.map(f => ({ f, walk: walkOf(f) })).sort((a, b) => walkOrder(a.walk) - walkOrder(b.walk));
+}
