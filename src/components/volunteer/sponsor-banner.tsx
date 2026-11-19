@@ -14,12 +14,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FigmaIcon } from '@/components/icons/figma-icon';
 import { Colors, Face, Fonts, Radius, Spacing } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
-import { facilityName, facilityOffer } from '@/features/venue/labels';
+import { facilityName, facilityOffer, walkLabel } from '@/features/venue/labels';
 import { SPONSOR_ACCENT, SPONSOR_SOFT, SponsoredIcon, SponsoredTag } from '@/features/venue/sponsor-ui';
 import { waitingBannerFor } from '@/features/venue/sponsors';
 import { useVolunteerRequest } from '@/features/volunteer/request-store';
-import { languageOf, useT } from '@/i18n';
-import { formatNumber } from '@/i18n/format';
+import { useT } from '@/i18n';
 
 // Requests whose banner was closed, for this visit: leaving for the stand and coming back keeps it closed.
 const dismissed = new Set<string>();
@@ -32,10 +31,10 @@ export function SponsorBanner() {
   const banner = waitingBannerFor({ role: profile?.role, status, location: request?.location });
   if (!banner || !request || closed) return null;
 
-  const { stand, minutes } = banner;
+  const { stand } = banner;
   const name = facilityName(stand, t);
   const offer = facilityOffer(stand, t);
-  const walk = t('walk', { count: minutes, number: formatNumber(minutes, undefined, languageOf(t)) });
+  const walk = walkLabel(banner.walk, t); // worded as on the list, the pin card and the stand's page
   const close = () => {
     dismissed.add(request.id);
     setClosed(true);

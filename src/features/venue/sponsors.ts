@@ -19,7 +19,8 @@
  * `walkMinutes` is the walk from the venue's main way in (its map's `arrival`), so the list, the
  * stand's page and its route agree; `wait` is a stand-in, as in ./mock.ts.
  */
-import { routeFor } from './directions';
+import { walkFromStart } from './directions';
+import type { FacilityWalk } from './labels';
 import { facilitiesFor, getVenue } from './mock';
 import type { Facility, FacilityCategory, FacilitySponsor } from './types';
 import { venueMapFor } from './venue-maps';
@@ -140,8 +141,8 @@ export function facilityListLayout(results: Facility[], featured: SponsoredStand
 
 export interface WaitingBanner {
   stand: SponsoredStand;
-  /** The walk from where the visitor said they are (or the venue's main way in). */
-  minutes: number;
+  /** The walk from where the visitor said they are (or the venue's main way in), as walkTo gives it. */
+  walk: FacilityWalk;
 }
 
 /**
@@ -149,7 +150,7 @@ export interface WaitingBanner {
  * a venue with a featured stand. Every other screen and state (volunteers, matched, chat, feedback,
  * the emergency dialog) gets null.
  * e.g. ({ role: 'visitor', status: 'searching', location: { venueId: 'intuit-dome', facilityId: null } })
- *      → Coca-Cola Refresh Stand, 2 min from the Main Entrance
+ *      → Coca-Cola Refresh Stand, { kind: 'walk', minutes: 1 } from the Main Entrance
  */
 export function waitingBannerFor(state: {
   role: string | null | undefined;
@@ -161,6 +162,6 @@ export function waitingBannerFor(state: {
   const venue = getVenue(venueId);
   const stand = featuredStandFor(venueId);
   if (!venue || !stand) return null;
-  const route = routeFor(venueMapFor(venue), venueFacilitiesFor(venueId), { venueId, facilityId }, venueId, stand.id);
-  return { stand, minutes: route?.walk.minutes ?? stand.walkMinutes };
+  const walk = walkFromStart(venueMapFor(venue), venueFacilitiesFor(venueId), { venueId, facilityId }, venueId, stand);
+  return { stand, walk: walk ?? { kind: 'walk', minutes: stand.walkMinutes } };
 }

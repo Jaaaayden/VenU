@@ -7,7 +7,7 @@ import { resources } from '@/i18n/locales';
 
 import { categoriesAt } from '../categories';
 import { routeFor } from '../directions';
-import { facilityDescription, facilityLocation, facilityName, facilityOffer } from '../labels';
+import { facilityDescription, facilityLocation, facilityMeta, facilityName, facilityOffer, walkLabel } from '../labels';
 import { facilitiesFor, getFacility, getVenue, searchFacilities, VENUES } from '../mock';
 import { facilityListLayout, featuredStandFor, isSponsored, sponsoredStandsFor, takesReports, venueFacilitiesFor, waitingBannerFor } from '../sponsors';
 import { mapAspect, venueMapFor } from '../venue-maps';
@@ -224,9 +224,22 @@ describe('waitingBannerFor (the waiting-screen ad slot)', () => {
   it('shows the venue’s featured stand to a visitor whose request is searching, with the walk to it', () => {
     const banner = waitingBannerFor({ role: 'visitor', status: 'searching', location });
     expect(banner?.stand).toBe(featuredStandFor('intuit-dome'));
-    expect(banner?.minutes).toBe(1);
+    expect(banner?.walk).toEqual({ kind: 'walk', minutes: 1 });
     // From a spot the visitor set (First Aid Terrace, at the south end), the walk is longer.
-    expect(waitingBannerFor({ role: 'visitor', status: 'searching', location: { venueId: 'intuit-dome', facilityId: 'first-aid-terrace' } })?.minutes).toBeGreaterThan(1);
+    const far = waitingBannerFor({ role: 'visitor', status: 'searching', location: { venueId: 'intuit-dome', facilityId: 'first-aid-terrace' } })?.walk;
+    expect(far).toEqual({ kind: 'walk', minutes: expect.any(Number) });
+    expect((far as { minutes: number }).minutes).toBeGreaterThan(1);
+  });
+
+  it('words its walk with the same helper as the list, the pin card and the stand’s page', () => {
+    const en = i18n.getFixedT('en', 'venue');
+    const stand = featuredStandFor('intuit-dome')!;
+    const walk = waitingBannerFor({ role: 'visitor', status: 'searching', location })!.walk;
+    expect(walkLabel(walk, en)).toBe('1 min walk');
+    expect(facilityMeta(stand, en, walk)).toBe(`${walkLabel(walk, en)} · Short wait`);
+    expect(walkLabel({ kind: 'start' }, en)).toBe('Walks start here');
+    expect(walkLabel({ kind: 'mine' }, en)).toBe('You’re here');
+    expect(walkLabel({ kind: 'walk', minutes: 3 }, i18n.getFixedT('fa', 'venue'))).toContain('۳');
   });
 
   it('shows nothing anywhere else: volunteers, other request steps, no request, unknown venues', () => {

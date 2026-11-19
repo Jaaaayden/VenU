@@ -88,16 +88,21 @@ export function echoQuery(query: string): string {
 export type FacilityWalk = { kind: 'walk'; minutes: number } | { kind: 'start' | 'mine' | 'ask' };
 
 /**
- * "3 min walk · Short wait"; the number in the language's digits ("۳ دقیقه پیاده‌روی" in Persian).
- * With a `walk`, the first part says that walk ("Walks start here", "Spot not published"); without
- * one it falls back to the facility's stand-in walkMinutes.
+ * A walk as every screen words it: "3 min walk" (in the language's digits: "۳ دقیقه پیاده‌روی"),
+ * "Walks start here", "You're here" or "Spot not published".
  */
-export function facilityMeta(f: Facility, t: VenueT = venueT(), walk?: FacilityWalk | null): string {
-  const w: FacilityWalk = walk ?? { kind: 'walk', minutes: f.walkMinutes };
-  const first = w.kind === 'walk'
+export function walkLabel(w: FacilityWalk, t: VenueT = venueT()): string {
+  return w.kind === 'walk'
     ? t('walk', { count: w.minutes, number: formatNumber(w.minutes, undefined, languageOf(t)) })
     : t(w.kind === 'start' ? 'walkStart' : w.kind === 'mine' ? 'walkMine' : 'walkAsk');
-  return `${first} · ${t(`wait.${f.wait}`)}`;
+}
+
+/**
+ * "3 min walk · Short wait": the walk (see walkLabel), then the wait. Without a `walk` it falls
+ * back to the facility's stand-in walkMinutes.
+ */
+export function facilityMeta(f: Facility, t: VenueT = venueT(), walk?: FacilityWalk | null): string {
+  return `${walkLabel(walk ?? { kind: 'walk', minutes: f.walkMinutes }, t)} · ${t(`wait.${f.wait}`)}`;
 }
 
 /**
