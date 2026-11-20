@@ -24,6 +24,7 @@ import { routeFor, routeStart, walkFrom, type Route } from './directions';
 import type { FacilityWalk } from './labels';
 import { boundsOf, FIT_MAX_SCALE, MAX_SCALE, pinsFor, type MapRect } from './map-geometry';
 import { PinCard } from './pin-card';
+import { pinPressAction } from './pin-press';
 import { snapPositions, type SheetSnap } from './sheet';
 import { venueFacilitiesFor } from './sponsors';
 import { MAP_BACKGROUND, SHEET_HANDLE } from './stadium-map';
@@ -210,8 +211,12 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
       ? { key: `chip:${category}`, rect: chipBounds, max: FIT_MAX_SCALE }
       : { key: 'focus', rect: map.focus, max: MAX_SCALE };
 
-  // A pin shows its card; the card opens the facility in the sheet.
-  const showCard = (f: Facility) => {
+  // From the list, a pin shows its card and the card opens the facility in the sheet. With a
+  // facility open, another pin opens straight away (./pin-press.ts).
+  const pressPin = (f: Facility) => {
+    const action = pinPressAction(facilityId, f.id);
+    if (action === 'open') openFacility(f);
+    if (action !== 'card') return;
     setCardId(f.id);
     setSnap(s => (s === 'up' ? 'mid' : s)); // room above the sheet for the card
   };
@@ -270,7 +275,7 @@ export function VenueMapScreen({ venue }: { venue: Venue }) {
                 fitMax={fit.max}
                 revealId={cardId ?? facilityId}
                 revealInset={card ? MAP_CARD_SPACE : 0}
-                onPinPress={showCard}>
+                onPinPress={pressPin}>
                 {card ? <PinCard facility={card} walk={walkTo(card)} onOpen={() => openFacility(card)} onClose={() => setCardId(null)} /> : null}
               </VenueMapView>
 
