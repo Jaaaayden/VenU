@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/button';
 import { StepHeader } from '@/components/form-section';
+import { LoadingScreen } from '@/components/loading-screen';
 import { BackLink } from '@/components/top-bar';
 import { Colors, Radius, Spacing, Type } from '@/constants/theme';
 import { useProfile } from '@/features/profile/profile-context';
@@ -40,7 +41,7 @@ export default function EditProfileScreen() {
     else goBack('/profile');
   }
 
-  if (status === 'loading') return null; // e.g. a web reload straight onto /edit-profile
+  if (status === 'loading') return <LoadingScreen />; // e.g. a web reload straight onto /edit-profile
   if (!profile || !initial) return <Redirect href="/" />;
 
   return (
